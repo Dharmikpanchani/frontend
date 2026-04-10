@@ -35,7 +35,6 @@ export default function Section() {
   const navigate = useNavigate();
   const { sections, total, loading, actionLoading } = useSelector((state: RootState) => state.SectionReducer);
   const { classes } = useSelector((state: RootState) => state.ClassReducer);
-  const { selectedSchool } = useSelector((state: RootState) => state.SchoolReducer);
   const { hasPermission, hasAnyPermission } = usePermissions();
 
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -76,9 +75,7 @@ export default function Section() {
   };
 
   const handleGetData = (searchQuery?: string, filters?: any) => {
-    if (!selectedSchool?._id) return;
     dispatch(getSections({
-      schoolId: selectedSchool._id,
       page: currentPage + 1,
       perPage: rowsPerPage > 0 ? rowsPerPage : 10,
       search: searchQuery?.trim() ?? searchNameValue.trim(),
@@ -88,14 +85,12 @@ export default function Section() {
   };
 
   useEffect(() => {
-    if (selectedSchool?._id) {
-      dispatch(getClasses({ schoolId: selectedSchool._id, type: "filter" }) as any);
-    }
-  }, [dispatch, selectedSchool?._id]);
+    dispatch(getClasses({ type: "filter" }) as any);
+  }, [dispatch]);
 
   useEffect(() => {
     handleGetData(searchNameValue);
-  }, [currentPage, rowsPerPage, selectedSchool?._id]);
+  }, [currentPage, rowsPerPage]);
 
   const handleApplyFilter = (values: any) => {
     setFilterValues(values);
@@ -122,7 +117,7 @@ export default function Section() {
       handleGetData(query);
       setCurrentPage(0);
     }, 1000),
-    [selectedSchool?._id]
+    []
   );
 
   return (

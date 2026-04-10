@@ -2,7 +2,8 @@ import { useLocation, Link } from "react-router-dom";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import {
-  Box, Button, List, ListItem, Collapse
+  Box, Button, List, ListItem, Collapse,
+  Typography
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import Svg from "@/assets/Svg";
@@ -63,14 +64,14 @@ export default function Sidebar(props: any) {
     {
       title: "Roles",
       pathName: "/role-list",
-      icon: Png.roleIcon,
+      icon: Svg.roleIcon,
       show: hasPermission(schoolAdminPermission.role.read),
       menuHighlight: ["role-list"],
     },
     {
       title: "Admin User",
       pathName: "/admin-list",
-      icon: Png.userListIcon,
+      icon: Svg.userList,
       show: hasPermission(schoolAdminPermission.admin_user.read),
       menuHighlight: ["admin-list"],
     },
@@ -80,35 +81,35 @@ export default function Sidebar(props: any) {
     {
       title: "Teachers",
       pathName: "/teacher",
-      icon: Png.userListIcon,
+      icon: Svg.userList,
       show: hasPermission(schoolAdminPermission.teacher.read),
       menuHighlight: ["teacher"],
     },
     {
       title: "Department",
       pathName: "/master/department",
-      icon: Png.roleIcon,
+      icon: Svg.roleIcon,
       show: hasPermission(schoolAdminPermission.department.read),
       menuHighlight: ["department"],
     },
     {
       title: "Subject",
       pathName: "/master/subject",
-      icon: Png.roleIcon,
+      icon: Svg.latestUpdate,
       show: hasPermission(schoolAdminPermission.subject.read),
       menuHighlight: ["subject"],
     },
     {
       title: "Class",
       pathName: "/master/class",
-      icon: Png.roleIcon,
+      icon: Svg.brand,
       show: hasPermission(schoolAdminPermission.class.read),
       menuHighlight: ["class"],
     },
     {
       title: "Section",
       pathName: "/master/section",
-      icon: Png.roleIcon,
+      icon: Svg.filter,
       show: hasPermission(schoolAdminPermission.section.read),
       menuHighlight: ["section"],
     },
@@ -139,7 +140,7 @@ export default function Sidebar(props: any) {
     {
       title: "Dashboard",
       pathName: "/dashboard",
-      icon: Png.dashboardIcon,
+      icon: Svg.dashboard,
       show: hasPermission(schoolAdminPermission.dashboard.read),
       menuHighlight: ["dashboard"],
     },
@@ -167,13 +168,17 @@ export default function Sidebar(props: any) {
       <Box className="admin-sidebar-inner-main">
         {/* Logo Section */}
         <Box className="admin-sidebar-logo-main">
-          <Link to={"/dashboard"} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textDecoration: 'none' }}>
-            <img
-              src={import.meta.env.VITE_BASE_URL_IMAGE + "/" + adminDetails?.schoolData?.logo || Png.logoImg}
-              className="admin-logo"
-              alt="logo"
-              style={{ display: 'block', height: '40px', width: '40px', borderRadius: '20px' }}
-            />
+          <Link to={"/dashboard"} className="admin-sidebar-logo-container">
+            <Box className="admin-logo-wrapper">
+              <img
+                src={import.meta.env.VITE_BASE_URL_IMAGE + "/" + adminDetails?.schoolData?.logo || Png.logoImg}
+                className="admin-logo"
+                alt="logo"
+              />
+            </Box>
+            <Typography variant="h6" className="admin-school-name">
+              {adminDetails?.schoolData?.schoolName || "School Pro"}
+            </Typography>
           </Link>
           <Button
             onClick={(e) => {
@@ -245,7 +250,7 @@ export default function Sidebar(props: any) {
                     onClick={handleClickRoleManagement}
                   >
                     <img
-                      src={Png.roleIcon}
+                      src={Svg.roleIcon}
                       alt="Admin"
                       className="admin-sidebar-icons"
                     />
@@ -323,7 +328,7 @@ export default function Sidebar(props: any) {
                     onClick={handleClickMasterManagement}
                   >
                     <img
-                      src={Png.roleIcon}
+                      src={Svg.brand}
                       alt="Master"
                       className="admin-sidebar-icons"
                     />
@@ -401,7 +406,7 @@ export default function Sidebar(props: any) {
                     onClick={handleClickCmsManagement}
                   >
                     <img
-                      src={Png.cmsIcon || Png.roleIcon}
+                      src={Svg.cms}
                       alt="CMS"
                       className="admin-sidebar-icons"
                     />

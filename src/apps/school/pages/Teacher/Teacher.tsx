@@ -27,16 +27,13 @@ export default function Teacher() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { teachers, total, loading } = useSelector((state: RootState) => state.TeacherReducer);
-  const { selectedSchool } = useSelector((state: RootState) => state.SchoolReducer);
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchNameValue, setSearchNameValue] = useState<string>("");
 
   const handleGetData = (searchQuery?: string) => {
-    if (!selectedSchool?._id) return;
     dispatch(getTeachers({
-      schoolId: selectedSchool._id,
       page: currentPage + 1,
       perPage: rowsPerPage > 0 ? rowsPerPage : 10,
       search: searchQuery?.trim() ?? searchNameValue.trim(),
@@ -45,14 +42,14 @@ export default function Teacher() {
 
   useEffect(() => {
     handleGetData(searchNameValue);
-  }, [currentPage, rowsPerPage, selectedSchool?._id]);
+  }, [currentPage, rowsPerPage]);
 
   const debouncedCallGetApi = useCallback(
     debounce((query?: string) => {
       handleGetData(query);
       setCurrentPage(0);
     }, 1000),
-    [selectedSchool?._id]
+    []
   );
 
   return (

@@ -30,7 +30,6 @@ import { labelSx, inputSx } from "@/utils/styles/commonSx";
 export default function AddEditTeacher() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { selectedSchool } = useSelector((state: RootState) => state.SchoolReducer);
     const { departments } = useSelector((state: RootState) => state.DepartmentReducer);
     const { subjects } = useSelector((state: RootState) => state.SubjectReducer);
     const { classes } = useSelector((state: RootState) => state.ClassReducer);
@@ -38,14 +37,12 @@ export default function AddEditTeacher() {
     const { actionLoading } = useSelector((state: RootState) => state.TeacherReducer);
 
     useEffect(() => {
-        if (selectedSchool?._id) {
-            const params = { schoolId: selectedSchool._id, page: 1, perPage: 100 };
-            dispatch(getDepartments(params) as any);
-            dispatch(getSubjects(params) as any);
-            dispatch(getClasses(params) as any);
-            dispatch(getSections(params) as any);
-        }
-    }, [dispatch, selectedSchool?._id]);
+        const params = { page: 1, perPage: 100 };
+        dispatch(getDepartments(params) as any);
+        dispatch(getSubjects(params) as any);
+        dispatch(getClasses(params) as any);
+        dispatch(getSections(params) as any);
+    }, [dispatch]);
 
     const initialValues = {
         name: "",
@@ -59,13 +56,8 @@ export default function AddEditTeacher() {
 
 
     const handleSubmit = async (values: any) => {
-        if (!selectedSchool?._id) return;
-        
         try {
-            const resultAction = await dispatch(createTeacher({
-                ...values,
-                schoolId: selectedSchool._id
-            }) as any);
+            const resultAction = await dispatch(createTeacher(values) as any);
             
             if (createTeacher.fulfilled.match(resultAction)) {
                 navigate("/teacher");

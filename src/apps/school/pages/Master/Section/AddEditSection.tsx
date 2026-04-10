@@ -31,7 +31,6 @@ export default function AddEditSection() {
     const isView = pathname.includes("/view/");
     const isEdit = pathname.includes("/edit/");
 
-    const { selectedSchool } = useSelector((state: RootState) => state.SchoolReducer);
     const { classes } = useSelector((state: RootState) => state.ClassReducer);
     const { actionLoading, loading, selectedSection } = useSelector((state: RootState) => state.SectionReducer);
 
@@ -42,14 +41,12 @@ export default function AddEditSection() {
     });
 
     useEffect(() => {
-        if (selectedSchool?._id) {
-            dispatch(getClasses({ schoolId: selectedSchool._id, type: "filter" }) as any);
-        }
+        dispatch(getClasses({ type: "filter" }) as any);
 
         if (id) {
             dispatch(getSectionById(id) as any);
         }
-    }, [dispatch, id, selectedSchool?._id]);
+    }, [dispatch, id]);
 
     useEffect(() => {
         if (id && selectedSection && (isEdit || isView)) {
@@ -62,13 +59,8 @@ export default function AddEditSection() {
     }, [id, selectedSection, isEdit, isView]);
 
     const handleSubmit = async (values: any) => {
-        if (!selectedSchool?._id) return;
-        
         try {
-            const resultAction = await dispatch(addEditSection({
-                ...values,
-                schoolId: selectedSchool._id
-            }) as any);
+            const resultAction = await dispatch(addEditSection(values) as any);
             
             if (addEditSection.fulfilled.match(resultAction)) {
                 navigate("/master/section");
