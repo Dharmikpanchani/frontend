@@ -1,0 +1,14 @@
+@media (max-width: 1249px) {}
+
+@media (max-width: 1023px) {}
+
+@media (max-width: 767px) {
+      .edit-profile-row{
+            grid-template-columns: repeat(1 ,1fr);
+      }
+      
+}
+
+@media (max-width: 549px) {}
+
+@media (max-width: 374px) {}

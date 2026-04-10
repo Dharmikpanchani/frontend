@@ -1,0 +1,227 @@
+import { lazy } from "react";
+import { useRouteError } from "react-router-dom";
+import type { RouteConfig } from "@/types/interfaces/routeInterface";
+import PrivateRoutes from "@/routes/PrivateRoutes";
+import PublicRoutes from "@/routes/PublicRoutes";
+import { usePermissions } from "@/hooks/usePermissions";
+import { developerPermission } from "@/apps/common/StaticArrayData";
+import PageLoader from "../common/loader/PageLoader";
+import PageNotFound from "./component/developerCommon/pageNotFound/PageNotFound";
+import NotAllowPermission from "../developer/pages/RolePermission/NotAllowPermission";
+
+interface RouteError {
+    data?: string;
+}
+
+/* Lazy Loading */
+/* auth */
+const Login = lazy(() => import("./auth/Login"));
+const Otp = lazy(() => import("./auth/Otp"));
+const ForgotPassword = lazy(() => import("./auth/ForgotPassword"));
+const SetPassWord = lazy(() => import("./auth/SetPassword"));
+
+/* layout */
+const AdminLayOut = lazy(
+    () => import("./layout/DeveloperLayout")
+);
+const AdminDashboard = lazy(
+    () => import("./pages/Dashboard")
+);
+const Profile = lazy(
+    () => import("./pages/Profile/AccountLayout")
+);
+const RoleList = lazy(
+    () => import("./pages/RolePermission/RolePermission")
+);
+const AddEditRole = lazy(
+    () => import("./pages/RolePermission/AddEditRole")
+);
+const AdminUser = lazy(
+    () => import("./pages/AdminUser/AdminUser")
+);
+const AddEditAdminUser = lazy(
+    () => import("./pages/AdminUser/AddEditAdminUser")
+);
+const SchoolList = lazy(
+    () => import("./pages/SchoolListing/SchoolList")
+);
+const RegisterSchool = lazy(
+    () => import("./pages/SchoolListing/RegisterSchool")
+);
+
+/**
+ * Wrapper component that reads permissions from the store (inside a component body,
+ * satisfying the Rules of Hooks) and conditionally renders the guarded page.
+ */
+function PermissionRoute({
+    permission,
+    children,
+}: {
+    permission: string;
+    children: React.ReactNode;
+}): React.ReactElement {
+    const { hasPermission, loading, permissions, isAdminLogin, isSuperDeveloper } = usePermissions();
+
+    if (loading || (isAdminLogin && permissions.length === 0 && !isSuperDeveloper)) {
+        return <PageLoader />;
+    }
+
+    return hasPermission(permission) ? (
+        <>{children}</>
+    ) : (
+        <NotAllowPermission />
+    );
+}
+
+function ErrorBoundary(): React.ReactElement {
+    const error = useRouteError() as RouteError | null;
+    return (
+        <div className="container">
+            <h1>Oh Dang!!</h1>
+            <p>{error?.data}</p>
+        </div>
+    );
+}
+export const developerRoutes: RouteConfig[] = [
+    // Auth / Public Routes
+    {
+        path: "/",
+        element: <PublicRoutes />,
+        children: [
+            { path: "/", element: <Login /> },
+            { path: "/otp", element: <Otp /> },
+            { path: "/forgot-password", element: <ForgotPassword /> },
+            { path: "/set-password", element: <SetPassWord /> },
+        ],
+    },
+
+    // Private Routes
+    {
+        path: "/",
+        element: <PrivateRoutes />,
+        children: [
+            {
+                element: <AdminLayOut />,
+                errorElement: <ErrorBoundary />,
+                children: [
+                    {
+                        path: "/dashboard",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.dashboard?.read}>
+                                <AdminDashboard />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/profile",
+                        element: (
+                            <Profile />
+                        ),
+                    },
+                    {
+                        path: "/role-list",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.role?.read}>
+                                <RoleList />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/role-list/add",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.role?.create}>
+                                <AddEditRole />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/role-list/edit/:id",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.role?.update}>
+                                <AddEditRole />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/role-list/view/:id",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.role?.read}>
+                                <AddEditRole />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/admin-list",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.admin_user?.read}>
+                                <AdminUser />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/admin-list/add",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.admin_user?.create}>
+                                <AddEditAdminUser />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/admin-list/edit/:id",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.admin_user?.update}>
+                                <AddEditAdminUser />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/admin-list/view/:id",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.admin_user?.read}>
+                                <AddEditAdminUser />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/school-list",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.school?.read}>
+                                <SchoolList />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/school-list/add",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.school?.create}>
+                                <RegisterSchool />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/school-list/edit/:id",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.school?.update}>
+                                <RegisterSchool />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/school-list/view/:id",
+                        element: (
+                            <PermissionRoute permission={developerPermission?.school?.read}>
+                                <RegisterSchool />
+                            </PermissionRoute>
+                        ),
+                    },
+
+                ],
+            },
+        ],
+    },
+
+    {
+        path: "*",
+        element: <PageNotFound />,
+    },
+];

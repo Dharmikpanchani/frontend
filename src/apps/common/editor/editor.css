@@ -1,0 +1,220 @@
+/* 
+.ck.ck-toolbar.ck-toolbar_grouping {
+      background: #161616;
+      border: 1px solid #3e3e3e;
+}
+
+.ck.ck-button.ck-on,
+.ck-custom-editor-main a.ck.ck-button.ck-on {
+      background: #161616;
+}
+
+.ck-custom-editor-main .ck.ck-list {
+      background: #161616;
+}
+
+.ck.ck-dropdown__panel {
+      border-color: #3e3e3e;
+      background-color: #161616;
+}
+
+.ck.ck-editor__main>.ck-editor__editable:not(.ck-focused),
+.ck.ck-editor__main>.ck-editor__editable.ck-focused {
+      background: transparent;
+      border-color: #3e3e3e;
+      color: #fff;
+      min-height: 300px;
+}
+
+.ck-reset_all :not(.ck-reset_all-excluded *),
+.ck.ck-reset_all {
+      color: #fff;
+}
+
+.ck.ck-toolbar .ck.ck-toolbar__separator {
+      background: #161616;
+}
+
+.ck.ck-button:not(.ck-disabled):hover,
+a.ck.ck-button:not(.ck-disabled):hover {
+      background: #161616;
+}
+
+.ck.ck-dropdown .ck-button.ck-dropdown__button.ck-off:active,
+.ck.ck-dropdown .ck-button.ck-dropdown__button.ck-on:active {
+      box-shadow: none !important;
+      border: none;
+      background: #161616;
+      color: white;
+}
+
+.ck.ck-button:not(.ck-disabled):hover,
+a.ck.ck-button:not(.ck-disabled):hover,
+.ck.ck-list__item .ck-button:hover:not(.ck-disabled) {
+      background: #161616;
+}
+
+.ck.ck-button.ck-on,
+a.ck.ck-button.ck-on {
+      color: #ffffff;
+}
+
+.ck.ck-button:not(.ck-disabled):hover,
+a.ck.ck-button:not(.ck-disabled):hover,
+.ck.ck-button.ck-on:not(.ck-disabled):hover,
+a.ck.ck-button.ck-on:not(.ck-disabled):hover,
+.ck.ck-labeled-field-view>.ck.ck-labeled-field-view__input-wrapper>.ck.ck-label {
+      background: #161616;
+}
+
+.ck.ck-balloon-panel {
+      background: #161616;
+      border: var(--ck-balloon-border-width) solid #3e3e3e;
+}
+
+.ck.ck-balloon-panel[class*=arrow_n]:after {
+      border-color: transparent transparent #161616 transparent;
+      margin-top: 0PX;
+}
+
+.ck.ck-content a {
+      color: #fff;
+}
+
+.ck.ck-input {
+      background: #1e1e1e;
+      border: 1px solid #3e3e3e;
+}
+
+
+
+.ck-reset_all :not(.ck-reset_all-excluded *),
+.ck.ck-reset,
+.ck.ck-reset_all {
+      background: #549bb24a;
+}
+
+.ck.ck-button:not(.ck-disabled):hover,
+a.ck.ck-button:not(.ck-disabled):hover {
+      background: transparent;
+}
+
+.ck.ck-button,
+a.ck.ck-button {
+      border: 1px solid #e5e7eb;
+}
+
+.ck.ck-icon.ck-icon_inherit-color,
+.ck.ck-icon.ck-icon_inherit-color * {
+      color: #fff;
+}
+
+.ck.ck-button.ck-on,
+a.ck.ck-button.ck-on {
+      background: transparent;
+}
+
+.ck.ck-button.ck-on:not(.ck-disabled):hover,
+a.ck.ck-button.ck-on:not(.ck-disabled):hover {
+      background: transparent;
+}
+
+.ck.ck-button .ck-button__label,
+a.ck.ck-button .ck-button__label {
+      color: #fff;
+}
+
+.ck-reset_all :not(.ck-reset_all-excluded *),
+.ck.ck-reset_all {
+      color: #fff;
+}
+
+.ck-content blockquote {
+      font-style: normal;
+}
+
+p {
+      font-family: 'Poppins-Regular';
+}
+
+.ck.ck-list__item .ck-button.ck-on {
+      background: transparent;
+}
+
+.ck.ck-list__item .ck-button.ck-on:hover:not(.ck-disabled) {
+      background: transparent;
+}
+
+.ck.ck-list__item .ck-button:hover:not(.ck-disabled) {
+      background: transparent;
+} */
+
+
+.editor-content-main p {
+      color: var(--secondary-color);
+      font-size: 13px;
+      line-height: 29px;
+      font-family: "DMSans-Regular";
+      margin-bottom: 20px;
+}
+
+.editor-content-main strong {
+      color: var(--main-black);
+      font-size: 15px;
+      line-height: 29px;
+      font-family: "DMSans-Medium";
+}
+
+.editor-content-main ul {
+      padding: 0 0 0 15px;
+      margin: 0px;
+}
+
+.editor-content-main li {
+      color: var(--secondary-color);
+      font-size: 13px;
+      line-height: 29px;
+      font-family: "DMSans-Regular";
+      margin-bottom: 20px;
+}
+
+.editor-content-main ol {
+      padding: 0 0 0 15px;
+      margin: 0px;
+}
+
+.editor-content-main b {
+      color: var(--main-black);
+      font-size: 13px;
+      line-height: 29px;
+      font-family: "DMSans-Medium";
+}
+
+.editor-content-main i {
+      font-size: 13px;
+      line-height: 29px;
+      font-family: "DMSans-Semibold";
+      color: var(--main-black);
+}
+
+.editor-content-main h1 {
+      color: var(--main-black);
+      font-size: 13px;
+      line-height: 29px;
+      font-family: "DMSans-Semibold";
+}
+
+.editor-content-main h2,
+h3,
+h4,
+h5,
+h6 {
+      color: var(--main-black);
+      font-size: 13px;
+      line-height: 29px;
+      font-family: "DMSans-Medium";
+}
+
+.ck .ck-content {
+      height: 200px;
+}
