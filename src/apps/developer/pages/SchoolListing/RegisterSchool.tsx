@@ -314,19 +314,15 @@ export default function RegisterSchool() {
                                                                         height: "40px",
                                                                         // default
                                                                         "& .MuiOutlinedInput-notchedOutline": {
-                                                                            borderColor: "#ced4da",
+                                                                            borderColor: "var(--input-border, #ced4da)",
                                                                         },
                                                                         // hover
-                                                                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                                                                            borderColor: "#ced4da !important",
+                                                                        "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+                                                                            borderColor: "var(--primary-color, #ced4da) !important",
                                                                         },
                                                                         // ✅ ACTIVE / FOCUS (yellow)
                                                                         "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                            border: "1px solid #ff8c00 !important",
-                                                                        },
-                                                                        // ✅ HOVER (red)
-                                                                        "&:hover .MuiPickersOutlinedInput-notchedOutline": {
-                                                                            border: "1px solid #ced4da !important",
+                                                                            border: "1px solid var(--primary-color, #ff8c00) !important",
                                                                         },
                                                                     },
 

@@ -23,7 +23,7 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
   placeholder = "Enter Location",
   name = "address",
   disabled = false,
-  focusedColor = "#ff8c00",
+  focusedColor = "var(--primary-color, #ff8c00)",
 }) => {
   const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
   const placeService = useRef<google.maps.places.PlacesService | null>(null);
@@ -87,15 +87,15 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
       backgroundColor: 'white !important',
       borderRadius: '6px !important',
       '& fieldset': {
-        borderColor: '#ced4da !important',
+        borderColor: 'var(--input-border, #ced4da) !important',
         transition: 'all 0.3s ease !important',
       },
       '&:hover fieldset': {
-        borderColor: '#ced4da !important',
+        borderColor: 'var(--primary-color, #ced4da) !important',
       },
       '&.Mui-focused fieldset': {
         borderColor: `${focusedColor} !important`,
-        borderWidth: '1.5px !important',
+        borderWidth: '1px !important',
       },
     },
     '& .MuiOutlinedInput-input, & input': {

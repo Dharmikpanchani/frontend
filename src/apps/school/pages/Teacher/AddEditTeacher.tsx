@@ -212,19 +212,19 @@ export default function AddEditTeacher() {
                                                             variant: "outlined",
                                                             onClick: () => setOpenDatePicker(true),
                                                             onBlur: handleBlur,
-                                                            sx: {
-                                                                "& .MuiPickersOutlinedInput-root": {
-                                                                    height: "40px",
-                                                                    "& .MuiOutlinedInput-notchedOutline": {
-                                                                        borderColor: "#ced4da",
+                                                                sx: {
+                                                                    "& .MuiPickersOutlinedInput-root": {
+                                                                        height: "40px",
+                                                                        "& .MuiOutlinedInput-notchedOutline": {
+                                                                            borderColor: "var(--input-border, #ced4da)",
+                                                                        },
+                                                                        "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+                                                                            borderColor: "var(--primary-color, #ced4da) !important",
+                                                                        },
+                                                                        "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
+                                                                            border: "1px solid var(--primary-color, #ff8c00) !important",
+                                                                        },
                                                                     },
-                                                                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                                                                        borderColor: "#ced4da !important",
-                                                                    },
-                                                                    "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                        border: "1px solid #ff8c00 !important",
-                                                                    },
-                                                                },
                                                                 "& .MuiPickersInputBase-sectionContent": {
                                                                     fontSize: "13px",
                                                                 },

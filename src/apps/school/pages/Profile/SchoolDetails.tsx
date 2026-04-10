@@ -637,16 +637,16 @@ export default function SchoolDetails() {
                             "& .MuiPickersOutlinedInput-root": {
                               height: "40px",
                               "& .MuiOutlinedInput-notchedOutline": {
-                                borderColor: "#ced4da",
+                                borderColor: "var(--input-border, #ced4da)",
                               },
-                              "&:hover .MuiOutlinedInput-notchedOutline": {
-                                borderColor: "#ced4da !important",
+                              "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "var(--primary-color, #ced4da) !important",
                               },
                               "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
                                 border: "1px solid var(--primary-color) !important",
                               },
                               "&:hover .MuiPickersOutlinedInput-notchedOutline": {
-                                border: "1px solid #ced4da !important",
+                                border: "1px solid var(--primary-color, #ced4da) !important",
                               },
                             },
 
