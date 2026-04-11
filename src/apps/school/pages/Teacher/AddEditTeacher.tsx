@@ -12,7 +12,6 @@ import {
     Link,
     Autocomplete,
 } from "@mui/material";
-import type { SxProps, Theme } from "@mui/material";
 import {
     Person as PersonIcon,
     Work as AcademicIcon,

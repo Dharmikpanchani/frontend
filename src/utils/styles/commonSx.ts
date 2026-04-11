@@ -65,7 +65,7 @@ export const inputSx: SxProps<Theme> = {
         alignItems: 'center',
         boxSizing: 'border-box',
         '&.Mui-disabled': {
-            '-webkit-text-fill-color': '#6b7280 !important',
+            WebkitTextFillColor: '#6b7280 !important',
         },
     },
 };

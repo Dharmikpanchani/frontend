@@ -1,5 +1,4 @@
 import { lazy } from "react";
-import { useRouteError } from "react-router-dom";
 import type { RouteConfig } from "@/types/interfaces/routeInterface";
 import PrivateRoutes from "@/routes/PrivateRoutes";
 import PublicRoutes from "@/routes/PublicRoutes";
@@ -10,9 +9,7 @@ import PageLoader from "../common/loader/PageLoader";
 import PageNotFound from "./component/schoolCommon/pageNotFound/PageNotFound";
 import ErrorPage from "../common/error/ErrorPage";
 
-interface RouteError {
-    data?: string;
-}
+
 
 /* Lazy Loading */
 /* auth */

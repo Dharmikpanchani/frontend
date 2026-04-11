@@ -20,7 +20,7 @@ export const emailValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid email",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .test("no-starting-dot", "Please enter a valid email", (value) => {
@@ -76,7 +76,7 @@ export const roleNameValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid role name",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z]+( [A-Za-z]+)*$/, "Please enter a valid role name")
@@ -93,7 +93,7 @@ export const fullNameValidation = (fieldName: string, required = true) => {
     .test(
       "no-whitespace",
       `Please enter a valid ${fieldName.toLowerCase()}`,
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z]+( [A-Za-z]+)*$/, `Please enter a valid ${fieldName.toLowerCase()}`)
@@ -110,7 +110,7 @@ export const phoneNumberValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid phone number",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[0-9]{10}$/, "Please enter a valid 10-digit number")
@@ -126,7 +126,7 @@ export const schoolCodeValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid school code",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z0-9-]+$/, "Please enter a valid school code")
@@ -143,7 +143,7 @@ export const schoolNameValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid school name",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z]+( [A-Za-z]+)*$/, "Please enter a valid school name")
@@ -160,7 +160,7 @@ export const addressValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid address",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(10, "Address must be at least 10 characters")
@@ -175,7 +175,7 @@ export const cityValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid city",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(2, "City must be at least 2 characters")
@@ -190,7 +190,7 @@ export const stateValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid state",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(2, "State must be at least 2 characters")
@@ -205,7 +205,7 @@ export const zipCodeValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid zip code",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(/^[0-9]{5,6}$/, "Zip code must be 5 or 6 digits");
@@ -218,7 +218,7 @@ export const genericStringValidation = (fieldName: string, min = 1, max = 200, r
     .test(
       "no-whitespace",
       `Please enter a valid ${fieldName.toLowerCase()}`,
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(min, `${fieldName} must be at least ${min} characters`)
@@ -232,7 +232,7 @@ export const countryValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid country",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(2, "Country must be at least 2 characters")
@@ -276,7 +276,7 @@ export const gstValidation = (required = false) => {
     .test(
       "no-whitespace",
       "Please enter a valid GST number",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.toUpperCase().trim())
     .matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, "Please enter a valid GST number");
@@ -288,7 +288,7 @@ export const panValidation = (required = false) => {
     .test(
       "no-whitespace",
       "Please enter a valid PAN number",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.toUpperCase().trim())
     .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Please enter a valid PAN number");
@@ -300,7 +300,7 @@ export const registrationNumberValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid registration number",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(3, "Registration number must be at least 3 characters")
@@ -505,7 +505,7 @@ export const departmentValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid department name",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(englishOnlyRegex, "Please enter a valid department name")
@@ -516,7 +516,7 @@ export const departmentValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid department code",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(alphanumericWithUnderscoreRegex, "Please enter a valid department code")
@@ -530,7 +530,7 @@ export const subjectValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid subject name",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(englishOnlyRegex, "Please enter a valid subject name")
@@ -541,7 +541,7 @@ export const subjectValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid subject code",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(alphanumericWithUnderscoreRegex, "Please enter a valid subject code")
@@ -556,7 +556,7 @@ export const classValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid class name",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(alphanumericWithSpaceRegex, "Please enter a valid class name")
@@ -567,7 +567,7 @@ export const classValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid class code",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(alphanumericWithUnderscoreRegex, "Please enter a valid class code")
@@ -581,7 +581,7 @@ export const sectionValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid section code",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(alphanumericWithUnderscoreRegex, "Please enter a valid section code")
@@ -616,7 +616,7 @@ export const teacherValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid designation",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(englishOnlyRegex, "Designation must contain letters only")
@@ -633,7 +633,7 @@ export const teacherValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid bank name",
-      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(englishOnlyRegex, "Bank name must contain letters only")
