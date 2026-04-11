@@ -83,7 +83,7 @@ const defaultTheme: ThemeState = {
   tableRowHover: "#f3f4f6",
 
   primaryColor: "#5c1a1a",
-  secondaryColor: "#6b7280",
+  secondaryColor: "#ad1e1e",
   successColor: "#46c700",
   errorColor: "#ff0000",
   warningColor: "#ff6200",

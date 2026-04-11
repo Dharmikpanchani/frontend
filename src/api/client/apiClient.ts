@@ -52,9 +52,13 @@ DataService.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+    if (error.response?.status === 404 && (originalRequest.url === Api.GET_PROFILE || originalRequest.url === Api.GET_SCHOOL_PROFILE)) {
+      window.location.href = "/";
+    }
     return Promise.reject(error);
   }
 );
+
 export const adminApiService = {
   get: async <T = unknown>(url: string, params?: object): Promise<T> => {
     const response = await DataService.get<T>(url, { params });

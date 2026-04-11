@@ -55,7 +55,7 @@ body {
 :root {
   --main-white: #fff;
   --primary-color: #5c1a1a;
-  --secondary-color: #6b7280;
+  --secondary-color: #ad1e1e;
   --selected-color: #5c1a1a;
   --main-border: #d1d5db85;
   --light-border: #d1d5db1f;
@@ -74,7 +74,7 @@ body {
   --header-maroon: #4E1111;
   --sidebar-bg: linear-gradient(180deg, #3a0000 0%, #1a0000 100%);
   --active-gradient: linear-gradient(90deg, #5c1a1a 0%, #3a0000 100%);
-  
+
   /* Themed variables defaults */
   --font-family: 'Poppins', sans-serif;
   --border-radius: 8px;
@@ -87,7 +87,7 @@ body {
 /* Common Branding Scope (can be customized via theme manager) */
 .portal-school {
   --primary-color: #5c1a1a;
-  --secondary-color: #6b7280;
+  --secondary-color: #ad1e1e;
   --selected-color: #5c1a1a;
   --bg-color: #5c1a1a;
   --body-color: #f7f7f7;
@@ -702,6 +702,7 @@ body .MuiTooltip-tooltip .MuiTooltip-arrow::before {
   top: 11px;
   margin-right: 10px;
 }
+
 .school-admin-search-grey-img {
   position: absolute;
   left: 13px;
@@ -2318,7 +2319,7 @@ img[alt] {
   border-bottom: 1px solid var(--card-border, rgba(255, 255, 255, 0.15));
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--header-text, #fff);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* .admin-header-deactive {
@@ -4435,13 +4436,20 @@ span.admin-sidebar-link-text {
 
 .login-form-group .MuiOutlinedInput-notchedOutline {
   border-color: #ced4da;
-  /* spec: #ced4da */
   transition: all 0.3s ease;
+}
+
+.login-form-group .MuiOutlinedInput-root:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline {
+  border-color: #ced4da !important;
+}
+
+.login-form-group .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: none !important;
 }
 
 .login-form-group .Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: var(--primary-color) !important;
-  border-width: 1.5px !important;
+  border-width: 1px !important;
 }
 
 .login-card .login-form-group .MuiOutlinedInput-input {
@@ -5033,4 +5041,4 @@ span.admin-sidebar-link-text {
   padding: 15px 0 !important;
   margin-bottom: 10px !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
+}

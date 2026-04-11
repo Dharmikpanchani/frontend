@@ -289,7 +289,7 @@ export default function AdminUser() {
                     className="table-th"
                     width="20%"
                   >
-                    Login Status
+                    Login / Verification
                   </TableCell>
                   {hasPermission(developerPermission.admin_user.status) && (
                     <TableCell
@@ -387,7 +387,7 @@ export default function AdminUser() {
                             scope="row"
                             className="table-td"
                           >
-                            <Box className="admin-table-data-flex">
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                               <Chip
                                 label={data?.isLogin ? "Online" : "Offline"}
                                 sx={{
@@ -395,13 +395,30 @@ export default function AdminUser() {
                                   color: data?.isLogin ? "#2e7d32" : "#d32f2f",
                                   boxShadow: `0px 0px 8px ${data?.isLogin ? "rgba(76, 175, 80, 0.4)" : "rgba(244, 67, 54, 0.4)"}`,
                                   fontWeight: 600,
-                                  fontSize: "12px",
-                                  height: "24px",
+                                  fontSize: "11px",
+                                  height: "22px",
+                                  width: 'fit-content',
                                   "& .MuiChip-label": {
                                     padding: "0 8px",
                                   },
                                 }}
                               />
+                              <Box sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                                px: 1,
+                                py: 0.3,
+                                borderRadius: '20px',
+                                backgroundColor: data?.isVerified ? 'rgba(33, 150, 243, 0.1)' : 'rgba(255, 152, 0, 0.1)',
+                                color: data?.isVerified ? '#2196f3' : '#ff9800',
+                                width: 'fit-content'
+                              }}>
+                                <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'currentColor' }} />
+                                <Typography sx={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
+                                  {data?.isVerified ? "Verified" : "Not Verified"}
+                                </Typography>
+                              </Box>
                             </Box>
                           </TableCell>
                           {hasPermission(developerPermission.admin_user.status) && (<TableCell
