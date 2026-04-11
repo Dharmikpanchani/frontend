@@ -309,6 +309,7 @@ export const boardOptions = [
   { label: "State Board", value: "State Board" },
   { label: "IB", value: "IB" },
   { label: "IGCSE", value: "IGCSE" },
+  { label: "Other", value: "Other" },
 ];
 
 export const schoolTypeOptions = [
@@ -316,12 +317,14 @@ export const schoolTypeOptions = [
   { label: "Secondary", value: "Secondary" },
   { label: "Higher Secondary", value: "Higher Secondary" },
   { label: "Junior College", value: "Junior College" },
+  { label: "Other", value: "Other" },
 ];
 
 export const mediumOptions = [
   { label: "English", value: "English" },
   { label: "Gujarati", value: "Gujarati" },
   { label: "Hindi", value: "Hindi" },
+  { label: "Other", value: "Other" },
 ];
 
 export const bloodGroupOptions = [
