@@ -5,6 +5,7 @@ import {
     Box,
     Typography,
     TextField,
+    OutlinedInput,
     Button,
     FormHelperText,
     Breadcrumbs,
@@ -18,8 +19,12 @@ import {
     LocationOn as LocationIcon,
     Payment as SalaryIcon,
     History as HistoryIcon,
-    Description as DocumentIcon
+    Description as DocumentIcon,
+    Visibility,
+    VisibilityOff,
+    AddCircleOutline as AddIcon
 } from "@mui/icons-material";
+import { InputAdornment, IconButton } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
 import { teacherValidationSchema } from "@/utils/validation/FormikValidation";
@@ -33,7 +38,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import AutoCompleteLocation from "@/apps/common/AutoCompleteLocation";
 import { renderSingleImage } from "@/apps/common/uploadImageAndVideo";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider, DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import type { RootState } from "@/redux/Store";
@@ -55,6 +60,10 @@ export default function AddEditTeacher() {
     const { actionLoading } = useSelector((state: RootState) => state.TeacherReducer);
     const [openDOB, setOpenDOB] = useState(false);
     const [openJoiningDate, setOpenJoiningDate] = useState(false);
+    const [openShiftTimeFrom, setOpenShiftTimeFrom] = useState(false);
+    const [openShiftTimeTo, setOpenShiftTimeTo] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         const params = { type: "filter" };
@@ -81,7 +90,9 @@ export default function AddEditTeacher() {
         country: "India",
         pincode: "",
         // Auth
+        id: "",
         password: "",
+        confirmPassword: "",
         // Professional
         joiningDate: null,
         experienceYears: "",
@@ -113,6 +124,8 @@ export default function AddEditTeacher() {
         leaveBalance: 0,
         workingHours: "",
         shiftTiming: "",
+        shiftTimeFrom: null,
+        shiftTimeTo: null,
     };
 
 
@@ -161,8 +174,10 @@ export default function AddEditTeacher() {
             if (values.accountNumber) formData.append("accountNumber", values.accountNumber);
             if (values.ifscCode) formData.append("ifscCode", values.ifscCode);
             if (values.panNumber) formData.append("panNumber", values.panNumber);
-
             if (values.aadharNumber) formData.append("aadharNumber", values.aadharNumber);
+
+            // Auth
+            if (values.password) formData.append("password", values.password);
 
             // Documents
             if (values.profileImage) formData.append("profileImage", values.profileImage);
@@ -173,7 +188,12 @@ export default function AddEditTeacher() {
             if (values.attendanceId) formData.append("attendanceId", values.attendanceId);
             if (values.leaveBalance) formData.append("leaveBalance", values.leaveBalance);
             if (values.workingHours) formData.append("workingHours", values.workingHours);
-            if (values.shiftTiming) formData.append("shiftTiming", values.shiftTiming);
+            if (values.shiftTimeFrom && values.shiftTimeTo) {
+                const shiftTimingStr = `${moment(values.shiftTimeFrom).format("hh:mm A")} - ${moment(values.shiftTimeTo).format("hh:mm A")}`;
+                formData.append("shiftTiming", shiftTimingStr);
+            } else if (values.shiftTiming) {
+                formData.append("shiftTiming", values.shiftTiming);
+            }
 
             const resultAction = await dispatch(createTeacher(formData) as any);
 
@@ -194,8 +214,8 @@ export default function AddEditTeacher() {
                 width: 32,
                 height: 32,
                 borderRadius: '8px',
-                backgroundColor: 'rgba(var(--primary-color-rgb, 255, 140, 0), 0.1)',
-                color: 'var(--primary-color, #ff8c00)'
+                backgroundColor: '#fff7ed',
+                color: '#ff8c00'
             }}>
                 <Icon sx={{ fontSize: 20 }} />
             </Box>
@@ -219,7 +239,7 @@ export default function AddEditTeacher() {
             <Box className="card-border common-card" sx={{ p: { xs: 2, sm: 3 }, borderRadius: '12px', backgroundColor: 'white' }}>
                 <Formik initialValues={initialValues} validationSchema={teacherValidationSchema} onSubmit={handleSubmit}>
                     {(formikProps: FormikProps<any>) => {
-                        const { values, setFieldValue, handleChange, handleSubmit, touched, errors } = formikProps;
+                        const { values, setFieldValue, handleChange, handleBlur, handleSubmit, touched, errors } = formikProps;
                         return (
                             <Form onSubmit={handleSubmit}>
                                 <Box sx={{ maxWidth: 1100 }}>
@@ -323,6 +343,25 @@ export default function AddEditTeacher() {
                                                                 },
                                                             }
                                                         },
+                                                        popper: {
+                                                            sx: {
+                                                                "& .MuiPickersDay-root.Mui-selected": {
+                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    color: "#ffffff !important"
+                                                                },
+                                                                "& .MuiPickersDay-root:hover": {
+                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 255, 140, 0), 0.1) !important",
+                                                                },
+                                                                "& .MuiPickersYear-yearButton.Mui-selected": {
+                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    color: "#ffffff !important"
+                                                                },
+                                                                "& .MuiPickersMonth-monthButton.Mui-selected": {
+                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    color: "#ffffff !important"
+                                                                }
+                                                            }
+                                                        },
                                                         field: { readOnly: true },
                                                     }}
                                                 />
@@ -355,10 +394,10 @@ export default function AddEditTeacher() {
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                                             <Typography sx={labelSx}>Alternate Phone</Typography>
-                                            <TextField 
-                                                fullWidth name="alternatePhoneNumber" placeholder="Alternate Number" variant="outlined" sx={inputSx} 
-                                                value={values.alternatePhoneNumber} 
-                                                onChange={(e) => setFieldValue("alternatePhoneNumber", e.target.value.replace(/\D/g, '').slice(0, 10))} 
+                                            <TextField
+                                                fullWidth name="alternatePhoneNumber" placeholder="Alternate Number" variant="outlined" sx={inputSx}
+                                                value={values.alternatePhoneNumber}
+                                                onChange={(e) => setFieldValue("alternatePhoneNumber", e.target.value.replace(/\D/g, '').slice(0, 10))}
                                             />
                                         </Box>
                                         <Box gridColumn="span 12">
@@ -435,6 +474,25 @@ export default function AddEditTeacher() {
                                                                 },
                                                             }
                                                         },
+                                                        popper: {
+                                                            sx: {
+                                                                "& .MuiPickersDay-root.Mui-selected": {
+                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    color: "#ffffff !important"
+                                                                },
+                                                                "& .MuiPickersDay-root:hover": {
+                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 255, 140, 0), 0.1) !important",
+                                                                },
+                                                                "& .MuiPickersYear-yearButton.Mui-selected": {
+                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    color: "#ffffff !important"
+                                                                },
+                                                                "& .MuiPickersMonth-monthButton.Mui-selected": {
+                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    color: "#ffffff !important"
+                                                                }
+                                                            }
+                                                        },
                                                         field: { readOnly: true },
                                                     }}
                                                 />
@@ -443,18 +501,18 @@ export default function AddEditTeacher() {
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                                             <Typography sx={labelSx}>Experience (Years)</Typography>
-                                            <TextField 
-                                                fullWidth name="experienceYears" placeholder="e.g. 5" variant="outlined" sx={inputSx} 
-                                                value={values.experienceYears} 
-                                                onChange={(e) => setFieldValue("experienceYears", e.target.value.replace(/\D/g, '').slice(0, 2))} 
+                                            <TextField
+                                                fullWidth name="experienceYears" placeholder="e.g. 5" variant="outlined" sx={inputSx}
+                                                value={values.experienceYears}
+                                                onChange={(e) => setFieldValue("experienceYears", e.target.value.replace(/\D/g, '').slice(0, 2))}
                                             />
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                                             <Typography sx={labelSx}>Designation<span style={{ color: '#ef4444' }}>*</span></Typography>
-                                            <TextField 
-                                                fullWidth name="designation" placeholder="e.g. Math Teacher" variant="outlined" sx={inputSx} 
-                                                value={values.designation} 
-                                                onChange={(e) => setFieldValue("designation", e.target.value.replace(/[^A-Za-z\s]/g, ''))} 
+                                            <TextField
+                                                fullWidth name="designation" placeholder="e.g. Math Teacher" variant="outlined" sx={inputSx}
+                                                value={values.designation}
+                                                onChange={(e) => setFieldValue("designation", e.target.value.replace(/[^A-Za-z\s]/g, ''))}
                                             />
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
@@ -536,36 +594,36 @@ export default function AddEditTeacher() {
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
                                             <Typography sx={labelSx}>Bank Name</Typography>
-                                            <TextField 
-                                                fullWidth name="bankName" placeholder="Bank Name" variant="outlined" sx={inputSx} 
-                                                value={values.bankName} 
-                                                onChange={(e) => setFieldValue("bankName", e.target.value.replace(/[^A-Za-z\s]/g, ''))} 
+                                            <TextField
+                                                fullWidth name="bankName" placeholder="Bank Name" variant="outlined" sx={inputSx}
+                                                value={values.bankName}
+                                                onChange={(e) => setFieldValue("bankName", e.target.value.replace(/[^A-Za-z\s]/g, ''))}
                                             />
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
                                             <Typography sx={labelSx}>IFSC Code</Typography>
-                                            <TextField 
-                                                fullWidth name="ifscCode" placeholder="IFSC Code" variant="outlined" sx={inputSx} 
-                                                value={values.ifscCode} 
-                                                onChange={(e) => setFieldValue("ifscCode", e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11))} 
+                                            <TextField
+                                                fullWidth name="ifscCode" placeholder="IFSC Code" variant="outlined" sx={inputSx}
+                                                value={values.ifscCode}
+                                                onChange={(e) => setFieldValue("ifscCode", e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11))}
                                                 error={touched.ifscCode && Boolean(errors.ifscCode)}
                                             />
                                             {touched.ifscCode && errors.ifscCode && <FormHelperText className="error-text">{errors.ifscCode as string}</FormHelperText>}
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
                                             <Typography sx={labelSx}>Account Number</Typography>
-                                            <TextField 
-                                                fullWidth name="accountNumber" placeholder="Account Number" variant="outlined" sx={inputSx} 
-                                                value={values.accountNumber} 
-                                                onChange={(e) => setFieldValue("accountNumber", e.target.value.replace(/\D/g, '').slice(0, 18))} 
+                                            <TextField
+                                                fullWidth name="accountNumber" placeholder="Account Number" variant="outlined" sx={inputSx}
+                                                value={values.accountNumber}
+                                                onChange={(e) => setFieldValue("accountNumber", e.target.value.replace(/\D/g, '').slice(0, 18))}
                                             />
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
                                             <Typography sx={labelSx}>Confirm Account Number</Typography>
-                                            <TextField 
-                                                fullWidth name="confirmAccountNumber" placeholder="Confirm Account Number" variant="outlined" sx={inputSx} 
-                                                value={values.confirmAccountNumber} 
-                                                onChange={(e) => setFieldValue("confirmAccountNumber", e.target.value.replace(/\D/g, '').slice(0, 18))} 
+                                            <TextField
+                                                fullWidth name="confirmAccountNumber" placeholder="Confirm Account Number" variant="outlined" sx={inputSx}
+                                                value={values.confirmAccountNumber}
+                                                onChange={(e) => setFieldValue("confirmAccountNumber", e.target.value.replace(/\D/g, '').slice(0, 18))}
                                                 error={touched.confirmAccountNumber && Boolean(errors.confirmAccountNumber)}
                                                 onPaste={(e) => e.preventDefault()}
                                             />
@@ -575,18 +633,18 @@ export default function AddEditTeacher() {
 
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
                                             <Typography sx={labelSx}>PAN Number</Typography>
-                                            <TextField 
-                                                fullWidth name="panNumber" placeholder="PAN" variant="outlined" sx={inputSx} 
-                                                value={values.panNumber} 
-                                                onChange={(e) => setFieldValue("panNumber", e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10))} 
+                                            <TextField
+                                                fullWidth name="panNumber" placeholder="PAN" variant="outlined" sx={inputSx}
+                                                value={values.panNumber}
+                                                onChange={(e) => setFieldValue("panNumber", e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10))}
                                             />
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
                                             <Typography sx={labelSx}>Aadhar Number</Typography>
-                                            <TextField 
-                                                fullWidth name="aadharNumber" placeholder="Aadhar" variant="outlined" sx={inputSx} 
-                                                value={values.aadharNumber} 
-                                                onChange={(e) => setFieldValue("aadharNumber", e.target.value.replace(/\D/g, '').slice(0, 12))} 
+                                            <TextField
+                                                fullWidth name="aadharNumber" placeholder="Aadhar" variant="outlined" sx={inputSx}
+                                                value={values.aadharNumber}
+                                                onChange={(e) => setFieldValue("aadharNumber", e.target.value.replace(/\D/g, '').slice(0, 12))}
                                             />
                                         </Box>
                                     </Box>
@@ -657,34 +715,219 @@ export default function AddEditTeacher() {
                                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }}>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                                             <Typography sx={labelSx}>Attendance ID</Typography>
-                                            <TextField 
-                                                fullWidth name="attendanceId" placeholder="ID" variant="outlined" sx={inputSx} 
-                                                value={values.attendanceId} 
-                                                onChange={(e) => setFieldValue("attendanceId", e.target.value.toUpperCase().replace(/\s/g, '_').replace(/[^A-Z0-9_]/g, ''))} 
+                                            <TextField
+                                                fullWidth name="attendanceId" placeholder="ID" variant="outlined" sx={inputSx}
+                                                value={values.attendanceId}
+                                                onChange={(e) => setFieldValue("attendanceId", e.target.value.toUpperCase().replace(/\s/g, '_').replace(/[^A-Z0-9_]/g, ''))}
                                             />
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                                             <Typography sx={labelSx}>Leave Balance</Typography>
-                                            <TextField 
-                                                fullWidth name="leaveBalance" placeholder="00" variant="outlined" sx={inputSx} 
-                                                value={values.leaveBalance} 
-                                                onChange={(e) => setFieldValue("leaveBalance", e.target.value.replace(/\D/g, '').slice(0, 2))} 
+                                            <TextField
+                                                fullWidth name="leaveBalance" placeholder="00" variant="outlined" sx={inputSx}
+                                                value={values.leaveBalance}
+                                                onChange={(e) => setFieldValue("leaveBalance", e.target.value.replace(/\D/g, '').slice(0, 2))}
                                             />
                                         </Box>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                            <Typography sx={labelSx}>Shift Timing</Typography>
-                                            <TextField 
-                                                fullWidth name="shiftTiming" placeholder="e.g. 9 AM - 5 PM" variant="outlined" sx={inputSx} 
-                                                value={values.shiftTiming} 
-                                                onChange={(e) => setFieldValue("shiftTiming", e.target.value.toUpperCase().replace(/[^A-Z0-9:\-\s]/g, ''))} 
+                                            <Typography sx={labelSx}>Time From</Typography>
+                                            <LocalizationProvider dateAdapter={AdapterMoment}>
+                                                <TimePicker
+                                                    value={values.shiftTimeFrom}
+                                                    open={openShiftTimeFrom}
+                                                    onOpen={() => setOpenShiftTimeFrom(true)}
+                                                    onClose={() => setOpenShiftTimeFrom(false)}
+                                                    onChange={(v) => {
+                                                        setFieldValue("shiftTimeFrom", v);
+                                                        if (values.shiftTimeTo && v && moment(v).isAfter(moment(values.shiftTimeTo))) {
+                                                            setFieldValue("shiftTimeTo", null);
+                                                        }
+                                                    }}
+                                                    slotProps={{
+                                                        textField: {
+                                                            fullWidth: true,
+                                                            placeholder: "Select Time",
+                                                            variant: "outlined",
+                                                            onClick: () => setOpenShiftTimeFrom(true),
+                                                            error: touched.shiftTimeFrom && Boolean(errors.shiftTimeFrom),
+                                                            sx: {
+                                                                "& .MuiPickersOutlinedInput-root": {
+                                                                    height: "40px",
+                                                                    "& .MuiOutlinedInput-notchedOutline": {
+                                                                        borderColor: "var(--input-border, #ced4da)",
+                                                                    },
+                                                                    "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+                                                                        borderColor: "var(--primary-color, #ced4da) !important",
+                                                                    },
+                                                                    "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
+                                                                        border: "1px solid var(--primary-color, #ff8c00) !important",
+                                                                    },
+                                                                },
+                                                            }
+                                                        },
+                                                        popper: {
+                                                            sx: {
+                                                                "& .MuiMultiSectionDigitalClockSection-item.Mui-selected": {
+                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    color: "#ffffff !important"
+                                                                },
+                                                                "& .MuiMultiSectionDigitalClockSection-item:hover": {
+                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 255, 140, 0), 0.1) !important",
+                                                                }
+                                                            }
+                                                        },
+                                                        field: { readOnly: true },
+                                                    }}
+                                                />
+                                            </LocalizationProvider>
+                                            {touched.shiftTimeFrom && errors.shiftTimeFrom && <FormHelperText className="error-text">{errors.shiftTimeFrom as string}</FormHelperText>}
+                                        </Box>
+                                        <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                            <Typography sx={labelSx}>Time To</Typography>
+                                            <LocalizationProvider dateAdapter={AdapterMoment}>
+                                                <TimePicker
+                                                    value={values.shiftTimeTo}
+                                                    open={openShiftTimeTo}
+                                                    onOpen={() => setOpenShiftTimeTo(true)}
+                                                    onClose={() => setOpenShiftTimeTo(false)}
+                                                    onChange={(v) => setFieldValue("shiftTimeTo", v)}
+                                                    disabled={!values.shiftTimeFrom}
+                                                    minTime={values.shiftTimeFrom ? moment(values.shiftTimeFrom).add(1, 'minutes') : undefined}
+                                                    slotProps={{
+                                                        textField: {
+                                                            fullWidth: true,
+                                                            placeholder: "Select Time",
+                                                            variant: "outlined",
+                                                            onClick: () => values.shiftTimeFrom && setOpenShiftTimeTo(true),
+                                                            error: touched.shiftTimeTo && Boolean(errors.shiftTimeTo),
+                                                            sx: {
+                                                                "& .MuiPickersOutlinedInput-root": {
+                                                                    height: "40px",
+                                                                    "& .MuiOutlinedInput-notchedOutline": {
+                                                                        borderColor: "var(--input-border, #ced4da)",
+                                                                    },
+                                                                    "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+                                                                        borderColor: "var(--primary-color, #ced4da) !important",
+                                                                    },
+                                                                    "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
+                                                                        border: "1px solid var(--primary-color, #ff8c00) !important",
+                                                                    },
+                                                                    "&.Mui-disabled": {
+                                                                        backgroundColor: "#f9fafb",
+                                                                        cursor: "not-allowed",
+                                                                        "& .MuiOutlinedInput-notchedOutline": {
+                                                                            borderColor: "#e5e7eb !important",
+                                                                        }
+                                                                    }
+                                                                },
+                                                            }
+                                                        },
+                                                        popper: {
+                                                            sx: {
+                                                                "& .MuiMultiSectionDigitalClockSection-item.Mui-selected": {
+                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    color: "#ffffff !important"
+                                                                },
+                                                                "& .MuiMultiSectionDigitalClockSection-item:hover": {
+                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 255, 140, 0), 0.1) !important",
+                                                                }
+                                                            }
+                                                        },
+                                                        field: { readOnly: true },
+                                                    }}
+                                                />
+                                            </LocalizationProvider>
+                                            {touched.shiftTimeTo && errors.shiftTimeTo && <FormHelperText className="error-text">{errors.shiftTimeTo as string}</FormHelperText>}
+                                        </Box>
+                                    </Box>
+
+                                    {/* 7. Login Credentials */}
+                                    <SectionTitle icon={Visibility} title="Login Credentials" />
+                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }}>
+                                        <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                            <Typography sx={labelSx}>Password<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                            <OutlinedInput
+                                                fullWidth
+                                                name="password"
+                                                type={showPassword ? "text" : "password"}
+                                                placeholder="Enter Password"
+                                                sx={inputSx}
+                                                value={values.password}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                error={touched.password && Boolean(errors.password)}
+                                                endAdornment={
+                                                    <InputAdornment position="end">
+                                                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" sx={{ mr: 1 }}>
+                                                            {showPassword ? <Visibility sx={{ fontSize: 18 }} /> : <VisibilityOff sx={{ fontSize: 18 }} />}
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                }
                                             />
+                                            {touched.password && errors.password && <FormHelperText className="error-text">{(touched.password && errors.password) ? (errors.password as string) : ""}</FormHelperText>}
+                                        </Box>
+                                        <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                            <Typography sx={labelSx}>Confirm Password<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                            <OutlinedInput
+                                                fullWidth
+                                                name="confirmPassword"
+                                                type={showConfirmPassword ? "text" : "password"}
+                                                placeholder="Confirm Password"
+                                                sx={inputSx}
+                                                value={values.confirmPassword}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                error={touched.confirmPassword && Boolean(errors.confirmPassword)}
+                                                onPaste={(e) => e.preventDefault()}
+                                                onCopy={(e) => e.preventDefault()}
+                                                onContextMenu={(e) => e.preventDefault()}
+                                                endAdornment={
+                                                    <InputAdornment position="end">
+                                                        <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ mr: 1 }}>
+                                                            {showConfirmPassword ? <Visibility sx={{ fontSize: 18 }} /> : <VisibilityOff sx={{ fontSize: 18 }} />}
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                }
+                                            />
+                                            {touched.confirmPassword && errors.confirmPassword && <FormHelperText className="error-text">{(touched.confirmPassword && errors.confirmPassword) ? (errors.confirmPassword as string) : ""}</FormHelperText>}
                                         </Box>
                                     </Box>
 
                                     <Box sx={{ mt: 6, pt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end', borderTop: '1px solid #f0f0f0' }}>
-                                        <Button className="admin-btn-secondary" onClick={() => navigate("/teacher")} variant="outlined" sx={{ minWidth: '130px' }}>Discard</Button>
-                                        <Button type="submit" className="admin-btn-theme" disabled={actionLoading} variant="contained" sx={{ minWidth: '180px' }}>
-                                            {actionLoading ? <Spinner /> : "Create Teacher Profile"}
+                                        <Button
+                                            onClick={() => navigate("/teacher")}
+                                            variant="outlined"
+                                            sx={{
+                                                minWidth: '130px',
+                                                height: '42px',
+                                                borderRadius: '8px',
+                                                borderColor: '#ad1e1e',
+                                                color: '#ad1e1e',
+                                                textTransform: 'none',
+                                                fontWeight: 600,
+                                                '&:hover': { borderColor: '#8e1818', bgcolor: 'rgba(173, 30, 30, 0.04)' }
+                                            }}
+                                        >
+                                            Discard
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            disabled={actionLoading}
+                                            variant="contained"
+                                            startIcon={!actionLoading && <AddIcon />}
+                                            sx={{
+                                                minWidth: '180px',
+                                                height: '42px',
+                                                borderRadius: '8px',
+                                                bgcolor: '#ad1e1e',
+                                                color: 'white',
+                                                textTransform: 'none',
+                                                fontWeight: 600,
+                                                '&:hover': { bgcolor: '#8e1818' },
+                                                '&.Mui-disabled': { bgcolor: '#e5e7eb' }
+                                            }}
+                                        >
+                                            {actionLoading ? <Spinner /> : "Add Teacher"}
                                         </Button>
                                     </Box>
                                 </Box>

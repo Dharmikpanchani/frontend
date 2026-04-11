@@ -8,6 +8,7 @@ import { developerPermission } from "@/apps/common/StaticArrayData";
 import PageLoader from "../common/loader/PageLoader";
 import PageNotFound from "./component/developerCommon/pageNotFound/PageNotFound";
 import NotAllowPermission from "../developer/pages/RolePermission/NotAllowPermission";
+import ErrorPage from "../common/error/ErrorPage";
 
 interface RouteError {
     data?: string;
@@ -74,13 +75,7 @@ function PermissionRoute({
 }
 
 function ErrorBoundary(): React.ReactElement {
-    const error = useRouteError() as RouteError | null;
-    return (
-        <div className="container">
-            <h1>Oh Dang!!</h1>
-            <p>{error?.data}</p>
-        </div>
-    );
+    return <ErrorPage />;
 }
 export const developerRoutes: RouteConfig[] = [
     // Auth / Public Routes

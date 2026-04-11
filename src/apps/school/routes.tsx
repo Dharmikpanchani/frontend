@@ -8,6 +8,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import PageLoader from "../common/loader/PageLoader";
 import PageNotFound from "./component/schoolCommon/pageNotFound/PageNotFound";
+import ErrorPage from "../common/error/ErrorPage";
 
 interface RouteError {
     data?: string;
@@ -83,13 +84,7 @@ function PermissionRoute({
 }
 
 function ErrorBoundary(): React.ReactElement {
-    const error = useRouteError() as RouteError | null;
-    return (
-        <div className="container">
-            <h1>Oh Dang!!</h1>
-            <p>{error?.data}</p>
-        </div>
-    );
+    return <ErrorPage />;
 }
 export const schoolRoutes: RouteConfig[] = [
     // Auth / Public Routes

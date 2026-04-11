@@ -662,6 +662,22 @@ export const teacherValidationSchema = Yup.object().shape({
     .max(12, "Aadhar number must be at most 12 digits")
     .optional(),
 
+  // Auth
+  id: Yup.string().optional(),
+  password: Yup.string().when("id", {
+    is: (id: string) => !id,
+    then: () => passwordValidation("Password", true),
+    otherwise: () => Yup.string().optional(),
+  }),
+  confirmPassword: Yup.string().when("id", {
+    is: (id: string) => !id,
+    then: () =>
+      Yup.string()
+        .oneOf([Yup.ref("password")], "Passwords must match")
+        .required("Please confirm your password"),
+    otherwise: () => Yup.string().optional(),
+  }),
+
   // Tracking
   attendanceId: Yup.string()
     .matches(/^[A-Z0-9_]+$/, "Only uppercase letters, numbers and underscores are allowed")
@@ -670,6 +686,8 @@ export const teacherValidationSchema = Yup.object().shape({
     .matches(/^\d{1,2}$/, "Leave balance must be 1-2 digits")
     .optional(),
   shiftTiming: Yup.string().optional(),
+  shiftTimeFrom: Yup.mixed().nullable().optional(),
+  shiftTimeTo: Yup.mixed().nullable().optional(),
   // Documents
   profileImage: imageValidation("Profile Image", false).nullable(),
   resume: fileValidation("Resume", false, ["application/pdf"]).nullable(),
