@@ -74,7 +74,7 @@ export default function AddEditClass() {
 
     return (
         <Box className="admin-dashboard-content">
-            <Box className="admin-page-title-main" sx={{ mb: 3 }}>
+            <Box className="admin-page-title-main" sx={{ mb: 1.5 }}>
                 <Breadcrumbs
                     separator={<NavigateNextIcon fontSize="small" />}
                     aria-label="breadcrumb"
@@ -90,7 +90,7 @@ export default function AddEditClass() {
                 </Breadcrumbs>
             </Box>
 
-            <Box className="card-border common-card" sx={{ p: 4, borderRadius: '12px', minHeight: '200px', position: 'relative' }}>
+            <Box className="card-border common-card" sx={{ p: { xs: 2, sm: 3 }, borderRadius: '12px', backgroundColor: 'white' }}>
                 {loading ? (
                     <CommonLoader />
                 ) : (
@@ -105,9 +105,9 @@ export default function AddEditClass() {
                             return (
                                 <Form onSubmit={handleSubmit}>
                                     <Box sx={{ maxWidth: 800 }}>
-                                        <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 1.5, sm: 2 }}>
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }} className="admin-input-box">
-                                                <Typography sx={labelSx}>Class Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                        <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }}>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                                <Typography sx={labelSx}>Class Name<span style={{ color: '#ef4444' }}>*</span></Typography>
                                                 <TextField
                                                     fullWidth
                                                     name="name"
@@ -115,16 +115,21 @@ export default function AddEditClass() {
                                                     variant="outlined"
                                                     sx={inputSx}
                                                     value={values.name}
-                                                    onChange={handleChange}
+                                                    onChange={(e) => {
+                                                        const nameValue = e.target.value;
+                                                        handleChange(e);
+                                                        const generatedCode = nameValue.toUpperCase().replace(/\s/g, "_").replace(/[^A-Z0-9_]/g, "");
+                                                        formikProps.setFieldValue("code", generatedCode);
+                                                    }}
                                                     onBlur={handleBlur}
                                                     error={touched.name && Boolean(errors.name)}
                                                     disabled={isView}
                                                 />
-                                                <FormHelperText className="error-text">{(touched.name && errors.name) ? (errors.name as string) : ""}</FormHelperText>
+                                                {touched.name && errors.name && <FormHelperText className="error-text">{errors.name as string}</FormHelperText>}
                                             </Box>
 
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }} className="admin-input-box">
-                                                <Typography sx={labelSx}>Class Code<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                                <Typography sx={labelSx}>Class Code<span style={{ color: '#ef4444' }}>*</span></Typography>
                                                 <TextField
                                                     fullWidth
                                                     name="code"
@@ -133,14 +138,14 @@ export default function AddEditClass() {
                                                     sx={inputSx}
                                                     value={values.code}
                                                     onChange={(e) => {
-                                                        const value = e.target.value.toUpperCase().replace(/\s/g, "_");
+                                                        const value = e.target.value.toUpperCase().replace(/\s/g, "_").replace(/[^A-Z0-9_]/g, "");
                                                         formikProps.setFieldValue("code", value);
                                                     }}
                                                     onBlur={handleBlur}
                                                     error={touched.code && Boolean(errors.code)}
                                                     disabled={isView}
                                                 />
-                                                <FormHelperText className="error-text">{(touched.code && errors.code) ? (errors.code as string) : ""}</FormHelperText>
+                                                {touched.code && errors.code && <FormHelperText className="error-text">{errors.code as string}</FormHelperText>}
                                             </Box>
                                         </Box>
 

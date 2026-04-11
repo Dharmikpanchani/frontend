@@ -4,6 +4,7 @@ import type { OtpNumberInterface } from "@/types/interfaces/LoginInterface";
 import type { FormikProps } from "formik";
 import { useNavigate, useLocation } from "react-router-dom";
 import { verifyOtpAdmin, resendOtpAdmin, verifyEmailChangeAdmin } from "@/redux/slices/authSlice";
+import { verifyTeacherOtp } from "@/redux/slices/teacherSlice";
 import { toasterError } from "@/utils/toaster/Toaster";
 import { otpNumberValidationSchema } from "@/utils/validation/FormikValidation";
 import { Box, Typography, FormHelperText, Button } from "@mui/material";
@@ -21,7 +22,7 @@ export default function Otp() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { type, email } = location.state || {};
+  const { type, email, phone } = location.state || {}; // Added phone
   const [timeLeft, setTimeLeft] = useState(120);
   const [buttonSpinner, setButtonSpinner] = useState(false);
   const [resendSpinner, setResendSpinner] = useState(false);
@@ -32,6 +33,8 @@ export default function Otp() {
   const handleBack = () => {
     if (type === "registration") {
       navigate("/admin-list", { replace: true });
+    } else if (type === "teacher") {
+      navigate("/teacher", { replace: true });
     } else if (type === "admin_email_change" || type === "developer_email_change") {
       navigate("/profile", { replace: true });
     } else {
@@ -42,38 +45,48 @@ export default function Otp() {
   const getBackLabel = () => {
     if (type === "login") return "Back to Login?";
     if (type === "registration") return "Back to Admin List?";
+    if (type === "teacher") return "Back to Teacher List?";
     if (type === "forgotPassword") return "Back to Login?";
     if (type === "admin_email_change" || type === "developer_email_change") return "Back to Profile";
     return "Back";
   };
 
   useEffect(() => {
-    if (!email) {
+    if (!email && !phone) {
       navigate("/", { replace: true });
     }
-  }, [email, navigate]);
+  }, [email, phone, navigate]);
 
   const handleVerifyOtp = async (values: OtpNumberInterface, { setFieldValue }: any) => {
-    const urlencoded = new URLSearchParams();
-    urlencoded.append("email", email);
-    urlencoded.append("otp", values?.code);
-    urlencoded.append("type", type);
-    urlencoded.append("schoolCode", isSubdomain?.name);
-
     setButtonSpinner(true);
     try {
       let resultAction;
-      if (type === "admin_email_change" || type === "developer_email_change") {
+      if (type === "teacher") {
+        const payload = {
+          phone: phone,
+          otp: values?.code
+        };
+        resultAction = await dispatch(verifyTeacherOtp(payload) as any);
+      } else if (type === "admin_email_change" || type === "developer_email_change") {
         const emailChangeData = new URLSearchParams();
         emailChangeData.append("newEmail", email);
         emailChangeData.append("otp", values?.code);
         resultAction = await dispatch(verifyEmailChangeAdmin(emailChangeData) as any);
       } else {
+        const urlencoded = new URLSearchParams();
+        urlencoded.append("email", email);
+        urlencoded.append("otp", values?.code);
+        urlencoded.append("type", type);
+        urlencoded.append("schoolCode", isSubdomain?.name);
         resultAction = await dispatch(verifyOtpAdmin(urlencoded) as any);
       }
-      
+
       setButtonSpinner(false);
-      if (resultAction && (verifyOtpAdmin.fulfilled.match(resultAction) || verifyEmailChangeAdmin.fulfilled.match(resultAction))) {
+      if (resultAction && (
+        verifyOtpAdmin.fulfilled.match(resultAction) ||
+        verifyEmailChangeAdmin.fulfilled.match(resultAction) ||
+        verifyTeacherOtp.fulfilled.match(resultAction)
+      )) {
         if (resultAction.payload?.message?.toLowerCase().includes("fetch")) {
           toasterError("Invalid verification response");
           setFieldValue("code", "");
@@ -84,6 +97,8 @@ export default function Otp() {
           navigate("/dashboard", { replace: true });
         } else if (type === "registration") {
           navigate("/admin-list", { replace: true });
+        } else if (type === "teacher") {
+          navigate("/teacher", { replace: true });
         } else if (type === "schoolRegistration") {
           navigate("/school-list", { replace: true });
         } else if (type === "forgotPassword") {
@@ -103,6 +118,14 @@ export default function Otp() {
   };
 
   const resendOtp = async (setFieldValue: any) => {
+    // For now, teacher resend is not specifically implemented in backend 
+    // we can use the same resend logic if we update backend to handle phone.
+    // Assuming for now it's only for email types in authSlice.
+    if (type === "teacher") {
+        toasterError("Resend OTP for teacher coming soon. Please re-create if needed.");
+        return;
+    }
+
     const urlencoded = new URLSearchParams();
     urlencoded.append("email", email);
     urlencoded.append("type", type);

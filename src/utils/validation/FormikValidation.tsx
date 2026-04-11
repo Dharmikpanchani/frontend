@@ -7,6 +7,9 @@ export const englishOnlyRegex = /^[A-Za-z\s]+$/;
 export const alphanumericRegex = /^[a-zA-Z0-9]+$/;
 export const alphanumericWithSpaceRegex = /^[a-zA-Z0-9\s]+$/;
 export const alphanumericWithUnderscoreRegex = /^[a-zA-Z0-9_]+$/;
+export const aadhaarRegex = /^\d{12}$/;
+export const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+
 
 export const FILE_SIZE = 20 * 1024 * 1024; // 20MB
 export const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/png", "image/svg+xml"];
@@ -17,7 +20,7 @@ export const emailValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid email",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .test("no-starting-dot", "Please enter a valid email", (value) => {
@@ -73,7 +76,7 @@ export const roleNameValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid role name",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z]+( [A-Za-z]+)*$/, "Please enter a valid role name")
@@ -90,7 +93,7 @@ export const fullNameValidation = (fieldName: string, required = true) => {
     .test(
       "no-whitespace",
       `Please enter a valid ${fieldName.toLowerCase()}`,
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z]+( [A-Za-z]+)*$/, `Please enter a valid ${fieldName.toLowerCase()}`)
@@ -107,7 +110,7 @@ export const phoneNumberValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid phone number",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[0-9]{10}$/, "Please enter a valid 10-digit number")
@@ -123,7 +126,7 @@ export const schoolCodeValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid school code",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z0-9-]+$/, "Please enter a valid school code")
@@ -140,7 +143,7 @@ export const schoolNameValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid school name",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z]+( [A-Za-z]+)*$/, "Please enter a valid school name")
@@ -157,7 +160,7 @@ export const addressValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid address",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(10, "Address must be at least 10 characters")
@@ -172,7 +175,7 @@ export const cityValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid city",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(2, "City must be at least 2 characters")
@@ -187,7 +190,7 @@ export const stateValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid state",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(2, "State must be at least 2 characters")
@@ -202,7 +205,7 @@ export const zipCodeValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid zip code",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(/^[0-9]{5,6}$/, "Zip code must be 5 or 6 digits");
@@ -215,7 +218,7 @@ export const genericStringValidation = (fieldName: string, min = 1, max = 200, r
     .test(
       "no-whitespace",
       `Please enter a valid ${fieldName.toLowerCase()}`,
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(min, `${fieldName} must be at least ${min} characters`)
@@ -229,7 +232,7 @@ export const countryValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid country",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(2, "Country must be at least 2 characters")
@@ -239,18 +242,33 @@ export const countryValidation = (required = true) => {
   return required ? schema.required("Country is required") : schema;
 };
 
-export const dateValidation = (required = true) => {
+export const dateValidation = (required = true, message = "Date is required") => {
   let schema = Yup.mixed<moment.Moment>()
     .test("is-valid", "Please enter a valid date", (value) => {
       if (!value) return true;
       return moment(value).isValid();
-    })
-    .test("is-past", "Date cannot be in the future", (value) => {
-      if (!value) return true;
-      return moment(value).isSameOrBefore(moment(), "day");
     });
 
-  return required ? schema.required("Established date is required") : schema;
+  return required
+    ? schema.required(message).typeError("Please enter a valid date")
+    : schema.nullable();
+};
+
+export const dobValidation = (required = true) => {
+  return dateValidation(required, "Date of birth is required")
+    .test("age-check", "Teacher must be between 18 and 70 years old", (value) => {
+      if (!value) return true;
+      const age = moment().diff(moment(value), 'years');
+      return age >= 18 && age <= 70;
+    });
+};
+
+export const joiningDateValidation = (required = true) => {
+  return dateValidation(required, "Joining date is required")
+    .test("future-check", "Joining date must be today or in the future", (value) => {
+      if (!value) return true;
+      return moment(value).isSameOrAfter(moment(), "day");
+    });
 };
 
 export const gstValidation = (required = false) => {
@@ -258,7 +276,7 @@ export const gstValidation = (required = false) => {
     .test(
       "no-whitespace",
       "Please enter a valid GST number",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.toUpperCase().trim())
     .matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, "Please enter a valid GST number");
@@ -270,7 +288,7 @@ export const panValidation = (required = false) => {
     .test(
       "no-whitespace",
       "Please enter a valid PAN number",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.toUpperCase().trim())
     .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Please enter a valid PAN number");
@@ -282,7 +300,7 @@ export const registrationNumberValidation = (required = true) => {
     .test(
       "no-whitespace",
       "Please enter a valid registration number",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .min(3, "Registration number must be at least 3 characters")
@@ -487,7 +505,7 @@ export const departmentValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid department name",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(englishOnlyRegex, "Please enter a valid department name")
@@ -498,7 +516,7 @@ export const departmentValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid department code",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(alphanumericWithUnderscoreRegex, "Please enter a valid department code")
@@ -512,7 +530,7 @@ export const subjectValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid subject name",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(englishOnlyRegex, "Please enter a valid subject name")
@@ -523,14 +541,14 @@ export const subjectValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid subject code",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(alphanumericWithUnderscoreRegex, "Please enter a valid subject code")
     .min(2, "Subject code must be at least 2 characters")
     .max(20, "Subject code must be at most 20 characters")
     .required("Subject code is required"),
-  departmentId: Yup.string().required("Department is required"),
+  departmentIds: Yup.array().min(1, "At least one department is required").required("Department is required"),
 });
 
 export const classValidationSchema = Yup.object().shape({
@@ -538,7 +556,7 @@ export const classValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid class name",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(alphanumericWithSpaceRegex, "Please enter a valid class name")
@@ -549,7 +567,7 @@ export const classValidationSchema = Yup.object().shape({
     .test(
       "no-whitespace",
       "Please enter a valid class code",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
     .matches(alphanumericWithUnderscoreRegex, "Please enter a valid class code")
@@ -559,40 +577,101 @@ export const classValidationSchema = Yup.object().shape({
 });
 
 export const sectionValidationSchema = Yup.object().shape({
-  name: Yup.string()
+  code: Yup.string()
     .test(
       "no-whitespace",
-      "Please enter a valid section name",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
+      "Please enter a valid section code",
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
     )
     .transform((value) => value?.trim())
-    .matches(englishOnlyRegex, "Please enter a valid section name")
-    .min(1, "Section name must be at least 1 characters")
-    .max(20, "Section name must be at most 20 characters")
-    .required("Section name is required"),
+    .matches(alphanumericWithUnderscoreRegex, "Please enter a valid section code")
+    .min(1, "Section code must be at least 1 characters")
+    .max(20, "Section code must be at most 20 characters")
+    .required("Section code is required"),
   classId: Yup.string().required("Class is required"),
 });
 
 export const teacherValidationSchema = Yup.object().shape({
-  name: Yup.string()
-    .test(
-      "no-whitespace",
-      "Please enter a valid teacher name",
-      (_value, context) => !context.originalValue || String(context.originalValue).trim() === String(context.originalValue)
-    )
-    .transform((value) => value?.trim())
-    .matches(englishOnlyRegex, "Please enter a valid teacher name")
-    .min(3, "Teacher name must be at least 3 characters")
-    .max(50, "Teacher name must be at most 50 characters")
-    .required("Teacher name is required"),
+  fullName: fullNameValidation("Fullname", true),
   email: emailValidation(true),
   phoneNumber: phoneNumberValidation(true),
+  alternatePhoneNumber: phoneNumberValidation(false),
+  gender: Yup.string().optional(),
+  dateOfBirth: dobValidation(false),
+  bloodGroup: Yup.string().optional(),
+  // Address
+  address: genericStringValidation("Address", 5, 200, false),
+  city: cityValidation(false),
+  state: stateValidation(false),
+  country: countryValidation(false),
+  pincode: zipCodeValidation(false),
+  // Professional
+  joiningDate: joiningDateValidation(true),
+  experienceYears: Yup.string()
+    .matches(/^\d{1,2}$/, "Experience must be 1-2 digits")
+    .required("Experience is required"),
+  qualification: genericStringValidation("Qualification", 2, 100, false),
+  specialization: genericStringValidation("Specialization", 2, 100, false),
+  designation: Yup.string()
+    .test(
+      "no-whitespace",
+      "Please enter a valid designation",
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+    )
+    .transform((value) => value?.trim())
+    .matches(englishOnlyRegex, "Designation must contain letters only")
+    .required("Designation is required"),
   departmentId: Yup.string().required("Department is required"),
-  subjectIds: Yup.array()
-    .min(1, "At least one subject is required")
-    .required("Subjects are required"),
-  classIds: Yup.array()
-    .min(1, "At least one class is required")
-    .required("Classes are required"),
-  sectionId: Yup.string().optional(),
+  subjects: Yup.array().min(1, "At least one subject is required").required("Subjects are required"),
+  classesAssigned: Yup.array().min(1, "At least one class is required").required("Classes are required"),
+  sectionsAssigned: Yup.array().optional(),
+  // Salary
+  employmentType: Yup.string().required("Employment type is required"),
+  salary: Yup.number().positive("Salary must be positive").optional(),
+  salaryType: Yup.string().optional(),
+  bankName: Yup.string()
+    .test(
+      "no-whitespace",
+      "Please enter a valid bank name",
+      (value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+    )
+    .transform((value) => value?.trim())
+    .matches(englishOnlyRegex, "Bank name must contain letters only")
+    .optional(),
+  accountNumber: Yup.string()
+    .matches(/^\d+$/, "Account number must be numeric")
+    .min(10, "Account number is too short")
+    .max(18, "Account number is too long")
+    .optional(),
+
+  confirmAccountNumber: Yup.string()
+    .oneOf([Yup.ref('accountNumber')], "Account numbers must match")
+    .when('accountNumber', {
+      is: (val: string) => val && val.length > 0,
+      then: (schema) => schema.required("Please confirm your account number"),
+      otherwise: (schema) => schema.optional(),
+    }),
+  ifscCode: Yup.string()
+    .matches(ifscRegex, "Invalid IFSC code format (e.g. SBIN0012345)")
+    .optional(),
+
+  panNumber: panValidation(false),
+  aadharNumber: Yup.string()
+    .matches(/^\d+$/, "Aadhar number must be numeric")
+    .min(12, "Aadhar number must be at least 12 digits")
+    .max(12, "Aadhar number must be at most 12 digits")
+    .optional(),
+
+  // Tracking
+  attendanceId: Yup.string()
+    .matches(/^[A-Z0-9_]+$/, "Only uppercase letters, numbers and underscores are allowed")
+    .optional(),
+  leaveBalance: Yup.string()
+    .matches(/^\d{1,2}$/, "Leave balance must be 1-2 digits")
+    .optional(),
+  shiftTiming: Yup.string().optional(),
+  // Documents
+  profileImage: imageValidation("Profile Image", false).nullable(),
+  resume: fileValidation("Resume", false, ["application/pdf"]).nullable(),
+  idProof: imageValidation("ID Proof", false).nullable(),
 });

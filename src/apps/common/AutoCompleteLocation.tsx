@@ -159,7 +159,7 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
                   setFieldValue("city", locality?.long_name || sublocality?.long_name || "");
                   setFieldValue("state", state?.long_name || "");
                   setFieldValue("country", country?.long_name || "India");
-                  setFieldValue("zipCode", zipCode?.long_name || "");
+                  setFieldValue("pincode", zipCode?.long_name || "");
 
                   if (place.geometry?.location) {
                     setFieldValue("latitude", place.geometry.location.lat());

@@ -48,6 +48,25 @@ export const createTeacher = createAsyncThunk(
   }
 );
 
+export const verifyTeacherOtp = createAsyncThunk(
+  "teacher/verifyOtp",
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      const res: any = await masterService.verifyTeacherOtp(payload);
+      if (res.status === 200) {
+        toast.success(res.message || "Teacher verified successfully");
+        return res.data;
+      }
+      toast.error(res.message || "Verification failed");
+      return rejectWithValue(res.message);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message;
+      toast.error(msg);
+      return rejectWithValue(msg);
+    }
+  }
+);
+
 const teacherSlice = createSlice({
   name: "teacher",
   initialState,
@@ -72,6 +91,15 @@ const teacherSlice = createSlice({
         state.actionLoading = false;
       })
       .addCase(createTeacher.rejected, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(verifyTeacherOtp.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(verifyTeacherOtp.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(verifyTeacherOtp.rejected, (state) => {
         state.actionLoading = false;
       });
   },

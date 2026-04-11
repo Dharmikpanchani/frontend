@@ -213,7 +213,7 @@ export default function Subject() {
                     className="table-th"
                     width="20%"
                   >
-                    Department
+                    Departments
                   </TableCell>
                   <TableCell
                     component="th"
@@ -300,16 +300,21 @@ export default function Subject() {
                             className="table-td"
                           >
                             <Box className="admin-table-data-flex">
-                              <Tooltip
-                                title={data?.departmentId?.name || "N/A"}
-                                arrow
-                                placement="bottom"
-                                className="admin-tooltip"
-                              >
-                                <Typography className="admin-table-data-text">
-                                  {data?.departmentId?.name || "N/A"}
-                                </Typography>
-                              </Tooltip>
+                              {data?.departmentIds?.length > 0 ? (
+                                <Tooltip
+                                  title={data.departmentIds.map((d: any) => d.name).join(", ")}
+                                  arrow
+                                  placement="bottom"
+                                  className="admin-tooltip"
+                                >
+                                  <Typography className="admin-table-data-text">
+                                    {data.departmentIds[0].name}
+                                    {data.departmentIds.length > 1 && ` (+${data.departmentIds.length - 1} more)`}
+                                  </Typography>
+                                </Tooltip>
+                              ) : (
+                                <Typography className="admin-table-data-text">N/A</Typography>
+                              )}
                             </Box>
                           </TableCell>
                           <TableCell

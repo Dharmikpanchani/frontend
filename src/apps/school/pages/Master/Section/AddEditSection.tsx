@@ -36,7 +36,7 @@ export default function AddEditSection() {
 
     const [initialValues, setInitialValues] = useState({
         id: "",
-        name: "",
+        code: "",
         classId: "",
     });
 
@@ -52,7 +52,7 @@ export default function AddEditSection() {
         if (id && selectedSection && (isEdit || isView)) {
             setInitialValues({
                 id: selectedSection._id || "",
-                name: selectedSection.name || "",
+                code: selectedSection.code || "",
                 classId: selectedSection.classId?._id || selectedSection.classId || "",
             });
         }
@@ -61,7 +61,7 @@ export default function AddEditSection() {
     const handleSubmit = async (values: any) => {
         try {
             const resultAction = await dispatch(addEditSection(values) as any);
-            
+
             if (addEditSection.fulfilled.match(resultAction)) {
                 navigate("/master/section");
             }
@@ -95,7 +95,7 @@ export default function AddEditSection() {
                     enableReinitialize
                 >
                     {(formikProps: FormikProps<any>) => {
-                        const { values, errors, touched, handleChange, handleSubmit, setFieldValue, handleBlur } = formikProps;
+                        const { values, errors, touched, handleSubmit, setFieldValue, handleBlur } = formikProps;
                         return (
                             <Form onSubmit={handleSubmit}>
                                 <Box sx={{ maxWidth: 800 }}>
@@ -139,20 +139,23 @@ export default function AddEditSection() {
                                         </Box>
 
                                         <Box gridColumn="span 6" className="admin-input-box">
-                                            <Typography sx={labelSx}>Section Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                            <Typography sx={labelSx}>Section Code<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
                                             <TextField
                                                 fullWidth
-                                                name="name"
-                                                placeholder="Enter Section Name (e.g., Section A)"
+                                                name="code"
+                                                placeholder="Enter Section Code (e.g., A)"
                                                 variant="outlined"
                                                 sx={inputSx}
-                                                value={values.name}
-                                                onChange={handleChange}
+                                                value={values.code}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.toUpperCase().replace(/\s/g, "_");
+                                                    setFieldValue("code", value);
+                                                }}
                                                 onBlur={handleBlur}
-                                                error={touched.name && Boolean(errors.name)}
+                                                error={touched.code && Boolean(errors.code)}
                                                 disabled={isView}
                                             />
-                                            <FormHelperText className="error-text">{(touched.name && errors.name) ? (errors.name as string) : ""}</FormHelperText>
+                                            <FormHelperText className="error-text">{(touched.code && errors.code) ? (errors.code as string) : ""}</FormHelperText>
                                         </Box>
                                     </Box>
 

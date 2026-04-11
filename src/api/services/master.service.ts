@@ -87,4 +87,5 @@ export const masterService = {
     return adminApiService.get<any>(url);
   },
   createTeacher: (payload: any) => adminApiService.post<any>(Api.TEACHERS, payload),
+  verifyTeacherOtp: (payload: any) => adminApiService.post<any>(Api.VERIFY_TEACHER_OTP, payload),
 };

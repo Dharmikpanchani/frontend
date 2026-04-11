@@ -16,12 +16,13 @@ import type { FormikProps } from "formik";
 import { subjectValidationSchema } from "@/utils/validation/FormikValidation";
 import { addEditSubjectAction, getSubjectById } from "@/redux/slices/subjectSlice";
 import { getDepartments } from "@/redux/slices/departmentSlice";
+import { getClasses } from "@/redux/slices/classSlice";
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import Svg from "@/assets/Svg";
 import type { RootState } from "@/redux/Store";
-import { labelSx, inputSx } from "@/utils/styles/commonSx";
+import { labelSx, inputSx, multiInputSx } from "@/utils/styles/commonSx";
 
 export default function AddEditSubject() {
     const { id } = useParams();
@@ -38,12 +39,13 @@ export default function AddEditSubject() {
         id: "",
         name: "",
         code: "",
-        departmentId: "",
+        departmentIds: [] as string[],
     });
 
     useEffect(() => {
-        // Fetch departments with type filter for dropdown
-        dispatch(getDepartments({ type: "filter" }) as any);
+        const params = { type: "filter" };
+        dispatch(getDepartments(params) as any);
+        dispatch(getClasses(params) as any);
 
         if (id) {
             dispatch(getSubjectById(id) as any);
@@ -56,7 +58,7 @@ export default function AddEditSubject() {
                 id: selectedSubject._id || "",
                 name: selectedSubject.name || "",
                 code: selectedSubject.code || "",
-                departmentId: selectedSubject.departmentId?._id || selectedSubject.departmentId || "",
+                departmentIds: selectedSubject.departmentIds?.map((d: any) => d._id || d) || [],
             });
         }
     }, [id, selectedSubject, isEdit, isView]);
@@ -80,7 +82,7 @@ export default function AddEditSubject() {
 
     return (
         <Box className="admin-dashboard-content">
-            <Box className="admin-page-title-main" sx={{ mb: 3 }}>
+            <Box className="admin-page-title-main" sx={{ mb: 1.5 }}>
                 <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} className="admin-breadcrumb" sx={{ mb: 1 }}>
                     <Link underline="hover" color="inherit" onClick={() => navigate("/master/subject")} sx={{ cursor: 'pointer', fontSize: '14px' }}>
                         Subjects
@@ -89,7 +91,7 @@ export default function AddEditSubject() {
                 </Breadcrumbs>
             </Box>
 
-            <Box className="card-border common-card" sx={{ p: 4, borderRadius: '12px', minHeight: '200px' }}>
+            <Box className="card-border common-card" sx={{ p: { xs: 2, sm: 3 }, borderRadius: '12px', backgroundColor: 'white' }}>
                 <Formik
                     initialValues={initialValues}
                     validationSchema={subjectValidationSchema}
@@ -100,71 +102,32 @@ export default function AddEditSubject() {
                         const { values, errors, touched, handleChange, handleSubmit, setFieldValue, handleBlur } = formikProps;
                         return (
                             <Form onSubmit={handleSubmit}>
-                                <Box sx={{ maxWidth: 800 }}>
-                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 1.5, sm: 2 }}>
-                                        <Box gridColumn="span 12" className="admin-input-box">
-                                            <Typography sx={labelSx}>Department<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                            <Autocomplete
-                                                options={departments || []}
-                                                getOptionLabel={(option: any) => option.name || ""}
-                                                value={departments?.find((d: any) => d._id === values.departmentId) || null}
-                                                onChange={(_, newValue) => setFieldValue("departmentId", newValue ? newValue._id : "")}
-                                                disabled={isView}
-                                                popupIcon={<img src={Svg.down} style={{ width: '10px' }} alt="dropdown" />}
-                                                clearIcon={null}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        placeholder="Select Department"
-                                                        variant="outlined"
-                                                        sx={inputSx}
-                                                        error={touched.departmentId && Boolean(errors.departmentId)}
-                                                    />
-                                                )}
-                                                sx={{
-                                                    '& .MuiAutocomplete-inputRoot': {
-                                                        paddingTop: '0 !important',
-                                                        paddingBottom: '0 !important',
-                                                        paddingLeft: '0 !important',
-                                                        paddingRight: '30px !important',
-                                                        height: '40px',
-                                                        '& .MuiAutocomplete-input': {
-                                                            padding: '0 10px !important',
-                                                            height: '40px',
-                                                            fontFamily: "'Poppins', sans-serif !important",
-                                                            fontSize: '14px !important',
-                                                        }
-                                                    }
-                                                }}
-                                            />
-                                            <FormHelperText className="error-text">{(touched.departmentId && errors.departmentId) ? (errors.departmentId as string) : ""}</FormHelperText>
-                                        </Box>
-
-                                        <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }} className="admin-input-box">
-                                            <Typography sx={labelSx}>Subject Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                <Box sx={{ maxWidth: 1000 }}>
+                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }}>
+                                        <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                            <Typography sx={labelSx}>Subject Name<span style={{ color: '#ef4444' }}>*</span></Typography>
                                             <TextField
-                                                fullWidth
-                                                name="name"
-                                                placeholder="Enter Subject Name"
-                                                variant="outlined"
-                                                sx={inputSx}
+                                                fullWidth name="name" placeholder="Enter Subject Name"
+                                                variant="outlined" sx={inputSx}
                                                 value={values.name}
-                                                onChange={handleChange}
+                                                onChange={(e) => {
+                                                    const nameValue = e.target.value;
+                                                    handleChange(e);
+                                                    const generatedCode = nameValue.toUpperCase().replace(/\s/g, "_").replace(/[^A-Z0-9_]/g, "");
+                                                    setFieldValue("code", generatedCode);
+                                                }}
                                                 onBlur={handleBlur}
                                                 error={touched.name && Boolean(errors.name)}
                                                 disabled={isView}
                                             />
-                                            <FormHelperText className="error-text">{(touched.name && errors.name) ? (errors.name as string) : ""}</FormHelperText>
+                                            {touched.name && errors.name && <FormHelperText className="error-text">{errors.name as string}</FormHelperText>}
                                         </Box>
 
-                                        <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }} className="admin-input-box">
-                                            <Typography sx={labelSx}>Subject Code<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                        <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                            <Typography sx={labelSx}>Subject Code<span style={{ color: '#ef4444' }}>*</span></Typography>
                                             <TextField
-                                                fullWidth
-                                                name="code"
-                                                placeholder="Enter Subject Code"
-                                                variant="outlined"
-                                                sx={inputSx}
+                                                fullWidth name="code" placeholder="Enter Subject Code"
+                                                variant="outlined" sx={inputSx}
                                                 value={values.code}
                                                 onChange={(e) => {
                                                     const value = e.target.value.toUpperCase().replace(/\s/g, "_");
@@ -174,36 +137,34 @@ export default function AddEditSubject() {
                                                 error={touched.code && Boolean(errors.code)}
                                                 disabled={isView}
                                             />
-                                            <FormHelperText className="error-text">{(touched.code && errors.code) ? (errors.code as string) : ""}</FormHelperText>
+                                            {touched.code && errors.code && <FormHelperText className="error-text">{errors.code as string}</FormHelperText>}
+                                        </Box>
+
+                                        <Box gridColumn="span 12">
+                                            <Typography sx={labelSx}>Departments<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                            <Autocomplete
+                                                multiple
+                                                options={departments || []}
+                                                getOptionLabel={(o) => o.name || ""}
+                                                value={departments?.filter((d: any) => values.departmentIds.includes(d._id)) || []}
+                                                onChange={(_, v) => setFieldValue("departmentIds", v.map((item: any) => item._id))}
+                                                disabled={isView}
+                                                renderInput={(p) => <TextField {...p} placeholder={isView ? "" : "Select Departments"} variant="outlined" sx={multiInputSx} error={touched.departmentIds && Boolean(errors.departmentIds)} />}
+                                            />
+                                            {touched.departmentIds && errors.departmentIds && <FormHelperText className="error-text">{errors.departmentIds as string}</FormHelperText>}
                                         </Box>
                                     </Box>
 
-                                    <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end', flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
-                                        <Button
-                                            className="admin-btn-secondary"
-                                            onClick={() => navigate("/master/subject")}
-                                            variant="outlined"
-                                            sx={{ minWidth: { xs: '100%', sm: '130px' }, borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
-                                        >
+                                    <Box sx={{ mt: 6, pt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end', borderTop: '1px solid #f0f0f0' }}>
+                                        <Button className="admin-btn-secondary" onClick={() => navigate("/master/subject")} variant="outlined" sx={{ minWidth: '130px' }}>
                                             {isView ? "Back" : "Discard"}
                                         </Button>
                                         {!isView && (
-                                            <Button
-                                                type="submit"
-                                                className="admin-btn-theme"
-                                                disabled={actionLoading}
-                                                variant="contained"
-                                                sx={{ minWidth: { xs: '100%', sm: '120px' }, borderRadius: '8px', textTransform: 'none', fontWeight: 600, boxShadow: 'none', '&:hover': { boxShadow: 'none' } }}
-                                            >
+                                            <Button type="submit" className="admin-btn-theme" disabled={actionLoading} variant="contained" sx={{ minWidth: '180px' }}>
                                                 {actionLoading ? <Spinner /> : (
                                                     <>
-                                                        <img
-                                                            src={Svg.plus}
-                                                            className="admin-plus-icon"
-                                                            alt="plus"
-                                                            style={{ filter: 'brightness(0) invert(1)', width: '12px', marginRight: '8px' }}
-                                                        />
-                                                        {isEdit ? "Update" : "Add"}
+                                                        <img src={Svg.plus} className="admin-plus-icon" alt="plus" style={{ filter: 'brightness(0) invert(1)', width: '12px', marginRight: '8px' }} />
+                                                        {isEdit ? "Update Subject" : "Add Subject"}
                                                     </>
                                                 )}
                                             </Button>
@@ -218,3 +179,4 @@ export default function AddEditSubject() {
         </Box>
     );
 }
+

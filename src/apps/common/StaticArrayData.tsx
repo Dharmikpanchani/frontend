@@ -293,6 +293,7 @@ export const schoolAdminPermission = {
     update: "section_edit",
     read: "section_view",
     delete: "section_delete",
+    status: "section_status",
   },
   teacher: {
     create: "teacher_add",
@@ -321,4 +322,32 @@ export const mediumOptions = [
   { label: "English", value: "English" },
   { label: "Gujarati", value: "Gujarati" },
   { label: "Hindi", value: "Hindi" },
+];
+
+export const bloodGroupOptions = [
+  { label: "A+", value: "A+" },
+  { label: "A-", value: "A-" },
+  { label: "B+", value: "B+" },
+  { label: "B-", value: "B-" },
+  { label: "AB+", value: "AB+" },
+  { label: "AB-", value: "AB-" },
+  { label: "O+", value: "O+" },
+  { label: "O-", value: "O-" },
+];
+
+export const genderOptions = [
+  { label: "Male", value: "Male" },
+  { label: "Female", value: "Female" },
+  { label: "Other", value: "Other" },
+];
+
+export const employmentTypeOptions = [
+  { label: "Full-time", value: "Full-time" },
+  { label: "Part-time", value: "Part-time" },
+  { label: "Contract", value: "Contract" },
+];
+
+export const salaryTypeOptions = [
+  { label: "Monthly", value: "Monthly" },
+  { label: "Hourly", value: "Hourly" },
 ];

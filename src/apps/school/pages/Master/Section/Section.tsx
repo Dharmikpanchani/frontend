@@ -202,7 +202,7 @@ export default function Section() {
                     className="table-th"
                     width="25%"
                   >
-                    Section Name
+                    Section Code
                   </TableCell>
                   <TableCell
                     component="th"
@@ -261,13 +261,13 @@ export default function Section() {
                           >
                             <Box className="admin-table-data-flex">
                               <Tooltip
-                                title={data?.name || "N/A"}
+                                title={data?.code || "N/A"}
                                 arrow
                                 placement="bottom"
                                 className="admin-tooltip"
                               >
                                 <Typography className="admin-table-data-text">
-                                  {data?.name || "N/A"}
+                                  {data?.code || "N/A"}
                                 </Typography>
                               </Tooltip>
                             </Box>

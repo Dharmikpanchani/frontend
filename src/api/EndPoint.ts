@@ -90,4 +90,5 @@ export const Api = {
   ADD_EDIT_SECTION: `${route}/add-edit-section`,
   CHANGE_SECTION_STATUS: `${route}/section-action-status`,
   TEACHERS: `${route}/teachers`,
+  VERIFY_TEACHER_OTP: `${route}/teachers/verify-otp`,
 };
