@@ -4,6 +4,7 @@ import type { OtpNumberInterface } from "@/types/interfaces/LoginInterface";
 import type { FormikProps } from "formik";
 import { useNavigate, useLocation } from "react-router-dom";
 import { verifyOtpAdmin, resendOtpAdmin, verifyEmailChangeAdmin } from "@/redux/slices/authSlice";
+import { addEditAdminUser } from "@/redux/slices/adminUserSlice";
 import { toasterError } from "@/utils/toaster/Toaster";
 import { otpNumberValidationSchema } from "@/utils/validation/FormikValidation";
 import { Box, Typography, FormHelperText, Button } from "@mui/material";
@@ -34,8 +35,8 @@ export default function Otp() {
       navigate("/admin-list", { replace: true });
     } else if (type === "schoolRegistration") {
       navigate("/school-list", { replace: true });
-    } else if (type === "admin_email_change" || type === "developer_email_change") {
-      navigate("/profile", { replace: true });
+    } else if (type === "admin_email_change" || type === "developer_email_change" || type === "admin_update") {
+      navigate(-1);
     } else {
       navigate("/", { replace: true });
     }
@@ -46,7 +47,7 @@ export default function Otp() {
     if (type === "registration") return "Back to Admin List?";
     if (type === "schoolRegistration") return "Back to School List?";
     if (type === "forgotPassword") return "Back to Login?";
-    if (type === "admin_email_change" || type === "developer_email_change") return "Back to Profile";
+    if (type === "admin_email_change" || type === "developer_email_change" || type === "admin_update") return "Back";
     return "Back";
   };
 
@@ -70,12 +71,20 @@ export default function Otp() {
         emailChangeData.append("newEmail", email);
         emailChangeData.append("otp", values?.code);
         resultAction = await dispatch(verifyEmailChangeAdmin(emailChangeData) as any);
+      } else if (type === "admin_update") {
+        const { updateData } = location.state || {};
+        const urlencodedUpdate = new URLSearchParams();
+        Object.keys(updateData).forEach(key => {
+          urlencodedUpdate.append(key, updateData[key]);
+        });
+        urlencodedUpdate.append("otp", values?.code);
+        resultAction = await dispatch(addEditAdminUser(urlencodedUpdate) as any);
       } else {
         resultAction = await dispatch(verifyOtpAdmin(urlencoded) as any);
       }
-      
+
       setButtonSpinner(false);
-      if (resultAction && (verifyOtpAdmin.fulfilled.match(resultAction) || verifyEmailChangeAdmin.fulfilled.match(resultAction))) {
+      if (resultAction && (verifyOtpAdmin.fulfilled.match(resultAction) || verifyEmailChangeAdmin.fulfilled.match(resultAction) || addEditAdminUser.fulfilled.match(resultAction))) {
         if (resultAction.payload?.message?.toLowerCase().includes("fetch")) {
           toasterError("Invalid verification response");
           setFieldValue("code", "");
@@ -92,6 +101,8 @@ export default function Otp() {
           navigate("/set-password", { replace: true });
         } else if (type === "admin_email_change" || type === "developer_email_change") {
           navigate("/profile", { replace: true });
+        } else if (type === "admin_update") {
+          navigate("/admin-list", { replace: true });
         } else {
           navigate("/", { replace: true });
         }

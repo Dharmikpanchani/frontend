@@ -235,6 +235,16 @@ export default function AddEditAdminUser() {
             const resultAction = await dispatch(addEditAdminUser(urlencoded) as any);
             setButtonSpinner(false);
             if (addEditAdminUser.fulfilled.match(resultAction)) {
+                if (resultAction.payload?.requireOtp) {
+                    navigate("/otp", { 
+                        state: { 
+                            type: "admin_update", 
+                            email: resultAction.payload.email, 
+                            updateData: values 
+                        } 
+                    });
+                    return;
+                }
                 if (!id) {
                     navigate("/otp", { state: { type: "registration", email: values.email } });
                 } else {

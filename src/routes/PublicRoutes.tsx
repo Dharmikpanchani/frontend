@@ -24,7 +24,11 @@ const PublicRoutes: React.FC = () => {
 
   const { pathname, state } = useLocation();
   const isValid = useIsValidToken(token);
-  const isOtpRegistration = pathname === "/otp" && (state?.type === "registration" || state?.type === "schoolRegistration");
+  const isOtpRegistration = 
+    pathname === "/otp" && 
+    (state?.type === "registration" || 
+     state?.type === "schoolRegistration" || 
+     state?.type === "admin_update");
 
   useEffect(() => {
     if (token && !isValid) {
