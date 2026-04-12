@@ -17,7 +17,6 @@ import { addEditClassAction, getClassById, clearSelectedClass } from "@/redux/sl
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
-import Svg from "@/assets/Svg";
 import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
