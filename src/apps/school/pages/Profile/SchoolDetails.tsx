@@ -636,17 +636,17 @@ export default function SchoolDetails() {
                           sx: {
                             "& .MuiPickersOutlinedInput-root": {
                               height: "40px",
-                              "& .MuiOutlinedInput-notchedOutline": {
-                                borderColor: "var(--input-border, #ced4da)",
+                              backgroundColor: "#fff !important",
+                              borderRadius: "var(--button-radius, 6px) !important",
+                              "& fieldset": {
+                                borderColor: "var(--input-border, #ced4da) !important",
                               },
-                              "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
-                                borderColor: "var(--primary-color, #ced4da) !important",
+                              "&:hover:not(.Mui-focused) fieldset": {
+                                borderColor: "var(--input-border, #ced4da) !important",
                               },
-                              "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                border: "1px solid var(--primary-color) !important",
-                              },
-                              "&:hover .MuiPickersOutlinedInput-notchedOutline": {
-                                border: "1px solid var(--primary-color, #ced4da) !important",
+                              "&.Mui-focused:not(.Mui-error) fieldset": {
+                                borderColor: "var(--primary-color, #942F15) !important",
+                                borderWidth: "1px !important",
                               },
                             },
 
@@ -659,12 +659,19 @@ export default function SchoolDetails() {
                               fontSize: "13px",
                               padding: "12px 0px",
                             },
+                            "& .MuiOutlinedInput-input": {
+                              padding: "0 14px !important",
+                              fontSize: "14px !important",
+                              fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
+                              height: "40px",
+                              cursor: "pointer",
+                            }
                           }
                         },
 
                         field: {
                           readOnly: true,
-                        },
+                        } as any,
                       }}
                     />
                   </LocalizationProvider>

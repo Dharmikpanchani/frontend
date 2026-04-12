@@ -25,6 +25,7 @@ import {
     AddCircleOutline as AddIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
+    CameraAlt as CameraAltIcon,
 } from "@mui/icons-material";
 import { InputAdornment, IconButton } from "@mui/material";
 import { Formik, Form } from "formik";
@@ -45,6 +46,8 @@ import moment from "moment";
 import { CommonLoader } from "@/apps/school/component/schoolCommon/loader/Loader";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx, multiInputSx } from "@/utils/styles/commonSx";
+import { usePermissions } from "@/hooks/usePermissions";
+import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import {
     bloodGroupOptions,
     genderOptions,
@@ -58,10 +61,14 @@ export default function AddEditTeacher() {
     const dispatch = useDispatch();
     const { pathname } = useLocation();
     const isView = pathname.includes("/view/");
-    const { departments } = useSelector((state: RootState) => state.DepartmentReducer);
-    const { subjects } = useSelector((state: RootState) => state.SubjectReducer);
-    const { classes } = useSelector((state: RootState) => state.ClassReducer);
-    const { sections } = useSelector((state: RootState) => state.SectionReducer);
+    const { hasPermission } = usePermissions();
+
+    const canAdd = hasPermission(schoolAdminPermission.teacher.create);
+    const canEdit = hasPermission(schoolAdminPermission.teacher.update);
+    const { allDepartments: departments } = useSelector((state: RootState) => state.DepartmentReducer);
+    const { allSubjects: subjects } = useSelector((state: RootState) => state.SubjectReducer);
+    const { allClasses: classes } = useSelector((state: RootState) => state.ClassReducer);
+    const { allSections: sections } = useSelector((state: RootState) => state.SectionReducer);
     const { actionLoading, loading: teacherLoading } = useSelector((state: RootState) => state.TeacherReducer);
     const { loading: deptLoading } = useSelector((state: RootState) => state.DepartmentReducer);
     const { loading: subjectLoading } = useSelector((state: RootState) => state.SubjectReducer);
@@ -332,7 +339,12 @@ export default function AddEditTeacher() {
                                                         sx={{
                                                             minWidth: '100px', width: '100px', height: '100px',
                                                             borderRadius: '50%', border: '1px dashed #ced4da',
-                                                            bgcolor: '#f8f9fa', overflow: 'hidden', p: 0
+                                                            bgcolor: '#f8f9fa', overflow: 'hidden', p: 0,
+                                                            transition: 'all 0.3s ease',
+                                                            '&:hover': {
+                                                                borderColor: 'var(--primary-color)',
+                                                                '& .avatar-overlay': { opacity: 1 }
+                                                            }
                                                         }}
                                                     >
                                                         <ProfileAvatar
@@ -341,8 +353,43 @@ export default function AddEditTeacher() {
                                                             size={100}
                                                             sx={{ borderRadius: '50%' }}
                                                         />
+                                                        {!isView && (
+                                                            <Box
+                                                                className="avatar-overlay"
+                                                                sx={{
+                                                                    position: 'absolute',
+                                                                    top: 0, left: 0, width: '100%', height: '100%',
+                                                                    bgcolor: 'rgba(0,0,0,0.3)',
+                                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                    opacity: 0, transition: 'all 0.3s ease',
+                                                                }}
+                                                            >
+                                                                <CameraAltIcon sx={{ color: 'white', fontSize: 24 }} />
+                                                            </Box>
+                                                        )}
                                                         <input hidden accept="image/*" type="file" onChange={(e) => setFieldValue("profileImage", e.target.files?.[0])} />
                                                     </Button>
+                                                    {!isView && (
+                                                        <Box sx={{
+                                                            position: 'absolute',
+                                                            bottom: 5,
+                                                            right: 5,
+                                                            backgroundColor: 'var(--primary-color, #ad1e1e)',
+                                                            width: '28px',
+                                                            height: '28px',
+                                                            borderRadius: '50%',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: 'white',
+                                                            border: '2px solid white',
+                                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                                            pointerEvents: 'none',
+                                                            zIndex: 2
+                                                        }}>
+                                                            <CameraAltIcon sx={{ fontSize: 14 }} />
+                                                        </Box>
+                                                    )}
                                                 </Box>
                                                 <Box>
                                                     <Typography sx={labelSx}>Profile Image</Typography>
@@ -406,14 +453,17 @@ export default function AddEditTeacher() {
                                                                 sx: {
                                                                     "& .MuiPickersOutlinedInput-root": {
                                                                         height: "40px",
-                                                                        "& .MuiOutlinedInput-notchedOutline": {
-                                                                            borderColor: "var(--input-border, #ced4da)",
-                                                                        },
-                                                                        "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+                                                                        backgroundColor: "#fff !important",
+                                                                        borderRadius: "var(--button-radius, 6px) !important",
+                                                                        "& fieldset": {
                                                                             borderColor: "var(--input-border, #ced4da) !important",
                                                                         },
-                                                                        "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                            border: "1px solid var(--primary-color, #5c1a1a) !important",
+                                                                        "&:hover:not(.Mui-focused) fieldset": {
+                                                                            borderColor: "var(--input-border, #ced4da) !important",
+                                                                        },
+                                                                        "&.Mui-focused:not(.Mui-error) fieldset": {
+                                                                            borderColor: "var(--primary-color, #942F15) !important",
+                                                                            borderWidth: "1px !important",
                                                                         },
                                                                     },
                                                                     "& .MuiPickersSectionList-root": {
@@ -424,6 +474,13 @@ export default function AddEditTeacher() {
                                                                         fontSize: "13px",
                                                                         padding: "12px 0px",
                                                                     },
+                                                                    "& .MuiOutlinedInput-input": {
+                                                                        padding: "0 14px !important",
+                                                                        fontSize: "14px !important",
+                                                                        fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
+                                                                        height: "40px",
+                                                                        cursor: "pointer",
+                                                                    }
                                                                 }
                                                             },
                                                             popper: {
@@ -445,7 +502,7 @@ export default function AddEditTeacher() {
                                                                     }
                                                                 }
                                                             },
-                                                            field: { readOnly: true },
+                                                            field: { readOnly: true } as any,
                                                         }}
                                                     />
                                                 </LocalizationProvider>
@@ -537,14 +594,17 @@ export default function AddEditTeacher() {
                                                                 sx: {
                                                                     "& .MuiPickersOutlinedInput-root": {
                                                                         height: "40px",
-                                                                        "& .MuiOutlinedInput-notchedOutline": {
-                                                                            borderColor: "var(--input-border, #ced4da)",
-                                                                        },
-                                                                        "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+                                                                        backgroundColor: "#fff !important",
+                                                                        borderRadius: "var(--button-radius, 6px) !important",
+                                                                        "& fieldset": {
                                                                             borderColor: "var(--input-border, #ced4da) !important",
                                                                         },
-                                                                        "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                            border: "1px solid var(--primary-color, #5c1a1a) !important",
+                                                                        "&:hover:not(.Mui-focused) fieldset": {
+                                                                            borderColor: "var(--input-border, #ced4da) !important",
+                                                                        },
+                                                                        "&.Mui-focused:not(.Mui-error) fieldset": {
+                                                                            borderColor: "var(--primary-color, #942F15) !important",
+                                                                            borderWidth: "1px !important",
                                                                         },
                                                                     },
                                                                     "& .MuiPickersSectionList-root": {
@@ -555,6 +615,13 @@ export default function AddEditTeacher() {
                                                                         fontSize: "13px",
                                                                         padding: "12px 0px",
                                                                     },
+                                                                    "& .MuiOutlinedInput-input": {
+                                                                        padding: "0 14px !important",
+                                                                        fontSize: "14px !important",
+                                                                        fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
+                                                                        height: "40px",
+                                                                        cursor: "pointer",
+                                                                    }
                                                                 }
                                                             },
                                                             popper: {
@@ -576,7 +643,7 @@ export default function AddEditTeacher() {
                                                                     }
                                                                 }
                                                             },
-                                                            field: { readOnly: true },
+                                                            field: { readOnly: true } as any,
                                                         }}
                                                     />
                                                 </LocalizationProvider>
@@ -764,8 +831,8 @@ export default function AddEditTeacher() {
                                                         {(values.resume || values.resumeName) && (
                                                             <Link
                                                                 onClick={() => {
-                                                                    const url = values.resume instanceof File 
-                                                                        ? URL.createObjectURL(values.resume) 
+                                                                    const url = values.resume instanceof File
+                                                                        ? URL.createObjectURL(values.resume)
                                                                         : `${import.meta.env.VITE_BASE_URL_IMAGE}/${values.resumeName}`;
                                                                     window.open(url, '_blank');
                                                                 }}
@@ -809,8 +876,8 @@ export default function AddEditTeacher() {
                                                         {(values.idProof || values.idProofName) && (
                                                             <Link
                                                                 onClick={() => {
-                                                                    const url = values.idProof instanceof File 
-                                                                        ? URL.createObjectURL(values.idProof) 
+                                                                    const url = values.idProof instanceof File
+                                                                        ? URL.createObjectURL(values.idProof)
                                                                         : `${import.meta.env.VITE_BASE_URL_IMAGE}/${values.idProofName}`;
                                                                     window.open(url, '_blank');
                                                                 }}
@@ -882,16 +949,16 @@ export default function AddEditTeacher() {
                                                         {values.educationCertificates.map((file: any, index: number) => {
                                                             const fileName = file instanceof File ? file.name : (typeof file === 'string' ? file.split('/').pop() : `Certificate ${index + 1}`);
                                                             return (
-                                                                <Box key={index} sx={{ 
-                                                                    display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.5, py: 0.8, 
+                                                                <Box key={index} sx={{
+                                                                    display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.5, py: 0.8,
                                                                     borderRadius: '6px', border: '1px solid #e5e7eb', backgroundColor: '#f9fafb'
                                                                 }}>
                                                                     <Typography sx={{ fontSize: '12px', color: '#374151', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                                         {fileName}
                                                                     </Typography>
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                        <IconButton 
-                                                                            size="small" 
+                                                                        <IconButton
+                                                                            size="small"
                                                                             onClick={() => {
                                                                                 const url = file instanceof File ? URL.createObjectURL(file) : `${import.meta.env.VITE_BASE_URL_IMAGE}/${file}`;
                                                                                 window.open(url, '_blank');
@@ -901,8 +968,8 @@ export default function AddEditTeacher() {
                                                                             <Visibility sx={{ fontSize: 16 }} />
                                                                         </IconButton>
                                                                         {!isView && (
-                                                                            <IconButton 
-                                                                                size="small" 
+                                                                            <IconButton
+                                                                                size="small"
                                                                                 onClick={() => {
                                                                                     const newList = [...values.educationCertificates];
                                                                                     newList.splice(index, 1);
@@ -960,16 +1027,16 @@ export default function AddEditTeacher() {
                                                         {values.experienceCertificates.map((file: any, index: number) => {
                                                             const fileName = file instanceof File ? file.name : (typeof file === 'string' ? file.split('/').pop() : `Certificate ${index + 1}`);
                                                             return (
-                                                                <Box key={index} sx={{ 
-                                                                    display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.5, py: 0.8, 
+                                                                <Box key={index} sx={{
+                                                                    display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.5, py: 0.8,
                                                                     borderRadius: '6px', border: '1px solid #e5e7eb', backgroundColor: '#f9fafb'
                                                                 }}>
                                                                     <Typography sx={{ fontSize: '12px', color: '#374151', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                                         {fileName}
                                                                     </Typography>
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                        <IconButton 
-                                                                            size="small" 
+                                                                        <IconButton
+                                                                            size="small"
                                                                             onClick={() => {
                                                                                 const url = file instanceof File ? URL.createObjectURL(file) : `${import.meta.env.VITE_BASE_URL_IMAGE}/${file}`;
                                                                                 window.open(url, '_blank');
@@ -979,8 +1046,8 @@ export default function AddEditTeacher() {
                                                                             <Visibility sx={{ fontSize: 16 }} />
                                                                         </IconButton>
                                                                         {!isView && (
-                                                                            <IconButton 
-                                                                                size="small" 
+                                                                            <IconButton
+                                                                                size="small"
                                                                                 onClick={() => {
                                                                                     const newList = [...values.experienceCertificates];
                                                                                     newList.splice(index, 1);
@@ -1043,16 +1110,26 @@ export default function AddEditTeacher() {
                                                                 sx: {
                                                                     "& .MuiPickersOutlinedInput-root": {
                                                                         height: "40px",
-                                                                        "& .MuiOutlinedInput-notchedOutline": {
-                                                                            borderColor: "var(--input-border, #ced4da)",
-                                                                        },
-                                                                        "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+                                                                        backgroundColor: "#fff !important",
+                                                                        borderRadius: "var(--button-radius, 6px) !important",
+                                                                        "& fieldset": {
                                                                             borderColor: "var(--input-border, #ced4da) !important",
                                                                         },
-                                                                        "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                            border: "1px solid var(--primary-color, #5c1a1a) !important",
+                                                                        "&:hover:not(.Mui-focused) fieldset": {
+                                                                            borderColor: "var(--input-border, #ced4da) !important",
+                                                                        },
+                                                                        "&.Mui-focused:not(.Mui-error) fieldset": {
+                                                                            borderColor: "var(--primary-color, #942F15) !important",
+                                                                            borderWidth: "1px !important",
                                                                         },
                                                                     },
+                                                                    "& .MuiOutlinedInput-input": {
+                                                                        padding: "0 14px !important",
+                                                                        fontSize: "14px !important",
+                                                                        fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
+                                                                        height: "40px",
+                                                                        cursor: "pointer",
+                                                                    }
                                                                 }
                                                             },
                                                             popper: {
@@ -1066,7 +1143,7 @@ export default function AddEditTeacher() {
                                                                     }
                                                                 }
                                                             },
-                                                            field: { readOnly: true },
+                                                            field: { readOnly: true } as any,
                                                         }}
                                                     />
                                                 </LocalizationProvider>
@@ -1093,23 +1170,33 @@ export default function AddEditTeacher() {
                                                                 sx: {
                                                                     "& .MuiPickersOutlinedInput-root": {
                                                                         height: "40px",
-                                                                        "& .MuiOutlinedInput-notchedOutline": {
-                                                                            borderColor: "var(--input-border, #ced4da)",
-                                                                        },
-                                                                        "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
+                                                                        backgroundColor: "#fff !important",
+                                                                        borderRadius: "var(--button-radius, 6px) !important",
+                                                                        "& fieldset": {
                                                                             borderColor: "var(--input-border, #ced4da) !important",
                                                                         },
-                                                                        "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                            border: "1px solid var(--primary-color, #5c1a1a) !important",
+                                                                        "&:hover:not(.Mui-focused) fieldset": {
+                                                                            borderColor: "var(--input-border, #ced4da) !important",
+                                                                        },
+                                                                        "&.Mui-focused:not(.Mui-error) fieldset": {
+                                                                            borderColor: "var(--primary-color, #942F15) !important",
+                                                                            borderWidth: "1px !important",
                                                                         },
                                                                         "&.Mui-disabled": {
-                                                                            backgroundColor: "#f9fafb",
+                                                                            backgroundColor: "#f8f9fa !important",
                                                                             cursor: "not-allowed",
-                                                                            "& .MuiOutlinedInput-notchedOutline": {
-                                                                                borderColor: "#e5e7eb !important",
+                                                                            "& fieldset": {
+                                                                                borderColor: "#e9ecef !important",
                                                                             }
                                                                         }
                                                                     },
+                                                                    "& .MuiOutlinedInput-input": {
+                                                                        padding: "0 14px !important",
+                                                                        fontSize: "14px !important",
+                                                                        fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
+                                                                        height: "40px",
+                                                                        cursor: values.shiftTimeFrom ? "pointer" : "not-allowed",
+                                                                    }
                                                                 }
                                                             },
                                                             popper: {
@@ -1123,33 +1210,13 @@ export default function AddEditTeacher() {
                                                                     }
                                                                 }
                                                             },
-                                                            field: { readOnly: true },
+                                                            field: { readOnly: true } as any,
                                                         }}
                                                     />
                                                 </LocalizationProvider>
                                                 {touched.shiftTimeTo && errors.shiftTimeTo && <FormHelperText className="error-text">{errors.shiftTimeTo as string}</FormHelperText>}
                                             </Box>
                                         </Box>
-
-                                        {isView && teacherData && (
-                                            <>
-                                                <SectionTitle icon={HistoryIcon} title="Metadata" />
-                                                <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 4 }}>
-                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                        <Typography sx={labelSx}>Created At</Typography>
-                                                        <Typography sx={{ fontSize: '14px', color: '#1f2937' }}>{moment(teacherData.createdAt).format("DD/MM/YYYY hh:mm A")}</Typography>
-                                                    </Box>
-                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                        <Typography sx={labelSx}>Updated At</Typography>
-                                                        <Typography sx={{ fontSize: '14px', color: '#1f2937' }}>{moment(teacherData.updatedAt).format("DD/MM/YYYY hh:mm A")}</Typography>
-                                                    </Box>
-                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                        <Typography sx={labelSx}>Created By</Typography>
-                                                        <Typography sx={{ fontSize: '14px', color: '#1f2937' }}>{teacherData.createdBy?.fullName || teacherData.createdBy || "System"}</Typography>
-                                                    </Box>
-                                                </Box>
-                                            </>
-                                        )}
 
                                         {/* 7. Login Credentials */}
                                         {!id && (
@@ -1207,7 +1274,7 @@ export default function AddEditTeacher() {
                                             </>
                                         )}
 
-                                        {!isView && (
+                                        {!isView && (id ? canEdit : canAdd) && (
                                             <Box sx={{ mt: 6, pt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end', borderTop: '1px solid #f0f0f0' }}>
                                                 <Button
                                                     onClick={() => navigate("/teacher")}

@@ -48,7 +48,7 @@ import type { RootState } from "@/redux/Store";
 export default function Teacher() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { hasPermission } = usePermissions();
+  const { hasPermission, hasAnyPermission } = usePermissions();
   const { teachers, total, loading } = useSelector((state: RootState) => state.TeacherReducer);
 
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -343,7 +343,13 @@ export default function Teacher() {
                   <TableCell component="th" className="table-th" width="18%">PROFESSIONAL</TableCell>
                   <TableCell component="th" className="table-th" width="20%">ASSIGNMENTS</TableCell>
                   <TableCell component="th" className="table-th" width="17%">STATUS / LOGIN</TableCell>
-                  <TableCell component="th" className="table-th" width="10%" align="center">ACTIONS</TableCell>
+                  {hasAnyPermission([
+                    schoolAdminPermission.teacher.read,
+                    schoolAdminPermission.teacher.update,
+                    schoolAdminPermission.teacher.delete,
+                  ]) && (
+                      <TableCell component="th" className="table-th" width="10%" align="center">ACTIONS</TableCell>
+                    )}
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
@@ -533,48 +539,57 @@ export default function Teacher() {
                           </Box>
                         </TableCell>
 
-                        {/* ACTIONS */}
-                        <TableCell component="td" className="table-td" align="center">
-                          <Box className="admin-table-data-btn-flex" sx={{ justifyContent: "center" }}>
-                            {hasPermission(schoolAdminPermission.teacher.read) && (
-                              <Tooltip title="View" arrow placement="bottom">
-                                <Button
-                                  className="admin-table-data-btn admin-table-view-btn"
-                                  onClick={() => navigate(`/teacher/view/${data?._id}`)}
-                                >
-                                  <img src={Svg.yellowEye} className="admin-icon" alt="View" />
-                                </Button>
-                              </Tooltip>
-                            )}
-                            {hasPermission(schoolAdminPermission.teacher.update) && (
-                              <Tooltip title="Edit" arrow placement="bottom">
-                                <Button
-                                  className="admin-table-data-btn admin-table-edit-btn"
-                                  onClick={() => navigate(`/teacher/edit/${data?._id}`)}
-                                >
-                                  <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
-                                </Button>
-                              </Tooltip>
-                            )}
-                            {hasPermission(schoolAdminPermission.teacher.delete) && (
-                              <Tooltip title="Delete" arrow placement="bottom">
-                                <Button
-                                  className="admin-table-data-btn admin-table-delete-btn"
-                                  onClick={() => handleOpenDelete(data)}
-                                >
-                                  <img src={Svg.trash} className="admin-icon" alt="Delete" />
-                                </Button>
-                              </Tooltip>
-                            )}
-                          </Box>
-                        </TableCell>
+                        {hasAnyPermission([
+                          schoolAdminPermission.teacher.read,
+                          schoolAdminPermission.teacher.update,
+                          schoolAdminPermission.teacher.delete,
+                        ]) && (
+                            <TableCell component="td" className="table-td" align="center">
+                              <Box className="admin-table-data-btn-flex" sx={{ justifyContent: "center" }}>
+                                {hasPermission(schoolAdminPermission.teacher.read) && (
+                                  <Tooltip title="View" arrow placement="bottom">
+                                    <Button
+                                      className="admin-table-data-btn admin-table-view-btn"
+                                      onClick={() => navigate(`/teacher/view/${data?._id}`)}
+                                    >
+                                      <img src={Svg.yellowEye} className="admin-icon" alt="View" />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                                {hasPermission(schoolAdminPermission.teacher.update) && (
+                                  <Tooltip title="Edit" arrow placement="bottom">
+                                    <Button
+                                      className="admin-table-data-btn admin-table-edit-btn"
+                                      onClick={() => navigate(`/teacher/edit/${data?._id}`)}
+                                    >
+                                      <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                                {hasPermission(schoolAdminPermission.teacher.delete) && (
+                                  <Tooltip title="Delete" arrow placement="bottom">
+                                    <Button
+                                      className="admin-table-data-btn admin-table-delete-btn"
+                                      onClick={() => handleOpenDelete(data)}
+                                    >
+                                      <img src={Svg.trash} className="admin-icon" alt="Delete" />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </TableCell>
+                          )}
                       </TableRow>
                     ))
                   ) : (
                     <DataNotFound text="No Teachers Found" />
                   )
                 ) : (
-                  <Loader colSpan={6} />
+                  <Loader colSpan={hasAnyPermission([
+                    schoolAdminPermission.teacher.read,
+                    schoolAdminPermission.teacher.update,
+                    schoolAdminPermission.teacher.delete,
+                  ]) ? 6 : 5} />
                 )}
               </TableBody>
             </Table>
