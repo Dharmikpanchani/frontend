@@ -59,7 +59,7 @@ export default function Login() {
       setButtonSpinner(false);
       if (loginAdmin.fulfilled.match(resultAction)) {
         if (resultAction?.payload?.requireOtp == true) {
-          navigate("/otp", {
+          navigate("/login/otp", {
             state: {
               email: values?.email,
               type: "login"

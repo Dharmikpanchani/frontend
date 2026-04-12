@@ -158,7 +158,7 @@ export default function RegisterSchool() {
                 if (isEdit) {
                     navigate("/school-list");
                 } else {
-                    navigate("/otp", { state: { type: "schoolRegistration", email: values.email } });
+                    navigate("/school-register/otp", { state: { type: "schoolRegistration", email: values.email } });
                 }
             }
         } catch (error: any) {

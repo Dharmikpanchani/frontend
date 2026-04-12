@@ -246,7 +246,7 @@ export default function AddEditTeacher() {
                 if (id) {
                     navigate("/teacher");
                 } else {
-                    navigate("/otp", { state: { type: "teacher", phone: values.phoneNumber, email: values.email } });
+                    navigate("/teacher/otp", { state: { type: "teacher", phone: values.phoneNumber, email: values.email } });
                 }
             }
         } catch (error: any) {
@@ -519,6 +519,7 @@ export default function AddEditTeacher() {
                                                     fullWidth name="email" placeholder="email@example.com" variant="outlined" sx={inputSx}
                                                     value={values.email} onChange={handleChange}
                                                     error={touched.email && Boolean(errors.email)}
+                                                    disabled={!!id}
                                                 />
                                                 {touched.email && errors.email && <FormHelperText className="error-text">{errors.email as string}</FormHelperText>}
                                             </Box>
@@ -529,6 +530,7 @@ export default function AddEditTeacher() {
                                                     value={values.phoneNumber}
                                                     onChange={(e) => setFieldValue("phoneNumber", e.target.value.replace(/\D/g, '').slice(0, 10))}
                                                     error={touched.phoneNumber && Boolean(errors.phoneNumber)}
+                                                    disabled={!!id}
                                                 />
                                                 {touched.phoneNumber && errors.phoneNumber && <FormHelperText className="error-text">{errors.phoneNumber as string}</FormHelperText>}
                                             </Box>

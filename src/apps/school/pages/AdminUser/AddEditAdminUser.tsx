@@ -237,7 +237,7 @@ export default function AddEditAdminUser() {
             setButtonSpinner(false);
             if (addEditAdminUser.fulfilled.match(resultAction)) {
                 if (!id) {
-                    navigate("/otp", { state: { type: "registration", email: values.email } });
+                    navigate("/admin-user/otp", { state: { type: "registration", email: values.email } });
                 } else {
                     navigate("/admin-list");
                 }

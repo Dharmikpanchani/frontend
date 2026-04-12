@@ -14,7 +14,14 @@ import ErrorPage from "../common/error/ErrorPage";
 /* Lazy Loading */
 /* auth */
 const Login = lazy(() => import("./auth/Login"));
-const Otp = lazy(() => import("./auth/Otp"));
+const LoginOtp = lazy(() => import("./auth/LoginOtp"));
+const RegisterSchoolOtp = lazy(() => import("./auth/RegisterSchoolOtp"));
+const AdminUserOtp = lazy(() => import("./auth/AdminUserOtp"));
+const EmailChangeOtp = lazy(() => import("./auth/EmailChangeOtp"));
+const ForgotPasswordOtp = lazy(() => import("./auth/ForgotPasswordOtp"));
+
+
+
 const ForgotPassword = lazy(() => import("./auth/ForgotPassword"));
 const SetPassWord = lazy(() => import("./auth/SetPassword"));
 
@@ -81,7 +88,11 @@ export const developerRoutes: RouteConfig[] = [
         element: <PublicRoutes />,
         children: [
             { path: "/", element: <Login /> },
-            { path: "/otp", element: <Otp /> },
+            { path: "/login/otp", element: <LoginOtp /> },
+            { path: "/school-register/otp", element: <RegisterSchoolOtp /> },
+            { path: "/admin-user/otp", element: <AdminUserOtp /> },
+            { path: "/email-change/otp", element: <EmailChangeOtp /> },
+            { path: "/forgot-password/otp", element: <ForgotPasswordOtp /> },
             { path: "/forgot-password", element: <ForgotPassword /> },
             { path: "/set-password", element: <SetPassWord /> },
         ],

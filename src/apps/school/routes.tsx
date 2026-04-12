@@ -14,7 +14,12 @@ import ErrorPage from "../common/error/ErrorPage";
 /* Lazy Loading */
 /* auth */
 const Login = lazy(() => import("./auth/Login"));
-const Otp = lazy(() => import("./auth/Otp"));
+const LoginOtp = lazy(() => import("./auth/LoginOtp"));
+const TeacherOtp = lazy(() => import("./auth/TeacherOtp"));
+const AdminUserOtp = lazy(() => import("./auth/AdminUserOtp"));
+const ForgotPasswordOtp = lazy(() => import("./auth/ForgotPasswordOtp"));
+const EmailChangeOtp = lazy(() => import("./auth/EmailChangeOtp"));
+
 const ForgotPassword = lazy(() => import("./auth/ForgotPassword"));
 const SetPassWord = lazy(() => import("./auth/SetPassword"));
 
@@ -90,7 +95,11 @@ export const schoolRoutes: RouteConfig[] = [
         element: <PublicRoutes />,
         children: [
             { path: "/", element: <Login /> },
-            { path: "/otp", element: <Otp /> },
+            { path: "/login/otp", element: <LoginOtp /> },
+            { path: "/teacher/otp", element: <TeacherOtp /> },
+            { path: "/admin-user/otp", element: <AdminUserOtp /> },
+            { path: "/forgot-password/otp", element: <ForgotPasswordOtp /> },
+            { path: "/email-change/otp", element: <EmailChangeOtp /> },
             { path: "/forgot-password", element: <ForgotPassword /> },
             { path: "/set-password", element: <SetPassWord /> },
         ],

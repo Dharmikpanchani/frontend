@@ -37,7 +37,7 @@ export default function ForgotPassword() {
       const resultAction = await dispatch(forgotPasswordAdmin(urlencoded) as any);
       setButtonSpinner(false);
       if (forgotPasswordAdmin.fulfilled.match(resultAction)) {
-        navigate("/otp", {
+        navigate("/forgot-password/otp", {
           replace: true,
           state: { type: "forgotPassword", email: values.email },
         });

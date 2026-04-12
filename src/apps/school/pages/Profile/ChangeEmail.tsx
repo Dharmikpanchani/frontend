@@ -51,7 +51,7 @@ export default function ChangeEmail() {
       );
       setButtonSpinner(false);
       if (changeEmailRequestAdmin.fulfilled.match(resultAction)) {
-        navigate("/otp", {
+        navigate("/email-change/otp", {
           state: {
             email: values.newEmail,
             type: "admin_email_change",
