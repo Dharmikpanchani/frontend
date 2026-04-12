@@ -26,7 +26,7 @@ import Pagination from "@/apps/common/pagination/Pagination";
 import PopupModal from "../../component/developerCommon/popUpModal/PopupModal";
 import { usePermissions } from "@/hooks/usePermissions";
 import { developerPermission } from "@/apps/common/StaticArrayData";
-import Filter from "../../component/developerCommon/filter/Filter";
+import Filter from "@/apps/common/filter/Filter";
 import { IOSSwitch } from "../../component/developerCommon/commonCssFunction/cssFunction";
 import { changeAdminUserStatus } from "@/redux/slices/adminUserSlice";
 import type { RootState } from "@/redux/Store";

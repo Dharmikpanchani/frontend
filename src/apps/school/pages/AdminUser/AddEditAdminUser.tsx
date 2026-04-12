@@ -13,6 +13,7 @@ import {
     InputAdornment,
     IconButton,
     Autocomplete,
+    Backdrop,
     TableContainer,
     Paper,
     Table,
@@ -44,7 +45,7 @@ import { CommonLoader } from "@/apps/common/loader/Loader";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
 import Pagination from "@/apps/common/pagination/Pagination";
-import Filter from "../../component/schoolCommon/filter/Filter";
+import Filter from "@/apps/common/filter/Filter";
 import moment from "moment";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
@@ -267,6 +268,12 @@ export default function AddEditAdminUser() {
                 </Breadcrumbs>
             </Box>
 
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
+                open={loading}
+            >
+                <Spinner />
+            </Backdrop>
             <Box className="card-border common-card" sx={{ p: 4, borderRadius: '12px', minHeight: '200px', position: 'relative' }}>
                 {loading ? (
                     <CommonLoader />

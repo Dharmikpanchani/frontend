@@ -24,6 +24,7 @@ export interface FilterField {
   placeholder?: string;
   options?: any[];
   getOptionLabel?: (option: any) => string;
+  getOptionValue?: (option: any) => any;
 }
 
 interface FilterProps {
@@ -41,8 +42,8 @@ const labelSx = {
   fontSize: "13px",
   fontWeight: 500,
   marginBottom: "4px",
-  color: "#374151",
-  fontFamily: "'Poppins', sans-serif !important",
+  color: "var(--text-primary, #374151)",
+  fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
 };
 
 const inputSx = {
@@ -51,14 +52,16 @@ const inputSx = {
     backgroundColor: "var(--input-bg) !important",
     borderRadius: "5px !important",
     "& fieldset": {
-      borderColor: "var(--main-border) !important",
+      borderColor: "rgba(var(--primary-color-rgb), 0.2) !important",
+      transition: "all 0.3s ease !important",
     },
     "&:hover fieldset": {
-      borderColor: "var(--main-border) !important",
+      borderColor: "var(--primary-color) !important",
     },
     "&.Mui-focused fieldset": {
-      borderColor: "var(--selected-color) !important",
+      borderColor: "var(--primary-color) !important",
       borderWidth: "1px !important",
+      boxShadow: "0 0 0 2px rgba(var(--primary-color-rgb), 0.1) !important",
     },
   },
   "& .MuiOutlinedInput-input": {
@@ -66,8 +69,8 @@ const inputSx = {
     height: "40px",
     display: "flex",
     alignItems: "center",
-    fontFamily: "'PlusJakartaSans-Medium', sans-serif !important",
-    color: "var(--secondary-color) !important",
+    fontFamily: "var(--font-family, 'PlusJakartaSans-Medium', sans-serif) !important",
+    color: "var(--text-primary, var(--secondary-color)) !important",
     backgroundColor: "transparent !important",
   },
 };
@@ -124,18 +127,16 @@ const Filter: React.FC<FilterProps> = ({
               getOptionLabel={field.getOptionLabel || ((option: any) => option.label || option)}
               value={
                 field.options?.find((opt: any) => {
-                  if (typeof opt === 'object' && opt !== null) {
-                    return (opt._id || opt.value) === values[field.name];
-                  }
-                  return opt === values[field.name];
+                  const val = field.getOptionValue ? field.getOptionValue(opt) : (typeof opt === 'object' && opt !== null ? (opt._id || opt.value) : opt);
+                  return val === values[field.name];
                 }) || null
               }
               onChange={(_, newValue) => {
-                if (typeof newValue === 'object' && newValue !== null) {
-                  setFieldValue(field.name, newValue._id !== undefined ? newValue._id : newValue.value !== undefined ? newValue.value : "");
-                } else {
-                  setFieldValue(field.name, newValue !== undefined ? newValue : "");
+                let val = "";
+                if (newValue !== null) {
+                  val = field.getOptionValue ? field.getOptionValue(newValue) : (typeof newValue === 'object' ? (newValue._id !== undefined ? newValue._id : newValue.value) : newValue);
                 }
+                setFieldValue(field.name, val ?? "");
               }}
               renderInput={(params) => (
                 <TextField
@@ -177,13 +178,12 @@ const Filter: React.FC<FilterProps> = ({
                         "&:hover .MuiOutlinedInput-notchedOutline": {
                           borderColor: "#ced4da !important",
                         },
-                        // ✅ HOVER (RED)
                         "&:hover .MuiPickersOutlinedInput-notchedOutline": {
                           borderColor: "#ced4da",
                           borderWidth: "1px",
                         },
                         "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                          border: "1px solid #ff8c00 !important",
+                          border: "1px solid var(--primary-color) !important",
                         },
                       },
                       "& .MuiPickersSectionList-root": {
@@ -197,7 +197,7 @@ const Filter: React.FC<FilterProps> = ({
                       "& .MuiOutlinedInput-input": {
                         padding: "0 12px !important",
                         fontSize: "13px !important",
-                        fontFamily: "'Poppins', sans-serif !important",
+                        fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
                         height: "40px",
                         cursor: "pointer",
                       }
@@ -320,8 +320,10 @@ const Filter: React.FC<FilterProps> = ({
       className="admin-filter-main"
       sx={{
         "& .MuiDrawer-paper": {
+          width: { xs: '100%', sm: '400px' },
           display: "flex",
           flexDirection: "column",
+          height: "100%",
         },
       }}
     >
@@ -337,59 +339,49 @@ const Filter: React.FC<FilterProps> = ({
         </IconButton>
       </Box>
 
-      <Box className="admin-filter-inner-main" sx={{ flex: 1, overflowY: "auto", p: "25px" }}>
-        <Formik
-          initialValues={initialValues}
-          enableReinitialize
-          onSubmit={handleApply}
-        >
-          {({ setFieldValue, values, resetForm }) => (
-            <Form>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: "20px", pb: "100px" }}>
-                {fields.map((field) => renderField(field, setFieldValue, values))}
-              </Box>
+      <Formik
+        initialValues={initialValues}
+        enableReinitialize
+        onSubmit={handleApply}
+      >
+        {({ setFieldValue, values, resetForm }) => (
+          <Form style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+            <Box
+              className="admin-filter-inner-main"
+              sx={{
+                flex: 1,
+                overflowY: "auto",
+                p: "25px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px"
+              }}
+            >
+              {fields.map((field) => renderField(field, setFieldValue, values))}
+            </Box>
 
-              <Box className="admin-filter-footer">
-                <Button
-                  className="admin-filter-cancel-btn btn-border"
-                  onClick={() => {
-                    resetForm();
-                    handleReset();
-                  }}
-                  sx={{
-                    backgroundColor: "var(--header-maroon) !important",
-                    color: "#fff !important",
-                    textTransform: "none",
-                    px: 3,
-                    borderRadius: "6px !important",
-                    "&:hover": {
-                      backgroundColor: "#3a0000 !important",
-                    },
-                  }}
-                >
-                  Reset
-                </Button>
-                <Button
-                  type="submit"
-                  className="admin-filter-apply-btn btn-primary"
-                  sx={{
-                    backgroundColor: "var(--apply-orange) !important",
-                    color: "#fff !important",
-                    textTransform: "none",
-                    px: 3,
-                    borderRadius: "6px !important",
-                    "&:hover": {
-                      backgroundColor: "#a03025 !important",
-                    },
-                  }}
-                >
-                  Apply
-                </Button>
-              </Box>
-            </Form>
-          )}
-        </Formik>
-      </Box>
+            <Box className="admin-filter-footer">
+              <Button
+                className="admin-btn-secondary"
+                onClick={() => {
+                  resetForm();
+                  handleReset();
+                }}
+                sx={{ px: 3, minWidth: "100px" }}
+              >
+                Reset
+              </Button>
+              <Button
+                type="submit"
+                className="admin-btn-theme"
+                sx={{ px: 3, minWidth: "100px" }}
+              >
+                Apply
+              </Button>
+            </Box>
+          </Form>
+        )}
+      </Formik>
     </Drawer>
   );
 };

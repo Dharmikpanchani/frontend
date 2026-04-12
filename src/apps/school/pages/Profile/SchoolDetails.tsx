@@ -771,23 +771,23 @@ export default function SchoolDetails() {
                   type="submit"
                   variant="contained"
                   disabled={isSubmitting || buttonSpinner}
-                    className="admin-btn-theme"
-                    sx={{
-                      minWidth: { xs: '100%', sm: '150px' },
-                      height: '40px',
-                      borderRadius: 'var(--button-radius, 8px)',
-                      background: 'var(--theme-gradient, var(--primary-color)) !important',
-                      textTransform: 'none',
-                      fontWeight: 600,
+                  className="admin-btn-theme"
+                  sx={{
+                    minWidth: { xs: '100%', sm: '150px' },
+                    height: '40px',
+                    borderRadius: 'var(--button-radius, 8px)',
+                    background: 'var(--theme-gradient, var(--primary-color)) !important',
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    boxShadow: 'none',
+                    color: 'var(--button-text, #fff)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      opacity: 0.9,
                       boxShadow: 'none',
-                      color: 'var(--button-text, #fff)',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        opacity: 0.9,
-                        boxShadow: 'none',
-                        transform: 'translateY(-1px)',
-                      },
-                    }}
+                      transform: 'translateY(-1px)',
+                    },
+                  }}
                 >
                   {isSubmitting || buttonSpinner ? (
                     <Spinner />

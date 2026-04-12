@@ -29,16 +29,16 @@ export const getTeachers = createAsyncThunk(
   }
 );
 
-export const createTeacher = createAsyncThunk(
-  "teacher/create",
-  async (payload: any, { rejectWithValue }) => {
+export const addEditTeacher = createAsyncThunk(
+  "teacher/addEdit",
+  async ({ payload, id }: { payload: any; id?: string }, { rejectWithValue }) => {
     try {
-      const res: any = await masterService.createTeacher(payload);
+      const res: any = await masterService.addEditTeacher(payload, id);
       if (res.status === 201 || res.status === 200) {
-        toast.success(res.message || "Teacher created successfully");
+        toast.success(res.message || (id ? "Teacher updated successfully" : "Teacher added successfully"));
         return res.data;
       }
-      toast.error(res.message || "Failed to create teacher");
+      toast.error(res.message || "Operation failed");
       return rejectWithValue(res.message);
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message;
@@ -48,16 +48,46 @@ export const createTeacher = createAsyncThunk(
   }
 );
 
-export const verifyTeacherOtp = createAsyncThunk(
-  "teacher/verifyOtp",
-  async (payload: any, { rejectWithValue }) => {
+export const getTeacherById = createAsyncThunk(
+  "teacher/getById",
+  async (id: string, { rejectWithValue }) => {
     try {
-      const res: any = await masterService.verifyTeacherOtp(payload);
+      const res: any = await masterService.getTeacherById(id);
+      if (res.status === 200) return res.data;
+      return rejectWithValue(res.message);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+export const changeTeacherStatus = createAsyncThunk(
+  "teacher/changeStatus",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const res: any = await masterService.changeTeacherStatus(id);
       if (res.status === 200) {
-        toast.success(res.message || "Teacher verified successfully");
+        toast.success(res.message || "Teacher status updated");
         return res.data;
       }
-      toast.error(res.message || "Verification failed");
+      return rejectWithValue(res.message);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message;
+      toast.error(msg);
+      return rejectWithValue(msg);
+    }
+  }
+);
+
+export const deleteTeacher = createAsyncThunk(
+  "teacher/delete",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const res: any = await masterService.deleteTeacher(id);
+      if (res.status === 200) {
+        toast.success(res.message || "Teacher deleted successfully");
+        return id;
+      }
       return rejectWithValue(res.message);
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message;
@@ -84,22 +114,44 @@ const teacherSlice = createSlice({
       .addCase(getTeachers.rejected, (state) => {
         state.loading = false;
       })
-      .addCase(createTeacher.pending, (state) => {
+
+      .addCase(addEditTeacher.pending, (state) => {
         state.actionLoading = true;
       })
-      .addCase(createTeacher.fulfilled, (state) => {
+      .addCase(addEditTeacher.fulfilled, (state) => {
         state.actionLoading = false;
       })
-      .addCase(createTeacher.rejected, (state) => {
+      .addCase(addEditTeacher.rejected, (state) => {
         state.actionLoading = false;
       })
-      .addCase(verifyTeacherOtp.pending, (state) => {
+
+      .addCase(getTeacherById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getTeacherById.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(getTeacherById.rejected, (state) => {
+        state.loading = false;
+      })
+
+      .addCase(changeTeacherStatus.pending, (state) => {
         state.actionLoading = true;
       })
-      .addCase(verifyTeacherOtp.fulfilled, (state) => {
+      .addCase(changeTeacherStatus.fulfilled, (state) => {
         state.actionLoading = false;
       })
-      .addCase(verifyTeacherOtp.rejected, (state) => {
+      .addCase(changeTeacherStatus.rejected, (state) => {
+        state.actionLoading = false;
+      })
+
+      .addCase(deleteTeacher.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(deleteTeacher.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(deleteTeacher.rejected, (state) => {
         state.actionLoading = false;
       });
   },

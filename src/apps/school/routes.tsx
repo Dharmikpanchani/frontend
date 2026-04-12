@@ -338,6 +338,22 @@ export const schoolRoutes: RouteConfig[] = [
                             </PermissionRoute>
                         ),
                     },
+                    {
+                        path: "/teacher/edit/:id",
+                        element: (
+                            <PermissionRoute permission={schoolAdminPermission?.teacher?.update}>
+                                <AddEditTeacher />
+                            </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/teacher/view/:id",
+                        element: (
+                            <PermissionRoute permission={schoolAdminPermission?.teacher?.read}>
+                                <AddEditTeacher />
+                            </PermissionRoute>
+                        ),
+                    },
                 ],
             },
         ],

@@ -44,7 +44,7 @@ import { CommonLoader } from "@/apps/common/loader/Loader";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import DataNotFound from "../../component/developerCommon/dataNotFound/DataNotFound";
 import Pagination from "@/apps/common/pagination/Pagination";
-import Filter from "../../component/developerCommon/filter/Filter";
+import Filter from "@/apps/common/filter/Filter";
 import moment from "moment";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";

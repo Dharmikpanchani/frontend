@@ -4,7 +4,6 @@ import type { OtpNumberInterface } from "@/types/interfaces/LoginInterface";
 import type { FormikProps } from "formik";
 import { useNavigate, useLocation } from "react-router-dom";
 import { verifyOtpAdmin, resendOtpAdmin, verifyEmailChangeAdmin } from "@/redux/slices/authSlice";
-import { verifyTeacherOtp } from "@/redux/slices/teacherSlice";
 import { toasterError } from "@/utils/toaster/Toaster";
 import { otpNumberValidationSchema } from "@/utils/validation/FormikValidation";
 import { Box, Typography, FormHelperText, Button } from "@mui/material";
@@ -62,11 +61,12 @@ export default function Otp() {
     try {
       let resultAction;
       if (type === "teacher") {
-        const payload = {
-          phone: phone,
-          otp: values?.code
-        };
-        resultAction = await dispatch(verifyTeacherOtp(payload) as any);
+        const urlencoded = new URLSearchParams();
+        urlencoded.append("email", phone); // Backend now handles email/phone based on type
+        urlencoded.append("otp", values?.code);
+        urlencoded.append("type", type);
+        urlencoded.append("schoolCode", isSubdomain?.name);
+        resultAction = await dispatch(verifyOtpAdmin(urlencoded) as any);
       } else if (type === "admin_email_change" || type === "developer_email_change") {
         const emailChangeData = new URLSearchParams();
         emailChangeData.append("newEmail", email);
@@ -84,8 +84,7 @@ export default function Otp() {
       setButtonSpinner(false);
       if (resultAction && (
         verifyOtpAdmin.fulfilled.match(resultAction) ||
-        verifyEmailChangeAdmin.fulfilled.match(resultAction) ||
-        verifyTeacherOtp.fulfilled.match(resultAction)
+        verifyEmailChangeAdmin.fulfilled.match(resultAction)
       )) {
         if (resultAction.payload?.message?.toLowerCase().includes("fetch")) {
           toasterError("Invalid verification response");
@@ -118,22 +117,24 @@ export default function Otp() {
   };
 
   const resendOtp = async (setFieldValue: any) => {
-    // For now, teacher resend is not specifically implemented in backend 
-    // we can use the same resend logic if we update backend to handle phone.
-    // Assuming for now it's only for email types in authSlice.
-    if (type === "teacher") {
-        toasterError("Resend OTP for teacher coming soon. Please re-create if needed.");
-        return;
-    }
-
     const urlencoded = new URLSearchParams();
     urlencoded.append("email", email);
     urlencoded.append("type", type);
     urlencoded.append("schoolCode", isSubdomain?.name);
 
+    let resultAction;
     setResendSpinner(true);
     try {
-      const resultAction = await dispatch(resendOtpAdmin(urlencoded) as any);
+      let urlencodedTeacher;
+      if (type === "teacher") {
+        urlencodedTeacher = new URLSearchParams();
+        urlencodedTeacher.append("email", phone);
+        urlencodedTeacher.append("type", type);
+        urlencodedTeacher.append("schoolCode", isSubdomain?.name);
+        resultAction = await dispatch(resendOtpAdmin(urlencodedTeacher) as any);
+      } else {
+        resultAction = await dispatch(resendOtpAdmin(urlencoded) as any);
+      }
       setResendSpinner(false);
       if (resendOtpAdmin.fulfilled.match(resultAction)) {
         startOtpTimer();
@@ -196,13 +197,13 @@ export default function Otp() {
           <Form onSubmit={handleSubmit}>
             <Box className="login-page-container otp-page">
               <Box className="login-card">
-                <Box component="img" src={isSubdomain?.isSubdomain ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo : Png?.logoImg} alt="Logo" className="login-logo" />
+                <Box component="img" src={(isSubdomain?.isSubdomain && schoolLogo) ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo : Png?.logoImg} alt="Logo" className="login-logo" />
 
                 <Typography className="login-title">
                   OTP Verification
                 </Typography>
                 <Typography className="login-subtitle">
-                  Please enter the 6-digit OTP sent to your email address.
+                  Please enter the 6-digit OTP sent to your {type === "teacher" ? "phone number" : "email address"}.
                 </Typography>
 
                 <Box className="login-form-group">

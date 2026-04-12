@@ -6,6 +6,7 @@ interface SectionState {
   loading: boolean;
   actionLoading: boolean;
   sections: any[];
+  allSections: any[];
   selectedSection: any | null;
   total: number;
 }
@@ -14,6 +15,7 @@ const initialState: SectionState = {
   loading: false,
   actionLoading: false,
   sections: [],
+  allSections: [],
   selectedSection: null,
   total: 0,
 };
@@ -114,8 +116,12 @@ const sectionSlice = createSlice({
       })
       .addCase(getSections.fulfilled, (state, action) => {
         state.loading = false;
-        state.sections = action.payload?.data || [];
-        state.total = action.payload?.pagination?.totalArrayLength || 0;
+        if ((action.meta.arg as any)?.type === "filter") {
+          state.allSections = action.payload?.data || [];
+        } else {
+          state.sections = action.payload?.data || [];
+          state.total = action.payload?.pagination?.totalArrayLength || 0;
+        }
       })
       .addCase(getSections.rejected, (state) => {
         state.loading = false;

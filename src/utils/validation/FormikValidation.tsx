@@ -624,7 +624,7 @@ export const teacherValidationSchema = Yup.object().shape({
   departmentId: Yup.string().required("Department is required"),
   subjects: Yup.array().min(1, "At least one subject is required").required("Subjects are required"),
   classesAssigned: Yup.array().min(1, "At least one class is required").required("Classes are required"),
-  sectionsAssigned: Yup.array().optional(),
+  sectionsAssigned: Yup.array().min(1, "At least one section is required").required("Sections are required"),
   // Salary
   employmentType: Yup.string().required("Employment type is required"),
   salary: Yup.number().positive("Salary must be positive").optional(),

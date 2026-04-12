@@ -20,7 +20,7 @@ import { Search as SearchIcon, Add as AddIcon, FilterList as FilterIcon } from "
 import { getSubjects, deleteSubject, changeSubjectStatus } from "@/redux/slices/subjectSlice";
 import { getDepartments } from "@/redux/slices/departmentSlice";
 import Svg from "@/assets/Svg";
-import Filter from "../../../component/schoolCommon/filter/Filter";
+import Filter from "@/apps/common/filter/Filter";
 import Loader from "@/apps/common/loader/Loader";
 import Pagination from "@/apps/common/pagination/Pagination";
 import { usePermissions } from "@/hooks/usePermissions";

@@ -300,6 +300,7 @@ export const schoolAdminPermission = {
     update: "teacher_edit",
     read: "teacher_view",
     delete: "teacher_delete",
+    status: "teacher_status",
   },
 };
 

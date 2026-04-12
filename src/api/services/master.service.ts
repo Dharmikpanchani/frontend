@@ -30,6 +30,7 @@ export const masterService = {
     if (params.search) queryParams.append("searchRequest", params.search);
     if (params.departmentId) queryParams.append("departmentId", params.departmentId);
     if (params.isActive !== undefined && params.isActive !== "") queryParams.append("isActive", params.isActive);
+    if (params.type) queryParams.append("type", params.type);
 
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;
@@ -68,6 +69,7 @@ export const masterService = {
     if (params.search) queryParams.append("searchRequest", params.search);
     if (params.classId) queryParams.append("classId", params.classId);
     if (params.isActive !== undefined && params.isActive !== "") queryParams.append("isActive", params.isActive);
+    if (params.type) queryParams.append("type", params.type);
 
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;
@@ -80,12 +82,32 @@ export const masterService = {
 
   // Teachers
   getTeachers: (params: any) => {
-    let url = `${Api.TEACHERS}?schoolId=${params.schoolId}`;
-    if (params.page) url += `&pageNumber=${params.page}`;
-    if (params.perPage) url += `&perPageData=${params.perPage}`;
-    if (params.search) url += `&searchRequest=${encodeURIComponent(params.search)}`;
+    let url = `${Api.GET_ALL_TEACHERS}`;
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append("pageNumber", params.page);
+    if (params.perPage) queryParams.append("perPageData", params.perPage);
+    if (params.search) queryParams.append("searchRequest", params.search);
+    if (params.departmentId) queryParams.append("departmentId", params.departmentId);
+    if (params.classId) queryParams.append("classId", params.classId);
+    if (params.sectionId) queryParams.append("sectionId", params.sectionId);
+    if (params.subjectId) queryParams.append("subjectId", params.subjectId);
+    if (params.joiningDate) queryParams.append("joiningDate", params.joiningDate);
+    if (params.designation) queryParams.append("designation", params.designation);
+    if (params.employmentType) queryParams.append("employmentType", params.employmentType);
+    if (params.attendanceId) queryParams.append("attendanceId", params.attendanceId);
+    if (params.isActive !== undefined && params.isActive !== "") queryParams.append("isActive", params.isActive);
+    if (params.isVerified !== undefined && params.isVerified !== "") queryParams.append("isVerified", params.isVerified);
+    if (params.type) queryParams.append("type", params.type);
+
+    const queryString = queryParams.toString();
+    if (queryString) url += `?${queryString}`;
     return adminApiService.get<any>(url);
   },
-  createTeacher: (payload: any) => adminApiService.post<any>(Api.TEACHERS, payload),
-  verifyTeacherOtp: (payload: any) => adminApiService.post<any>(Api.VERIFY_TEACHER_OTP, payload),
+  addEditTeacher: (payload: any, id?: string) => {
+    const url = id ? `${Api.ADD_EDIT_TEACHER}/${id}` : Api.ADD_EDIT_TEACHER;
+    return adminApiService.post<any>(url, payload);
+  },
+  getTeacherById: (id: string) => adminApiService.get<any>(`${Api.GET_TEACHER}/${id}`),
+  deleteTeacher: (id: string) => adminApiService.delete<any>(`${Api.DELETE_TEACHER}/${id}`),
+  changeTeacherStatus: (id: string) => adminApiService.post<any>(`${Api.CHANGE_TEACHER_STATUS}/${id}`, {}),
 };

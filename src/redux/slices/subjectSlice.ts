@@ -6,6 +6,7 @@ interface SubjectState {
   loading: boolean;
   actionLoading: boolean;
   subjects: any[];
+  allSubjects: any[];
   total: number;
   selectedSubject: any;
 }
@@ -14,6 +15,7 @@ const initialState: SubjectState = {
   loading: false,
   actionLoading: false,
   subjects: [],
+  allSubjects: [],
   total: 0,
   selectedSubject: null,
 };
@@ -112,8 +114,12 @@ const subjectSlice = createSlice({
       })
       .addCase(getSubjects.fulfilled, (state, action) => {
         state.loading = false;
-        state.subjects = action.payload?.data || [];
-        state.total = action.payload?.pagination?.totalArrayLength || 0;
+        if ((action.meta.arg as any)?.type === "filter") {
+          state.allSubjects = action.payload?.data || [];
+        } else {
+          state.subjects = action.payload?.data || [];
+          state.total = action.payload?.pagination?.totalArrayLength || 0;
+        }
       })
       .addCase(getSubjects.rejected, (state) => {
         state.loading = false;

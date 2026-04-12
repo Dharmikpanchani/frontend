@@ -29,7 +29,7 @@ import Loader from "@/apps/common/loader/Loader";
 import Pagination from "@/apps/common/pagination/Pagination";
 import { usePermissions } from "@/hooks/usePermissions";
 import { developerPermission } from "@/apps/common/StaticArrayData";
-import Filter from "../../component/developerCommon/filter/Filter";
+import Filter from "@/apps/common/filter/Filter";
 import { IOSSwitch } from "../../component/developerCommon/commonCssFunction/cssFunction";
 import PopupModal from "../../component/developerCommon/popUpModal/PopupModal";
 import { deleteSchool, changeSchoolStatus } from "@/redux/slices/schoolSlice";

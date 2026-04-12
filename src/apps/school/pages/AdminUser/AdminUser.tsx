@@ -24,10 +24,11 @@ import Svg from "@/assets/Svg";
 import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
 import Loader from "@/apps/common/loader/Loader";
 import Pagination from "@/apps/common/pagination/Pagination";
+import ProfileAvatar from "@/apps/common/ProfileAvatar";
 import PopupModal from "../../component/schoolCommon/popUpModal/PopupModal";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
-import Filter from "../../component/schoolCommon/filter/Filter";
+import Filter from "@/apps/common/filter/Filter";
 import { IOSSwitch } from "../../component/schoolCommon/commonCssFunction/cssFunction";
 import { changeAdminUserStatus } from "@/redux/slices/adminUserSlice";
 import type { RootState } from "@/redux/Store";
@@ -329,17 +330,24 @@ export default function AdminUser() {
                             scope="row"
                             className="table-td"
                           >
-                            <Box className="admin-table-data-flex">
-                              <Tooltip
-                                title={data?.name || "N/A"}
-                                arrow
-                                placement="bottom"
-                                className="admin-tooltip"
-                              >
-                                <Typography className="admin-table-data-text">
-                                  {data?.name || "N/A"}
-                                </Typography>
-                              </Tooltip>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                              <ProfileAvatar
+                                name={data?.name}
+                                imageUrl={data?.profileImage}
+                                size={40}
+                              />
+                              <Box className="admin-table-data-flex">
+                                <Tooltip
+                                  title={data?.name || "N/A"}
+                                  arrow
+                                  placement="bottom"
+                                  className="admin-tooltip"
+                                >
+                                  <Typography className="admin-table-data-text">
+                                    {data?.name || "N/A"}
+                                  </Typography>
+                                </Tooltip>
+                              </Box>
                             </Box>
                           </TableCell>
                           <TableCell

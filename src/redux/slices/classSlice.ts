@@ -6,6 +6,7 @@ interface ClassState {
   loading: boolean;
   actionLoading: boolean;
   classes: any[];
+  allClasses: any[];
   total: number;
   selectedClass: any;
 }
@@ -14,6 +15,7 @@ const initialState: ClassState = {
   loading: false,
   actionLoading: false,
   classes: [],
+  allClasses: [],
   total: 0,
   selectedClass: null,
 };
@@ -118,8 +120,12 @@ const classSlice = createSlice({
       })
       .addCase(getClasses.fulfilled, (state, action) => {
         state.loading = false;
-        state.classes = action.payload?.data || [];
-        state.total = action.payload?.pagination?.totalArrayLength || 0;
+        if ((action.meta.arg as any)?.type === "filter") {
+          state.allClasses = action.payload?.data || [];
+        } else {
+          state.classes = action.payload?.data || [];
+          state.total = action.payload?.pagination?.totalArrayLength || 0;
+        }
       })
       .addCase(getClasses.rejected, (state) => {
         state.loading = false;

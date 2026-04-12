@@ -771,13 +771,13 @@ export default function RegisterSchool() {
                                                             }}
                                                         >
                                                             {values.bannerUrl ? (
-                                                              <img src={values.bannerUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Banner" />
+                                                                <img src={values.bannerUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Banner" />
                                                             ) : values.banner ? (
-                                                              renderSingleImage({ profile: values.banner, imageUrl: "" })
+                                                                renderSingleImage({ profile: values.banner, imageUrl: "" })
                                                             ) : (
-                                                              <Typography sx={{ fontSize: '14px', fontWeight: 600, color: '#475467', letterSpacing: '0.02em' }}>
-                                                                UPLOAD BANNER
-                                                              </Typography>
+                                                                <Typography sx={{ fontSize: '14px', fontWeight: 600, color: '#475467', letterSpacing: '0.02em' }}>
+                                                                    UPLOAD BANNER
+                                                                </Typography>
                                                             )}
                                                             <input
                                                                 hidden

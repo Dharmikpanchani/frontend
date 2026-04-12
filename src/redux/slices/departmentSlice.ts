@@ -6,6 +6,7 @@ interface DepartmentState {
   loading: boolean;
   actionLoading: boolean;
   departments: any[];
+  allDepartments: any[];
   total: number;
   selectedDepartment: any;
 }
@@ -14,6 +15,7 @@ const initialState: DepartmentState = {
   loading: false,
   actionLoading: false,
   departments: [],
+  allDepartments: [],
   total: 0,
   selectedDepartment: null,
 };
@@ -112,8 +114,12 @@ const departmentSlice = createSlice({
       })
       .addCase(getDepartments.fulfilled, (state, action) => {
         state.loading = false;
-        state.departments = action.payload?.data || [];
-        state.total = action.payload?.pagination?.totalArrayLength || 0;
+        if ((action.meta.arg as any)?.type === "filter") {
+          state.allDepartments = action.payload?.data || [];
+        } else {
+          state.departments = action.payload?.data || [];
+          state.total = action.payload?.pagination?.totalArrayLength || 0;
+        }
       })
       .addCase(getDepartments.rejected, (state) => {
         state.loading = false;

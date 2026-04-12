@@ -89,6 +89,9 @@ export const Api = {
   GET_SECTION: `${route}/get-section`,
   ADD_EDIT_SECTION: `${route}/add-edit-section`,
   CHANGE_SECTION_STATUS: `${route}/section-action-status`,
-  TEACHERS: `${route}/teachers`,
-  VERIFY_TEACHER_OTP: `${route}/teachers/verify-otp`,
+  GET_ALL_TEACHERS: `${route}/get-all-teachers`,
+  GET_TEACHER: `${route}/get-teacher`,
+  ADD_EDIT_TEACHER: `${route}/add-edit-teacher`,
+  DELETE_TEACHER: `${route}/delete-teacher`,
+  CHANGE_TEACHER_STATUS: `${route}/teacher-action-status`,
 };
