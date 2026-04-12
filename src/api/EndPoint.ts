@@ -63,9 +63,8 @@ export const Api = {
   CMS: `${route}/cms`,
 
   // School Management
-  SCHOOL_REGISTER: `${route}/schoolRegister`,
+  ADD_EDIT_SCHOOL: `${route}/add-edit-school`,
   GET_ALL_SCHOOLS: `${route}/get-all-schools`,
-  UPDATE_SCHOOL: `${route}/update-school`,
   DELETE_SCHOOL: `${route}/delete-school`,
   CHANGE_SCHOOL_STATUS: `${route}/school-status`,
   GET_SCHOOL: `${route}/get-school`,

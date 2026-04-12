@@ -37,41 +37,27 @@ export const getAllSchools = createAsyncThunk(
   }
 );
 
-export const schoolRegister = createAsyncThunk(
-  "school/register",
+export const addEditSchool = createAsyncThunk(
+  "school/addEdit",
   async (payload: FormData, { rejectWithValue }) => {
     try {
-      const res: any = await schoolService.register(payload);
+      const isUpdate = !!payload.get("id");
+      const res: any = await schoolService.addEditSchool(payload);
       if (res.status === 201 || res.status === 200) {
-        toast.success(res?.message || "School registered successfully");
+        toast.success(
+          res?.message || 
+          (isUpdate ? "School updated successfully" : "School registered successfully")
+        );
         return res.data;
       }
-      toast.error(res?.message || "Registration failed");
+      toast.error(res?.message || (isUpdate ? "Update failed" : "Registration failed"));
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Registration failed";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-export const updateSchool = createAsyncThunk(
-  "school/update",
-  async (
-    { id, payload }: { id: string; payload: FormData },
-    { rejectWithValue }
-  ) => {
-    try {
-      const res: any = await schoolService.update(id, payload);
-      if (res.status === 200 || res.status === 201) {
-        toast.success(res?.message || "School updated successfully");
-        return res.data;
-      }
-      toast.error(res?.message || "Update failed");
-      return rejectWithValue(res?.message);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Update failed";
+      const isUpdate = !!payload.get("id");
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        (isUpdate ? "Update failed" : "Registration failed");
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
@@ -172,23 +158,13 @@ const schoolSlice = createSlice({
         state.loading = false;
       })
 
-      .addCase(schoolRegister.pending, (state) => {
+      .addCase(addEditSchool.pending, (state) => {
         state.actionLoading = true;
       })
-      .addCase(schoolRegister.fulfilled, (state) => {
+      .addCase(addEditSchool.fulfilled, (state) => {
         state.actionLoading = false;
       })
-      .addCase(schoolRegister.rejected, (state) => {
-        state.actionLoading = false;
-      })
-
-      .addCase(updateSchool.pending, (state) => {
-        state.actionLoading = true;
-      })
-      .addCase(updateSchool.fulfilled, (state) => {
-        state.actionLoading = false;
-      })
-      .addCase(updateSchool.rejected, (state) => {
+      .addCase(addEditSchool.rejected, (state) => {
         state.actionLoading = false;
       })
 

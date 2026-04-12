@@ -693,10 +693,30 @@ export const teacherValidationSchema = Yup.object().shape({
     .matches(/^\d{1,2}$/, "Leave balance must be 1-2 digits")
     .optional(),
   shiftTiming: Yup.string().optional(),
-  shiftTimeFrom: Yup.mixed().nullable().optional(),
-  shiftTimeTo: Yup.mixed().nullable().optional(),
+  shiftTimeFrom: dateValidation(false).when("shiftTimeTo", {
+    is: (val: any) => !!val,
+    then: (schema) => schema.required("Start time is required"),
+    otherwise: (schema) => schema.optional(),
+  }),
+  shiftTimeTo: dateValidation(false)
+    .when("shiftTimeFrom", {
+      is: (val: any) => !!val,
+      then: (schema) => schema.required("End time is required"),
+      otherwise: (schema) => schema.optional(),
+    })
+    .test(
+      "is-after",
+      "End time must be after start time",
+      function (value) {
+        const { shiftTimeFrom } = this.parent;
+        if (!value || !shiftTimeFrom) return true;
+        return moment(value).isAfter(moment(shiftTimeFrom));
+      }
+    ),
   // Documents
   profileImage: imageValidation("Profile Image", false).nullable(),
-  resume: fileValidation("Resume", false, ["application/pdf"]).nullable(),
+  resume: fileValidation("Resume", false, ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/jpeg", "image/jpg", "image/png", "image/svg+xml"]).nullable(),
   idProof: imageValidation("ID Proof", false).nullable(),
-});
+  educationCertificates: Yup.array().of(Yup.mixed()).optional(),
+  experienceCertificates: Yup.array().of(Yup.mixed()).optional(),
+}, [["shiftTimeFrom", "shiftTimeTo"]]);

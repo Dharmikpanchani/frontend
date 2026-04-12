@@ -25,7 +25,7 @@ import {
 } from "@mui/icons-material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
-import { getSchoolById, schoolRegister, updateSchool } from "@/redux/slices/schoolSlice";
+import { addEditSchool, getSchoolById } from "@/redux/slices/schoolSlice";
 import Svg from "@/assets/Svg";
 import { schoolValidationSchema } from "@/utils/validation/FormikValidation";
 import Spinner from "../../component/developerCommon/spinner/Spinner";
@@ -153,15 +153,11 @@ export default function RegisterSchool() {
         }
 
         try {
-            let resultAction;
-            if (isEdit) {
-                resultAction = await dispatch(updateSchool({ id: values.id, payload: formData }) as any);
-                if (updateSchool.fulfilled.match(resultAction)) {
+            const resultAction = await dispatch(addEditSchool(formData) as any);
+            if (addEditSchool.fulfilled.match(resultAction)) {
+                if (isEdit) {
                     navigate("/school-list");
-                }
-            } else {
-                resultAction = await dispatch(schoolRegister(formData) as any);
-                if (schoolRegister.fulfilled.match(resultAction)) {
+                } else {
                     navigate("/otp", { state: { type: "schoolRegistration", email: values.email } });
                 }
             }

@@ -2,15 +2,8 @@ import { adminApiService } from "../client/apiClient";
 import { Api } from "../EndPoint";
 
 export const schoolService = {
-  register: (payload: FormData) =>
-    adminApiService.post<any>(Api.SCHOOL_REGISTER, payload, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }),
-
-  update: (id: string, payload: FormData) =>
-    adminApiService.patch<any>(`${Api.UPDATE_SCHOOL}/${id}`, payload, {
+  addEditSchool: (payload: FormData) =>
+    adminApiService.post<any>(Api.ADD_EDIT_SCHOOL, payload, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
