@@ -18,6 +18,7 @@ import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import Svg from "@/assets/Svg";
+import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
 import { CommonLoader } from "@/apps/common/loader/Loader";
@@ -165,19 +166,10 @@ export default function AddEditClass() {
                                                     className="admin-btn-theme"
                                                     disabled={actionLoading}
                                                     variant="contained"
+                                                    startIcon={id ? <EditIcon /> : <AddIcon />}
                                                     sx={{ minWidth: { xs: '100%', sm: '120px' }, borderRadius: '8px', textTransform: 'none', fontWeight: 600, boxShadow: 'none', '&:hover': { boxShadow: 'none' } }}
                                                 >
-                                                    {actionLoading ? <Spinner /> : (
-                                                        <>
-                                                            <img
-                                                                src={Svg.plus}
-                                                                className="admin-plus-icon"
-                                                                alt="plus"
-                                                                style={{ filter: 'brightness(0) invert(1)', width: '12px', marginRight: '8px' }}
-                                                            />
-                                                            {isEdit ? "Update" : "Add"}
-                                                        </>
-                                                    )}
+                                                    {actionLoading ? <Spinner /> : (isEdit ? "Update Class" : "Add Class")}
                                                 </Button>
                                             )}
                                         </Box>

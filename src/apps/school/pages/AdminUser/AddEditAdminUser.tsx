@@ -49,7 +49,7 @@ import Filter from "@/apps/common/filter/Filter";
 import moment from "moment";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
-
+import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
 import { boardOptions, schoolTypeOptions } from "@/apps/common/StaticArrayData";
 
 export default function AddEditAdminUser() {
@@ -461,19 +461,10 @@ export default function AddEditAdminUser() {
                                                     className="admin-btn-theme"
                                                     disabled={buttonSpinner}
                                                     variant="contained"
+                                                    startIcon={id ? <EditIcon /> : <AddIcon />}
                                                     sx={{ minWidth: { xs: '100%', sm: '120px' }, borderRadius: '8px', textTransform: 'none', fontWeight: 600, boxShadow: 'none', '&:hover': { boxShadow: 'none' } }}
                                                 >
-                                                    {buttonSpinner ? <Spinner /> : (
-                                                        <>
-                                                            <img
-                                                                src={Svg.plus}
-                                                                className="admin-plus-icon"
-                                                                alt="plus"
-                                                                style={{ filter: 'brightness(0) invert(1)', width: '12px', marginRight: '8px' }}
-                                                            />
-                                                            {isEdit ? "Update" : "Add"}
-                                                        </>
-                                                    )}
+                                                    {buttonSpinner ? <Spinner /> : (isEdit ? "Update Admin" : "Add Admin")}
                                                 </Button>
                                             )}
                                         </Box>

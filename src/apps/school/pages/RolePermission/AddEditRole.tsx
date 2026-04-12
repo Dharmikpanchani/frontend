@@ -30,6 +30,7 @@ import type { RootState } from "@/redux/Store";
 import { inputSx } from "@/utils/styles/commonSx";
 
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
 
 export default function AddEditRole() {
     const { id } = useParams<{ id: string }>();
@@ -398,9 +399,10 @@ export default function AddEditRole() {
                                             className="admin-btn-theme"
                                             disabled={buttonSpinner}
                                             variant="contained"
+                                            startIcon={id ? <EditIcon /> : <AddIcon />}
                                             sx={{ minWidth: '120px', borderRadius: '8px', textTransform: 'none', fontWeight: 600, boxShadow: 'none', '&:hover': { boxShadow: 'none' } }}
                                         >
-                                            {buttonSpinner ? <Spinner /> : (isEdit ? "Update" : "Add")}
+                                            {buttonSpinner ? <Spinner /> : (isEdit ? "Update Role" : "Add Role")}
                                         </Button>
                                     )}
                                 </Box>

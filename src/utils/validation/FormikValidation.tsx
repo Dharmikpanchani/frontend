@@ -606,7 +606,11 @@ export const teacherValidationSchema = Yup.object().shape({
   country: countryValidation(false),
   pincode: zipCodeValidation(false),
   // Professional
-  joiningDate: joiningDateValidation(true),
+  joiningDate: Yup.mixed().when("id", {
+    is: (id: string) => !!id,
+    then: () => dateValidation(true, "Joining date is required"),
+    otherwise: () => joiningDateValidation(true)
+  }),
   experienceYears: Yup.string()
     .matches(/^\d{1,2}$/, "Experience must be 1-2 digits")
     .required("Experience is required"),
@@ -627,7 +631,10 @@ export const teacherValidationSchema = Yup.object().shape({
   sectionsAssigned: Yup.array().min(1, "At least one section is required").required("Sections are required"),
   // Salary
   employmentType: Yup.string().required("Employment type is required"),
-  salary: Yup.number().positive("Salary must be positive").optional(),
+  salary: Yup.number()
+    .transform((value, originalValue) => originalValue === "" ? undefined : value)
+    .positive("Salary must be positive")
+    .optional(),
   salaryType: Yup.string().optional(),
   bankName: Yup.string()
     .test(

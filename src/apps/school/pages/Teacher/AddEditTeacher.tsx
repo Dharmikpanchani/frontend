@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
@@ -11,7 +11,6 @@ import {
     Breadcrumbs,
     Link,
     Autocomplete,
-    Backdrop,
 } from "@mui/material";
 import ProfileAvatar from "@/apps/common/ProfileAvatar";
 import {
@@ -42,6 +41,7 @@ import AutoCompleteLocation from "@/apps/common/AutoCompleteLocation";
 import { LocalizationProvider, DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
+import { CommonLoader } from "@/apps/school/component/schoolCommon/loader/Loader";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx, multiInputSx } from "@/utils/styles/commonSx";
 import {
@@ -96,7 +96,8 @@ export default function AddEditTeacher() {
         }
     };
 
-    const initialValues = {
+    const initialValues = useMemo(() => ({
+        id: id || "",
         fullName: teacherData?.fullName || "",
         gender: teacherData?.gender || "",
         dateOfBirth: teacherData?.dateOfBirth ? moment(teacherData.dateOfBirth) : null,
@@ -149,7 +150,7 @@ export default function AddEditTeacher() {
         shiftTiming: teacherData?.shiftTiming || "",
         shiftTimeFrom: teacherData?.shiftTiming?.includes(" - ") ? moment(teacherData.shiftTiming.split(" - ")[0], "hh:mm A") : null,
         shiftTimeTo: teacherData?.shiftTiming?.includes(" - ") ? moment(teacherData.shiftTiming.split(" - ")[1], "hh:mm A") : null,
-    };
+    }), [id, teacherData]);
 
     const handleSubmit = async (values: any) => {
         try {
@@ -240,8 +241,8 @@ export default function AddEditTeacher() {
                 width: 32,
                 height: 32,
                 borderRadius: '8px',
-                backgroundColor: '#fff7ed',
-                color: '#ff8c00'
+                backgroundColor: 'rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)',
+                color: 'var(--primary-color, #5c1a1a)'
             }}>
                 <Icon sx={{ fontSize: 20 }} />
             </Box>
@@ -275,15 +276,16 @@ export default function AddEditTeacher() {
                 )}
             </Box>
 
-            <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: 'rgba(255, 255, 255, 0.6)' }}
-                open={isPageLoading || actionLoading}
-            >
-                <Spinner size={50} color="var(--primary-color)" />
-            </Backdrop>
-
-            <Box className="card-border common-card" sx={{ p: { xs: 2, sm: 3 }, borderRadius: '12px', backgroundColor: 'white' }}>
-                <Formik initialValues={initialValues} validationSchema={teacherValidationSchema} onSubmit={handleSubmit} enableReinitialize>
+            <Box className="card-border common-card" sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: '12px', minHeight: '200px', position: 'relative', backgroundColor: 'white' }}>
+                {isPageLoading ? (
+                    <CommonLoader />
+                ) : (
+                    <Formik
+                        enableReinitialize
+                        initialValues={initialValues}
+                        validationSchema={teacherValidationSchema}
+                        onSubmit={handleSubmit}
+                    >
                     {(formikProps: FormikProps<any>) => {
                         const { values, setFieldValue, handleChange, handleBlur, handleSubmit, touched, errors } = formikProps;
                         return (
@@ -381,7 +383,7 @@ export default function AddEditTeacher() {
                                                                         borderColor: "var(--input-border, #ced4da) !important",
                                                                     },
                                                                     "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                        border: "1px solid var(--primary-color, #ff8c00) !important",
+                                                                        border: "1px solid var(--primary-color, #5c1a1a) !important",
                                                                     },
                                                                 },
                                                                 "& .MuiPickersSectionList-root": {
@@ -397,18 +399,18 @@ export default function AddEditTeacher() {
                                                         popper: {
                                                             sx: {
                                                                 "& .MuiPickersDay-root.Mui-selected": {
-                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    backgroundColor: "var(--primary-color, #5c1a1a) !important",
                                                                     color: "#ffffff !important"
                                                                 },
                                                                 "& .MuiPickersDay-root:hover": {
-                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 255, 140, 0), 0.1) !important",
+                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1) !important",
                                                                 },
                                                                 "& .MuiPickersYear-yearButton.Mui-selected": {
-                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    backgroundColor: "var(--primary-color, #5c1a1a) !important",
                                                                     color: "#ffffff !important"
                                                                 },
                                                                 "& .MuiPickersMonth-monthButton.Mui-selected": {
-                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    backgroundColor: "var(--primary-color, #5c1a1a) !important",
                                                                     color: "#ffffff !important"
                                                                 }
                                                             }
@@ -512,7 +514,7 @@ export default function AddEditTeacher() {
                                                                         borderColor: "var(--input-border, #ced4da) !important",
                                                                     },
                                                                     "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                        border: "1px solid var(--primary-color, #ff8c00) !important",
+                                                                        border: "1px solid var(--primary-color, #5c1a1a) !important",
                                                                     },
                                                                 },
                                                                 "& .MuiPickersSectionList-root": {
@@ -528,18 +530,18 @@ export default function AddEditTeacher() {
                                                         popper: {
                                                             sx: {
                                                                 "& .MuiPickersDay-root.Mui-selected": {
-                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    backgroundColor: "var(--primary-color, #5c1a1a) !important",
                                                                     color: "#ffffff !important"
                                                                 },
                                                                 "& .MuiPickersDay-root:hover": {
-                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 255, 140, 0), 0.1) !important",
+                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1) !important",
                                                                 },
                                                                 "& .MuiPickersYear-yearButton.Mui-selected": {
-                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    backgroundColor: "var(--primary-color, #5c1a1a) !important",
                                                                     color: "#ffffff !important"
                                                                 },
                                                                 "& .MuiPickersMonth-monthButton.Mui-selected": {
-                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    backgroundColor: "var(--primary-color, #5c1a1a) !important",
                                                                     color: "#ffffff !important"
                                                                 }
                                                             }
@@ -815,7 +817,7 @@ export default function AddEditTeacher() {
                                                                         borderColor: "var(--input-border, #ced4da) !important",
                                                                     },
                                                                     "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                        border: "1px solid var(--primary-color, #ff8c00) !important",
+                                                                        border: "1px solid var(--primary-color, #5c1a1a) !important",
                                                                     },
                                                                 },
                                                             }
@@ -823,11 +825,11 @@ export default function AddEditTeacher() {
                                                         popper: {
                                                             sx: {
                                                                 "& .MuiMultiSectionDigitalClockSection-item.Mui-selected": {
-                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    backgroundColor: "var(--primary-color, #5c1a1a) !important",
                                                                     color: "#ffffff !important"
                                                                 },
                                                                 "& .MuiMultiSectionDigitalClockSection-item:hover": {
-                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 255, 140, 0), 0.1) !important",
+                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1) !important",
                                                                 }
                                                             }
                                                         },
@@ -865,7 +867,7 @@ export default function AddEditTeacher() {
                                                                         borderColor: "var(--input-border, #ced4da) !important",
                                                                     },
                                                                     "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                        border: "1px solid var(--primary-color, #ff8c00) !important",
+                                                                        border: "1px solid var(--primary-color, #5c1a1a) !important",
                                                                     },
                                                                     "&.Mui-disabled": {
                                                                         backgroundColor: "#f9fafb",
@@ -880,11 +882,11 @@ export default function AddEditTeacher() {
                                                         popper: {
                                                             sx: {
                                                                 "& .MuiMultiSectionDigitalClockSection-item.Mui-selected": {
-                                                                    backgroundColor: "var(--primary-color, #ff8c00) !important",
+                                                                    backgroundColor: "var(--primary-color, #5c1a1a) !important",
                                                                     color: "#ffffff !important"
                                                                 },
                                                                 "& .MuiMultiSectionDigitalClockSection-item:hover": {
-                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 255, 140, 0), 0.1) !important",
+                                                                    backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1) !important",
                                                                 }
                                                             }
                                                         },
@@ -996,7 +998,8 @@ export default function AddEditTeacher() {
                         );
                     }}
                 </Formik>
-            </Box>
+            )}
         </Box>
+    </Box>
     );
 }

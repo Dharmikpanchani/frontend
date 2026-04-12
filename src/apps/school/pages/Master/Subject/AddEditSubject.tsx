@@ -21,6 +21,7 @@ import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import Svg from "@/assets/Svg";
+import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx, multiInputSx } from "@/utils/styles/commonSx";
 
@@ -160,13 +161,15 @@ export default function AddEditSubject() {
                                             {isView ? "Back" : "Discard"}
                                         </Button>
                                         {!isView && (
-                                            <Button type="submit" className="admin-btn-theme" disabled={actionLoading} variant="contained" sx={{ minWidth: '180px' }}>
-                                                {actionLoading ? <Spinner /> : (
-                                                    <>
-                                                        <img src={Svg.plus} className="admin-plus-icon" alt="plus" style={{ filter: 'brightness(0) invert(1)', width: '12px', marginRight: '8px' }} />
-                                                        {isEdit ? "Update Subject" : "Add Subject"}
-                                                    </>
-                                                )}
+                                            <Button
+                                                type="submit"
+                                                className="admin-btn-theme"
+                                                disabled={actionLoading}
+                                                variant="contained"
+                                                startIcon={id ? <EditIcon /> : <AddIcon />}
+                                                sx={{ minWidth: '180px' }}
+                                            >
+                                                {actionLoading ? <Spinner /> : (isEdit ? "Update Subject" : "Add Subject")}
                                             </Button>
                                         )}
                                     </Box>
