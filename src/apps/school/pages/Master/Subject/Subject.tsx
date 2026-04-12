@@ -157,7 +157,8 @@ export default function Subject() {
               onClick={() => setOpenFilter(true)}
               sx={{
                 ml: 1,
-                textTransform: 'capitalize',
+                minWidth: '45px',
+                p: '0 12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'

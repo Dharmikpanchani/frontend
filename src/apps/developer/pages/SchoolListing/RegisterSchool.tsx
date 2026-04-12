@@ -305,33 +305,7 @@ export default function RegisterSchool() {
                                                                 onClick: () => setOpenDatePicker(true),
                                                                 // error: touched.establishedYear && Boolean(errors.establishedYear),
                                                                 onBlur: handleBlur,
-                                                                sx: {
-                                                                    "& .MuiPickersOutlinedInput-root": {
-                                                                        height: "40px",
-                                                                        // default
-                                                                        "& .MuiOutlinedInput-notchedOutline": {
-                                                                            borderColor: "var(--input-border, #ced4da)",
-                                                                        },
-                                                                        // hover
-                                                                        "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline": {
-                                                                            borderColor: "var(--primary-color, #ced4da) !important",
-                                                                        },
-                                                                        // ✅ ACTIVE / FOCUS (yellow)
-                                                                        "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                                                                            border: "1px solid var(--primary-color, #ff8c00) !important",
-                                                                        },
-                                                                    },
-
-                                                                    "& .MuiPickersSectionList-root": {
-                                                                        padding: "12px 0px",
-                                                                        fontSize: "12px",
-                                                                    },
-
-                                                                    "& .MuiPickersInputBase-sectionContent": {
-                                                                        fontSize: "13px",
-                                                                        padding: "12px 0px",
-                                                                    },
-                                                                }
+                                                                sx: inputSx
                                                             },
 
                                                             field: {

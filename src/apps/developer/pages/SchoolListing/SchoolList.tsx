@@ -21,6 +21,9 @@ import {
   Email as EmailIcon,
   LocalPhone as PhoneIcon,
   ContentCopy as CopyIcon,
+  Search as SearchIcon,
+  FilterList as FilterIcon,
+  Add as AddIcon,
 } from "@mui/icons-material";
 import { getAllSchools } from "@/redux/slices/schoolSlice";
 import Svg from "@/assets/Svg";
@@ -249,10 +252,9 @@ export default function SchoolList() {
                   }}
                   inputProps={{ maxLength: 80 }}
                 />
-                <img
-                  src={Svg.search}
-                  className="admin-search-grey-img admin-icon admin-icon-theme"
-                  alt="search"
+                <SearchIcon
+                  sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                  className="school-admin-search-grey-img admin-icon"
                 />
               </Box>
             </Box>
@@ -261,9 +263,18 @@ export default function SchoolList() {
             <Button
               className="admin-btn-theme"
               onClick={() => setOpenFilter(true)}
-              sx={{ ml: 1, textTransform: 'capitalize', display: 'flex', alignItems: 'center', gap: '8px' }}
+              sx={{
+                ml: 1,
+                minWidth: '45px',
+                p: '0 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
             >
-              <img src={Svg.filter} alt="filter" style={{ width: '16px', filter: 'brightness(0) invert(1)' }} />
+              <FilterIcon
+                sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }}
+              />
             </Button>
           </Box>
           {hasPermission(developerPermission.school.create) && (
@@ -272,11 +283,8 @@ export default function SchoolList() {
                 className="admin-btn-theme"
                 onClick={() => navigate("/school-list/add")}
               >
-                <img
-                  src={Svg.plus}
-                  className="admin-plus-icon"
-                  alt="plus"
-                  style={{ filter: 'brightness(0) invert(1)' }}
+                <AddIcon
+                  sx={{ color: 'var(--button-text, #fff)', fontSize: '18px', mr: 1 }}
                 />
                 Add School
               </Button>

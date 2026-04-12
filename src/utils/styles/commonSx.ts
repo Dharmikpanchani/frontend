@@ -20,28 +20,30 @@ export const inputSx: SxProps<Theme> = {
     height: '40px',
     backgroundColor: '#ffffff !important',
     borderRadius: 'var(--button-radius, 6px) !important',
-    '&.MuiOutlinedInput-root, & .MuiOutlinedInput-root': {
+    '&.MuiOutlinedInput-root, & .MuiOutlinedInput-root, & .MuiPickersOutlinedInput-root, & .MuiInputBase-root': {
         height: '40px',
         backgroundColor: '#ffffff !important',
         borderRadius: 'var(--button-radius, 6px) !important',
-        padding: '0 !important',
-        border: 'none !important', // Ensure no double border from the container
-        '& fieldset': {
+        // default border
+        '& .MuiOutlinedInput-notchedOutline, & fieldset': {
             borderColor: 'var(--input-border, #ced4da) !important',
+            borderWidth: '1px !important',
             transition: 'all 0.3s ease !important',
         },
-        '&:hover:not(.Mui-focused) fieldset': {
-            borderColor: 'var(--input-border, #ced4da) !important', // Keep it grey on hover unless focused
+        // hover
+        '&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline, &:hover:not(.Mui-focused) fieldset': {
+            borderColor: 'var(--input-border, #ced4da) !important',
             opacity: 1,
         },
-        '&.Mui-focused fieldset': {
+        // focus
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline, &.Mui-focused fieldset': {
             borderColor: 'var(--primary-color, #942F15) !important',
             borderWidth: '1px !important',
-            boxShadow: 'none !important', // Remove shadow that looks like a second border
+            boxShadow: 'none !important',
         },
         '&.Mui-disabled': {
             backgroundColor: '#f8f9fa !important',
-            '& fieldset': {
+            '& .MuiOutlinedInput-notchedOutline, & fieldset': {
                 borderColor: '#e9ecef !important',
             },
         },
@@ -79,8 +81,6 @@ export const multiInputSx: SxProps<Theme> = {
         minHeight: '40px',
         backgroundColor: '#ffffff !important',
         borderRadius: 'var(--button-radius, 6px) !important',
-        padding: '0 8px !important', // Root padding for chips alignment
-        border: 'none !important',
         '& fieldset': {
             borderColor: 'var(--input-border, #ced4da) !important',
             transition: 'all 0.3s ease !important',

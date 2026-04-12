@@ -17,6 +17,11 @@ import {
   debounce,
   Chip,
 } from "@mui/material";
+import {
+  Search as SearchIcon,
+  FilterList as FilterIcon,
+  Add as AddIcon,
+} from "@mui/icons-material";
 import { getAllAdminUsers, deleteAdminUser } from "@/redux/slices/adminUserSlice";
 import { getAllRolesSimple } from "@/redux/slices/roleSlice";
 import Svg from "@/assets/Svg";
@@ -208,11 +213,10 @@ export default function AdminUser() {
                   }}
                   inputProps={{ maxLength: 80 }}
                 />
-                <img
-                  src={Svg.search}
-                  className="admin-search-grey-img admin-icon admin-icon-theme"
-                  alt="search"
-                ></img>
+                <SearchIcon
+                  sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                  className="school-admin-search-grey-img admin-icon"
+                />
               </Box>
             </Box>
           </Box>
@@ -222,16 +226,15 @@ export default function AdminUser() {
               onClick={() => setOpenFilter(true)}
               sx={{
                 ml: 1,
-                textTransform: 'capitalize',
+                minWidth: '45px',
+                p: '0 12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}
             >
-              <img
-                src={Svg.filter}
-                alt="filter"
-                style={{ width: '16px', filter: 'brightness(0) invert(1)' }}
+              <FilterIcon
+                sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }}
               />
             </Button>
           </Box>
@@ -241,11 +244,8 @@ export default function AdminUser() {
                 className="admin-btn-theme"
                 onClick={() => navigate("/admin-list/add")}
               >
-                <img
-                  src={Svg.plus}
-                  className="admin-plus-icon"
-                  alt="plus"
-                  style={{ filter: 'brightness(0) invert(1)' }}
+                <AddIcon
+                  sx={{ color: 'var(--button-text, #fff)', fontSize: '18px', mr: 1 }}
                 />
                 Add Admin User
               </Button>

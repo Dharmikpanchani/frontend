@@ -11,11 +11,13 @@ import {
   Select,
   FormControl,
 } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
 import { Formik, Form } from "formik";
-import Svg from "@/assets/Svg";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
+import { labelSx, inputSx } from "@/utils/styles/commonSx";
+import Svg from "@/assets/Svg";
 
 export interface FilterField {
   type: "select" | "searchbaseSelect" | "date" | "inputSelect" | "dateRange";
@@ -37,43 +39,7 @@ interface FilterProps {
   initialValues: any;
 }
 
-const labelSx = {
-  display: "block",
-  fontSize: "13px",
-  fontWeight: 500,
-  marginBottom: "4px",
-  color: "var(--text-primary, #374151)",
-  fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
-};
-
-const inputSx = {
-  "&.MuiFormControl-root, & .MuiOutlinedInput-root, & .MuiInputBase-root": {
-    height: "40px",
-    backgroundColor: "var(--input-bg) !important",
-    borderRadius: "5px !important",
-    "& fieldset": {
-      borderColor: "rgba(var(--primary-color-rgb), 0.2) !important",
-      transition: "all 0.3s ease !important",
-    },
-    "&:hover fieldset": {
-      borderColor: "var(--primary-color) !important",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "var(--primary-color) !important",
-      borderWidth: "1px !important",
-      boxShadow: "0 0 0 2px rgba(var(--primary-color-rgb), 0.1) !important",
-    },
-  },
-  "& .MuiOutlinedInput-input": {
-    fontSize: "12px !important",
-    height: "40px",
-    display: "flex",
-    alignItems: "center",
-    fontFamily: "var(--font-family, 'PlusJakartaSans-Medium', sans-serif) !important",
-    color: "var(--text-primary, var(--secondary-color)) !important",
-    backgroundColor: "transparent !important",
-  },
-};
+// Using styles from commonSx.ts
 
 const Filter: React.FC<FilterProps> = ({
   open,
@@ -161,47 +127,13 @@ const Filter: React.FC<FilterProps> = ({
                 open={!!openSelectors[field.name]}
                 onOpen={() => toggleSelector(field.name, true)}
                 onClose={() => toggleSelector(field.name, false)}
-                slots={{ openPickerIcon: () => null }}
                 slotProps={{
                   textField: {
                     fullWidth: true,
                     placeholder: field.placeholder || "Select Date",
                     variant: "outlined",
                     onClick: () => toggleSelector(field.name, true),
-                    sx: {
-                      "& .MuiPickersOutlinedInput-root": {
-                        height: "40px",
-                        background: "#ededed !important",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#ced4da",
-                        },
-                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#ced4da !important",
-                        },
-                        "&:hover .MuiPickersOutlinedInput-notchedOutline": {
-                          borderColor: "#ced4da",
-                          borderWidth: "1px",
-                        },
-                        "&.Mui-focused:not(.Mui-error) .MuiPickersOutlinedInput-notchedOutline": {
-                          border: "1px solid var(--primary-color) !important",
-                        },
-                      },
-                      "& .MuiPickersSectionList-root": {
-                        padding: "12px 0px",
-                        fontSize: "12px",
-                      },
-                      "& .MuiPickersInputBase-sectionContent": {
-                        fontSize: "13px",
-                        padding: "12px 0px",
-                      },
-                      "& .MuiOutlinedInput-input": {
-                        padding: "0 12px !important",
-                        fontSize: "13px !important",
-                        fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
-                        height: "40px",
-                        cursor: "pointer",
-                      }
-                    }
+                    sx: inputSx
                   },
                   field: {
                     readOnly: true,
@@ -222,11 +154,18 @@ const Filter: React.FC<FilterProps> = ({
                   display: "flex",
                   alignItems: "center",
                   height: "40px",
-                  backgroundColor: "var(--input-bg) !important",
-                  borderRadius: "5px !important",
-                  border: "1px solid var(--main-border) !important",
+                  backgroundColor: "#ffffff !important",
+                  borderRadius: "var(--button-radius, 6px) !important",
+                  border: "1px solid var(--input-border, #ced4da) !important",
+                  transition: 'all 0.3s ease !important',
                   px: 1,
                   cursor: "pointer",
+                  '&:hover': {
+                    borderColor: 'var(--input-border, #ced4da) !important',
+                  },
+                  '&:focus-within': {
+                    borderColor: 'var(--primary-color, #942F15) !important',
+                  }
                 }}
               >
                 <DatePicker
@@ -237,7 +176,6 @@ const Filter: React.FC<FilterProps> = ({
                   open={!!openSelectors[`${field.name}Start`]}
                   onOpen={() => toggleSelector(`${field.name}Start`, true)}
                   onClose={() => toggleSelector(`${field.name}Start`, false)}
-                  slots={{ openPickerIcon: () => null }}
                   sx={{ flex: 1 }}
                   slotProps={{
                     textField: {
@@ -248,8 +186,8 @@ const Filter: React.FC<FilterProps> = ({
                       sx: {
                         "& .MuiInputBase-input": {
                           padding: "0 4px !important",
-                          fontSize: "12px !important",
-                          fontFamily: "'PlusJakartaSans-Medium', sans-serif !important",
+                          fontSize: "14px !important",
+                          fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
                           cursor: "pointer",
                           textAlign: "center",
                           width: "100%",
@@ -268,7 +206,6 @@ const Filter: React.FC<FilterProps> = ({
                   open={!!openSelectors[`${field.name}End`]}
                   onOpen={() => toggleSelector(`${field.name}End`, true)}
                   onClose={() => toggleSelector(`${field.name}End`, false)}
-                  slots={{ openPickerIcon: () => null }}
                   sx={{ flex: 1 }}
                   slotProps={{
                     textField: {
@@ -279,8 +216,8 @@ const Filter: React.FC<FilterProps> = ({
                       sx: {
                         "& .MuiInputBase-input": {
                           padding: "0 4px !important",
-                          fontSize: "12px !important",
-                          fontFamily: "'PlusJakartaSans-Medium', sans-serif !important",
+                          fontSize: "14px !important",
+                          fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
                           cursor: "pointer",
                           textAlign: "center",
                           width: "100%",
@@ -327,15 +264,38 @@ const Filter: React.FC<FilterProps> = ({
         },
       }}
     >
-      <Box className="admin-filter-header">
-        <Typography className="admin-filter-title">{title}</Typography>
-        <IconButton onClick={onClose} sx={{ p: 0 }}>
-          <img
-            src={Svg.close}
-            className="admin-filter-close-icon"
-            alt="Close"
-            style={{ filter: "brightness(0) invert(1)" }}
-          />
+      <Box
+        className="admin-filter-header"
+        sx={{
+          p: '12px 20px',
+          backgroundColor: 'var(--primary-color)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <Typography
+          className="admin-filter-title"
+          sx={{
+            fontSize: '18px',
+            fontWeight: 700,
+            color: '#fff',
+            fontFamily: "'PlusJakartaSans-Bold', sans-serif"
+          }}
+        >
+          {title}
+        </Typography>
+        <IconButton
+          onClick={onClose}
+          sx={{
+            p: '4px',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+            }
+          }}
+        >
+          <CloseIcon sx={{ fontSize: '20px' }} />
         </IconButton>
       </Box>
 
