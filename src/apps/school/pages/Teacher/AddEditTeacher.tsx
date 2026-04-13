@@ -1298,7 +1298,7 @@ export default function AddEditTeacher() {
                                                     type="submit"
                                                     disabled={actionLoading}
                                                     variant="contained"
-                                                    startIcon={id ? <EditIcon /> : <AddIcon />}
+                                                    startIcon={!actionLoading ? (id ? <EditIcon /> : <AddIcon />) : null}
                                                     sx={{
                                                         minWidth: '180px',
                                                         height: '42px',

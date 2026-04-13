@@ -399,7 +399,7 @@ export default function AddEditRole() {
                                             className="admin-btn-theme"
                                             disabled={buttonSpinner}
                                             variant="contained"
-                                            startIcon={id ? <EditIcon /> : <AddIcon />}
+                                            startIcon={!buttonSpinner ? (id ? <EditIcon /> : <AddIcon />) : null}
                                             sx={{ minWidth: '120px', borderRadius: '8px', textTransform: 'none', fontWeight: 600, boxShadow: 'none', '&:hover': { boxShadow: 'none' } }}
                                         >
                                             {buttonSpinner ? <Spinner /> : (isEdit ? "Update Role" : "Add Role")}

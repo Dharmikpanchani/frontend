@@ -585,11 +585,7 @@ export default function Teacher() {
                     <DataNotFound text="No Teachers Found" />
                   )
                 ) : (
-                  <Loader colSpan={hasAnyPermission([
-                    schoolAdminPermission.teacher.read,
-                    schoolAdminPermission.teacher.update,
-                    schoolAdminPermission.teacher.delete,
-                  ]) ? 6 : 5} />
+                  <Loader />
                 )}
               </TableBody>
             </Table>

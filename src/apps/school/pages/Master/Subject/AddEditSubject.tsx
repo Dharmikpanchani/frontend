@@ -165,7 +165,7 @@ export default function AddEditSubject() {
                                                 className="admin-btn-theme"
                                                 disabled={actionLoading}
                                                 variant="contained"
-                                                startIcon={id ? <EditIcon /> : <AddIcon />}
+                                                startIcon={!actionLoading ? (id ? <EditIcon /> : <AddIcon />) : null}
                                                 sx={{ minWidth: '180px' }}
                                             >
                                                 {actionLoading ? <Spinner /> : (isEdit ? "Update Subject" : "Add Subject")}

@@ -175,7 +175,7 @@ export default function AddEditSection() {
                                                 className="admin-btn-theme"
                                                 disabled={actionLoading}
                                                 variant="contained"
-                                                startIcon={id ? <EditIcon /> : <AddIcon />}
+                                                startIcon={!actionLoading ? (id ? <EditIcon /> : <AddIcon />) : null}
                                                 sx={{ minWidth: { xs: '100%', sm: '120px' }, borderRadius: '8px', textTransform: 'none', fontWeight: 600, boxShadow: 'none', '&:hover': { boxShadow: 'none' } }}
                                             >
                                                 {actionLoading ? <Spinner /> : (isEdit ? "Update Section" : "Add Section")}
