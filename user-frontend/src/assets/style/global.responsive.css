@@ -1,0 +1,141 @@
+@media (max-width: 1249px) {}
+
+@media (max-width: 1023px) {
+      .admin-body-overflow {
+            overflow: hidden;
+      }
+
+      .admin-dashboard-left-main {
+            left: -290px;
+            z-index: 1000;
+      }
+
+      .admin-dashboard-left-main.active {
+            left: 0;
+            width: 100% !important;
+            max-width: 250px !important;
+      }
+
+      .admin-header-main {
+            left: 0 !important;
+      }
+
+      .admin-dashboard-containt-main {
+            padding: 85px 0px 24px 0px !important;
+      }
+
+      .admin-sidebar-logo-main .admin-sidebar-close-btn {
+            display: block;
+      }
+
+      .admin-close-icon {
+            display: block;
+      }
+
+      .admin-user-list-flex {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+      }
+
+      .admin-flex-end {
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+      }
+
+      .admin-search-main {
+            width: 100% !important;
+      }
+
+      .admin-add-user-btn-main {
+            width: 100%;
+      }
+
+      .admin-add-user-btn-main .admin-btn-theme {
+            width: 100%;
+            justify-content: center;
+      }
+
+      .admin-auth-left-main {
+            display: none;
+      }
+
+      .admin-auth-right-main {
+            width: 100%;
+            max-width: 100%;
+            flex: 0 0 100%;
+      }
+
+      .login-auth-bg {
+            height: 50vh;
+            background-size: cover;
+      }
+}
+
+@media (max-width: 767px) {
+      .admin-admin-dashboard-inner-box {
+            max-width: 100%;
+      }
+
+      .admin-dashboard-content .admin-user-list-page-title {
+            margin-bottom: 10px;
+      }
+
+      .admin-filter-main .MuiDrawer-paper {
+            min-width: 100% !important;
+            max-width: 100% !important;
+      }
+
+      .admin-progress-bar-text {
+            right: 0px;
+            top: -23px;
+      }
+
+      .admin-search-main {
+            width: 100%;
+      }
+
+      .admin-dash-card-row {
+            grid-template-columns: repeat(1, 1fr);
+      }
+
+      .admin-form-group-flex,
+      .admin-form-group-flex-main {
+            flex-wrap: wrap;
+      }
+
+      .admin-form-group-flex .admin-dropdown-with {
+            min-width: 100%;
+      }
+}
+
+@media (max-width: 549px) {
+      .admin-header-main {
+            padding: 12px 15px;
+      }
+      
+      .admin-avatar-circle {
+            width: 34px !important;
+            height: 34px !important;
+      }
+}
+
+@media (max-width: 479px) {
+      .common-card {
+            padding: 20px 15px !important;
+      }
+
+      .profile-header-main {
+            align-items: center !important;
+            text-align: center;
+      }
+
+      .profile-header-main > div:last-child {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+      }
+}
