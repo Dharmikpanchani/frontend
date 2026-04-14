@@ -89,9 +89,6 @@ export const developerRoutes: RouteConfig[] = [
         children: [
             { path: "/", element: <Login /> },
             { path: "/login/otp", element: <LoginOtp /> },
-            { path: "/school-register/otp", element: <RegisterSchoolOtp /> },
-            { path: "/admin-user/otp", element: <AdminUserOtp /> },
-            { path: "/email-change/otp", element: <EmailChangeOtp /> },
             { path: "/forgot-password/otp", element: <ForgotPasswordOtp /> },
             { path: "/forgot-password", element: <ForgotPassword /> },
             { path: "/set-password", element: <SetPassWord /> },
@@ -103,6 +100,9 @@ export const developerRoutes: RouteConfig[] = [
         path: "/",
         element: <PrivateRoutes />,
         children: [
+            { path: "/school-register/otp", element: <RegisterSchoolOtp /> },
+            { path: "/admin-user/otp", element: <AdminUserOtp /> },
+            { path: "/email-change/otp", element: <EmailChangeOtp /> },
             {
                 element: <AdminLayOut />,
                 errorElement: <ErrorBoundary />,

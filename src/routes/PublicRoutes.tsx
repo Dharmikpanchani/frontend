@@ -22,13 +22,8 @@ const PublicRoutes: React.FC = () => {
     (state: RootState | any) => state.AdminReducer
   );
 
-  const { pathname, state } = useLocation();
+  const { pathname } = useLocation();
   const isValid = useIsValidToken(token);
-  const isOtpRegistration = 
-    pathname === "/otp" && 
-    (state?.type === "registration" || 
-     state?.type === "schoolRegistration" || 
-     state?.type === "admin_update");
 
   useEffect(() => {
     if (token && !isValid) {
@@ -45,7 +40,7 @@ const PublicRoutes: React.FC = () => {
     }
   }, [token, isValid, dispatch]);
 
-  if (isAdminLogin && adminDetails?.isLogin && isValid && !isOtpRegistration) {
+  if (isAdminLogin && adminDetails?.isLogin && isValid) {
     return <Navigate to="/dashboard" replace={true} />;
   }
   return <Outlet />;
