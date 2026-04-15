@@ -37,7 +37,6 @@ import type { FormikProps } from "formik";
 import { getAllRolesSimple } from "@/redux/slices/roleSlice";
 import { addEditAdminUser, getAdminUserById } from "@/redux/slices/adminUserSlice";
 import Svg from "@/assets/Svg";
-import { BpCheckbox } from "../../component/schoolCommon/commonCssFunction/cssFunction";
 import { adminUserValidationSchema } from "@/utils/validation/FormikValidation";
 import Spinner from "../../component/schoolCommon/spinner/Spinner";
 import { toasterError } from "@/utils/toaster/Toaster";

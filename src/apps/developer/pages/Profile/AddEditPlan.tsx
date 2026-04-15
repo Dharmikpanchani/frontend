@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
     Box,
@@ -23,25 +22,19 @@ import type { FormikProps } from "formik";
 import { planStaticData as roleStaticData } from "@/apps/common/StaticArrayData";
 import { BpCheckbox } from "../../component/developerCommon/commonCssFunction/cssFunction";
 import { CommonLoader } from "@/apps/common/loader/Loader";
-import type { RootState } from "@/redux/Store";
 import { inputSx } from "@/utils/styles/commonSx";
 
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
 
 export default function AddEditPlan() {
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const location = useLocation();
-    const dispatch = useDispatch();
-
+    const navigate = useNavigate();
     const isView = location.pathname.includes("/view/");
     const isEdit = !!id && !isView;
 
     // Static loading state for now
-    const [loading, setLoading] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState<any>(null);
-
+    const loading = false;
     const [permissions, setPermissions] = useState<string[]>([]);
     const [permissionsError, setPermissionsError] = useState("");
     const [buttonSpinner, setButtonSpinner] = useState(false);
@@ -58,8 +51,8 @@ export default function AddEditPlan() {
     }, [id]);
 
     const initialValues = {
-        planName: selectedPlan?.planName || "",
-        price: selectedPlan?.price || "",
+        planName: "",
+        price: "",
     };
 
     const handleSubmit = async (values: { planName: string, price: string }) => {
