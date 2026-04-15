@@ -60,15 +60,18 @@ export default function ForgotPasswordOtp() {
 
             if (resendOtpAdmin.fulfilled.match(resultAction)) {
                 setFieldValue("code", "");
+                return true;
             } else {
                 const message = resultAction?.payload?.message;
                 if (message?.includes("Too many OTP requests")) {
                     navigate("/");
                 }
+                return false;
             }
         } catch (error: any) {
             setResendLoading(false);
             toasterError(error?.message || "Failed to resend OTP");
+            return false;
         }
     };
 

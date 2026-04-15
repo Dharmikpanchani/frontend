@@ -26,4 +26,5 @@ export const Api = {
   GET_SCHOOL_PROFILE: `${route}/school-profile`,
   UPDATE_SCHOOL_PROFILE: `${route}/school-update-profile`,
   GET_SCHOOL_IMAGE: `${route}/get-school-image`,
+  ALL_SCHOOL_CODES: `user/all-school-codes`,
 };

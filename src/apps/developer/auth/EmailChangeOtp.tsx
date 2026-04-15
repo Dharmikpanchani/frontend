@@ -31,7 +31,7 @@ export default function EmailChangeOtp() {
             setLoading(false);
 
             if (verifyEmailChangeAdmin.fulfilled.match(resultAction)) {
-                if (resultAction.payload?.message?.toLowerCase().includes("fetch")) {
+                if ((resultAction.payload as any)?.message?.toLowerCase().includes("fetch")) {
                     toasterError("Invalid verification response");
                     return;
                 }
@@ -55,10 +55,13 @@ export default function EmailChangeOtp() {
 
             if (resendOtpAdmin.fulfilled.match(resultAction)) {
                 setFieldValue("code", "");
+                return true;
             }
+            return false;
         } catch (error: any) {
             setResendLoading(false);
             toasterError(error?.message || "Failed to resend OTP");
+            return false;
         }
     };
 

@@ -15,7 +15,7 @@ interface SharedOtpProps {
     title?: string;
     subtitle: string;
     onVerify: (values: OtpNumberInterface, formikProps: any) => Promise<void>;
-    onResend: (setFieldValue: any) => Promise<void>;
+    onResend: (setFieldValue: any) => Promise<boolean>;
     handleBack: () => void;
     backLabel: string;
     loading: boolean;
@@ -73,8 +73,10 @@ export default function SharedOtp({
     };
 
     const handleResendClick = async (setFieldValue: any) => {
-        await onResend(setFieldValue);
-        startOtpTimer();
+        const success = await onResend(setFieldValue);
+        if (success) {
+            startOtpTimer();
+        }
     };
 
     return (

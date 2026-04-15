@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { verifyOtpAdmin, resendOtpAdmin } from "@/redux/slices/authSlice";
 import { addEditAdminUser } from "@/redux/slices/adminUserSlice";
@@ -67,10 +67,13 @@ export default function AdminUserOtp() {
 
             if (resendOtpAdmin.fulfilled.match(resultAction)) {
                 setFieldValue("code", "");
+                return true;
             }
+            return false;
         } catch (error: any) {
             setResendLoading(false);
             toasterError(error?.message || "Failed to resend OTP");
+            return false;
         }
     };
 

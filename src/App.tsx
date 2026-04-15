@@ -35,6 +35,13 @@ const theme = createTheme({
         },
       },
     },
+    MuiAutocomplete: {
+      styleOverrides: {
+        popper: {
+          zIndex: 'auto !important'
+        }
+      }
+    }
   },
 });
 

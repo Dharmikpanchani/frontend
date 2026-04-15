@@ -12,7 +12,7 @@ export default function TeacherOtp() {
     const dispatch = useDispatch();
     const location = useLocation();
     const isSubdomain = getSubdomain();
-    const { phone, email } = location.state || {};
+    const { phone } = location.state || {};
     const [loading, setLoading] = useState(false);
     const [resendLoading, setResendLoading] = useState(false);
 
@@ -60,15 +60,18 @@ export default function TeacherOtp() {
 
             if (resendOtpAdmin.fulfilled.match(resultAction)) {
                 setFieldValue("code", "");
+                return true;
             } else {
                 const message = resultAction?.payload?.message;
                 if (message?.includes("Too many OTP requests")) {
                     navigate("/");
                 }
+                return false;
             }
         } catch (error: any) {
             setResendLoading(false);
             toasterError(error?.message || "Failed to resend OTP");
+            return false;
         }
     };
 

@@ -56,10 +56,13 @@ export default function RegisterSchoolOtp() {
 
             if (resendOtpAdmin.fulfilled.match(resultAction)) {
                 setFieldValue("code", "");
+                return true;
             }
+            return false;
         } catch (error: any) {
             setResendLoading(false);
             toasterError(error?.message || "Failed to resend OTP");
+            return false;
         }
     };
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Outlet, Navigate, useLocation } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import type { RootState } from "../redux/rootReducer";
 import useIsValidToken from "./isValidToken";
 
@@ -22,7 +22,6 @@ const PublicRoutes: React.FC = () => {
     (state: RootState | any) => state.AdminReducer
   );
 
-  const { pathname } = useLocation();
   const isValid = useIsValidToken(token);
 
   useEffect(() => {

@@ -69,15 +69,18 @@ export default function LoginOtp() {
 
             if (resendOtpAdmin.fulfilled.match(resultAction)) {
                 setFieldValue("code", "");
+                return true;
             } else {
                 const message = (resultAction?.payload as any)?.message;
                 if (message?.includes("Too many OTP requests")) {
                     router.replace("/login");
                 }
+                return false;
             }
         } catch (error: any) {
             setResendLoading(false);
             toasterError(error?.message || "Failed to resend OTP");
+            return false;
         }
     };
 

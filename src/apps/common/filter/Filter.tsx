@@ -17,7 +17,6 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
-import Svg from "@/assets/Svg";
 
 export interface FilterField {
   type: "select" | "searchbaseSelect" | "date" | "inputSelect" | "dateRange";
