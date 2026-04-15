@@ -53,6 +53,9 @@ const SchoolList = lazy(
 const RegisterSchool = lazy(
     () => import("./pages/SchoolListing/RegisterSchool")
 );
+const AddEditPlan = lazy(
+    () => import("./pages/Profile/AddEditPlan")
+);
 
 /**
  * Wrapper component that reads permissions from the store (inside a component body,
@@ -215,6 +218,24 @@ export const developerRoutes: RouteConfig[] = [
                             <PermissionRoute permission={developerPermission?.school?.read}>
                                 <RegisterSchool />
                             </PermissionRoute>
+                        ),
+                    },
+                    {
+                        path: "/plan-list/add",
+                        element: (
+                            <AddEditPlan />
+                        ),
+                    },
+                    {
+                        path: "/plan-list/edit/:id",
+                        element: (
+                            <AddEditPlan />
+                        ),
+                    },
+                    {
+                        path: "/plan-list/view/:id",
+                        element: (
+                            <AddEditPlan />
                         ),
                     },
 

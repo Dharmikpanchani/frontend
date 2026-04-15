@@ -273,17 +273,17 @@ const ThemeSettings = () => {
             backgroundColor: 'transparent',
             p: 0.5
           }}>
-            <img 
-              src={schoolData.logoUrl} 
-              alt="School Logo" 
-              style={{ 
+            <img
+              src={schoolData.logoUrl}
+              alt="School Logo"
+              style={{
                 display: 'block',
-                width: 'auto', 
-                height: 'auto', 
-                maxWidth: '100px', 
-                maxHeight: '60px', 
-                objectFit: 'contain' 
-              }} 
+                width: 'auto',
+                height: 'auto',
+                maxWidth: '100px',
+                maxHeight: '60px',
+                objectFit: 'contain'
+              }}
             />
           </Box>
           <Box>

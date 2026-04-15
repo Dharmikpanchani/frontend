@@ -12,218 +12,184 @@ export interface RoleStaticItem {
   subRole: SubRole[];
 }
 
-export const roleStaticData: RoleStaticItem[] = [
-  {
-    mainTitle: "Dashboard",
-    mainTitleId: "dashboard",
-    subRole: [
-      {
-        title: "Add",
-        titleId: "add",
-        is_show: false,
-      },
-      {
-        title: "Edit",
-        titleId: "edit",
-        is_show: false,
-      },
-      {
-        title: "View",
-        titleId: "view",
-        is_show: true,
-      },
-      {
-        title: "Delete",
-        titleId: "delete",
-        is_show: false,
-      },
-      {
-        title: "Status",
-        titleId: "status",
-        is_show: false,
-      },
-    ],
-  },
-  {
-    mainTitle: "Roles",
-    mainTitleId: "admin_role",
-    subRole: [
-      {
-        title: "Add",
-        titleId: "add",
-        is_show: true,
-      },
-      {
-        title: "Edit",
-        titleId: "edit",
-        is_show: true,
-      },
-      {
-        title: "View",
-        titleId: "view",
-        is_show: true,
-      },
-      {
-        title: "Delete",
-        titleId: "delete",
-        is_show: true,
-      },
-      {
-        title: "Status",
-        titleId: "status",
-        is_show: false,
-      },
-    ],
-  },
-  {
-    mainTitle: "Admin User",
-    mainTitleId: "admin_user",
-    subRole: [
-      {
-        title: "Add",
-        titleId: "add",
-        is_show: true,
-      },
-      {
-        title: "Edit",
-        titleId: "edit",
-        is_show: true,
-      },
-      {
-        title: "View",
-        titleId: "view",
-        is_show: true,
-      },
-      {
-        title: "Delete",
-        titleId: "delete",
-        is_show: true,
-      },
-      {
-        title: "Status",
-        titleId: "status",
-        is_show: true,
-      },
-    ],
-  },
-  {
-    mainTitle: "Teacher",
-    mainTitleId: "teacher",
-    subRole: [
-      { title: "Add", titleId: "add", is_show: true },
-      { title: "Edit", titleId: "edit", is_show: true },
-      { title: "View", titleId: "view", is_show: true },
-      { title: "Delete", titleId: "delete", is_show: true },
-    ],
-  },
-  {
-    mainTitle: "Department",
-    mainTitleId: "department",
-    subRole: [
-      { title: "Add", titleId: "add", is_show: true },
-      { title: "Edit", titleId: "edit", is_show: true },
-      { title: "View", titleId: "view", is_show: true },
-      { title: "Delete", titleId: "delete", is_show: true },
-    ],
-  },
-  {
-    mainTitle: "Subject",
-    mainTitleId: "subject",
-    subRole: [
-      { title: "Add", titleId: "add", is_show: true },
-      { title: "Edit", titleId: "edit", is_show: true },
-      { title: "View", titleId: "view", is_show: true },
-      { title: "Delete", titleId: "delete", is_show: true },
-    ],
-  },
-  {
-    mainTitle: "Class",
-    mainTitleId: "class",
-    subRole: [
-      { title: "Add", titleId: "add", is_show: true },
-      { title: "Edit", titleId: "edit", is_show: true },
-      { title: "View", titleId: "view", is_show: true },
-      { title: "Delete", titleId: "delete", is_show: true },
-    ],
-  },
-  {
-    mainTitle: "Section",
-    mainTitleId: "section",
-    subRole: [
-      { title: "Add", titleId: "add", is_show: true },
-      { title: "Edit", titleId: "edit", is_show: true },
-      { title: "View", titleId: "view", is_show: true },
-      { title: "Delete", titleId: "delete", is_show: true },
-    ],
-  },
-  {
-    mainTitle: "School List",
-    mainTitleId: "school",
-    subRole: [
-      {
-        title: "Add",
-        titleId: "add",
-        is_show: true,
-      },
-      {
-        title: "Edit",
-        titleId: "edit",
-        is_show: true,
-      },
-      {
-        title: "View",
-        titleId: "view",
-        is_show: true,
-      },
-      {
-        title: "Delete",
-        titleId: "delete",
-        is_show: false,
-      },
-      {
-        title: "Status",
-        titleId: "status",
-        is_show: true,
-      },
-    ],
-  },
-  {
-    mainTitle: "Theme Settings",
-    mainTitleId: "theme",
-    subRole: [
-      {
-        title: "Edit",
-        titleId: "edit",
-        is_show: true,
-      },
-      {
-        title: "View",
-        titleId: "view",
-        is_show: true,
-      },
-    ],
-  },
-  {
-    mainTitle: "School Profile",
-    mainTitleId: "school_profile",
-    subRole: [
-      { title: "Edit", titleId: "edit", is_show: true },
-      { title: "View", titleId: "view", is_show: true },
-    ],
-  },
+const dashboardModule: RoleStaticItem = {
+  mainTitle: "Dashboard",
+  mainTitleId: "dashboard",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: false },
+    { title: "Edit", titleId: "edit", is_show: false },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: false },
+    { title: "Status", titleId: "status", is_show: false },
+  ],
+};
+
+const rolesModule: RoleStaticItem = {
+  mainTitle: "Roles",
+  mainTitleId: "role",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: true },
+    { title: "Status", titleId: "status", is_show: false },
+  ],
+};
+
+const adminUserModule: RoleStaticItem = {
+  mainTitle: "Admin User",
+  mainTitleId: "admin_user",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: true },
+    { title: "Status", titleId: "status", is_show: true },
+  ],
+};
+
+const teacherModule: RoleStaticItem = {
+  mainTitle: "Teacher",
+  mainTitleId: "teacher",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: true },
+  ],
+};
+
+const departmentModule: RoleStaticItem = {
+  mainTitle: "Department",
+  mainTitleId: "department",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: true },
+  ],
+};
+
+const subjectModule: RoleStaticItem = {
+  mainTitle: "Subject",
+  mainTitleId: "subject",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: true },
+  ],
+};
+
+const classModule: RoleStaticItem = {
+  mainTitle: "Class",
+  mainTitleId: "class",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: true },
+  ],
+};
+
+const sectionModule: RoleStaticItem = {
+  mainTitle: "Section",
+  mainTitleId: "section",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: true },
+  ],
+};
+
+const schoolListModule: RoleStaticItem = {
+  mainTitle: "School List",
+  mainTitleId: "school",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: false },
+    { title: "Status", titleId: "status", is_show: true },
+  ],
+};
+
+const themeModule: RoleStaticItem = {
+  mainTitle: "Theme Settings",
+  mainTitleId: "theme",
+  subRole: [
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+  ],
+};
+
+const schoolProfileModule: RoleStaticItem = {
+  mainTitle: "School Profile",
+  mainTitleId: "school_profile",
+  subRole: [
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+  ],
+};
+
+const planModule: RoleStaticItem = {
+  mainTitle: "Plan",
+  mainTitleId: "plan",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: true },
+  ],
+};
+
+
+export const developerRoleStaticData: RoleStaticItem[] = [
+  dashboardModule,
+  rolesModule,
+  adminUserModule,
+  schoolListModule,
+  planModule,
 ];
 
+export const planStaticData: RoleStaticItem[] = [
+  dashboardModule,
+  rolesModule,
+  adminUserModule,
+  teacherModule,
+  departmentModule,
+  subjectModule,
+  classModule,
+  sectionModule,
+  themeModule,
+  schoolProfileModule,
+  planModule,
+];
+
+export const schoolRoleStaticData: RoleStaticItem[] = [
+  dashboardModule,
+  rolesModule,
+  adminUserModule,
+  teacherModule,
+  departmentModule,
+  subjectModule,
+  classModule,
+  sectionModule,
+  themeModule,
+  schoolProfileModule,
+];
 
 export const developerPermission = {
   dashboard: {
     read: "dashboard_view",
   },
   role: {
-    create: "admin_role_add",
-    update: "admin_role_edit",
-    read: "admin_role_view",
-    delete: "admin_role_delete",
-    status: "admin_role_status",
+    create: "role_add",
+    update: "role_edit",
+    read: "role_view",
+    delete: "role_delete",
+    status: "role_status",
   },
   admin_user: {
     create: "admin_user_add",
@@ -239,6 +205,12 @@ export const developerPermission = {
     delete: "school_delete",
     status: "school_status",
   },
+  plan: {
+    create: "plan_add",
+    update: "plan_edit",
+    read: "plan_view",
+    delete: "plan_delete",
+  },
 };
 
 export const schoolAdminPermission = {
@@ -246,11 +218,11 @@ export const schoolAdminPermission = {
     read: "dashboard_view",
   },
   role: {
-    create: "admin_role_add",
-    update: "admin_role_edit",
-    read: "admin_role_view",
-    delete: "admin_role_delete",
-    status: "admin_role_status",
+    create: "role_add",
+    update: "role_edit",
+    read: "role_view",
+    delete: "role_delete",
+    status: "role_status",
   },
   admin_user: {
     create: "admin_user_add",

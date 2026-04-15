@@ -16,15 +16,12 @@ import {
     FormHelperText,
     Breadcrumbs,
     Link,
+    InputAdornment,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
-import { schoolAdminPermission, schoolRoleStaticData as roleStaticData } from "@/apps/common/StaticArrayData";
-import { addEditRole, getRoleById, clearSelectedRole } from "@/redux/slices/roleSlice";
-import { roleValidationSchema } from "@/utils/validation/FormikValidation";
-import Spinner from "../../component/schoolCommon/spinner/Spinner";
-import { BpCheckbox } from "../../component/schoolCommon/commonCssFunction/cssFunction";
-import { toasterError } from "@/utils/toaster/Toaster";
+import { planStaticData as roleStaticData } from "@/apps/common/StaticArrayData";
+import { BpCheckbox } from "../../component/developerCommon/commonCssFunction/cssFunction";
 import { CommonLoader } from "@/apps/common/loader/Loader";
 import type { RootState } from "@/redux/Store";
 import { inputSx } from "@/utils/styles/commonSx";
@@ -32,7 +29,7 @@ import { inputSx } from "@/utils/styles/commonSx";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
 
-export default function AddEditRole() {
+export default function AddEditPlan() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const location = useLocation();
@@ -41,46 +38,32 @@ export default function AddEditRole() {
     const isView = location.pathname.includes("/view/");
     const isEdit = !!id && !isView;
 
-    const { selectedRole, loading } = useSelector((state: RootState) => state.RoleReducer);
+    // Static loading state for now
+    const [loading, setLoading] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<any>(null);
+
     const [permissions, setPermissions] = useState<string[]>([]);
     const [permissionsError, setPermissionsError] = useState("");
     const [buttonSpinner, setButtonSpinner] = useState(false);
+
+    // For School side permissions reference
     const adminModuleIds = ["admin_role", "admin_user"];
     const masterModuleIds = ["teacher", "department", "subject", "class", "section"];
 
     useEffect(() => {
         if (id) {
-            dispatch(getRoleById(id) as any);
+            // Future: dispatch(getPlanById(id) as any);
+            console.log("Fetching plan by id:", id);
         }
-        return () => {
-            dispatch(clearSelectedRole());
-        };
-    }, [id, dispatch]);
-
-    useEffect(() => {
-        if (selectedRole) {
-            setPermissions(selectedRole.permissions || []);
-        }
-    }, [selectedRole]);
+    }, [id]);
 
     const initialValues = {
-        role: selectedRole?.role || "",
+        planName: selectedPlan?.planName || "",
+        price: selectedPlan?.price || "",
     };
 
-    const handleSubmit = async (values: { role: string }) => {
+    const handleSubmit = async (values: { planName: string, price: string }) => {
         if (isView) return;
-
-        let checkRole =
-            !permissions.includes(schoolAdminPermission.role.create) ||
-            !permissions.includes(schoolAdminPermission.role.update) ||
-            !permissions.includes(schoolAdminPermission.role.read) ||
-            !permissions.includes(schoolAdminPermission.role.delete) ||
-            !permissions.includes(schoolAdminPermission.role.status);
-
-        if (checkRole && selectedRole?.role?.includes("admin")) {
-            setPermissionsError("You cannot remove admin permissions from the role");
-            return;
-        }
 
         if (!permissions.length) {
             setPermissionsError("Please select at least one permission");
@@ -91,23 +74,19 @@ export default function AddEditRole() {
         setButtonSpinner(true);
 
         const payload: any = {
-            role: values.role,
+            planName: values.planName,
+            price: values.price,
             permissions: [...new Set(permissions)],
         };
         if (id) {
             payload.id = id;
         }
 
-        try {
-            const result = await dispatch(addEditRole(payload) as any);
+        console.log("Submitting Plan:", payload);
+        setTimeout(() => {
             setButtonSpinner(false);
-            if (addEditRole.fulfilled.match(result)) {
-                navigate("/role-list");
-            }
-        } catch (error: any) {
-            setButtonSpinner(false);
-            toasterError(error?.message || "Something went wrong");
-        }
+            navigate("/profile"); // Navigate back to profile (Plan Details tab)
+        }, 1000);
     };
 
     const onChangeCheckBox = (key: string) => {
@@ -210,14 +189,13 @@ export default function AddEditRole() {
                     className="admin-breadcrumb"
                     sx={{ mb: 1 }}
                 >
-                    <Link underline="hover" color="inherit" onClick={() => navigate("/role-list")} sx={{ cursor: 'pointer', fontSize: '14px' }}>
-                        Roles
+                    <Link underline="hover" color="inherit" onClick={() => navigate("/profile")} sx={{ cursor: 'pointer', fontSize: '14px' }}>
+                        Profile (Plan Details)
                     </Link>
                     <Typography className="admin-breadcrumb-active">
-                        {isView ? "View" : isEdit ? "Edit" : "Add"} Role & Permission
+                        {isView ? "View" : isEdit ? "Edit" : "Add"} Plan
                     </Typography>
                 </Breadcrumbs>
-
             </Box>
 
             <Box className="card-border common-card" sx={{ p: 4, borderRadius: '12px', minHeight: '200px', position: 'relative' }}>
@@ -227,40 +205,54 @@ export default function AddEditRole() {
                     <Formik
                         enableReinitialize
                         initialValues={initialValues}
-                        validationSchema={roleValidationSchema}
                         onSubmit={handleSubmit}
                     >
                         {(formikProps: FormikProps<any>) => (
                             <Form>
-                                <Box className="admin-login-style-input-wrapper" sx={{ maxWidth: 500 }}>
-                                    <label htmlFor="role">Role Name<span className="required-asterisk">*</span></label>
-                                    <TextField
-                                        fullWidth
-                                        id="role"
-                                        name="role"
-                                        placeholder="Role Name"
-                                        variant="outlined"
-                                        className="admin-login-style-input"
-                                        value={formikProps.values.role}
-                                        onChange={formikProps.handleChange}
-                                        error={formikProps.touched.role && Boolean(formikProps.errors.role)}
-                                        disabled={isView}
-                                        sx={inputSx}
-                                    />
-                                    {formikProps.touched.role && formikProps.errors.role && (
-                                        <FormHelperText className="error-text">
-                                            {formikProps.errors.role as string}
-                                        </FormHelperText>
-                                    )}
+                                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 3 }}>
+                                    <Box className="admin-login-style-input-wrapper" sx={{ flex: 1, minWidth: '300px' }}>
+                                        <label htmlFor="planName">Plan Name<span className="required-asterisk">*</span></label>
+                                        <TextField
+                                            fullWidth
+                                            id="planName"
+                                            name="planName"
+                                            placeholder="Enter Plan Name"
+                                            variant="outlined"
+                                            className="admin-login-style-input"
+                                            value={formikProps.values.planName}
+                                            onChange={formikProps.handleChange}
+                                            disabled={isView}
+                                            sx={inputSx}
+                                        />
+                                    </Box>
+
+                                    <Box className="admin-login-style-input-wrapper" sx={{ flex: 1, minWidth: '300px' }}>
+                                        <label htmlFor="price">Price<span className="required-asterisk">*</span></label>
+                                        <TextField
+                                            fullWidth
+                                            id="price"
+                                            name="price"
+                                            placeholder="Enter Price"
+                                            variant="outlined"
+                                            className="admin-login-style-input"
+                                            value={formikProps.values.price}
+                                            onChange={formikProps.handleChange}
+                                            disabled={isView}
+                                            sx={inputSx}
+                                            InputProps={{
+                                                startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+                                            }}
+                                        />
+                                    </Box>
                                 </Box>
 
-                                <Typography className="admin-form-lable" sx={{ mb: 2, fontWeight: 400, fontSize: '14px' }}>
-                                    Permissions <span className="astrick-sing">*</span>
+                                <Typography className="admin-form-lable" sx={{ mb: 2, fontWeight: 600, fontSize: '14px', color: '#344054' }}>
+                                    Permissions Configuration <span className="astrick-sing">*</span>
                                 </Typography>
 
                                 <TableContainer component={Paper} className="table-container permission-table-container" sx={{ boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: '12px' }}>
                                     <Table className="table">
-                                        <TableHead className="table-head" sx={{ bgcolor: 'var(--table-header-bg, #f8fbfc)' }}>
+                                        <TableHead className="table-head" sx={{ bgcolor: '#F9FAFB' }}>
                                             <TableRow className="table-row">
                                                 <TableCell className="table-th" sx={{ fontWeight: 700, py: 2 }}>Module Name</TableCell>
                                                 <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>All</TableCell>
@@ -386,12 +378,11 @@ export default function AddEditRole() {
                                 <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
                                     <Button
                                         className="admin-btn-secondary"
-                                        onClick={() => navigate("/role-list")}
+                                        onClick={() => navigate("/profile")}
                                         disabled={buttonSpinner}
-                                        variant="outlined"
-                                        sx={{ minWidth: '130px', borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
+                                        sx={{ minWidth: '130px' }}
                                     >
-                                        Discard
+                                        Cancel
                                     </Button>
                                     {!isView && (
                                         <Button
@@ -399,10 +390,9 @@ export default function AddEditRole() {
                                             className="admin-btn-theme"
                                             disabled={buttonSpinner}
                                             variant="contained"
-                                            startIcon={!buttonSpinner ? (id ? <EditIcon /> : <AddIcon />) : null}
-                                            sx={{ minWidth: '120px', borderRadius: '8px', textTransform: 'none', fontWeight: 600, boxShadow: 'none', '&:hover': { boxShadow: 'none' } }}
+                                            sx={{ minWidth: '150px' }}
                                         >
-                                            {buttonSpinner ? <Spinner /> : (isEdit ? "Update Role" : "Add Role")}
+                                            {buttonSpinner ? "Saving..." : (isEdit ? "Update Plan" : "Create Plan")}
                                         </Button>
                                     )}
                                 </Box>

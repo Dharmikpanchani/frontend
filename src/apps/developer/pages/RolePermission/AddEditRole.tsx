@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
-import { developerPermission, roleStaticData } from "@/apps/common/StaticArrayData";
+import { developerPermission, developerRoleStaticData as roleStaticData } from "@/apps/common/StaticArrayData";
 import { addEditRole, getRoleById, clearSelectedRole } from "@/redux/slices/roleSlice";
 import { roleValidationSchema } from "@/utils/validation/FormikValidation";
 import Spinner from "../../component/developerCommon/spinner/Spinner";
