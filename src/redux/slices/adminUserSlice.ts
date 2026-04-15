@@ -22,9 +22,9 @@ const initialState: AdminUserState = {
 
 export const getAllAdminUsers = createAsyncThunk(
   "adminUser/getAll",
-  async ({ page, perPage, search, role, isActive, isLogin, adminType, isVerified }: { page: number; perPage: number; search: string, role?: string, isActive?: string, isLogin?: string, adminType?: string, isVerified?: string }, { rejectWithValue }) => {
+  async ({ page, perPage, search, role, isActive, isLogin, isVerified }: { page: number; perPage: number; search: string, role?: string, isActive?: string, isLogin?: string, isVerified?: string }, { rejectWithValue }) => {
     try {
-      const res: any = await adminUserService.getAll(page, perPage, search, role, isActive, isLogin, adminType, isVerified);
+      const res: any = await adminUserService.getAll(page, perPage, search, role, isActive, isLogin, isVerified);
       if (res.status === 200) return res;
       const message = res?.message || "Failed to fetch admin users";
       toast.error(message);

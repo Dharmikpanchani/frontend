@@ -54,7 +54,6 @@ export default function AdminUser() {
     role: "",
     isActive: "",
     isLogin: "",
-    adminType: "",
     isVerified: "",
   });
 
@@ -77,7 +76,6 @@ export default function AdminUser() {
       role: filters?.role !== undefined ? filters.role : filterValues.role,
       isActive: filters?.isActive !== undefined ? filters.isActive : filterValues.isActive,
       isLogin: filters?.isLogin !== undefined ? filters.isLogin : filterValues.isLogin,
-      adminType: filters?.adminType !== undefined ? filters.adminType : filterValues.adminType,
       isVerified: filters?.isVerified !== undefined ? filters.isVerified : filterValues.isVerified,
     }) as any);
   };
@@ -95,7 +93,7 @@ export default function AdminUser() {
   };
 
   const handleResetFilter = () => {
-    const resetValues = { role: "", isActive: "", isLogin: "", adminType: "", isVerified: "" };
+    const resetValues = { role: "", isActive: "", isLogin: "", isVerified: "" };
     setFilterValues(resetValues);
     handleGetData(searchNameValue, resetValues);
     setOpenFilter(false);
@@ -150,17 +148,6 @@ export default function AdminUser() {
       options: [
         { label: "Active", value: true },
         { label: "Deactive", value: false },
-      ],
-    },
-    {
-      type: "searchbaseSelect",
-      name: "adminType",
-      label: "Admin Type",
-      placeholder: "Select Admin Type",
-      options: [
-        { label: "Super Admin", value: "super_admin" },
-        { label: "Admin", value: "admin" },
-        { label: "Reffral", value: "reffral" },
       ],
     },
     {

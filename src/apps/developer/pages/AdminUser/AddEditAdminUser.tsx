@@ -206,7 +206,6 @@ export default function AddEditAdminUser() {
         name: (isEdit || isView) ? (selectedAdminUser?.name || "") : "",
         email: (isEdit || isView) ? (selectedAdminUser?.email || "") : "",
         phoneNumber: (isEdit || isView) ? (selectedAdminUser?.phoneNumber || "") : "",
-        isReferralAdmin: (isEdit || isView) ? (selectedAdminUser?.isReferralAdmin || false) : false,
         password: "",
         confirmPassword: "",
         role: (isEdit || isView) ? (selectedAdminUser?.role?._id || "") : "",
@@ -222,7 +221,6 @@ export default function AddEditAdminUser() {
         urlencoded.append("name", values.name);
         urlencoded.append("email", values.email);
         urlencoded.append("phoneNumber", values.phoneNumber);
-        urlencoded.append("isReferralAdmin", values.isReferralAdmin);
         urlencoded.append("role", values.role);
 
         if (id) {
@@ -384,16 +382,7 @@ export default function AddEditAdminUser() {
                                                 <FormHelperText className="error-text">{(touched.phoneNumber && errors.phoneNumber) ? (errors.phoneNumber as string) : ""}</FormHelperText>
                                             </Box>
 
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }} className="admin-input-box" sx={{ display: 'flex', alignItems: 'center', mt: { xs: 0, sm: 2.5 } }}>
-                                                <BpCheckbox
-                                                    checked={values.isReferralAdmin}
-                                                    onChange={(e) => setFieldValue("isReferralAdmin", e.target.checked)}
-                                                    disabled={isView || isEdit}
-                                                />
-                                                <Typography sx={{ ...labelSx, mb: 0, ml: 1, cursor: 'pointer' }} onClick={() => !(isView || isEdit) && setFieldValue("isReferralAdmin", !values.isReferralAdmin)}>
-                                                    Have you referral admin
-                                                </Typography>
-                                            </Box>
+
 
                                             {!isEdit && !isView && (
                                                 <>

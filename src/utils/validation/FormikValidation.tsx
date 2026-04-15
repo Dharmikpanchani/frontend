@@ -367,7 +367,6 @@ export const adminUserValidationSchema = Yup.object({
   name: fullNameValidation("Name", true),
   email: emailValidation(true),
   phoneNumber: phoneNumberValidation(true),
-  isReferralAdmin: Yup.boolean().optional(),
   password: Yup.string().when("id", {
     is: (id: string) => !id,
     then: () => passwordValidation("Password", true),

@@ -2,12 +2,11 @@ import { adminApiService } from "../client/apiClient";
 import { Api } from "../EndPoint";
 
 export const adminUserService = {
-  getAll: (page: number, perPage: number, search: string, role?: string, isActive?: string, isLogin?: string, adminType?: string, isVerified?: string) => {
+  getAll: (page: number, perPage: number, search: string, role?: string, isActive?: string, isLogin?: string, isVerified?: string) => {
     let url = `${Api.GET_ALL_ADMIN}?pageNumber=${page}&perPageData=${perPage}&searchRequest=${encodeURIComponent(search)}`;
     if (role) url += `&role=${role}`;
     if (isActive !== undefined && isActive !== "") url += `&isActive=${isActive}`;
     if (isLogin !== undefined && isLogin !== "") url += `&isLogin=${isLogin}`;
-    if (adminType) url += `&adminType=${adminType}`;
     if (isVerified !== undefined && isVerified !== "") url += `&isVerified=${isVerified}`;
     return adminApiService.get<any>(url);
   },
