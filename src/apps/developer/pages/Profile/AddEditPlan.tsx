@@ -47,7 +47,7 @@ export default function AddEditPlan() {
     const [buttonSpinner, setButtonSpinner] = useState(false);
 
     // For School side permissions reference
-    const adminModuleIds = ["admin_role", "admin_user"];
+    const adminModuleIds = ["role", "admin_user"];
     const masterModuleIds = ["teacher", "department", "subject", "class", "section"];
 
     useEffect(() => {
@@ -284,7 +284,7 @@ export default function AddEditPlan() {
                                                 const rows = [];
 
                                                 // Admin Module Header
-                                                if (module.mainTitleId === "admin_role") {
+                                                if (module.mainTitleId === "role") {
                                                     rows.push(
                                                         <TableRow key="admin_module_header" className="table-row all-row" sx={{ bgcolor: '#f0f4f8' }}>
                                                             <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #ff8c00)' }}>Admin Module</TableCell>

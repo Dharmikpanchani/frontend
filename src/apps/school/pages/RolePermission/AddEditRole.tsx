@@ -45,7 +45,7 @@ export default function AddEditRole() {
     const [permissions, setPermissions] = useState<string[]>([]);
     const [permissionsError, setPermissionsError] = useState("");
     const [buttonSpinner, setButtonSpinner] = useState(false);
-    const adminModuleIds = ["admin_role", "admin_user"];
+    const adminModuleIds = ["role", "admin_user"];
     const masterModuleIds = ["teacher", "department", "subject", "class", "section"];
 
     useEffect(() => {
@@ -292,7 +292,7 @@ export default function AddEditRole() {
                                                 const rows = [];
 
                                                 // Admin Module Header
-                                                if (module.mainTitleId === "admin_role") {
+                                                if (module.mainTitleId === "role") {
                                                     rows.push(
                                                         <TableRow key="admin_module_header" className="table-row all-row" sx={{ bgcolor: '#f0f4f8' }}>
                                                             <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #ff8c00)' }}>Admin Module</TableCell>
