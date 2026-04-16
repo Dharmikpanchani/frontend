@@ -112,10 +112,29 @@ export default function AddEditRole() {
 
     const onChangeCheckBox = (key: string) => {
         if (isView) return;
+        const lastUnderscoreIndex = key.lastIndexOf('_');
+        const moduleId = key.substring(0, lastUnderscoreIndex);
+        const typeId = key.substring(lastUnderscoreIndex + 1);
+        const viewKey = `${moduleId}_view`;
+
         if (permissions.includes(key)) {
-            setPermissions(permissions.filter((p) => p !== key));
+            // Unchecking
+            let newPermissions = permissions.filter((p) => p !== key);
+            // If unchecking 'view', also uncheck everything else for this module
+            if (typeId === 'view') {
+                newPermissions = newPermissions.filter((p) => !p.startsWith(`${moduleId}_`));
+            }
+            setPermissions(newPermissions);
         } else {
-            setPermissions([...permissions, key]);
+            // Checking
+            let newPermissions = [...permissions, key];
+            // If checking anything other than 'view', also check 'view'
+            if (typeId !== 'view') {
+                if (!newPermissions.includes(viewKey)) {
+                    newPermissions.push(viewKey);
+                }
+            }
+            setPermissions([...new Set(newPermissions)]);
         }
     };
 
@@ -133,9 +152,28 @@ export default function AddEditRole() {
         ];
 
         if (action === "add") {
-            setPermissions((prev) => [...new Set([...prev, ...relatedKeys])]);
+            let newPermissions = [...permissions, ...relatedKeys];
+            // If adding any action other than 'view', also add all corresponding 'view' permissions
+            if (typeId !== 'view') {
+                const correspondingViewKeys = roleStaticData.flatMap((module: any) =>
+                    module.subRole.some((sr: any) => sr.titleId === typeId) && 
+                    module.subRole.some((sr: any) => sr.titleId === 'view')
+                        ? [`${module.mainTitleId}_view`]
+                        : []
+                );
+                newPermissions = [...newPermissions, ...correspondingViewKeys];
+            }
+            setPermissions([...new Set(newPermissions)]);
         } else {
-            setPermissions((prev) => prev.filter((k) => !relatedKeys.includes(k)));
+            let newPermissions = permissions.filter((k) => !relatedKeys.includes(k));
+            // If removing 'view' for all, also remove all other permissions for those modules
+            if (typeId === 'view') {
+                const allActionKeys = roleStaticData.flatMap((module: any) =>
+                    module.subRole.map((sr: any) => `${module.mainTitleId}_${sr.titleId}`)
+                );
+                newPermissions = newPermissions.filter((k) => !allActionKeys.includes(k));
+            }
+            setPermissions(newPermissions);
         }
     };
 
