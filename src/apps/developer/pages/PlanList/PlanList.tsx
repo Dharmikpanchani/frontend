@@ -141,33 +141,35 @@ export default function PlanList() {
       label: "Plan Name",
       placeholder: "Enter Plan Name",
     },
-    ...(isSuperDeveloper ? [{
-      type: "searchbaseSelect",
-      name: "developerId",
-      label: "Developer User",
-      placeholder: "Select Developer",
-      options: allAdminUsersSimple,
-      getOptionLabel: (option: any) => option.name || option.email || "",
-      getOptionValue: (option: any) => option._id,
-    }] : []),
-    {
-      type: "inputSelect",
-      name: "developerName",
-      label: "Creator Name",
-      placeholder: "Enter Creator Name",
-    },
-    {
-      type: "inputSelect",
-      name: "developerEmail",
-      label: "Creator Email",
-      placeholder: "Enter Creator Email",
-    },
-    {
-      type: "inputSelect",
-      name: "developerPhoneNumber",
-      label: "Creator Number",
-      placeholder: "Enter Creator Number",
-    },
+    ...(isSuperDeveloper ? [
+      {
+        type: "searchbaseSelect",
+        name: "developerId",
+        label: "Developer User",
+        placeholder: "Select Developer",
+        options: allAdminUsersSimple,
+        getOptionLabel: (option: any) => option.name || option.email || "",
+        getOptionValue: (option: any) => option._id,
+      },
+      {
+        type: "inputSelect",
+        name: "developerName",
+        label: "Creator Name",
+        placeholder: "Enter Creator Name",
+      },
+      {
+        type: "inputSelect",
+        name: "developerEmail",
+        label: "Creator Email",
+        placeholder: "Enter Creator Email",
+      },
+      {
+        type: "inputSelect",
+        name: "developerPhoneNumber",
+        label: "Creator Number",
+        placeholder: "Enter Creator Number",
+      }
+    ] : []),
     {
       type: "searchbaseSelect",
       name: "isActive",
@@ -209,15 +211,17 @@ export default function PlanList() {
               </Box>
             </Box>
           </Box>
-          <Box className="admin-filter-btn-main">
-            <Button
-              className="admin-btn-theme"
-              onClick={() => setOpenFilter(true)}
-              sx={{ ml: 1, minWidth: '45px', p: '0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}
-            >
-              <FilterIcon sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }} />
-            </Button>
-          </Box>
+          {isSuperDeveloper && (
+            <Box className="admin-filter-btn-main">
+              <Button
+                className="admin-btn-theme"
+                onClick={() => setOpenFilter(true)}
+                sx={{ ml: 1, minWidth: '45px', p: '0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <FilterIcon sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }} />
+              </Button>
+            </Box>
+          )}
           {hasPermission(developerPermission.plan.create) && (
             <Box className="admin-add-user-btn-main">
               <Button
@@ -238,7 +242,7 @@ export default function PlanList() {
             <Table aria-label="plan table" className="table">
               <TableHead className="table-head">
                 <TableRow className="table-row">
-                  <TableCell className="table-th" sx={{ fontWeight: 700 }}>Plan & Creator</TableCell>
+                  <TableCell className="table-th" sx={{ fontWeight: 700 }}>{isSuperDeveloper ? "Plan & Creator" : "Plan Name"}</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Price</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Cycle</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Limits (S/T/C)</TableCell>
@@ -259,32 +263,38 @@ export default function PlanList() {
                       <TableRow key={data._id} sx={{ "&:last-child td, &:last-child th": { border: 0 }, '&:hover': { bgcolor: '#f9fafb' } }}>
                         <TableCell className="table-td">
                           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                            <Avatar
-                              src={`${import.meta.env.VITE_BASE_URL_IMAGE}/${data.adminId?.image || ""}`}
-                              variant="circular"
-                              sx={{ width: 45, height: 45, border: '1px solid #ddd' }}
-                            >
-                              {data.adminId?.name?.[0]?.toUpperCase() || "A"}
-                            </Avatar>
+                            {isSuperDeveloper && (
+                              <Avatar
+                                src={`${import.meta.env.VITE_BASE_URL_IMAGE}/${data.adminId?.image || ""}`}
+                                variant="circular"
+                                sx={{ width: 45, height: 45, border: '1px solid #ddd' }}
+                              >
+                                {data.adminId?.name?.[0]?.toUpperCase() || "A"}
+                              </Avatar>
+                            )}
                             <Box sx={{ textAlign: 'left' }}>
                               <Typography sx={{ fontSize: '15px', fontWeight: 700, color: '#111827', mb: 0.2 }}>
                                 {data.planName}
                               </Typography>
-                              <Typography sx={{ fontSize: '13px', fontWeight: 600, color: '#4B5563', mb: 0.4 }}>
-                                {data.adminId?.name || "N/A"}
-                              </Typography>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.4 }}>
-                                <EmailIcon sx={{ fontSize: 13, color: '#942F15' }} />
-                                <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>
-                                  {data.adminId?.email || "N/A"}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <PhoneIcon sx={{ fontSize: 13, color: '#942F15' }} />
-                                <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>
-                                  {data.adminId?.phoneNumber || "N/A"}
-                                </Typography>
-                              </Box>
+                              {isSuperDeveloper && (
+                                <>
+                                  <Typography sx={{ fontSize: '13px', fontWeight: 600, color: '#4B5563', mb: 0.4 }}>
+                                    {data.adminId?.name || "N/A"}
+                                  </Typography>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.4 }}>
+                                    <EmailIcon sx={{ fontSize: 13, color: '#942F15' }} />
+                                    <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>
+                                      {data.adminId?.email || "N/A"}
+                                    </Typography>
+                                  </Box>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <PhoneIcon sx={{ fontSize: 13, color: '#942F15' }} />
+                                    <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>
+                                      {data.adminId?.phoneNumber || "N/A"}
+                                    </Typography>
+                                  </Box>
+                                </>
+                              )}
                             </Box>
                           </Box>
                         </TableCell>
