@@ -4,13 +4,11 @@ import {
   Person as PersonIcon,
   Lock as LockIcon,
   AlternateEmail as EmailIcon,
-  Assignment as AssignmentIcon
 } from "@mui/icons-material";
 import Svg from "@/assets/Svg";
 import EditProfile from "./EditProfile";
 import ChangePassword from "./ChangePassword";
 import ChangeEmail from "./ChangeEmail";
-import PlanDetails from "./PlanDetails";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -161,13 +159,6 @@ export default function AccountLayout() {
               {...a11yprops(2)}
               className="admin-tab"
             />
-            <Tab
-              icon={<AssignmentIcon />}
-              iconPosition="start"
-              label="Plan Details"
-              {...a11yprops(3)}
-              className="admin-tab"
-            />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0} className="admin-tabpanel">
@@ -183,11 +174,6 @@ export default function AccountLayout() {
         <TabPanel value={value} index={2} className="admin-tabpanel">
           <Box className="admin-tabpanel-main" sx={{ p: "32px" }}>
             <ChangeEmail />
-          </Box>
-        </TabPanel>
-        <TabPanel value={value} index={3} className="admin-tabpanel">
-          <Box className="admin-tabpanel-main" sx={{ p: "32px" }}>
-            <PlanDetails />
           </Box>
         </TabPanel>
       </Box>

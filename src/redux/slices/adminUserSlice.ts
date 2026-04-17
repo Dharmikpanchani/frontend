@@ -44,7 +44,7 @@ export const getAllAdminUsersSimple = createAsyncThunk(
   async (search: string, { rejectWithValue }) => {
     try {
       const res: any = await adminUserService.getAllSimple(search);
-      if (res.status === 200) return res;
+      if (res.status === 200) return res?.data;
       const message = res?.message || "Failed to fetch admin users";
       toast.error(message);
       return rejectWithValue(message);

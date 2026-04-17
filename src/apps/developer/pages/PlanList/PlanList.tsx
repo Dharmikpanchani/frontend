@@ -15,11 +15,14 @@ import {
   TableBody,
   Tooltip,
   debounce,
+  Avatar,
 } from "@mui/material";
 import {
   Search as SearchIcon,
   FilterList as FilterIcon,
   Add as AddIcon,
+  Email as EmailIcon,
+  LocalPhone as PhoneIcon,
 } from "@mui/icons-material";
 import { getAllPlans, changePlanStatus, deletePlan } from "@/redux/slices/planSlice";
 import { getAllAdminUsersSimple } from "@/redux/slices/adminUserSlice";
@@ -39,7 +42,7 @@ export default function PlanList() {
   const navigate = useNavigate();
   const { plans, total, loading, actionLoading } = useSelector((state: RootState) => state.PlanReducer);
   const { allAdminUsersSimple } = useSelector((state: RootState) => state.AdminUserReducer);
-  const { hasPermission, isSuperDeveloper } = usePermissions();
+  const { hasPermission, hasAnyPermission, isSuperDeveloper } = usePermissions();
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchNameValue, setSearchNameValue] = useState<string>("");
@@ -50,6 +53,7 @@ export default function PlanList() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const [filterValues, setFilterValues] = useState({
+    planName: "",
     developerId: "",
     developerEmail: "",
     developerName: "",
@@ -85,6 +89,7 @@ export default function PlanList() {
 
   const handleResetFilter = () => {
     const resetValues = {
+      planName: "",
       developerId: "",
       developerEmail: "",
       developerName: "",
@@ -130,6 +135,12 @@ export default function PlanList() {
   };
 
   const filterFields: any[] = [
+    {
+      type: "inputSelect",
+      name: "planName",
+      label: "Plan Name",
+      placeholder: "Enter Plan Name",
+    },
     ...(isSuperDeveloper ? [{
       type: "searchbaseSelect",
       name: "developerId",
@@ -140,19 +151,19 @@ export default function PlanList() {
       getOptionValue: (option: any) => option._id,
     }] : []),
     {
-      type: "text",
+      type: "inputSelect",
       name: "developerName",
       label: "Creator Name",
       placeholder: "Enter Creator Name",
     },
     {
-      type: "text",
+      type: "inputSelect",
       name: "developerEmail",
       label: "Creator Email",
       placeholder: "Enter Creator Email",
     },
     {
-      type: "text",
+      type: "inputSelect",
       name: "developerPhoneNumber",
       label: "Creator Number",
       placeholder: "Enter Creator Number",
@@ -227,13 +238,18 @@ export default function PlanList() {
             <Table aria-label="plan table" className="table">
               <TableHead className="table-head">
                 <TableRow className="table-row">
-                  <TableCell className="table-th" sx={{ fontWeight: 700 }}>Plan Name</TableCell>
+                  <TableCell className="table-th" sx={{ fontWeight: 700 }}>Plan & Creator</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Price</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Cycle</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Limits (S/T/C)</TableCell>
-                  <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Creator</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Status</TableCell>
-                  <TableCell className="table-th" align="right" sx={{ fontWeight: 700 }}>Action</TableCell>
+                  {hasAnyPermission([
+                    developerPermission.plan.read,
+                    developerPermission.plan.update,
+                    developerPermission.plan.delete,
+                  ]) && (
+                      <TableCell className="table-th" align="right" sx={{ fontWeight: 700 }}>Action</TableCell>
+                    )}
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
@@ -242,7 +258,35 @@ export default function PlanList() {
                     plans.map((data: any) => (
                       <TableRow key={data._id} sx={{ "&:last-child td, &:last-child th": { border: 0 }, '&:hover': { bgcolor: '#f9fafb' } }}>
                         <TableCell className="table-td">
-                          <Typography sx={{ fontSize: '14px', fontWeight: 600, color: '#1f2937' }}>{data.planName}</Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                            <Avatar
+                              src={`${import.meta.env.VITE_BASE_URL_IMAGE}/${data.adminId?.image || ""}`}
+                              variant="circular"
+                              sx={{ width: 45, height: 45, border: '1px solid #ddd' }}
+                            >
+                              {data.adminId?.name?.[0]?.toUpperCase() || "A"}
+                            </Avatar>
+                            <Box sx={{ textAlign: 'left' }}>
+                              <Typography sx={{ fontSize: '15px', fontWeight: 700, color: '#111827', mb: 0.2 }}>
+                                {data.planName}
+                              </Typography>
+                              <Typography sx={{ fontSize: '13px', fontWeight: 600, color: '#4B5563', mb: 0.4 }}>
+                                {data.adminId?.name || "N/A"}
+                              </Typography>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.4 }}>
+                                <EmailIcon sx={{ fontSize: 13, color: '#942F15' }} />
+                                <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>
+                                  {data.adminId?.email || "N/A"}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <PhoneIcon sx={{ fontSize: 13, color: '#942F15' }} />
+                                <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>
+                                  {data.adminId?.phoneNumber || "N/A"}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Box>
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Typography sx={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary-color)' }}>{data.price}</Typography>
@@ -254,11 +298,6 @@ export default function PlanList() {
                           <Typography sx={{ fontSize: '13px', color: '#666' }}>
                             {data.maxStudents} / {data.maxTeachers} / {data.maxClasses}
                           </Typography>
-                        </TableCell>
-                        <TableCell align="center" className="table-td">
-                          <Tooltip title={data.adminId?.email || ""} arrow>
-                            <Typography sx={{ fontSize: '13px' }}>{data.adminId?.name || "N/A"}</Typography>
-                          </Tooltip>
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
@@ -283,31 +322,37 @@ export default function PlanList() {
                             )}
                           </Box>
                         </TableCell>
-                        <TableCell className="table-td">
-                          <Box className="admin-table-data-btn-flex" sx={{ justifyContent: 'flex-end' }}>
-                            {hasPermission(developerPermission.plan.read) && (
-                              <Tooltip title="View" arrow placement="bottom">
-                                <Button className="admin-table-data-btn admin-table-view-btn" onClick={() => navigate(`/plan-list/view/${data._id}`)}>
-                                  <img src={Svg.yellowEye} className="admin-icon" alt="View" />
-                                </Button>
-                              </Tooltip>
-                            )}
-                            {hasPermission(developerPermission.plan.update) && (
-                              <Tooltip title="Edit" arrow placement="bottom">
-                                <Button className="admin-table-data-btn admin-table-edit-btn" onClick={() => navigate(`/plan-list/edit/${data._id}`)}>
-                                  <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
-                                </Button>
-                              </Tooltip>
-                            )}
-                            {hasPermission(developerPermission.plan.delete) && (
-                              <Tooltip title="Delete" arrow placement="bottom">
-                                <Button className="admin-table-data-btn admin-table-delete-btn" onClick={() => handleOpenDelete(data)}>
-                                  <img src={Svg.trash} className="admin-icon" alt="Trash" />
-                                </Button>
-                              </Tooltip>
-                            )}
-                          </Box>
-                        </TableCell>
+                        {hasAnyPermission([
+                          developerPermission.plan.read,
+                          developerPermission.plan.update,
+                          developerPermission.plan.delete,
+                        ]) && (
+                            <TableCell className="table-td">
+                              <Box className="admin-table-data-btn-flex" sx={{ justifyContent: 'flex-end' }}>
+                                {hasPermission(developerPermission.plan.read) && (
+                                  <Tooltip title="View" arrow placement="bottom">
+                                    <Button className="admin-table-data-btn admin-table-view-btn" onClick={() => navigate(`/plan-list/view/${data._id}`)}>
+                                      <img src={Svg.yellowEye} className="admin-icon" alt="View" />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                                {hasPermission(developerPermission.plan.update) && (
+                                  <Tooltip title="Edit" arrow placement="bottom">
+                                    <Button className="admin-table-data-btn admin-table-edit-btn" onClick={() => navigate(`/plan-list/edit/${data._id}`)}>
+                                      <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                                {hasPermission(developerPermission.plan.delete) && (
+                                  <Tooltip title="Delete" arrow placement="bottom">
+                                    <Button className="admin-table-data-btn admin-table-delete-btn" onClick={() => handleOpenDelete(data)}>
+                                      <img src={Svg.trash} className="admin-icon" alt="Trash" />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </TableCell>
+                          )}
                       </TableRow>
                     ))
                   ) : (

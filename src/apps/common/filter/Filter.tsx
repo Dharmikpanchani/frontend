@@ -103,6 +103,11 @@ const Filter: React.FC<FilterProps> = ({
                 }
                 setFieldValue(field.name, val ?? "");
               }}
+              slotProps={{
+                popper: {
+                  sx: { zIndex: "999999 !important" },
+                },
+              }}
               renderInput={(params) => (
                 <TextField
                   {...params}
