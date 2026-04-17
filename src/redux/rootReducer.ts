@@ -12,6 +12,7 @@ import subjectReducer from "./slices/subjectSlice";
 import classReducer from "./slices/classSlice";
 import sectionReducer from "./slices/sectionSlice";
 import teacherReducer from "./slices/teacherSlice";
+import planReducer from "./slices/planSlice";
 import type { AuthState } from "./slices/authSlice";
 
 export interface RootState {
@@ -28,6 +29,7 @@ export interface RootState {
   ClassReducer: ReturnType<typeof classReducer>;
   SectionReducer: ReturnType<typeof sectionReducer>;
   TeacherReducer: ReturnType<typeof teacherReducer>;
+  PlanReducer: ReturnType<typeof planReducer>;
 }
 
 const rootReducer = combineReducers({
@@ -44,6 +46,7 @@ const rootReducer = combineReducers({
   ClassReducer: classReducer,
   SectionReducer: sectionReducer,
   TeacherReducer: teacherReducer,
+  PlanReducer: planReducer,
 });
 
 export default rootReducer;

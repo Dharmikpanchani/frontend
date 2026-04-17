@@ -91,6 +91,13 @@ export default function Sidebar(props: any) {
       icon: Png.roleIcon, // Using roleIcon as a fallback if schoolIcon doesn't exist
       show: hasPermission(developerPermission.school.read),
       menuHighlight: ["school-list"],
+    },
+    {
+      title: "Plan List",
+      pathName: "/plan-list",
+      icon: Png.reportsIcon,
+      show: hasPermission(developerPermission.plan.read),
+      menuHighlight: ["plan-list"],
     }
   ];
 

@@ -93,4 +93,10 @@ export const Api = {
   ADD_EDIT_TEACHER: `${route}/add-edit-teacher`,
   DELETE_TEACHER: `${route}/delete-teacher`,
   CHANGE_TEACHER_STATUS: `${route}/teacher-action-status`,
+  // Plan management
+  GET_ALL_PLANS: `${route}/get-all-plans`,
+  GET_PLAN: `${route}/get-plan`,
+  ADD_EDIT_PLAN: `${route}/add-edit-plan`,
+  DELETE_PLAN: `${route}/delete-plan`,
+  CHANGE_PLAN_STATUS: `${route}/plan-status`,
 };

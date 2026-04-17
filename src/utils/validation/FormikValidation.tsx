@@ -719,3 +719,28 @@ export const teacherValidationSchema = Yup.object().shape({
   educationCertificates: Yup.array().of(Yup.mixed()).optional(),
   experienceCertificates: Yup.array().of(Yup.mixed()).optional(),
 }, [["shiftTimeFrom", "shiftTimeTo"]]);
+
+export const planValidationSchema = Yup.object().shape({
+  id: Yup.string().optional(),
+  planName: genericStringValidation("Plan name", 3, 50, true),
+  price: Yup.number()
+    .typeError("Price must be a number")
+    .min(0, "Price cannot be negative")
+    .required("Price is required"),
+  billingCycle: Yup.string().required("Billing cycle is required"),
+  maxStudents: Yup.number()
+    .typeError("Limit must be a number")
+    .integer("Must be an integer")
+    .min(0, "Limit cannot be negative")
+    .required("Max students is required"),
+  maxTeachers: Yup.number()
+    .typeError("Limit must be a number")
+    .integer("Must be an integer")
+    .min(0, "Limit cannot be negative")
+    .required("Max teachers is required"),
+  maxClasses: Yup.number()
+    .typeError("Limit must be a number")
+    .integer("Must be an integer")
+    .min(0, "Limit cannot be negative")
+    .required("Max classes is required"),
+});

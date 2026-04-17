@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
     Box,
@@ -16,46 +16,83 @@ import {
     Breadcrumbs,
     Link,
     InputAdornment,
+    Autocomplete,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
+import {
+    Assignment as AssignmentIcon,
+    SignalCellularAlt as LimitsIcon,
+    Security as SecurityIcon,
+    NavigateNext as NavigateNextIcon,
+} from "@mui/icons-material";
 import { planStaticData as roleStaticData } from "@/apps/common/StaticArrayData";
 import { BpCheckbox } from "../../component/developerCommon/commonCssFunction/cssFunction";
 import { CommonLoader } from "@/apps/common/loader/Loader";
-import { inputSx } from "@/utils/styles/commonSx";
+import { labelSx, inputSx } from "@/utils/styles/commonSx";
+import { planValidationSchema } from "@/utils/validation/FormikValidation";
+import { useDispatch, useSelector } from "react-redux";
+import { addEditPlan, getPlanById, clearSelectedPlan } from "@/redux/slices/planSlice";
+import type { RootState } from "@/redux/Store";
 
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+const billingCycleOptions = [
+    { label: "Monthly", value: "monthly" },
+    { label: "Yearly", value: "yearly" },
+];
+
 
 export default function AddEditPlan() {
+    const dispatch = useDispatch();
     const { id } = useParams<{ id: string }>();
     const location = useLocation();
     const navigate = useNavigate();
     const isView = location.pathname.includes("/view/");
     const isEdit = !!id && !isView;
 
-    // Static loading state for now
-    const loading = false;
+    const { selectedPlan, loading, actionLoading } = useSelector((state: RootState) => state.PlanReducer);
     const [permissions, setPermissions] = useState<string[]>([]);
     const [permissionsError, setPermissionsError] = useState("");
-    const [buttonSpinner, setButtonSpinner] = useState(false);
 
-    // For School side permissions reference
+    // Filter categories for the table logic
     const adminModuleIds = ["role", "admin_user"];
     const masterModuleIds = ["teacher", "department", "subject", "class", "section"];
 
     useEffect(() => {
         if (id) {
-            // Future: dispatch(getPlanById(id) as any);
-            console.log("Fetching plan by id:", id);
+            dispatch(getPlanById(id) as any);
+        } else {
+            dispatch(clearSelectedPlan());
         }
-    }, [id]);
+    }, [id, dispatch]);
 
-    const initialValues = {
-        planName: "",
-        price: "",
-    };
+    useEffect(() => {
+        if (selectedPlan && id) {
+            setPermissions(selectedPlan.permissions || []);
+        }
+    }, [selectedPlan, id]);
 
-    const handleSubmit = async (values: { planName: string, price: string }) => {
+    const initialValues = useMemo(() => {
+        if (selectedPlan && id) {
+            return {
+                planName: selectedPlan.planName || "",
+                price: selectedPlan.price || "",
+                billingCycle: selectedPlan.billingCycle || "monthly",
+                maxStudents: selectedPlan.maxStudents || "",
+                maxTeachers: selectedPlan.maxTeachers || "",
+                maxClasses: selectedPlan.maxClasses || "",
+            };
+        }
+        return {
+            planName: "",
+            price: "",
+            billingCycle: "monthly",
+            maxStudents: "",
+            maxTeachers: "",
+            maxClasses: "",
+        };
+    }, [selectedPlan, id]);
+
+    const handleSubmit = async (values: any) => {
         if (isView) return;
 
         if (!permissions.length) {
@@ -64,24 +101,40 @@ export default function AddEditPlan() {
         }
 
         setPermissionsError("");
-        setButtonSpinner(true);
 
-        const payload: any = {
-            planName: values.planName,
-            price: values.price,
+        const payload = {
+            ...values,
             permissions: [...new Set(permissions)],
         };
-        if (id) {
-            payload.id = id;
-        }
+        if (id) payload.id = id;
 
-        console.log("Submitting Plan:", payload);
-        setTimeout(() => {
-            setButtonSpinner(false);
-            navigate("/profile"); // Navigate back to profile (Plan Details tab)
-        }, 1000);
+        const res = await dispatch(addEditPlan(payload) as any);
+        if (res.meta.requestStatus === "fulfilled") {
+            navigate("/profile");
+        }
     };
 
+    const SectionTitle = ({ icon: Icon, title }: { icon: any, title: string }) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, mt: 1, pb: 1, borderBottom: '1px solid #f0f0f0' }}>
+            <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 32,
+                height: 32,
+                borderRadius: '8px',
+                backgroundColor: '#fff7ed',
+                color: '#ff8c00'
+            }}>
+                <Icon sx={{ fontSize: 20 }} />
+            </Box>
+            <Typography sx={{ fontSize: '17px', fontWeight: 600, color: '#1f2937', fontFamily: "'Poppins', sans-serif" }}>
+                {title}
+            </Typography>
+        </Box>
+    );
+
+    // Reusable permission logic
     const onChangeCheckBox = (key: string) => {
         if (isView) return;
         const lastUnderscoreIndex = key.lastIndexOf('_');
@@ -90,21 +143,15 @@ export default function AddEditPlan() {
         const viewKey = `${moduleId}_view`;
 
         if (permissions.includes(key)) {
-            // Unchecking
             let newPermissions = permissions.filter((p) => p !== key);
-            // If unchecking 'view', also uncheck everything else for this module
             if (typeId === 'view') {
                 newPermissions = newPermissions.filter((p) => !p.startsWith(`${moduleId}_`));
             }
             setPermissions(newPermissions);
         } else {
-            // Checking
             let newPermissions = [...permissions, key];
-            // If checking anything other than 'view', also check 'view'
             if (typeId !== 'view') {
-                if (!newPermissions.includes(viewKey)) {
-                    newPermissions.push(viewKey);
-                }
+                if (!newPermissions.includes(viewKey)) newPermissions.push(viewKey);
             }
             setPermissions([...new Set(newPermissions)]);
         }
@@ -112,37 +159,23 @@ export default function AddEditPlan() {
 
     const checkUncheckAllType = (action: "add" | "remove", typeId: string) => {
         if (isView) return;
-
-        const relatedKeys = [
-            ...new Set(
-                roleStaticData.flatMap((module: any) =>
-                    module.subRole.some((sr: any) => sr.titleId === typeId)
-                        ? [`${module.mainTitleId}_${typeId}`]
-                        : []
-                )
-            ),
-        ];
+        const relatedKeys = roleStaticData.flatMap((module: any) =>
+            module.subRole.some((sr: any) => sr.titleId === typeId) ? [`${module.mainTitleId}_${typeId}`] : []
+        );
 
         if (action === "add") {
             let newPermissions = [...permissions, ...relatedKeys];
-            // If adding any action other than 'view', also add all corresponding 'view' permissions
             if (typeId !== 'view') {
-                const correspondingViewKeys = roleStaticData.flatMap((module: any) =>
-                    module.subRole.some((sr: any) => sr.titleId === typeId) && 
-                    module.subRole.some((sr: any) => sr.titleId === 'view')
-                        ? [`${module.mainTitleId}_view`]
-                        : []
+                const views = roleStaticData.flatMap((m: any) =>
+                    m.subRole.some((sr: any) => sr.titleId === typeId) && m.subRole.some((sr: any) => sr.titleId === 'view') ? [`${m.mainTitleId}_view`] : []
                 );
-                newPermissions = [...newPermissions, ...correspondingViewKeys];
+                newPermissions = [...newPermissions, ...views];
             }
             setPermissions([...new Set(newPermissions)]);
         } else {
             let newPermissions = permissions.filter((k) => !relatedKeys.includes(k));
-            // If removing 'view' for all, also remove all other permissions for those modules
             if (typeId === 'view') {
-                const allActionKeys = roleStaticData.flatMap((module: any) =>
-                    module.subRole.map((sr: any) => `${module.mainTitleId}_${sr.titleId}`)
-                );
+                const allActionKeys = roleStaticData.flatMap((m: any) => m.subRole.map((sr: any) => `${m.mainTitleId}_${sr.titleId}`));
                 newPermissions = newPermissions.filter((k) => !allActionKeys.includes(k));
             }
             setPermissions(newPermissions);
@@ -150,285 +183,192 @@ export default function AddEditPlan() {
     };
 
     const isTypeAllChecked = (typeId: string) => {
-        const allKeysForType = [
-            ...new Set(
-                roleStaticData.flatMap((module: any) =>
-                    module.subRole.some((sr: any) => sr.titleId === typeId)
-                        ? [`${module.mainTitleId}_${typeId}`]
-                        : []
-                )
-            ),
-        ];
-        return allKeysForType.length > 0 && allKeysForType.every((k) => permissions.includes(k));
-    };
-
-    const isModuleAllChecked = (module: any) => {
-        const keys = module.subRole.filter((sr: any) => sr.is_show).map((sr: any) => `${module.mainTitleId}_${sr.titleId}`);
-        return keys.length > 0 && keys.every((k: string) => permissions.includes(k));
-    };
-
-    const isMasterAllChecked = () => {
-        const masterModules = roleStaticData.filter((m) => masterModuleIds.includes(m.mainTitleId));
-        const allKeys = masterModules.flatMap((m) =>
-            m.subRole.filter((sr) => sr.is_show).map((sr) => `${m.mainTitleId}_${sr.titleId}`)
-        );
+        const allKeys = roleStaticData.flatMap((m: any) => m.subRole.some((sr: any) => sr.titleId === typeId) ? [`${m.mainTitleId}_${typeId}`] : []);
         return allKeys.length > 0 && allKeys.every((k) => permissions.includes(k));
     };
 
-    const handleMasterAllChange = (checked: boolean) => {
-        if (isView) return;
-        const masterModules = roleStaticData.filter((m) => masterModuleIds.includes(m.mainTitleId));
-        const allKeys = masterModules.flatMap((m) =>
-            m.subRole.filter((sr) => sr.is_show).map((sr) => `${m.mainTitleId}_${sr.titleId}`)
+    const isGroupChecked = (groupIds: string[]) => {
+        const groupModules = roleStaticData.filter(m => groupIds.includes(m.mainTitleId));
+        return groupModules.length > 0 && groupModules.every(module =>
+            module.subRole.filter((sr: any) => sr.is_show).every((sr: any) => permissions.includes(`${module.mainTitleId}_${sr.titleId}`))
         );
-
-        if (checked) {
-            setPermissions((prev) => [...new Set([...prev, ...allKeys])]);
-        } else {
-            setPermissions((prev) => prev.filter((k) => !allKeys.includes(k)));
-        }
     };
 
-    const isAdminAllChecked = () => {
-        const adminModules = roleStaticData.filter((m) => adminModuleIds.includes(m.mainTitleId));
-        const allKeys = adminModules.flatMap((m) =>
-            m.subRole.filter((sr) => sr.is_show).map((sr) => `${m.mainTitleId}_${sr.titleId}`)
-        );
-        return allKeys.length > 0 && allKeys.every((k) => permissions.includes(k));
-    };
-
-    const handleAdminAllChange = (checked: boolean) => {
+    const checkUncheckGroup = (action: "add" | "remove", groupIds: string[]) => {
         if (isView) return;
-        const adminModules = roleStaticData.filter((m) => adminModuleIds.includes(m.mainTitleId));
-        const allKeys = adminModules.flatMap((m) =>
-            m.subRole.filter((sr) => sr.is_show).map((sr) => `${m.mainTitleId}_${sr.titleId}`)
-        );
+        const groupModules = roleStaticData.filter(m => groupIds.includes(m.mainTitleId));
+        const allKeys = groupModules.flatMap(m => m.subRole.filter((sr: any) => sr.is_show).map((sr: any) => `${m.mainTitleId}_${sr.titleId}`));
 
-        if (checked) {
-            setPermissions((prev) => [...new Set([...prev, ...allKeys])]);
+        if (action === "add") {
+            setPermissions([...new Set([...permissions, ...allKeys])]);
         } else {
-            setPermissions((prev) => prev.filter((k) => !allKeys.includes(k)));
+            setPermissions(permissions.filter(k => !allKeys.includes(k)));
         }
     };
 
     return (
         <Box className="admin-dashboard-content">
             <Box className="admin-page-title-main" sx={{ mb: 3 }}>
-                <Breadcrumbs
-                    separator={<NavigateNextIcon fontSize="small" />}
-                    aria-label="breadcrumb"
-                    className="admin-breadcrumb"
-                    sx={{ mb: 1 }}
-                >
+                <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} className="admin-breadcrumb" sx={{ mb: 1 }}>
                     <Link underline="hover" color="inherit" onClick={() => navigate("/profile")} sx={{ cursor: 'pointer', fontSize: '14px' }}>
                         Profile (Plan Details)
                     </Link>
-                    <Typography className="admin-breadcrumb-active">
-                        {isView ? "View" : isEdit ? "Edit" : "Add"} Plan
-                    </Typography>
+                    <Typography className="admin-breadcrumb-active">{isView ? "View" : isEdit ? "Edit" : "Add"} Plan</Typography>
                 </Breadcrumbs>
             </Box>
 
-            <Box className="card-border common-card" sx={{ p: 4, borderRadius: '12px', minHeight: '200px', position: 'relative' }}>
-                {loading ? (
-                    <CommonLoader />
-                ) : (
-                    <Formik
-                        enableReinitialize
-                        initialValues={initialValues}
-                        onSubmit={handleSubmit}
-                    >
-                        {(formikProps: FormikProps<any>) => (
-                            <Form>
-                                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 3 }}>
-                                    <Box className="admin-login-style-input-wrapper" sx={{ flex: 1, minWidth: '300px' }}>
-                                        <label htmlFor="planName">Plan Name<span className="required-asterisk">*</span></label>
-                                        <TextField
-                                            fullWidth
-                                            id="planName"
-                                            name="planName"
-                                            placeholder="Enter Plan Name"
-                                            variant="outlined"
-                                            className="admin-login-style-input"
-                                            value={formikProps.values.planName}
-                                            onChange={formikProps.handleChange}
-                                            disabled={isView}
-                                            sx={inputSx}
-                                        />
-                                    </Box>
+            <Box className="card-border common-card" sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: '12px', minHeight: '200px', backgroundColor: 'white' }}>
+                {loading ? <CommonLoader /> : (
+                    <Formik enableReinitialize initialValues={initialValues} validationSchema={planValidationSchema} onSubmit={handleSubmit}>
+                        {(formikProps: FormikProps<any>) => {
+                            const { values, errors, touched, handleChange, setFieldValue, handleBlur } = formikProps;
+                            return (
+                                <Form>
+                                    <Box sx={{ maxWidth: 1100 }}>
+                                        {/* 1. Plan Details */}
+                                        <SectionTitle icon={AssignmentIcon} title="Plan Details" />
+                                        <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 6 }}>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                                <Typography sx={labelSx}>Plan Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <TextField fullWidth name="planName" placeholder="Enter Plan Name" variant="outlined" sx={inputSx} value={values.planName} onChange={handleChange} onBlur={handleBlur} error={touched.planName && Boolean(errors.planName)} disabled={isView} />
+                                                <FormHelperText className="error-text">{(touched.planName && errors.planName) ? (errors.planName as string) : ""}</FormHelperText>
+                                            </Box>
 
-                                    <Box className="admin-login-style-input-wrapper" sx={{ flex: 1, minWidth: '300px' }}>
-                                        <label htmlFor="price">Price<span className="required-asterisk">*</span></label>
-                                        <TextField
-                                            fullWidth
-                                            id="price"
-                                            name="price"
-                                            placeholder="Enter Price"
-                                            variant="outlined"
-                                            className="admin-login-style-input"
-                                            value={formikProps.values.price}
-                                            onChange={formikProps.handleChange}
-                                            disabled={isView}
-                                            sx={inputSx}
-                                            InputProps={{
-                                                startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-                                            }}
-                                        />
-                                    </Box>
-                                </Box>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                                <Typography sx={labelSx}>Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <TextField fullWidth name="price" placeholder="Enter Price" variant="outlined" sx={inputSx} value={values.price} onChange={handleChange} onBlur={handleBlur} error={touched.price && Boolean(errors.price)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
+                                                <FormHelperText className="error-text">{(touched.price && errors.price) ? (errors.price as string) : ""}</FormHelperText>
+                                            </Box>
 
-                                <Typography className="admin-form-lable" sx={{ mb: 2, fontWeight: 600, fontSize: '14px', color: '#344054' }}>
-                                    Permissions Configuration <span className="astrick-sing">*</span>
-                                </Typography>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 12' }}>
+                                                <Typography sx={labelSx}>Billing Cycle<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <Autocomplete
+                                                    options={billingCycleOptions}
+                                                    getOptionLabel={(o) => o.label}
+                                                    value={billingCycleOptions.find(o => o.value === values.billingCycle) || null}
+                                                    onChange={(_, v) => setFieldValue("billingCycle", v ? v.value : "")}
+                                                    disabled={isView}
+                                                    renderInput={(params) => <TextField {...params} placeholder="Select Cycle" variant="outlined" sx={inputSx} error={touched.billingCycle && Boolean(errors.billingCycle)} />}
+                                                />
+                                                <FormHelperText className="error-text">{(touched.billingCycle && errors.billingCycle) ? (errors.billingCycle as string) : ""}</FormHelperText>
+                                            </Box>
+                                        </Box>
 
-                                <TableContainer component={Paper} className="table-container permission-table-container" sx={{ boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: '12px' }}>
-                                    <Table className="table">
-                                        <TableHead className="table-head" sx={{ bgcolor: '#F9FAFB' }}>
-                                            <TableRow className="table-row">
-                                                <TableCell className="table-th" sx={{ fontWeight: 700, py: 2 }}>Module Name</TableCell>
-                                                <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>All</TableCell>
-                                                <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>View</TableCell>
-                                                <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Add</TableCell>
-                                                <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Edit</TableCell>
-                                                <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Delete</TableCell>
-                                                <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Status</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody className="table-body">
-                                            <TableRow className="table-row all-row" sx={{ bgcolor: '#fafafa' }}>
-                                                <TableCell className="table-td" sx={{ fontWeight: 600 }}>Apply to All Modules</TableCell>
-                                                <TableCell className="table-td" align="center">-</TableCell>
-                                                {['view', 'add', 'edit', 'delete', 'status'].map((typeId) => (
-                                                    <TableCell key={typeId} className="table-td" align="center">
-                                                        <BpCheckbox
-                                                            checked={isTypeAllChecked(typeId)}
-                                                            onChange={(e: any) => checkUncheckAllType(e.target.checked ? "add" : "remove", typeId)}
-                                                            disabled={isView}
-                                                        />
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
+                                        {/* 2. Usage Limits */}
+                                        <SectionTitle icon={LimitsIcon} title="Usage Limits" />
+                                        <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 6 }}>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                <Typography sx={labelSx}>Max Students<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <TextField fullWidth name="maxStudents" type="number" placeholder="e.g. 500" variant="outlined" sx={inputSx} value={values.maxStudents} onChange={handleChange} onBlur={handleBlur} error={touched.maxStudents && Boolean(errors.maxStudents)} disabled={isView} />
+                                                <FormHelperText className="error-text">{(touched.maxStudents && errors.maxStudents) ? (errors.maxStudents as string) : ""}</FormHelperText>
+                                            </Box>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                <Typography sx={labelSx}>Max Teachers<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <TextField fullWidth name="maxTeachers" type="number" placeholder="e.g. 50" variant="outlined" sx={inputSx} value={values.maxTeachers} onChange={handleChange} onBlur={handleBlur} error={touched.maxTeachers && Boolean(errors.maxTeachers)} disabled={isView} />
+                                                <FormHelperText className="error-text">{(touched.maxTeachers && errors.maxTeachers) ? (errors.maxTeachers as string) : ""}</FormHelperText>
+                                            </Box>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                <Typography sx={labelSx}>Max Classes<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <TextField fullWidth name="maxClasses" type="number" placeholder="e.g. 20" variant="outlined" sx={inputSx} value={values.maxClasses} onChange={handleChange} onBlur={handleBlur} error={touched.maxClasses && Boolean(errors.maxClasses)} disabled={isView} />
+                                                <FormHelperText className="error-text">{(touched.maxClasses && errors.maxClasses) ? (errors.maxClasses as string) : ""}</FormHelperText>
+                                            </Box>
+                                        </Box>
 
-                                            {roleStaticData.map((module) => {
-                                                const isMaster = masterModuleIds.includes(module.mainTitleId);
-                                                const isAdmin = adminModuleIds.includes(module.mainTitleId);
-                                                const rows = [];
-
-                                                // Admin Module Header
-                                                if (module.mainTitleId === "role") {
-                                                    rows.push(
-                                                        <TableRow key="admin_module_header" className="table-row all-row" sx={{ bgcolor: '#f0f4f8' }}>
-                                                            <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #ff8c00)' }}>Admin Module</TableCell>
-                                                            <TableCell className="table-td" align="center">
-                                                                <BpCheckbox
-                                                                    checked={isAdminAllChecked()}
-                                                                    onChange={(e: any) => handleAdminAllChange(e.target.checked)}
-                                                                    disabled={isView}
-                                                                />
-                                                            </TableCell>
-                                                            <TableCell className="table-td" align="center" colSpan={5}>
-                                                                <Typography sx={{ fontSize: '12px', fontStyle: 'italic', color: '#666' }}>
-                                                                    Select all admin related permissions
-                                                                </Typography>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    );
-                                                }
-
-                                                // Student Master Header
-                                                if (module.mainTitleId === "teacher") {
-                                                    rows.push(
-                                                        <TableRow key="student_master_header" className="table-row all-row" sx={{ bgcolor: '#f0f4f8' }}>
-                                                            <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #ff8c00)' }}>Student Master</TableCell>
-                                                            <TableCell className="table-td" align="center">
-                                                                <BpCheckbox
-                                                                    checked={isMasterAllChecked()}
-                                                                    onChange={(e: any) => handleMasterAllChange(e.target.checked)}
-                                                                    disabled={isView}
-                                                                />
-                                                            </TableCell>
-                                                            <TableCell className="table-td" align="center" colSpan={5}>
-                                                                <Typography sx={{ fontSize: '12px', fontStyle: 'italic', color: '#666' }}>
-                                                                    Select all student master related permissions
-                                                                </Typography>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    );
-                                                }
-
-                                                rows.push(
-                                                    <TableRow key={module.mainTitleId} className="table-row" sx={{ '&:hover': { bgcolor: '#f5f5f5' }, bgcolor: (isMaster || isAdmin) ? '#fcfcfc' : 'inherit' }}>
-                                                        <TableCell className="table-td" sx={{ py: 2, pl: (isMaster || isAdmin) ? 5 : 2 }}>
-                                                            {(isMaster || isAdmin) && <span style={{ color: '#999', marginRight: '8px' }}>↳</span>}
-                                                            {module.mainTitle}
-                                                        </TableCell>
-                                                        <TableCell className="table-td" align="center">
-                                                            <BpCheckbox
-                                                                checked={isModuleAllChecked(module)}
-                                                                onChange={(e: any) => {
-                                                                    const keys = module.subRole.filter(sr => sr.is_show).map(sr => `${module.mainTitleId}_${sr.titleId}`);
-                                                                    if (e.target.checked) {
-                                                                        setPermissions(prev => [...new Set([...prev, ...keys])]);
-                                                                    } else {
-                                                                        setPermissions(prev => prev.filter(k => !keys.includes(k)));
-                                                                    }
-                                                                }}
-                                                                disabled={isView}
-                                                            />
-                                                        </TableCell>
-                                                        {['view', 'add', 'edit', 'delete', 'status'].map((typeId) => {
-                                                            const subRole = module.subRole.find(sr => sr.titleId === typeId);
-                                                            const key = `${module.mainTitleId}_${typeId}`;
-                                                            return (
-                                                                <TableCell key={typeId} className="table-td" align="center">
-                                                                    {subRole?.is_show ? (
-                                                                        <BpCheckbox
-                                                                            checked={permissions.includes(key)}
-                                                                            onChange={() => onChangeCheckBox(key)}
-                                                                            disabled={isView}
-                                                                        />
-                                                                    ) : "-"}
-                                                                </TableCell>
-                                                            );
-                                                        })}
+                                        {/* 3. Permissions */}
+                                        <SectionTitle icon={SecurityIcon} title="Permissions Configuration" />
+                                        <TableContainer component={Paper} className="table-container permission-table-container" sx={{ boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: '12px', mb: 4 }}>
+                                            <Table className="table">
+                                                <TableHead className="table-head" sx={{ bgcolor: '#F9FAFB' }}>
+                                                    <TableRow className="table-row">
+                                                        <TableCell className="table-th" sx={{ fontWeight: 700, py: 2 }}>Module Name</TableCell>
+                                                        <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>All</TableCell>
+                                                        <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>View</TableCell>
+                                                        <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Add / Mark</TableCell>
+                                                        <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Edit</TableCell>
+                                                        <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Delete / Collect</TableCell>
+                                                        <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Status</TableCell>
                                                     </TableRow>
-                                                );
+                                                </TableHead>
+                                                <TableBody className="table-body">
+                                                    <TableRow className="table-row all-row" sx={{ bgcolor: '#fafafa' }}>
+                                                        <TableCell className="table-td" sx={{ fontWeight: 600 }}>Apply to All Modules</TableCell>
+                                                        <TableCell className="table-td" align="center">-</TableCell>
+                                                        {['view', 'add', 'edit', 'delete', 'status'].map((typeId) => (
+                                                            <TableCell key={typeId} className="table-td" align="center">
+                                                                <BpCheckbox checked={isTypeAllChecked(typeId)} onChange={(e: any) => checkUncheckAllType(e.target.checked ? "add" : "remove", typeId)} disabled={isView} />
+                                                            </TableCell>
+                                                        ))}
+                                                    </TableRow>
 
-                                                return rows;
-                                            })}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
+                                                    {roleStaticData.map((module: any) => {
+                                                        const isMaster = masterModuleIds.includes(module.mainTitleId);
+                                                        const isAdmin = adminModuleIds.includes(module.mainTitleId);
+                                                        const rows = [];
 
-                                {permissionsError && (
-                                    <FormHelperText className="error-text" sx={{ mt: 2, fontSize: '13px' }}>
-                                        {permissionsError}
-                                    </FormHelperText>
-                                )}
+                                                        if (module.mainTitleId === "role") rows.push(
+                                                            <TableRow key="admin_hr" sx={{ bgcolor: '#f0f4f8' }}>
+                                                                <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #ff8c00)', py: 1.5 }}>Admin & Management</TableCell>
+                                                                <TableCell className="table-td" align="center">
+                                                                    <BpCheckbox checked={isGroupChecked(adminModuleIds)} onChange={(e: any) => checkUncheckGroup(e.target.checked ? "add" : "remove", adminModuleIds)} disabled={isView} />
+                                                                </TableCell>
+                                                                <TableCell colSpan={5} />
+                                                            </TableRow>
+                                                        );
+                                                        if (module.mainTitleId === "student") rows.push(
+                                                            <TableRow key="master_hr" sx={{ bgcolor: '#f0f4f8' }}>
+                                                                <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #ff8c00)', py: 1.5 }}>Teacher Master</TableCell>
+                                                                <TableCell className="table-td" align="center">
+                                                                    <BpCheckbox checked={isGroupChecked(masterModuleIds)} onChange={(e: any) => checkUncheckGroup(e.target.checked ? "add" : "remove", masterModuleIds)} disabled={isView} />
+                                                                </TableCell>
+                                                                <TableCell colSpan={5} />
+                                                            </TableRow>
+                                                        );
 
-                                <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                                    <Button
-                                        className="admin-btn-secondary"
-                                        onClick={() => navigate("/profile")}
-                                        disabled={buttonSpinner}
-                                        sx={{ minWidth: '130px' }}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    {!isView && (
-                                        <Button
-                                            type="submit"
-                                            className="admin-btn-theme"
-                                            disabled={buttonSpinner}
-                                            variant="contained"
-                                            sx={{ minWidth: '150px' }}
-                                        >
-                                            {buttonSpinner ? "Saving..." : (isEdit ? "Update Plan" : "Create Plan")}
-                                        </Button>
-                                    )}
-                                </Box>
-                            </Form>
-                        )}
+                                                        rows.push(
+                                                            <TableRow key={module.mainTitleId} sx={{ '&:hover': { bgcolor: '#f5f5f5' } }}>
+                                                                <TableCell className="table-td" sx={{ py: 2, pl: (isMaster || isAdmin) ? 4 : 2 }}>{module.mainTitle}</TableCell>
+                                                                <TableCell className="table-td" align="center">
+                                                                    <BpCheckbox checked={module.subRole.filter((sr: any) => sr.is_show).every((sr: any) => permissions.includes(`${module.mainTitleId}_${sr.titleId}`))} onChange={(e: any) => {
+                                                                        const keys = module.subRole.filter((sr: any) => sr.is_show).map((sr: any) => `${module.mainTitleId}_${sr.titleId}`);
+                                                                        setPermissions(e.target.checked ? [...new Set([...permissions, ...keys])] : permissions.filter(k => !keys.includes(k)));
+                                                                    }} disabled={isView} />
+                                                                </TableCell>
+                                                                {['view', 'add', 'edit', 'delete', 'status'].map((typeId) => {
+                                                                    // Handle legacy titleIds for specific modules
+                                                                    let actualTypeId = typeId;
+                                                                    if (module.mainTitleId === 'attendance' && typeId === 'add') actualTypeId = 'mark';
+                                                                    if (module.mainTitleId === 'fees' && typeId === 'delete') actualTypeId = 'collect';
+
+                                                                    const subRole = module.subRole.find((sr: any) => sr.titleId === actualTypeId || sr.titleId === typeId);
+                                                                    const key = `${module.mainTitleId}_${subRole?.titleId}`;
+                                                                    return (
+                                                                        <TableCell key={typeId} className="table-td" align="center">
+                                                                            {subRole?.is_show ? <BpCheckbox checked={permissions.includes(key)} onChange={() => onChangeCheckBox(key)} disabled={isView} /> : "-"}
+                                                                        </TableCell>
+                                                                    );
+                                                                })}
+                                                            </TableRow>
+                                                        );
+                                                        return rows;
+                                                    })}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+
+                                        {permissionsError && <FormHelperText className="error-text" sx={{ mt: -2, mb: 2, fontSize: '13px' }}>{permissionsError}</FormHelperText>}
+
+                                        <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+                                            <Button className="admin-btn-secondary" onClick={() => navigate("/profile")} disabled={actionLoading} sx={{ minWidth: '130px' }}>Cancel</Button>
+                                            {!isView && (
+                                                <Button type="submit" className="admin-btn-theme" disabled={actionLoading} variant="contained" sx={{ minWidth: '150px' }}>
+                                                    {actionLoading ? "Saving..." : (isEdit ? "Update Plan" : "Create Plan")}
+                                                </Button>
+                                            )}
+                                        </Box>
+                                    </Box>
+                                </Form>
+                            );
+                        }}
                     </Formik>
                 )}
             </Box>

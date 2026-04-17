@@ -10,6 +10,7 @@ export const adminUserService = {
     if (isVerified !== undefined && isVerified !== "") url += `&isVerified=${isVerified}`;
     return adminApiService.get<any>(url);
   },
+  getAllSimple: (search: string) => adminApiService.get<any>(`${Api.GET_ALL_ADMIN}?filterType=${encodeURIComponent(search)}`),
   getById: (id: string, params: any = {}) => {
     let url = `${Api.GET_ADMIN}/${id}?`;
     if (params.page) url += `pageNumber=${params.page}&`;

@@ -56,6 +56,7 @@ const teacherModule: RoleStaticItem = {
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
+    { title: "Status", titleId: "status", is_show: true },
   ],
 };
 
@@ -67,6 +68,7 @@ const departmentModule: RoleStaticItem = {
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
+    { title: "Status", titleId: "status", is_show: true },
   ],
 };
 
@@ -78,6 +80,7 @@ const subjectModule: RoleStaticItem = {
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
+    { title: "Status", titleId: "status", is_show: true },
   ],
 };
 
@@ -89,6 +92,7 @@ const classModule: RoleStaticItem = {
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
+    { title: "Status", titleId: "status", is_show: true },
   ],
 };
 
@@ -100,6 +104,7 @@ const sectionModule: RoleStaticItem = {
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
+    { title: "Status", titleId: "status", is_show: true },
   ],
 };
 
@@ -141,6 +146,7 @@ const planModule: RoleStaticItem = {
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
+    { title: "Status", titleId: "status", is_show: true },
   ],
 };
 
@@ -210,6 +216,7 @@ export const developerPermission = {
     update: "plan_edit",
     read: "plan_view",
     delete: "plan_delete",
+    status: "plan_status",
   },
 };
 

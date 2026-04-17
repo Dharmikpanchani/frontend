@@ -7,6 +7,7 @@ interface AdminUserState {
   actionLoading: boolean;
   adminUsers: any[];
   total: number;
+  allAdminUsersSimple: any[];
   selectedAdminUser: any;
   schoolPagination: any;
 }
@@ -16,6 +17,7 @@ const initialState: AdminUserState = {
   actionLoading: false,
   adminUsers: [],
   total: 0,
+  allAdminUsersSimple: [],
   selectedAdminUser: null,
   schoolPagination: null,
 };
@@ -25,6 +27,23 @@ export const getAllAdminUsers = createAsyncThunk(
   async ({ page, perPage, search, role, isActive, isLogin, isVerified }: { page: number; perPage: number; search: string, role?: string, isActive?: string, isLogin?: string, isVerified?: string }, { rejectWithValue }) => {
     try {
       const res: any = await adminUserService.getAll(page, perPage, search, role, isActive, isLogin, isVerified);
+      if (res.status === 200) return res;
+      const message = res?.message || "Failed to fetch admin users";
+      toast.error(message);
+      return rejectWithValue(message);
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch admin users";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const getAllAdminUsersSimple = createAsyncThunk(
+  "adminUser/getAllSimple",
+  async (search: string, { rejectWithValue }) => {
+    try {
+      const res: any = await adminUserService.getAllSimple(search);
       if (res.status === 200) return res;
       const message = res?.message || "Failed to fetch admin users";
       toast.error(message);
@@ -128,6 +147,9 @@ const adminUserSlice = createSlice({
         state.total = action.payload?.pagination?.totalArrayLength || 0;
       })
       .addCase(getAllAdminUsers.rejected, (state) => { state.loading = false; })
+      .addCase(getAllAdminUsersSimple.fulfilled, (state, action) => {
+        state.allAdminUsersSimple = action.payload || [];
+      })
 
       .addCase(getAdminUserById.pending, (state) => { state.loading = true; })
       .addCase(getAdminUserById.fulfilled, (state, action) => {
