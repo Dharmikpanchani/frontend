@@ -70,6 +70,7 @@ export const Api = {
   GET_SCHOOL: `${route}/get-school`,
   GET_SCHOOL_IMAGE: `${route}/get-school-image`,
   UPDATE_SCHOOL_THEME: `${route}/update-school-theme`,
+  GET_DEVELOPER_WISE_SCHOOL_PLAN: `${route}/get-developer-wise-school-plan`,
 
   // Master Modules
   DEPARTMENTS: `${route}/departments`,

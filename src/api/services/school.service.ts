@@ -30,4 +30,5 @@ export const schoolService = {
   getById: (id: string) => adminApiService.get<any>(`${Api.GET_SCHOOL}/${id}`),
   getSchoolImageByCode: (payload: any) => adminApiService.post<any>(Api.GET_SCHOOL_IMAGE, payload),
   updateSchoolTheme: (payload: any) => adminApiService.post<any>(Api.UPDATE_SCHOOL_THEME, payload),
+  getDeveloperWiseSchoolPlan: () => adminApiService.get<any>(Api.GET_DEVELOPER_WISE_SCHOOL_PLAN),
 };
