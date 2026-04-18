@@ -18,10 +18,14 @@ const PrivateRoutes: React.FC = () => {
 
   const isSchoolAdmin = adminDetails?.type === "school_admin";
   const planExptyDate = adminDetails?.schoolData?.PlanExptyDate;
-  const isExpired = !!(isSchoolAdmin && planExptyDate && (planExptyDate < Math.floor(Date.now() / 1000)));
-  console.log("ddddd", isExpired, isSchoolAdmin, planExptyDate, Math.floor(Date.now() / 1000))
+  const currentTime = Math.floor(Date.now() / 1000);
+  const isExpired = !!(
+    isSchoolAdmin &&
+    planExptyDate &&
+    Number(planExptyDate) < currentTime
+  );
   // If they should be on the plan page but aren't
-  const isPlanPage = window.location.pathname === "/user-plan" || window.location.pathname === "/login/otp"; // Add any exceptions here
+  const isPlanPage = window.location.pathname === "/user-plan" || window.location.pathname === "/login/otp";
 
   if (canAccess && isExpired && !isPlanPage) {
     return <Navigate to="/user-plan" replace={true} />;
