@@ -6,10 +6,8 @@ import {
 } from "@mui/material";
 import { ExpandMore, Settings as SettingsIcon, Logout as LogoutIcon, Palette as PaletteIcon } from "@mui/icons-material";
 import { authService } from "@/api/services/auth.service";
-import { schoolService } from "@/api/services/school.service";
 import { logoutAdmin, getProfileAdmin } from "@/redux/slices/authSlice";
 import Svg from "@/assets/Svg";
-import moment from "moment";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import type { RootState } from "@/redux/Store";
@@ -22,7 +20,6 @@ export default function Header(props: any) {
   const { hasPermission } = usePermissions();
   const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [planData, setPlanData] = useState<{ name: string; expiry: number | null } | null>(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -36,30 +33,10 @@ export default function Header(props: any) {
     dispatch(getProfileAdmin() as any);
   };
 
-  const fetchPlanData = async () => {
-    try {
-      const response: any = await schoolService.getDeveloperWiseSchoolPlan();
-      if (response?.data && Array.isArray(response.data)) {
-        const schoolId = adminDetails?.schoolId?._id || adminDetails?.schoolId;
-        const currentPlan = response.data.find((plan: any) =>
-          plan.schools?.some((school: any) => school._id === schoolId)
-        );
-        if (currentPlan) {
-          const schoolRecord = currentPlan.schools.find((s: any) => s._id === schoolId);
-          setPlanData({
-            name: currentPlan.planName,
-            expiry: schoolRecord?.PlanExptyDate || null
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Failed to fetch plan data", error);
-    }
-  };
+
 
   useEffect(() => {
     handleGetData();
-    fetchPlanData();
   }, []);
 
   const handleLogOut = async () => {
@@ -101,49 +78,7 @@ export default function Header(props: any) {
           </Box>
         </Box>
         <Box className="admin-header-right">
-          {planData && (
-            <Box
-              sx={{
-                display: { xs: 'none', md: 'flex' },
-                flexDirection: 'column',
-                alignItems: 'flex-end',
-                mr: 2,
-                px: 2,
-                py: 0.5,
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  color: '#FFD700',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  fontFamily: 'var(--font-family)',
-                  lineHeight: 1.2
-                }}
-              >
-                {planData.name}
-              </Typography>
-              {planData.expiry && (
-                <Typography
-                  sx={{
-                    fontSize: '10px',
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    fontFamily: 'var(--font-family)',
-                    fontWeight: 500,
-                    lineHeight: 1.2
-                  }}
-                >
-                  Exp: {moment.unix(planData.expiry).format("DD MMM YYYY")}
-                </Typography>
-              )}
-            </Box>
-          )}
+
           <Box className="admin-header-drop-main">
             <Button
               className="admin-drop-header-btn"

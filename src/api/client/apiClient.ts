@@ -48,6 +48,7 @@ DataService.interceptors.response.use(
           }
         }
       } catch (refreshError) {
+        Cookies.remove("auth_token");
         window.location.href = "/";
         return Promise.reject(refreshError);
       }

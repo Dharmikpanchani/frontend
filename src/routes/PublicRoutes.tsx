@@ -8,6 +8,7 @@ import { useThemeManager } from "../apps/school/hooks/useThemeManager";
 import { getSubdomain } from "../apps/common/commonJsFunction";
 import { logoutAdmin } from "../redux/slices/authSlice";
 import { authService } from "../api/services/auth.service";
+import Cookies from "js-cookie";
 
 const PublicRoutes: React.FC = () => {
   const { isSubdomain } = getSubdomain();
@@ -22,10 +23,11 @@ const PublicRoutes: React.FC = () => {
     (state: RootState | any) => state.AdminReducer
   );
 
-  const isValid = useIsValidToken(token);
+  const cookieToken = Cookies.get("auth_token");
+  const isValid = useIsValidToken(token || cookieToken || null);
 
   useEffect(() => {
-    if (token && !isValid) {
+    if ((token || cookieToken) && !isValid) {
       const performLogout = async () => {
         try {
           await authService.logout();
@@ -37,9 +39,9 @@ const PublicRoutes: React.FC = () => {
       };
       performLogout();
     }
-  }, [token, isValid, dispatch]);
+  }, [token, cookieToken, isValid, dispatch]);
 
-  if (isAdminLogin && adminDetails?.isLogin && isValid) {
+  if ((isAdminLogin && adminDetails?.isLogin && isValid) || (!!cookieToken && isValid)) {
     return <Navigate to="/dashboard" replace={true} />;
   }
   return <Outlet />;

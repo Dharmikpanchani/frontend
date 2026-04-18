@@ -61,6 +61,7 @@ const AddEditSection = lazy(() => import("./pages/Master/Section/AddEditSection"
 const TeacherList = lazy(() => import("./pages/Teacher/Teacher"));
 const AddEditTeacher = lazy(() => import("./pages/Teacher/AddEditTeacher"));
 
+
 /**
  * Wrapper component that reads permissions from the store (inside a component body,
  * satisfying the Rules of Hooks) and conditionally renders the guarded page.
@@ -110,6 +111,7 @@ export const schoolRoutes: RouteConfig[] = [
             { path: "/teacher/otp", element: <TeacherOtp /> },
             { path: "/admin-user/otp", element: <AdminUserOtp /> },
             { path: "/email-change/otp", element: <EmailChangeOtp /> },
+
             {
                 element: <AdminLayOut />,
                 errorElement: <ErrorBoundary />,
