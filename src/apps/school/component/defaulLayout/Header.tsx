@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Box, Button, Typography, Menu, MenuItem
 } from "@mui/material";
@@ -17,6 +17,7 @@ import type { RootState } from "@/redux/Store";
 export default function Header(props: any) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { hasPermission } = usePermissions();
   const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -50,32 +51,37 @@ export default function Header(props: any) {
     handleClose();
   };
 
+  const isUserPlanPage = location.pathname === '/user-plan';
+
   return (
     <Box
       className={`admin-header-main ${props?.open ? "active" : "admin-header-deactive"}`}
+      sx={{ left: isUserPlanPage ? '0 !important' : undefined, width: isUserPlanPage ? '100% !important' : undefined }}
     >
       <Box className="header-flex">
         <Box className="admin-header-left">
-          <Box className="admin-header-logo-main">
-            <Button
-              className="admin-bergur-button"
-              onClick={() => {
-                const isOpen = !props?.open;
-                props?.setOpen?.(isOpen);
-                if (window.innerWidth < 1024) {
-                  document.body.classList[isOpen ? "add" : "remove"]("admin-body-overflow");
-                }
-              }}
-              sx={{ minWidth: 'auto', p: 0 }}
-            >
-              <img
-                src={Svg.bergerMenu}
-                className="berger-menu-icon"
-                alt="toggle menu"
-                style={{ width: '22px', height: 'auto' }}
-              />
-            </Button>
-          </Box>
+          {!isUserPlanPage && (
+            <Box className="admin-header-logo-main">
+              <Button
+                className="admin-bergur-button"
+                onClick={() => {
+                  const isOpen = !props?.open;
+                  props?.setOpen?.(isOpen);
+                  if (window.innerWidth < 1024) {
+                    document.body.classList[isOpen ? "add" : "remove"]("admin-body-overflow");
+                  }
+                }}
+                sx={{ minWidth: 'auto', p: 0 }}
+              >
+                <img
+                  src={Svg.bergerMenu}
+                  className="berger-menu-icon"
+                  alt="toggle menu"
+                  style={{ width: '22px', height: 'auto' }}
+                />
+              </Button>
+            </Box>
+          )}
         </Box>
         <Box className="admin-header-right">
 
@@ -179,30 +185,34 @@ export default function Header(props: any) {
               }
             }}
           >
-            <MenuItem
-              onClick={() => {
-                navigate("/profile");
-                handleClose();
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <SettingsIcon sx={{ fontSize: '18px' }} />
-                Account Settings
-              </Box>
-            </MenuItem>
+            {!isUserPlanPage && (
+              <>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/profile");
+                    handleClose();
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <SettingsIcon sx={{ fontSize: '18px' }} />
+                    Account Settings
+                  </Box>
+                </MenuItem>
 
-            {hasPermission(schoolAdminPermission.theme.read) && (
-              <MenuItem
-                onClick={() => {
-                  navigate("/theme-settings");
-                  handleClose();
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <PaletteIcon sx={{ fontSize: '18px' }} />
-                  Theme Settings
-                </Box>
-              </MenuItem>
+                {hasPermission(schoolAdminPermission.theme.read) && (
+                  <MenuItem
+                    onClick={() => {
+                      navigate("/theme-settings");
+                      handleClose();
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <PaletteIcon sx={{ fontSize: '18px' }} />
+                      Theme Settings
+                    </Box>
+                  </MenuItem>
+                )}
+              </>
             )}
 
             <MenuItem

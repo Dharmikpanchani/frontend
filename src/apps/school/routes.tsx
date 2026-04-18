@@ -48,6 +48,9 @@ const AddEditAdminUser = lazy(
 const ThemeSettings = lazy(
     () => import("./pages/Profile/ThemeSettings")
 );
+const UserPlan = lazy(
+    () => import("./pages/UserPlan/UserPlan")
+);
 
 /* master */
 const DepartmentList = lazy(() => import("./pages/Master/Department/Department"));
@@ -134,6 +137,12 @@ export const schoolRoutes: RouteConfig[] = [
                         path: "/theme-settings",
                         element: (
                             <ThemeSettings />
+                        ),
+                    },
+                    {
+                        path: "/user-plan",
+                        element: (
+                            <UserPlan />
                         ),
                     },
                     {
