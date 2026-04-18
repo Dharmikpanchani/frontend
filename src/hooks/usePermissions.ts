@@ -52,7 +52,7 @@ export const usePermissions = () => {
         hasPermission,
         hasAllPermissions,
         hasAnyPermission,
-        isSuperDeveloper,
+        isSuperDeveloper: isSuperDeveloper || isSuperAdmin,
         loading,
         isAdminLogin,
     };
