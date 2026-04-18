@@ -137,6 +137,18 @@ export default function PlanList() {
   const filterFields: any[] = [
     {
       type: "inputSelect",
+      name: "developerEmail",
+      label: "Creator Email",
+      placeholder: "Enter Creator Email",
+    },
+    {
+      type: "inputSelect",
+      name: "developerPhoneNumber",
+      label: "Creator Number",
+      placeholder: "Enter Creator Number",
+    },
+    {
+      type: "inputSelect",
       name: "planName",
       label: "Plan Name",
       placeholder: "Enter Plan Name",
@@ -157,18 +169,6 @@ export default function PlanList() {
         label: "Creator Name",
         placeholder: "Enter Creator Name",
       },
-      {
-        type: "inputSelect",
-        name: "developerEmail",
-        label: "Creator Email",
-        placeholder: "Enter Creator Email",
-      },
-      {
-        type: "inputSelect",
-        name: "developerPhoneNumber",
-        label: "Creator Number",
-        placeholder: "Enter Creator Number",
-      }
     ] : []),
     {
       type: "searchbaseSelect",

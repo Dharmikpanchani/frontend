@@ -1,9 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { alpha } from "@mui/material/styles";
 import {
     Box,
     Typography,
     TextField,
+    Button,
     TableContainer,
     Paper,
     Table,
@@ -31,6 +33,7 @@ import { toasterError } from "@/utils/toaster/Toaster";
 export default function PlanView() {
     const [loading, setLoading] = useState(true);
     const [profileData, setProfileData] = useState<any>(null);
+    const navigate = useNavigate();
 
     const fetchSchoolProfile = async () => {
         try {
@@ -120,59 +123,104 @@ export default function PlanView() {
 
     return (
         <Box className="admin-tabpanel-main" sx={{ p: 0 }}>
-            {/* Expiry Banner */}
             <Box 
                 sx={{ 
                     mb: 4, 
-                    p: 2.5, 
-                    borderRadius: '12px', 
+                    p: { xs: 2.5, sm: 3.5 }, 
+                    borderRadius: '16px', 
                     background: 'var(--theme-gradient, linear-gradient(135deg, #942F15 0%, #E35D5B 100%))',
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    boxShadow: '0 4px 15px rgba(148, 47, 21, 0.2)',
+                    gap: 3,
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    boxShadow: '0 10px 30px -10px var(--primary-color, rgba(148, 47, 21, 0.4))',
                     position: 'relative',
                     overflow: 'hidden'
                 }}
             >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, zIndex: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, zIndex: 1, width: '100%' }}>
                     <Box sx={{ 
-                        width: 45, 
-                        height: 45, 
-                        borderRadius: '50%', 
-                        bgcolor: 'rgba(255,255,255,0.2)', 
+                        width: 54, 
+                        height: 54, 
+                        borderRadius: '14px', 
+                        bgcolor: 'rgba(255,255,255,0.18)', 
                         display: 'flex', 
                         justifyContent: 'center', 
-                        alignItems: 'center' 
+                        alignItems: 'center',
+                        backdropFilter: 'blur(4px)',
+                        border: '1px solid rgba(255,255,255,0.1)'
                     }}>
-                        <ExpiryIcon sx={{ color: 'white' }} />
+                        <ExpiryIcon sx={{ color: 'white', fontSize: 28 }} />
                     </Box>
                     <Box>
-                        <Typography sx={{ fontSize: '12px', fontWeight: 500, opacity: 0.9, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            Current Plan Expiry
+                        <Typography sx={{ 
+                            fontSize: '11px', 
+                            fontWeight: 700, 
+                            opacity: 0.85, 
+                            textTransform: 'uppercase', 
+                            letterSpacing: '1.2px',
+                            mb: 0.5,
+                            fontFamily: "'Inter', sans-serif"
+                        }}>
+                            Subscription Expiry
                         </Typography>
-                        <Typography sx={{ fontSize: '20px', fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>
+                        <Typography sx={{ 
+                            fontSize: { xs: '20px', sm: '24px' }, 
+                            fontWeight: 800, 
+                            fontFamily: "'Poppins', sans-serif",
+                            lineHeight: 1
+                        }}>
                             {planExpiryDate ? moment.unix(planExpiryDate).format("MMMM DD, YYYY") : "No Expiry Set"}
                         </Typography>
                     </Box>
                 </Box>
-                <Box sx={{ 
-                    px: 2, 
-                    py: 1, 
-                    borderRadius: '8px', 
-                    bgcolor: 'rgba(255,255,255,0.2)', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: 1,
-                    zIndex: 1
-                }}>
-                    <VerifiedIcon sx={{ fontSize: 18 }} />
-                    <Typography sx={{ fontSize: '14px', fontWeight: 600 }}>Active Status</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, zIndex: 1, shrink: 0 }}>
+                    <Box sx={{ 
+                        px: 2, 
+                        py: 0.7, 
+                        borderRadius: '25px', 
+                        bgcolor: 'rgba(255,255,255,0.15)', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 1,
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        backdropFilter: 'blur(4px)'
+                    }}>
+                        <VerifiedIcon sx={{ fontSize: 14, color: 'white' }} />
+                        <Typography sx={{ fontSize: '12px', fontWeight: 700, color: 'white' }}>ACTIVE</Typography>
+                    </Box>
+                    <Button
+                        variant="contained"
+                        onClick={() => navigate("/user-plan")}
+                        sx={{
+                            bgcolor: 'var(--primary-color, #942F15) !important',
+                            color: '#FFFFFF !important',
+                            textTransform: 'none',
+                            fontWeight: 800,
+                            borderRadius: '25px',
+                            px: 4,
+                            py: 1.1,
+                            fontSize: '13px',
+                            whiteSpace: 'nowrap',
+                            border: '1px solid rgba(255,255,255,0.4)',
+                            boxShadow: '0 8px 16px -4px rgba(0,0,0,0.2)',
+                            '&:hover': {
+                                bgcolor: 'var(--primary-color, #942F15) !important',
+                                opacity: 0.9,
+                                transform: 'translateY(-2px)',
+                                boxShadow: '0 12px 20px -5px rgba(0,0,0,0.2)'
+                            },
+                            transition: 'all 0.3s ease'
+                        }}
+                    >
+                        Upgrade Plan
+                    </Button>
                 </Box>
                 {/* Decorative circles */}
-                <Box sx={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.05)' }} />
-                <Box sx={{ position: 'absolute', bottom: -50, left: 100, width: 150, height: 150, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.05)' }} />
+                <Box sx={{ position: 'absolute', top: -40, right: -40, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%)' }} />
+                <Box sx={{ position: 'absolute', bottom: -60, left: '20%', width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)' }} />
             </Box>
 
             <Box sx={{ maxWidth: 1100 }}>
@@ -186,24 +234,24 @@ export default function PlanView() {
 
                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                         <Typography sx={labelSx}>Price</Typography>
-                        <TextField 
-                            fullWidth 
-                            variant="outlined" 
-                            sx={inputSx} 
-                            value={initialValues.price} 
-                            disabled 
-                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} 
+                        <TextField
+                            fullWidth
+                            variant="outlined"
+                            sx={inputSx}
+                            value={initialValues.price}
+                            disabled
+                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
                         />
                     </Box>
 
                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                         <Typography sx={labelSx}>Billing Cycle</Typography>
-                        <TextField 
-                            fullWidth 
-                            variant="outlined" 
-                            sx={inputSx} 
-                            value={initialValues.billingCycle.charAt(0).toUpperCase() + initialValues.billingCycle.slice(1)} 
-                            disabled 
+                        <TextField
+                            fullWidth
+                            variant="outlined"
+                            sx={inputSx}
+                            value={initialValues.billingCycle.charAt(0).toUpperCase() + initialValues.billingCycle.slice(1)}
+                            disabled
                         />
                     </Box>
                 </Box>
