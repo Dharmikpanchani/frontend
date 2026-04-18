@@ -62,7 +62,10 @@ export default function PlanView() {
         if (selectedPlan) {
             return {
                 planName: selectedPlan.planName || "",
-                price: selectedPlan.price || "0",
+                monPrice: selectedPlan.monPrice || "0",
+                monOfferPrice: selectedPlan.monOfferPrice || "0",
+                yerPrice: selectedPlan.yerPrice || "0",
+                yerOfferPrice: selectedPlan.yerOfferPrice || "0",
                 billingCycle: selectedPlan.billingCycle || "monthly",
                 maxStudents: selectedPlan.maxStudents || "",
                 maxTeachers: selectedPlan.maxTeachers || "",
@@ -233,12 +236,28 @@ export default function PlanView() {
                     </Box>
 
                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                        <Typography sx={labelSx}>Price</Typography>
+                        <Typography sx={labelSx}>
+                            {initialValues.billingCycle === "monthly" ? "Monthly Price" : "Yearly Price"}
+                        </Typography>
                         <TextField
                             fullWidth
                             variant="outlined"
                             sx={inputSx}
-                            value={initialValues.price}
+                            value={initialValues.billingCycle === "monthly" ? initialValues.monPrice : initialValues.yerPrice}
+                            disabled
+                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
+                        />
+                    </Box>
+ 
+                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                        <Typography sx={labelSx}>
+                            {initialValues.billingCycle === "monthly" ? "Monthly Offer Price" : "Yearly Offer Price"}
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            variant="outlined"
+                            sx={inputSx}
+                            value={initialValues.billingCycle === "monthly" ? initialValues.monOfferPrice : initialValues.yerOfferPrice}
                             disabled
                             InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
                         />

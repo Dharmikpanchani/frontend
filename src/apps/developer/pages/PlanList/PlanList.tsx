@@ -244,6 +244,7 @@ export default function PlanList() {
                 <TableRow className="table-row">
                   <TableCell className="table-th" sx={{ fontWeight: 700 }}>{isSuperDeveloper ? "Plan & Creator" : "Plan Name"}</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Price</TableCell>
+                  <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Offer Price</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Cycle</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Limits (S/T/C)</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Status</TableCell>
@@ -299,7 +300,14 @@ export default function PlanList() {
                           </Box>
                         </TableCell>
                         <TableCell align="center" className="table-td">
-                          <Typography sx={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary-color)' }}>{data.price}</Typography>
+                          <Typography sx={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary-color)' }}>
+                            {data.billingCycle === "monthly" ? data.monPrice : data.yerPrice}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center" className="table-td">
+                          <Typography sx={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary-color)' }}>
+                            {data.billingCycle === "monthly" ? (data.monOfferPrice || "-") : (data.yerOfferPrice || "-")}
+                          </Typography>
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Typography sx={{ fontSize: '13px', textTransform: 'capitalize' }}>{data.billingCycle}</Typography>

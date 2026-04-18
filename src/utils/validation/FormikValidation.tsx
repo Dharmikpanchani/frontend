@@ -723,18 +723,32 @@ export const teacherValidationSchema = Yup.object().shape({
 export const planValidationSchema = Yup.object().shape({
   id: Yup.string().optional(),
   planName: genericStringValidation("Plan name", 3, 50, true),
-  price: Yup.number()
-    .typeError("Price must be a number")
+  monPrice: Yup.number()
+    .typeError("Monthly Price must be a number")
     .min(0, "Price cannot be negative")
-    .when(["planName", "id"], {
-      is: (planName: string, id: string) => {
-        const isFree = planName && planName.toLowerCase() === "free";
-        const isEdit = !!id;
-        return isFree || isEdit;
-      },
-      then: (schema) => schema.optional().nullable(),
-      otherwise: (schema) => schema.required("Price is required"),
+    .when("billingCycle", {
+      is: "monthly",
+      then: (schema) => schema.required("Monthly price is required"),
+      otherwise: (schema) => schema.optional().nullable(),
     }),
+  monOfferPrice: Yup.number()
+    .typeError("Monthly Offer Price must be a number")
+    .min(0, "Offer price cannot be negative")
+    .optional()
+    .nullable(),
+  yerPrice: Yup.number()
+    .typeError("Yearly Price must be a number")
+    .min(0, "Price cannot be negative")
+    .when("billingCycle", {
+      is: "yearly",
+      then: (schema) => schema.required("Yearly price is required"),
+      otherwise: (schema) => schema.optional().nullable(),
+    }),
+  yerOfferPrice: Yup.number()
+    .typeError("Yearly Offer Price must be a number")
+    .min(0, "Offer price cannot be negative")
+    .optional()
+    .nullable(),
   billingCycle: Yup.string().required("Billing cycle is required"),
   maxStudents: Yup.number()
     .typeError("Limit must be a number")

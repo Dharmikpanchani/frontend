@@ -82,12 +82,19 @@ export default function AddEditPlan() {
                 maxStudents: selectedPlan.maxStudents || "",
                 maxTeachers: selectedPlan.maxTeachers || "",
                 maxClasses: selectedPlan.maxClasses || "",
+                monPrice: selectedPlan.monPrice || "",
+                monOfferPrice: selectedPlan.monOfferPrice || "",
+                yerPrice: selectedPlan.yerPrice || "",
+                yerOfferPrice: selectedPlan.yerOfferPrice || "",
             };
         }
         return {
             id: "",
             planName: "",
-            price: "",
+            monPrice: "",
+            monOfferPrice: "",
+            yerPrice: "",
+            yerOfferPrice: "",
             billingCycle: "monthly",
             maxStudents: "",
             maxTeachers: "",
@@ -105,11 +112,20 @@ export default function AddEditPlan() {
 
         setPermissionsError("");
 
-        const payload = {
+        const payload: any = {
             ...values,
             permissions: [...new Set(permissions)],
         };
         if (id) payload.id = id;
+
+        // Ensure we only send fields relevant to the selected billing cycle
+        if (values.billingCycle === "monthly") {
+            delete payload.yerPrice;
+            delete payload.yerOfferPrice;
+        } else if (values.billingCycle === "yearly") {
+            delete payload.monPrice;
+            delete payload.monOfferPrice;
+        }
 
         const res = await dispatch(addEditPlan(payload) as any);
         if (res.meta.requestStatus === "fulfilled") {
@@ -231,30 +247,63 @@ export default function AddEditPlan() {
                                         {/* 1. Plan Details */}
                                         <SectionTitle icon={AssignmentIcon} title="Plan Details" />
                                         <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 6 }}>
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 12' }}>
                                                 <Typography sx={labelSx}>Plan Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
                                                 <TextField fullWidth name="planName" placeholder="Enter Plan Name" variant="outlined" sx={inputSx} value={values.planName} onChange={handleChange} onBlur={handleBlur} error={touched.planName && Boolean(errors.planName)} disabled={isView || isEdit} />
                                                 <FormHelperText className="error-text">{(touched.planName && errors.planName) ? (errors.planName as string) : ""}</FormHelperText>
                                             </Box>
 
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
-                                                <Typography sx={labelSx}>Price{(values.planName.toLowerCase() !== "free" && !isEdit) && <span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span>}</Typography>
-                                                <TextField fullWidth name="price" placeholder="Enter Price" variant="outlined" sx={inputSx} value={values.price} onChange={handleChange} onBlur={handleBlur} error={touched.price && Boolean(errors.price)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
-                                                <FormHelperText className="error-text">{(touched.price && errors.price) ? (errors.price as string) : ""}</FormHelperText>
-                                            </Box>
-
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 12' }}>
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                                                 <Typography sx={labelSx}>Billing Cycle<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
                                                 <Autocomplete
                                                     options={billingCycleOptions}
                                                     getOptionLabel={(o) => o.label}
                                                     value={billingCycleOptions.find(o => o.value === values.billingCycle) || null}
-                                                    onChange={(_, v) => setFieldValue("billingCycle", v ? v.value : "")}
+                                                    onChange={(_, v) => {
+                                                        const newCycle = v ? v.value : "";
+                                                        setFieldValue("billingCycle", newCycle);
+                                                        // Clear non-relevant fields when cycle changes
+                                                        if (newCycle === "monthly") {
+                                                            setFieldValue("yerPrice", "");
+                                                            setFieldValue("yerOfferPrice", "");
+                                                        } else if (newCycle === "yearly") {
+                                                            setFieldValue("monPrice", "");
+                                                            setFieldValue("monOfferPrice", "");
+                                                        }
+                                                    }}
                                                     disabled={isView}
                                                     renderInput={(params) => <TextField {...params} placeholder="Select Cycle" variant="outlined" sx={inputSx} error={touched.billingCycle && Boolean(errors.billingCycle)} />}
                                                 />
                                                 <FormHelperText className="error-text">{(touched.billingCycle && errors.billingCycle) ? (errors.billingCycle as string) : ""}</FormHelperText>
                                             </Box>
+
+                                            {values.billingCycle === "monthly" ? (
+                                                <>
+                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                        <Typography sx={labelSx}>Monthly Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                        <TextField fullWidth name="monPrice" placeholder="Enter Monthly Price" variant="outlined" sx={inputSx} value={values.monPrice} onChange={handleChange} onBlur={handleBlur} error={touched.monPrice && Boolean(errors.monPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
+                                                        <FormHelperText className="error-text">{(touched.monPrice && errors.monPrice) ? (errors.monPrice as string) : ""}</FormHelperText>
+                                                    </Box>
+                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                        <Typography sx={labelSx}>Monthly Offer Price</Typography>
+                                                        <TextField fullWidth name="monOfferPrice" placeholder="Enter Monthly Offer Price" variant="outlined" sx={inputSx} value={values.monOfferPrice} onChange={handleChange} onBlur={handleBlur} error={touched.monOfferPrice && Boolean(errors.monOfferPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
+                                                        <FormHelperText className="error-text">{(touched.monOfferPrice && errors.monOfferPrice) ? (errors.monOfferPrice as string) : ""}</FormHelperText>
+                                                    </Box>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                        <Typography sx={labelSx}>Yearly Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                        <TextField fullWidth name="yerPrice" placeholder="Enter Yearly Price" variant="outlined" sx={inputSx} value={values.yerPrice} onChange={handleChange} onBlur={handleBlur} error={touched.yerPrice && Boolean(errors.yerPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
+                                                        <FormHelperText className="error-text">{(touched.yerPrice && errors.yerPrice) ? (errors.yerPrice as string) : ""}</FormHelperText>
+                                                    </Box>
+                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                        <Typography sx={labelSx}>Yearly Offer Price</Typography>
+                                                        <TextField fullWidth name="yerOfferPrice" placeholder="Enter Yearly Offer Price" variant="outlined" sx={inputSx} value={values.yerOfferPrice} onChange={handleChange} onBlur={handleBlur} error={touched.yerOfferPrice && Boolean(errors.yerOfferPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
+                                                        <FormHelperText className="error-text">{(touched.yerOfferPrice && errors.yerOfferPrice) ? (errors.yerOfferPrice as string) : ""}</FormHelperText>
+                                                    </Box>
+                                                </>
+                                            )}
                                         </Box>
 
                                         {/* 2. Usage Limits */}
