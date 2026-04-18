@@ -170,7 +170,6 @@ export const planStaticData: RoleStaticItem[] = [
   sectionModule,
   themeModule,
   schoolProfileModule,
-  planModule,
 ];
 
 export const schoolRoleStaticData: RoleStaticItem[] = [

@@ -726,7 +726,15 @@ export const planValidationSchema = Yup.object().shape({
   price: Yup.number()
     .typeError("Price must be a number")
     .min(0, "Price cannot be negative")
-    .required("Price is required"),
+    .when(["planName", "id"], {
+      is: (planName: string, id: string) => {
+        const isFree = planName && planName.toLowerCase() === "free";
+        const isEdit = !!id;
+        return isFree || isEdit;
+      },
+      then: (schema) => schema.optional().nullable(),
+      otherwise: (schema) => schema.required("Price is required"),
+    }),
   billingCycle: Yup.string().required("Billing cycle is required"),
   maxStudents: Yup.number()
     .typeError("Limit must be a number")

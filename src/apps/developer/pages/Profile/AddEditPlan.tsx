@@ -30,6 +30,7 @@ import { planStaticData as roleStaticData } from "@/apps/common/StaticArrayData"
 import { BpCheckbox } from "../../component/developerCommon/commonCssFunction/cssFunction";
 import { CommonLoader } from "@/apps/common/loader/Loader";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
+import Spinner from "../../component/developerCommon/spinner/Spinner";
 import { planValidationSchema } from "@/utils/validation/FormikValidation";
 import { useDispatch, useSelector } from "react-redux";
 import { addEditPlan, getPlanById, clearSelectedPlan } from "@/redux/slices/planSlice";
@@ -74,6 +75,7 @@ export default function AddEditPlan() {
     const initialValues = useMemo(() => {
         if (selectedPlan && id) {
             return {
+                id: id,
                 planName: selectedPlan.planName || "",
                 price: selectedPlan.price || "",
                 billingCycle: selectedPlan.billingCycle || "monthly",
@@ -83,6 +85,7 @@ export default function AddEditPlan() {
             };
         }
         return {
+            id: "",
             planName: "",
             price: "",
             billingCycle: "monthly",
@@ -110,7 +113,7 @@ export default function AddEditPlan() {
 
         const res = await dispatch(addEditPlan(payload) as any);
         if (res.meta.requestStatus === "fulfilled") {
-            navigate("/profile");
+            navigate("/plan-list");
         }
     };
 
@@ -210,8 +213,8 @@ export default function AddEditPlan() {
         <Box className="admin-dashboard-content">
             <Box className="admin-page-title-main" sx={{ mb: 3 }}>
                 <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} className="admin-breadcrumb" sx={{ mb: 1 }}>
-                    <Link underline="hover" color="inherit" onClick={() => navigate("/profile")} sx={{ cursor: 'pointer', fontSize: '14px' }}>
-                        Profile (Plan Details)
+                    <Link underline="hover" color="inherit" onClick={() => navigate("/plan-list")} sx={{ cursor: 'pointer', fontSize: '14px' }}>
+                        Plan List
                     </Link>
                     <Typography className="admin-breadcrumb-active">{isView ? "View" : isEdit ? "Edit" : "Add"} Plan</Typography>
                 </Breadcrumbs>
@@ -230,12 +233,12 @@ export default function AddEditPlan() {
                                         <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 6 }}>
                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
                                                 <Typography sx={labelSx}>Plan Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                <TextField fullWidth name="planName" placeholder="Enter Plan Name" variant="outlined" sx={inputSx} value={values.planName} onChange={handleChange} onBlur={handleBlur} error={touched.planName && Boolean(errors.planName)} disabled={isView} />
+                                                <TextField fullWidth name="planName" placeholder="Enter Plan Name" variant="outlined" sx={inputSx} value={values.planName} onChange={handleChange} onBlur={handleBlur} error={touched.planName && Boolean(errors.planName)} disabled={isView || isEdit} />
                                                 <FormHelperText className="error-text">{(touched.planName && errors.planName) ? (errors.planName as string) : ""}</FormHelperText>
                                             </Box>
 
                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
-                                                <Typography sx={labelSx}>Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <Typography sx={labelSx}>Price{(values.planName.toLowerCase() !== "free" && !isEdit) && <span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span>}</Typography>
                                                 <TextField fullWidth name="price" placeholder="Enter Price" variant="outlined" sx={inputSx} value={values.price} onChange={handleChange} onBlur={handleBlur} error={touched.price && Boolean(errors.price)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
                                                 <FormHelperText className="error-text">{(touched.price && errors.price) ? (errors.price as string) : ""}</FormHelperText>
                                             </Box>
@@ -358,10 +361,10 @@ export default function AddEditPlan() {
                                         {permissionsError && <FormHelperText className="error-text" sx={{ mt: -2, mb: 2, fontSize: '13px' }}>{permissionsError}</FormHelperText>}
 
                                         <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                                            <Button className="admin-btn-secondary" onClick={() => navigate("/profile")} disabled={actionLoading} sx={{ minWidth: '130px' }}>Cancel</Button>
+                                            <Button className="admin-btn-secondary" onClick={() => navigate("/plan-list")} disabled={actionLoading} sx={{ minWidth: '130px' }}>Cancel</Button>
                                             {!isView && (
                                                 <Button type="submit" className="admin-btn-theme" disabled={actionLoading} variant="contained" sx={{ minWidth: '150px' }}>
-                                                    {actionLoading ? "Saving..." : (isEdit ? "Update Plan" : "Create Plan")}
+                                                    {actionLoading ? <Spinner /> : (isEdit ? "Update Plan" : "Create Plan")}
                                                 </Button>
                                             )}
                                         </Box>

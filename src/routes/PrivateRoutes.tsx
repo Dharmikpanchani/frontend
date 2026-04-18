@@ -19,8 +19,11 @@ const PrivateRoutes: React.FC = () => {
   const isSchoolAdmin = adminDetails?.type === "school_admin";
   const planExptyDate = adminDetails?.schoolData?.PlanExptyDate;
   const currentTime = Math.floor(Date.now() / 1000);
+
+  // Safeguard: Only check expiry if the profile is fully loaded and the user is a school admin
   const isExpired = !!(
     isSchoolAdmin &&
+    adminDetails?._id && // Ensure profile is loaded
     planExptyDate &&
     Number(planExptyDate) < currentTime
   );
