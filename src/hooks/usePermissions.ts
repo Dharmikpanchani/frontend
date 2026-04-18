@@ -6,32 +6,49 @@ export const usePermissions = () => {
         (state: RootState) => state.AdminReducer
     );
 
-    const isSuperDeveloper =
-        adminDetails?.type === "super_developer" || adminDetails?.isSuperAdmin;
 
-    const permissions: string[] =
-        adminDetails?.role?.permissions ?? [];
+    const isSuperDeveloper = adminDetails?.type === "super_developer";
+    const isSchoolAdmin = adminDetails?.type === "school_admin";
+    const isSuperAdmin = adminDetails?.isSuperAdmin;
+
+    const rolePermissions: string[] = adminDetails?.role?.permissions ?? [];
+    const planPermissions: string[] = adminDetails?.schoolData?.planId?.permissions ?? [];
+    const checkPermission = (p: string): boolean => {
+        if (isSuperDeveloper) return true;
+
+        if (isSchoolAdmin) {
+            // First layer: Plan check
+            if (!planPermissions.includes(p)) return false;
+            // Second layer: Super Admin bypass within the plan
+            if (isSuperAdmin) return true;
+        } else if (isSuperAdmin) {
+            // Non-school Super Admin bypass (e.g. platform admin)
+            return true;
+        }
+
+        // Third layer: Role check
+        return rolePermissions.includes(p);
+    };
 
     // ✅ Single permission
     const hasPermission = (permission: string): boolean => {
-        if (isSuperDeveloper) return true;
-        return permissions.includes(permission);
+        return checkPermission(permission);
     };
 
     // ✅ ALL permissions required
     const hasAllPermissions = (requiredPermissions: string[]): boolean => {
         if (isSuperDeveloper) return true;
-        return requiredPermissions.every((p) => permissions.includes(p));
+        return requiredPermissions.every((p) => checkPermission(p));
     };
 
     // ✅ ANY one permission
     const hasAnyPermission = (requiredPermissions: string[]): boolean => {
         if (isSuperDeveloper) return true;
-        return requiredPermissions.some((p) => permissions.includes(p));
+        return requiredPermissions.some((p) => checkPermission(p));
     };
 
     return {
-        permissions,
+        permissions: rolePermissions,
         hasPermission,
         hasAllPermissions,
         hasAnyPermission,
