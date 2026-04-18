@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -12,6 +12,9 @@ import {
   NorthEast as ExternalIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
+import { schoolService } from "@/api/services/school.service";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/Store";
 
 interface PlanCardProps {
   isPopular?: boolean;
@@ -42,6 +45,7 @@ const PlanCard = styled(Card, {
   flex: 1,
   "&:hover": {
     transform: "translateY(-10px)",
+    borderColor: "var(--primary-color)",
     boxShadow: isPopular
       ? "0 35px 70px -20px var(--primary-color-rgb, rgba(148, 47, 21, 0.45))"
       : "0 20px 45px -15px rgba(0,0,0,0.15)",
@@ -93,52 +97,27 @@ const CustomSwitch = styled(Box)(() => ({
 
 export default function UserPlan() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
+  const [apiPlans, setApiPlans] = useState<any[]>([]);
+  const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
 
-  const plans = [
-    {
-      planName: "Basic",
-      price: billingCycle === "monthly" ? 9.99 : 6.99,
-      modules: ["Income Tracking", "Expense Tracking", "Event Categorization"],
-      isPopular: false,
-    },
-    {
-      planName: "Pro",
-      price: billingCycle === "monthly" ? 34.99 : 26.99,
-      modules: [
-        "Smart AI Assistant",
-        "Income Tracking",
-        "Expense Tracking",
-        "Warranty Tracking",
-        "Subscription Tracking",
-        "Event Categorization",
-      ],
-      isPopular: true,
-      oldPrice: billingCycle === "yearly" ? 46.99 : 59.99,
-    },
-    {
-      planName: "Starter",
-      price: billingCycle === "monthly" ? 19.99 : 16.99,
-      modules: [
-        "Income Tracking",
-        "Expense Tracking",
-        "Warranty Tracking",
-        "Subscription Tracking",
-        "Event Categorization",
-      ],
-      isPopular: false,
-    },
-    {
-      planName: "Premium",
-      price: billingCycle === "monthly" ? 59.99 : 49.99,
-      modules: [
-        "All Pro Features",
-        "Advanced Analytics",
-        "Custom Branding",
-        "API Access",
-      ],
-      isPopular: false,
-    },
-  ];
+  useEffect(() => {
+    const fetchPlanData = async () => {
+      try {
+        const res = await schoolService.getDeveloperWiseSchoolPlan(adminDetails?.schoolId);
+        setApiPlans(res.data || []);
+      } catch (error) {
+        console.error("Error fetching plan data:", error);
+      }
+    };
+
+    fetchPlanData();
+  }, [adminDetails?.schoolId]);
+
+  const filteredPlans = apiPlans.filter((plan: any) => {
+    const isNotFree = plan.planName?.toLowerCase() !== "free";
+    const matchesCycle = plan.billingCycle === billingCycle;
+    return isNotFree && matchesCycle;
+  });
 
   return (
     <Box
@@ -222,91 +201,107 @@ export default function UserPlan() {
         </Box>
 
         <Grid container spacing={4} justifyContent="center">
-          {plans.map((plan, index) => (
-            <Grid 
-              size={{ xs: 12, md: 6, lg: 4, xl: 3 }} 
-              key={index} 
-              sx={{ display: 'flex', justifyContent: 'center' }}
-            >
-              <PlanCard isPopular={plan.isPopular}>
-                {plan.isPopular && <PopularBadge>Most Popular</PopularBadge>}
+          {filteredPlans.map((plan: any, index: number) => {
+            const price = billingCycle === "monthly" ? plan.monPrice : plan.yerPrice;
+            const offerPrice = billingCycle === "monthly" ? plan.monOfferPrice : plan.yerOfferPrice;
+            const isPopular = false; // Add logic if API provides this in future
 
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5, color: "var(--text-primary)", fontSize: "16px" }}>
-                  {plan.planName}
-                </Typography>
+            return (
+              <Grid
+                size={{ xs: 12, md: 6, lg: 4, xl: 3 }}
+                key={index}
+                sx={{ display: 'flex', justifyContent: 'center' }}
+              >
+                <PlanCard isPopular={isPopular}>
+                  {isPopular && <PopularBadge>Most Popular</PopularBadge>}
 
-                <Box sx={{ minHeight: "80px", display: "flex", flexDirection: "column", justifyContent: "flex-end", mb: 2 }}>
-                  <Box sx={{ display: "flex", alignItems: "baseline", mb: 0.2 }}>
-                    {plan.oldPrice && (
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 800, 
+                    mb: 1.2, 
+                    color: "var(--text-primary)", 
+                    fontSize: "24px", 
+                    textTransform: "capitalize",
+                    borderBottom: "1px solid var(--main-border)",
+                    pb: 1
+                  }}>
+                    {plan.planName}
+                  </Typography>
+
+                  <Box sx={{ minHeight: "70px", display: "flex", flexDirection: "column", justifyContent: "flex-end", mb: 2 }}>
+                    <Box sx={{ display: "flex", alignItems: "baseline", mb: 0.2 }}>
+                      {offerPrice > 0 && (
+                        <Typography
+                          sx={{
+                            fontSize: "22px",
+                            fontWeight: 500,
+                            color: "var(--text-muted)",
+                            textDecoration: "line-through",
+                            mr: 0.25,
+                          }}
+                        >
+                          ₹{offerPrice}
+                        </Typography>
+                      )}
                       <Typography
                         sx={{
-                          fontSize: "18px",
-                          fontWeight: 500,
-                          color: "var(--text-muted)",
-                          textDecoration: "line-through",
-                          mr: 0.8,
+                          fontSize: "36px",
+                          fontWeight: 800,
+                          color: "var(--text-primary)",
                         }}
                       >
-                        ${plan.oldPrice}
-                      </Typography>
-                    )}
-                    <Typography
-                      sx={{
-                        fontSize: "28px",
-                        fontWeight: 800,
-                        color: "var(--text-primary)",
-                      }}
-                    >
-                      ${plan.price}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    sx={{
-                      fontSize: "10px",
-                      color: "var(--text-muted)",
-                    }}
-                  >
-                    one-time payment + Local Taxes
-                  </Typography>
-                </Box>
-
-                <Button
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    py: 1,
-                    borderRadius: "10px",
-                    textTransform: "none",
-                    fontWeight: 700,
-                    fontSize: "13px",
-                    background: plan.isPopular ? "var(--theme-gradient)" : "#1a1a1a",
-                    color: "white",
-                    mb: 3,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    "&:hover": {
-                      background: plan.isPopular ? "var(--theme-gradient)" : "#000",
-                      opacity: 0.9,
-                    },
-                  }}
-                >
-                  Buy now <ExternalIcon sx={{ fontSize: 16 }} />
-                </Button>
-
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                  {plan.modules.map((module, i) => (
-                    <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <CheckIcon sx={{ fontSize: 16, color: "var(--text-muted)" }} />
-                      <Typography sx={{ fontSize: "12.5px", color: "var(--text-secondary)" }}>
-                        {module}
+                        ₹{price}
                       </Typography>
                     </Box>
-                  ))}
-                </Box>
-              </PlanCard>
-            </Grid>
-          ))}
+                    <Typography
+                      sx={{
+                        fontSize: "10px",
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      one-time payment + Local Taxes
+                    </Typography>
+                  </Box>
+
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      py: 1,
+                      borderRadius: "10px",
+                      textTransform: "none",
+                      fontWeight: 700,
+                      fontSize: "13px",
+                      background: "var(--theme-gradient)",
+                      color: "white",
+                      mb: 3,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        background: "var(--theme-gradient)",
+                        opacity: 0.9,
+                        transform: "translateY(-1px)",
+                      },
+                    }}
+                  >
+                    Buy now <ExternalIcon sx={{ fontSize: 16 }} />
+                  </Button>
+
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                    {plan.moduleDescription?.map((module: string, i: number) => (
+                      <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <CheckIcon sx={{ fontSize: 16, color: "var(--text-muted)" }} />
+                        <Typography sx={{ fontSize: "12.5px", color: "var(--text-secondary)" }}>
+                          {module}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </PlanCard>
+              </Grid>
+            );
+          })}
         </Grid>
       </Container>
     </Box>
