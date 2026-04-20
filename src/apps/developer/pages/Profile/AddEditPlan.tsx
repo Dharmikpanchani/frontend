@@ -22,7 +22,6 @@ import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
 import {
     Assignment as AssignmentIcon,
-    SignalCellularAlt as LimitsIcon,
     Security as SecurityIcon,
     NavigateNext as NavigateNextIcon,
 } from "@mui/icons-material";
@@ -51,7 +50,6 @@ export default function AddEditPlan() {
     const isEdit = !!id && !isView;
 
     const { selectedPlan, loading, actionLoading } = useSelector((state: RootState) => state.PlanReducer);
-    const [permissions, setPermissions] = useState<string[]>([]);
     const [permissionsError, setPermissionsError] = useState("");
 
     // Filter categories for the table logic
@@ -66,26 +64,19 @@ export default function AddEditPlan() {
         }
     }, [id, dispatch]);
 
-    useEffect(() => {
-        if (selectedPlan && id) {
-            setPermissions(selectedPlan.permissions || []);
-        }
-    }, [selectedPlan, id]);
+
 
     const initialValues = useMemo(() => {
         if (selectedPlan && id) {
             return {
                 id: id,
                 planName: selectedPlan.planName || "",
-                price: selectedPlan.price || "",
                 billingCycle: selectedPlan.billingCycle || "monthly",
-                maxStudents: selectedPlan.maxStudents || "",
-                maxTeachers: selectedPlan.maxTeachers || "",
-                maxClasses: selectedPlan.maxClasses || "",
                 monPrice: selectedPlan.monPrice || "",
                 monOfferPrice: selectedPlan.monOfferPrice || "",
                 yerPrice: selectedPlan.yerPrice || "",
                 yerOfferPrice: selectedPlan.yerOfferPrice || "",
+                permissions: selectedPlan.permissions || [],
             };
         }
         return {
@@ -96,16 +87,14 @@ export default function AddEditPlan() {
             yerPrice: "",
             yerOfferPrice: "",
             billingCycle: "monthly",
-            maxStudents: "",
-            maxTeachers: "",
-            maxClasses: "",
+            permissions: [],
         };
     }, [selectedPlan, id]);
 
     const handleSubmit = async (values: any) => {
         if (isView) return;
 
-        if (!permissions.length) {
+        if (!values.permissions || !values.permissions.length) {
             setPermissionsError("Please select at least one permission");
             return;
         }
@@ -114,7 +103,7 @@ export default function AddEditPlan() {
 
         const payload: any = {
             ...values,
-            permissions: [...new Set(permissions)],
+            permissions: [...new Set(values.permissions)],
         };
         if (id) payload.id = id;
 
@@ -153,78 +142,6 @@ export default function AddEditPlan() {
         </Box>
     );
 
-    // Reusable permission logic
-    const onChangeCheckBox = (key: string) => {
-        if (isView) return;
-        const lastUnderscoreIndex = key.lastIndexOf('_');
-        const moduleId = key.substring(0, lastUnderscoreIndex);
-        const typeId = key.substring(lastUnderscoreIndex + 1);
-        const viewKey = `${moduleId}_view`;
-
-        if (permissions.includes(key)) {
-            let newPermissions = permissions.filter((p) => p !== key);
-            if (typeId === 'view') {
-                newPermissions = newPermissions.filter((p) => !p.startsWith(`${moduleId}_`));
-            }
-            setPermissions(newPermissions);
-        } else {
-            let newPermissions = [...permissions, key];
-            if (typeId !== 'view') {
-                if (!newPermissions.includes(viewKey)) newPermissions.push(viewKey);
-            }
-            setPermissions([...new Set(newPermissions)]);
-        }
-    };
-
-    const checkUncheckAllType = (action: "add" | "remove", typeId: string) => {
-        if (isView) return;
-        const relatedKeys = roleStaticData.flatMap((module: any) =>
-            module.subRole.some((sr: any) => sr.titleId === typeId) ? [`${module.mainTitleId}_${typeId}`] : []
-        );
-
-        if (action === "add") {
-            let newPermissions = [...permissions, ...relatedKeys];
-            if (typeId !== 'view') {
-                const views = roleStaticData.flatMap((m: any) =>
-                    m.subRole.some((sr: any) => sr.titleId === typeId) && m.subRole.some((sr: any) => sr.titleId === 'view') ? [`${m.mainTitleId}_view`] : []
-                );
-                newPermissions = [...newPermissions, ...views];
-            }
-            setPermissions([...new Set(newPermissions)]);
-        } else {
-            let newPermissions = permissions.filter((k) => !relatedKeys.includes(k));
-            if (typeId === 'view') {
-                const allActionKeys = roleStaticData.flatMap((m: any) => m.subRole.map((sr: any) => `${m.mainTitleId}_${sr.titleId}`));
-                newPermissions = newPermissions.filter((k) => !allActionKeys.includes(k));
-            }
-            setPermissions(newPermissions);
-        }
-    };
-
-    const isTypeAllChecked = (typeId: string) => {
-        const allKeys = roleStaticData.flatMap((m: any) => m.subRole.some((sr: any) => sr.titleId === typeId) ? [`${m.mainTitleId}_${typeId}`] : []);
-        return allKeys.length > 0 && allKeys.every((k) => permissions.includes(k));
-    };
-
-    const isGroupChecked = (groupIds: string[]) => {
-        const groupModules = roleStaticData.filter(m => groupIds.includes(m.mainTitleId));
-        return groupModules.length > 0 && groupModules.every(module =>
-            module.subRole.filter((sr: any) => sr.is_show).every((sr: any) => permissions.includes(`${module.mainTitleId}_${sr.titleId}`))
-        );
-    };
-
-    const checkUncheckGroup = (action: "add" | "remove", groupIds: string[]) => {
-        if (isView) return;
-        const groupModules = roleStaticData.filter(m => groupIds.includes(m.mainTitleId));
-        const allKeys = groupModules.flatMap(m => m.subRole.filter((sr: any) => sr.is_show).map((sr: any) => `${m.mainTitleId}_${sr.titleId}`));
-
-        if (action === "add") {
-            setPermissions([...new Set([...permissions, ...allKeys])]);
-        } else {
-            setPermissions(permissions.filter(k => !allKeys.includes(k)));
-        }
-    };
-
     return (
         <Box className="admin-dashboard-content">
             <Box className="admin-page-title-main" sx={{ mb: 3 }}>
@@ -235,12 +152,86 @@ export default function AddEditPlan() {
                     <Typography className="admin-breadcrumb-active">{isView ? "View" : isEdit ? "Edit" : "Add"} Plan</Typography>
                 </Breadcrumbs>
             </Box>
-
+ 
             <Box className="card-border common-card" sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: '12px', minHeight: '200px', backgroundColor: 'white' }}>
                 {loading ? <CommonLoader /> : (
                     <Formik enableReinitialize initialValues={initialValues} validationSchema={planValidationSchema} onSubmit={handleSubmit}>
                         {(formikProps: FormikProps<any>) => {
                             const { values, errors, touched, handleChange, setFieldValue, handleBlur } = formikProps;
+ 
+                            // Reusable permission logic
+                            const permissions = values.permissions || [];
+ 
+                            const onChangeCheckBox = (key: string) => {
+                                if (isView) return;
+                                const lastUnderscoreIndex = key.lastIndexOf('_');
+                                const moduleId = key.substring(0, lastUnderscoreIndex);
+                                const typeId = key.substring(lastUnderscoreIndex + 1);
+                                const viewKey = `${moduleId}_view`;
+ 
+                                if (permissions.includes(key)) {
+                                    let newPermissions = permissions.filter((p: string) => p !== key);
+                                    if (typeId === 'view') {
+                                        newPermissions = newPermissions.filter((p: string) => !p.startsWith(`${moduleId}_`));
+                                    }
+                                    setFieldValue("permissions", newPermissions);
+                                } else {
+                                    let newPermissions = [...permissions, key];
+                                    if (typeId !== 'view') {
+                                        if (!newPermissions.includes(viewKey)) newPermissions.push(viewKey);
+                                    }
+                                    setFieldValue("permissions", [...new Set(newPermissions)]);
+                                }
+                            };
+ 
+                            const checkUncheckAllType = (action: "add" | "remove", typeId: string) => {
+                                if (isView) return;
+                                const relatedKeys = roleStaticData.flatMap((module: any) =>
+                                    module.subRole.some((sr: any) => sr.titleId === typeId) ? [`${module.mainTitleId}_${typeId}`] : []
+                                );
+ 
+                                if (action === "add") {
+                                    let newPermissions = [...permissions, ...relatedKeys];
+                                    if (typeId !== 'view') {
+                                        const views = roleStaticData.flatMap((m: any) =>
+                                            m.subRole.some((sr: any) => sr.titleId === typeId) && m.subRole.some((sr: any) => sr.titleId === 'view') ? [`${m.mainTitleId}_view`] : []
+                                        );
+                                        newPermissions = [...newPermissions, ...views];
+                                    }
+                                    setFieldValue("permissions", [...new Set(newPermissions)]);
+                                } else {
+                                    let newPermissions = permissions.filter((k: string) => !relatedKeys.includes(k));
+                                    if (typeId === 'view') {
+                                        const allActionKeys = roleStaticData.flatMap((m: any) => m.subRole.map((sr: any) => `${m.mainTitleId}_${sr.titleId}`));
+                                        newPermissions = newPermissions.filter((k: string) => !allActionKeys.includes(k));
+                                    }
+                                    setFieldValue("permissions", newPermissions);
+                                }
+                            };
+ 
+                            const isTypeAllChecked = (typeId: string) => {
+                                const allKeys = roleStaticData.flatMap((m: any) => m.subRole.some((sr: any) => sr.titleId === typeId) ? [`${m.mainTitleId}_${typeId}`] : []);
+                                return allKeys.length > 0 && allKeys.every((k) => permissions.includes(k));
+                            };
+ 
+                            const isGroupChecked = (groupIds: string[]) => {
+                                const groupModules = roleStaticData.filter(m => groupIds.includes(m.mainTitleId));
+                                return groupModules.length > 0 && groupModules.every(module =>
+                                    module.subRole.filter((sr: any) => sr.is_show).every((sr: any) => permissions.includes(`${module.mainTitleId}_${sr.titleId}`))
+                                );
+                            };
+ 
+                            const checkUncheckGroup = (action: "add" | "remove", groupIds: string[]) => {
+                                if (isView) return;
+                                const groupModules = roleStaticData.filter(m => groupIds.includes(m.mainTitleId));
+                                const allKeys = groupModules.flatMap(m => m.subRole.filter((sr: any) => sr.is_show).map((sr: any) => `${m.mainTitleId}_${sr.titleId}`));
+ 
+                                if (action === "add") {
+                                    setFieldValue("permissions", [...new Set([...permissions, ...allKeys])]);
+                                } else {
+                                    setFieldValue("permissions", permissions.filter((k: string) => !allKeys.includes(k)));
+                                }
+                            };
                             return (
                                 <Form>
                                     <Box sx={{ maxWidth: 1100 }}>
@@ -281,7 +272,25 @@ export default function AddEditPlan() {
                                                 <>
                                                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                                                         <Typography sx={labelSx}>Monthly Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                        <TextField fullWidth name="monPrice" placeholder="Enter Monthly Price" variant="outlined" sx={inputSx} value={values.monPrice} onChange={handleChange} onBlur={handleBlur} error={touched.monPrice && Boolean(errors.monPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
+                                                        <TextField 
+                                                            fullWidth 
+                                                            name="monPrice" 
+                                                            placeholder="Enter Monthly Price" 
+                                                            variant="outlined" 
+                                                            sx={inputSx} 
+                                                            value={values.monPrice} 
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                setFieldValue("monPrice", val);
+                                                                if (!isNaN(Number(val)) && val !== "") {
+                                                                    setFieldValue("monOfferPrice", Math.round(Number(val) * 0.20));
+                                                                }
+                                                            }} 
+                                                            onBlur={handleBlur} 
+                                                            error={touched.monPrice && Boolean(errors.monPrice)} 
+                                                            disabled={isView} 
+                                                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} 
+                                                        />
                                                         <FormHelperText className="error-text">{(touched.monPrice && errors.monPrice) ? (errors.monPrice as string) : ""}</FormHelperText>
                                                     </Box>
                                                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
@@ -294,7 +303,25 @@ export default function AddEditPlan() {
                                                 <>
                                                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                                                         <Typography sx={labelSx}>Yearly Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                        <TextField fullWidth name="yerPrice" placeholder="Enter Yearly Price" variant="outlined" sx={inputSx} value={values.yerPrice} onChange={handleChange} onBlur={handleBlur} error={touched.yerPrice && Boolean(errors.yerPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
+                                                        <TextField 
+                                                            fullWidth 
+                                                            name="yerPrice" 
+                                                            placeholder="Enter Yearly Price" 
+                                                            variant="outlined" 
+                                                            sx={inputSx} 
+                                                            value={values.yerPrice} 
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                setFieldValue("yerPrice", val);
+                                                                if (!isNaN(Number(val)) && val !== "") {
+                                                                    setFieldValue("yerOfferPrice", Math.round(Number(val) * 0.20));
+                                                                }
+                                                            }} 
+                                                            onBlur={handleBlur} 
+                                                            error={touched.yerPrice && Boolean(errors.yerPrice)} 
+                                                            disabled={isView} 
+                                                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} 
+                                                        />
                                                         <FormHelperText className="error-text">{(touched.yerPrice && errors.yerPrice) ? (errors.yerPrice as string) : ""}</FormHelperText>
                                                     </Box>
                                                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
@@ -304,26 +331,6 @@ export default function AddEditPlan() {
                                                     </Box>
                                                 </>
                                             )}
-                                        </Box>
-
-                                        {/* 2. Usage Limits */}
-                                        <SectionTitle icon={LimitsIcon} title="Usage Limits" />
-                                        <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 6 }}>
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                <Typography sx={labelSx}>Max Students<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                <TextField fullWidth name="maxStudents" type="number" placeholder="e.g. 500" variant="outlined" sx={inputSx} value={values.maxStudents} onChange={handleChange} onBlur={handleBlur} error={touched.maxStudents && Boolean(errors.maxStudents)} disabled={isView} />
-                                                <FormHelperText className="error-text">{(touched.maxStudents && errors.maxStudents) ? (errors.maxStudents as string) : ""}</FormHelperText>
-                                            </Box>
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                <Typography sx={labelSx}>Max Teachers<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                <TextField fullWidth name="maxTeachers" type="number" placeholder="e.g. 50" variant="outlined" sx={inputSx} value={values.maxTeachers} onChange={handleChange} onBlur={handleBlur} error={touched.maxTeachers && Boolean(errors.maxTeachers)} disabled={isView} />
-                                                <FormHelperText className="error-text">{(touched.maxTeachers && errors.maxTeachers) ? (errors.maxTeachers as string) : ""}</FormHelperText>
-                                            </Box>
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                <Typography sx={labelSx}>Max Classes<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                <TextField fullWidth name="maxClasses" type="number" placeholder="e.g. 20" variant="outlined" sx={inputSx} value={values.maxClasses} onChange={handleChange} onBlur={handleBlur} error={touched.maxClasses && Boolean(errors.maxClasses)} disabled={isView} />
-                                                <FormHelperText className="error-text">{(touched.maxClasses && errors.maxClasses) ? (errors.maxClasses as string) : ""}</FormHelperText>
-                                            </Box>
                                         </Box>
 
                                         {/* 3. Permissions */}
@@ -378,11 +385,30 @@ export default function AddEditPlan() {
 
                                                         rows.push(
                                                             <TableRow key={module.mainTitleId} sx={{ '&:hover': { bgcolor: '#f5f5f5' } }}>
-                                                                <TableCell className="table-td" sx={{ py: 2, pl: (isMaster || isAdmin) ? 4 : 2 }}>{module.mainTitle}</TableCell>
+                                                                <TableCell className="table-td" sx={{ py: 2, pl: (isMaster || isAdmin) ? 4 : 2 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                        {module.mainTitle}
+                                                                        {module.price && (
+                                                                            <Box sx={{ 
+                                                                                fontSize: '10px', 
+                                                                                fontWeight: 700, 
+                                                                                bgcolor: 'rgba(255, 140, 0, 0.08)', 
+                                                                                color: '#ff8c00', 
+                                                                                px: 0.8, 
+                                                                                py: 0.1, 
+                                                                                borderRadius: '4px',
+                                                                                border: '1px solid rgba(255, 140, 0, 0.15)',
+                                                                                fontFamily: "'Inter', sans-serif"
+                                                                            }}>
+                                                                                {module.price}
+                                                                            </Box>
+                                                                        )}
+                                                                    </Box>
+                                                                </TableCell>
                                                                 <TableCell className="table-td" align="center">
                                                                     <BpCheckbox checked={module.subRole.filter((sr: any) => sr.is_show).every((sr: any) => permissions.includes(`${module.mainTitleId}_${sr.titleId}`))} onChange={(e: any) => {
                                                                         const keys = module.subRole.filter((sr: any) => sr.is_show).map((sr: any) => `${module.mainTitleId}_${sr.titleId}`);
-                                                                        setPermissions(e.target.checked ? [...new Set([...permissions, ...keys])] : permissions.filter(k => !keys.includes(k)));
+                                                                        setFieldValue("permissions", e.target.checked ? [...new Set([...permissions, ...keys])] : permissions.filter((k: string) => !keys.includes(k)));
                                                                     }} disabled={isView} />
                                                                 </TableCell>
                                                                 {['view', 'add', 'edit', 'delete', 'status'].map((typeId) => {

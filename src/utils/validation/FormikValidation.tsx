@@ -720,12 +720,24 @@ export const teacherValidationSchema = Yup.object().shape({
   experienceCertificates: Yup.array().of(Yup.mixed()).optional(),
 }, [["shiftTimeFrom", "shiftTimeTo"]]);
 
+import { calculateMinMonthlyPrice } from "@/apps/common/StaticArrayData";
+
 export const planValidationSchema = Yup.object().shape({
   id: Yup.string().optional(),
   planName: genericStringValidation("Plan name", 3, 50, true),
+  permissions: Yup.array().of(Yup.string()).optional(),
   monPrice: Yup.number()
     .typeError("Monthly Price must be a number")
     .min(0, "Price cannot be negative")
+    .test("min-monthly-price", "Minimum price not met", function (value) {
+      const { permissions, billingCycle } = this.parent;
+      if (billingCycle !== "monthly") return true;
+      const minPrice = calculateMinMonthlyPrice(permissions || []);
+      if ((value || 0) < minPrice) {
+        return this.createError({ message: `Monthly price must be at least ₹ ${minPrice}` });
+      }
+      return true;
+    })
     .when("billingCycle", {
       is: "monthly",
       then: (schema) => schema.required("Monthly price is required"),
@@ -739,6 +751,15 @@ export const planValidationSchema = Yup.object().shape({
   yerPrice: Yup.number()
     .typeError("Yearly Price must be a number")
     .min(0, "Price cannot be negative")
+    .test("min-yearly-price", "Minimum price not met", function (value) {
+      const { permissions, billingCycle } = this.parent;
+      if (billingCycle !== "yearly") return true;
+      const minPrice = calculateMinMonthlyPrice(permissions || []) * 12;
+      if ((value || 0) < minPrice) {
+        return this.createError({ message: `Yearly price must be at least ₹ ${minPrice}` });
+      }
+      return true;
+    })
     .when("billingCycle", {
       is: "yearly",
       then: (schema) => schema.required("Yearly price is required"),
@@ -750,19 +771,4 @@ export const planValidationSchema = Yup.object().shape({
     .optional()
     .nullable(),
   billingCycle: Yup.string().required("Billing cycle is required"),
-  maxStudents: Yup.number()
-    .typeError("Limit must be a number")
-    .integer("Must be an integer")
-    .min(0, "Limit cannot be negative")
-    .required("Max students is required"),
-  maxTeachers: Yup.number()
-    .typeError("Limit must be a number")
-    .integer("Must be an integer")
-    .min(0, "Limit cannot be negative")
-    .required("Max teachers is required"),
-  maxClasses: Yup.number()
-    .typeError("Limit must be a number")
-    .integer("Must be an integer")
-    .min(0, "Limit cannot be negative")
-    .required("Max classes is required"),
 });

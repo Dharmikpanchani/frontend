@@ -246,7 +246,6 @@ export default function PlanList() {
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Price</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Offer Price</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Cycle</TableCell>
-                  <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Limits (S/T/C)</TableCell>
                   <TableCell className="table-th" align="center" sx={{ fontWeight: 700 }}>Status</TableCell>
                   {hasAnyPermission([
                     developerPermission.plan.read,
@@ -311,11 +310,6 @@ export default function PlanList() {
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Typography sx={{ fontSize: '13px', textTransform: 'capitalize' }}>{data.billingCycle}</Typography>
-                        </TableCell>
-                        <TableCell align="center" className="table-td">
-                          <Typography sx={{ fontSize: '13px', color: '#666' }}>
-                            {data.maxStudents} / {data.maxTeachers} / {data.maxClasses}
-                          </Typography>
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>

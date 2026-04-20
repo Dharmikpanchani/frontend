@@ -26,6 +26,7 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 import { getAllSchools } from "@/redux/slices/schoolSlice";
+import { getAllAdminUsersSimple } from "@/redux/slices/adminUserSlice";
 import Svg from "@/assets/Svg";
 import DataNotFound from "../../component/developerCommon/dataNotFound/DataNotFound";
 import Loader from "@/apps/common/loader/Loader";
@@ -45,6 +46,7 @@ export default function SchoolList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { schools, total, loading } = useSelector((state: RootState) => state.SchoolReducer);
+  const { allAdminUsersSimple } = useSelector((state: RootState) => state.AdminUserReducer);
   const { hasPermission, hasAnyPermission } = usePermissions();
 
   const [openFilter, setOpenFilter] = useState(false);
@@ -62,6 +64,9 @@ export default function SchoolList() {
     gstNumber: "",
     registrationNumber: "",
     establishedYear: "",
+    planStatus: "",
+    planName: "",
+    adminId: "",
   });
 
   const [openDelete, setOpenDelete] = useState(false);
@@ -120,12 +125,19 @@ export default function SchoolList() {
       gstNumber: filters?.gstNumber ?? filterValues.gstNumber,
       registrationNumber: filters?.registrationNumber ?? filterValues.registrationNumber,
       establishedYear: filters?.establishedYear ?? filterValues.establishedYear,
+      planStatus: filters?.planStatus ?? filterValues.planStatus,
+      planName: filters?.planName ?? filterValues.planName,
+      adminId: filters?.adminId ?? filterValues.adminId,
     }) as any);
   };
 
   useEffect(() => {
     handleGetData(searchNameValue);
   }, [currentPage, rowsPerPage]);
+
+  useEffect(() => {
+    dispatch(getAllAdminUsersSimple("filter") as any);
+  }, [dispatch]);
 
   const handleApplyFilter = (values: any) => {
     setFilterValues(values);
@@ -144,6 +156,9 @@ export default function SchoolList() {
       gstNumber: "",
       registrationNumber: "",
       establishedYear: "",
+      planStatus: "",
+      planName: "",
+      adminId: "",
     };
     setFilterValues(resetValues);
     handleGetData(searchNameValue, resetValues);
@@ -216,6 +231,31 @@ export default function SchoolList() {
       name: "registrationNumber",
       label: "Registration Number",
       placeholder: "Enter Registration Number",
+    },
+    {
+      type: "searchbaseSelect",
+      name: "planStatus",
+      label: "Plan Status",
+      placeholder: "Select Plan Status",
+      options: [
+        { label: "Active", value: true },
+        { label: "Expired", value: false },
+      ],
+    },
+    {
+      type: "inputSelect",
+      name: "planName",
+      label: "Plan Name",
+      placeholder: "Enter Plan Name",
+    },
+    {
+      type: "searchbaseSelect",
+      name: "adminId",
+      label: "Admin/Developer",
+      placeholder: "Select Admin/Developer",
+      options: allAdminUsersSimple || [],
+      getOptionLabel: (option: any) => option.name || "",
+      getOptionValue: (option: any) => option._id,
     },
     {
       type: "date",
@@ -299,14 +339,15 @@ export default function SchoolList() {
             <Table aria-label="simple table" className="table">
               <TableHead className="table-head">
                 <TableRow className="table-row">
-                  <TableCell className="table-th" width="18%">SCHOOL DETAILS</TableCell>
-                  <TableCell className="table-th" width="18%">LOCATION</TableCell>
+                  <TableCell className="table-th" width="16%">SCHOOL DETAILS</TableCell>
+                  <TableCell className="table-th" width="16%">LOCATION</TableCell>
                   {hasPermission(developerPermission.school.status) && (
-                    <TableCell className="table-th" width="12%">STATUS</TableCell>
+                    <TableCell className="table-th" width="10%">STATUS</TableCell>
                   )}
-                  <TableCell className="table-th" width="15%">ACADEMIC INFO</TableCell>
-                  <TableCell className="table-th" width="12%">TAX INFO</TableCell>
-                  <TableCell className="table-th" width="15%">JOINED</TableCell>
+                  <TableCell className="table-th" width="12%">ACADEMIC INFO</TableCell>
+                  <TableCell className="table-th" width="12%">PLAN INFO</TableCell>
+                  <TableCell className="table-th" width="10%">TAX INFO</TableCell>
+                  <TableCell className="table-th" width="14%">JOINED</TableCell>
                   {hasAnyPermission([
                     developerPermission.school.read,
                     developerPermission.school.update,
@@ -445,6 +486,29 @@ export default function SchoolList() {
                           <Typography sx={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>{data?.board}</Typography>
                           <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>{data?.schoolType}</Typography>
                           <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>Medium: {data?.medium}</Typography>
+                        </TableCell>
+                        <TableCell className="table-td">
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                            <Typography sx={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>
+                              {data?.planId?.planName || '---'}
+                            </Typography>
+                            <Box sx={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              px: 1.2,
+                              py: 0.3,
+                              borderRadius: '20px',
+                              backgroundColor: data?.planStatus ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                              color: data?.planStatus ? '#4caf50' : '#f44336',
+                              width: 'fit-content'
+                            }}>
+                              <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'currentColor' }} />
+                              <Typography sx={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' }}>
+                                {data?.planStatus ? "Active" : "Expired"}
+                              </Typography>
+                            </Box>
+                          </Box>
                         </TableCell>
                         <TableCell className="table-td">
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>

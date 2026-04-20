@@ -9,12 +9,14 @@ export interface SubRole {
 export interface RoleStaticItem {
   mainTitle: string;
   mainTitleId: string;
+  price?: string;
   subRole: SubRole[];
 }
 
 const dashboardModule: RoleStaticItem = {
   mainTitle: "Dashboard",
   mainTitleId: "dashboard",
+  price: "₹ 200",
   subRole: [
     { title: "Add", titleId: "add", is_show: false },
     { title: "Edit", titleId: "edit", is_show: false },
@@ -27,6 +29,7 @@ const dashboardModule: RoleStaticItem = {
 const rolesModule: RoleStaticItem = {
   mainTitle: "Roles",
   mainTitleId: "role",
+  price: "₹ 300",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -39,6 +42,7 @@ const rolesModule: RoleStaticItem = {
 const adminUserModule: RoleStaticItem = {
   mainTitle: "Admin User",
   mainTitleId: "admin_user",
+  price: "₹ 500",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -51,6 +55,7 @@ const adminUserModule: RoleStaticItem = {
 const teacherModule: RoleStaticItem = {
   mainTitle: "Teacher",
   mainTitleId: "teacher",
+  price: "₹ 1000",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -63,6 +68,7 @@ const teacherModule: RoleStaticItem = {
 const departmentModule: RoleStaticItem = {
   mainTitle: "Department",
   mainTitleId: "department",
+  price: "₹ 400",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -75,6 +81,7 @@ const departmentModule: RoleStaticItem = {
 const subjectModule: RoleStaticItem = {
   mainTitle: "Subject",
   mainTitleId: "subject",
+  price: "₹ 400",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -87,6 +94,7 @@ const subjectModule: RoleStaticItem = {
 const classModule: RoleStaticItem = {
   mainTitle: "Class",
   mainTitleId: "class",
+  price: "₹ 600",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -99,6 +107,7 @@ const classModule: RoleStaticItem = {
 const sectionModule: RoleStaticItem = {
   mainTitle: "Section",
   mainTitleId: "section",
+  price: "₹ 300",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -111,6 +120,7 @@ const sectionModule: RoleStaticItem = {
 const schoolListModule: RoleStaticItem = {
   mainTitle: "School List",
   mainTitleId: "school",
+  price: "₹ 800",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -123,6 +133,7 @@ const schoolListModule: RoleStaticItem = {
 const themeModule: RoleStaticItem = {
   mainTitle: "Theme Settings",
   mainTitleId: "theme",
+  price: "₹ 500",
   subRole: [
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
@@ -132,6 +143,7 @@ const themeModule: RoleStaticItem = {
 const schoolProfileModule: RoleStaticItem = {
   mainTitle: "School Profile",
   mainTitleId: "school_profile",
+  price: "₹ 700",
   subRole: [
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
@@ -141,6 +153,7 @@ const schoolProfileModule: RoleStaticItem = {
 const planModule: RoleStaticItem = {
   mainTitle: "Plan",
   mainTitleId: "plan",
+  price: "₹ 1200",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -333,3 +346,21 @@ export const salaryTypeOptions = [
   { label: "Monthly", value: "Monthly" },
   { label: "Hourly", value: "Hourly" },
 ];
+
+export const calculateMinMonthlyPrice = (permissions: string[]): number => {
+  let total = 0;
+  planStaticData.forEach((module) => {
+    // Check if any selected permission starts with this module's mainTitleId
+    const isModuleSelected = permissions.some((p) =>
+      p.startsWith(`${module.mainTitleId}_`)
+    );
+    if (isModuleSelected && module.price) {
+      const priceNum = parseInt(module.price.replace(/[^\d]/g, ""), 10);
+      if (!isNaN(priceNum)) {
+        total += priceNum;
+      }
+    }
+  });
+  return total;
+};
+
