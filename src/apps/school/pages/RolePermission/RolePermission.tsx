@@ -208,7 +208,7 @@ export default function RoleList() {
                                   <Button
                                     className="admin-table-data-btn admin-table-view-btn"
                                     onClick={() => {
-                                      navigate(`/role-list/view/${data._id}`);
+                                      navigate("/role-list/view", { state: { id: data?._id } });
                                     }}
                                   >
                                     <img
@@ -231,7 +231,7 @@ export default function RoleList() {
                                     <Button
                                       className="admin-table-data-btn admin-table-edit-btn"
                                       onClick={() => {
-                                        navigate(`/role-list/edit/${data._id}`);
+                                        navigate("/role-list/edit", { state: { id: data?._id } });
                                       }}
                                     >
                                       <img

@@ -292,7 +292,7 @@ export default function Class() {
                                       <Button
                                         className="admin-table-data-btn admin-table-view-btn"
                                         onClick={() => {
-                                          navigate(`/master/class/view/${data?._id}`);
+                                          navigate("/master/class/view", { state: { id: data?._id } });
                                         }}
                                       >
                                         <img
@@ -314,7 +314,7 @@ export default function Class() {
                                       <Button
                                         className="admin-table-data-btn admin-table-edit-btn"
                                         onClick={() => {
-                                          navigate(`/master/class/edit/${data?._id}`);
+                                          navigate("/master/class/edit", { state: { id: data?._id } });
                                         }}
                                       >
                                         <img

@@ -119,7 +119,7 @@ export default function Dashboard() {
                       component="h1"
                       sx={{ fontSize: '24px !important', fontWeight: 700 }}
                     >
-                      {card.value}
+                      {card.title === "Total Revenue" ? `₹${card.value}` : card.value}
                     </Typography>
                   </Box>
                   <Box className="admin-dash-right">

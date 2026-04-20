@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     Box,
     Typography,
@@ -51,13 +51,13 @@ import { boardOptions, schoolTypeOptions } from "@/apps/common/StaticArrayData";
 
 
 export default function AddEditAdminUser() {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const location = useLocation();
+    const id = location.state?.id;
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const isView = location.pathname.includes("/view/");
-    const isEdit = !!id && !isView;
+    const isView = location.pathname.endsWith("/view");
+    const isEdit = !!id && location.pathname.endsWith("/edit");
 
     const { allRoles } = useSelector((state: RootState) => state.RoleReducer);
     const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
@@ -84,6 +84,28 @@ export default function AddEditAdminUser() {
         registrationNumber: "",
         establishedYear: "",
     });
+
+    const getRelativePlanExpiry = (expiryTimestamp: number, planStatus: boolean) => {
+        if (!expiryTimestamp) return "No expiry set";
+        const now = moment();
+        const expiry = moment.unix(expiryTimestamp);
+
+        if (!planStatus || expiry.isBefore(now)) {
+            return `Expired on ${expiry.format('DD MMM YY')}`;
+        }
+
+        const duration = moment.duration(expiry.diff(now));
+        const years = duration.years();
+        const months = duration.months();
+        const days = duration.days();
+
+        let parts = [];
+        if (years > 0) parts.push(`${years}y`);
+        if (months > 0) parts.push(`${months}m`);
+        if (days > 0) parts.push(`${days}d`);
+
+        return parts.length > 0 ? `${parts.join(' ')} left` : "Expiring soon";
+    };
 
     const handleCopyCode = (id: string, code: string) => {
         navigator.clipboard.writeText(code);
@@ -526,12 +548,13 @@ export default function AddEditAdminUser() {
                                 <Table aria-label="simple table" className="table">
                                     <TableHead className="table-head">
                                         <TableRow className="table-row">
-                                            <TableCell className="table-th" width="22%">SCHOOL DETAILS</TableCell>
-                                            <TableCell className="table-th" width="20%">LOCATION</TableCell>
-                                            <TableCell className="table-th" width="15%">STATUS</TableCell>
-                                            <TableCell className="table-th" width="18%">ACADEMIC INFO</TableCell>
-                                            <TableCell className="table-th" width="13%">TAX INFO</TableCell>
-                                            <TableCell className="table-th" width="12%">JOINED</TableCell>
+                                            <TableCell className="table-th" width="20%">SCHOOL DETAILS</TableCell>
+                                            <TableCell className="table-th" width="18%">LOCATION</TableCell>
+                                            <TableCell className="table-th" width="12%">STATUS</TableCell>
+                                            <TableCell className="table-th" width="15%">ACADEMIC INFO</TableCell>
+                                            <TableCell className="table-th" width="15%">PLAN INFO</TableCell>
+                                            <TableCell className="table-th" width="10%">TAX INFO</TableCell>
+                                            <TableCell className="table-th" width="10%">JOINED</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody className="table-body">
@@ -596,6 +619,37 @@ export default function AddEditAdminUser() {
                                                     <TableCell className="table-td">
                                                         <Typography sx={{ fontSize: '12px', fontWeight: 600, color: '#111827' }}>{data?.board}</Typography>
                                                         <Typography sx={{ fontSize: '11px', color: '#6b7280' }}>{data?.schoolType}</Typography>
+                                                    </TableCell>
+                                                    <TableCell className="table-td">
+                                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>
+                                                            <Typography sx={{ fontSize: '13px', fontWeight: 700, color: '#111827', textTransform: 'capitalize' }}>
+                                                                {data?.planId?.planName || '---'}
+                                                            </Typography>
+                                                            <Box sx={{
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: 0.5,
+                                                                px: 1,
+                                                                py: 0.2,
+                                                                borderRadius: '20px',
+                                                                backgroundColor: data?.planStatus ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                                                                color: data?.planStatus ? '#4caf50' : '#f44336',
+                                                                width: 'fit-content'
+                                                            }}>
+                                                                <Box sx={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: 'currentColor' }} />
+                                                                <Typography sx={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase' }}>
+                                                                    {data?.planStatus ? "Active" : "Expired"}
+                                                                </Typography>
+                                                            </Box>
+                                                            <Typography sx={{ 
+                                                                fontSize: '10px', 
+                                                                color: data?.planStatus ? '#6b7280' : '#ef4444', 
+                                                                fontWeight: 500,
+                                                                fontFamily: "'Inter', sans-serif"
+                                                            }}>
+                                                                {getRelativePlanExpiry(data?.PlanExptyDate, data?.planStatus)}
+                                                            </Typography>
+                                                        </Box>
                                                     </TableCell>
                                                     <TableCell className="table-td">
                                                         {data?.panNumber && (<Typography sx={{ fontSize: '11px', color: '#9ca3af' }}>PAN: {data?.panNumber || 'NA'}</Typography>)}

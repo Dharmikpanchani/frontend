@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     Box,
     Typography,
@@ -43,11 +43,11 @@ const billingCycleOptions = [
 
 export default function AddEditPlan() {
     const dispatch = useDispatch();
-    const { id } = useParams<{ id: string }>();
     const location = useLocation();
+    const id = location.state?.id;
     const navigate = useNavigate();
-    const isView = location.pathname.includes("/view/");
-    const isEdit = !!id && !isView;
+    const isView = location.pathname.endsWith("/view");
+    const isEdit = !!id && location.pathname.endsWith("/edit");
 
     const { selectedPlan, loading, actionLoading } = useSelector((state: RootState) => state.PlanReducer);
     const [permissionsError, setPermissionsError] = useState("");

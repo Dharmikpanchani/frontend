@@ -144,7 +144,7 @@ export const developerRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/role-list/edit/:id",
+                        path: "/role-list/edit",
                         element: (
                             <PermissionRoute permission={developerPermission?.role?.update}>
                                 <AddEditRole />
@@ -152,7 +152,7 @@ export const developerRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/role-list/view/:id",
+                        path: "/role-list/view",
                         element: (
                             <PermissionRoute permission={developerPermission?.role?.read}>
                                 <AddEditRole />
@@ -176,7 +176,7 @@ export const developerRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/admin-list/edit/:id",
+                        path: "/admin-list/edit",
                         element: (
                             <PermissionRoute permission={developerPermission?.admin_user?.update}>
                                 <AddEditAdminUser />
@@ -184,7 +184,7 @@ export const developerRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/admin-list/view/:id",
+                        path: "/admin-list/view",
                         element: (
                             <PermissionRoute permission={developerPermission?.admin_user?.read}>
                                 <AddEditAdminUser />
@@ -208,7 +208,7 @@ export const developerRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/school-list/edit/:id",
+                        path: "/school-list/edit",
                         element: (
                             <PermissionRoute permission={developerPermission?.school?.update}>
                                 <RegisterSchool />
@@ -216,7 +216,7 @@ export const developerRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/school-list/view/:id",
+                        path: "/school-list/view",
                         element: (
                             <PermissionRoute permission={developerPermission?.school?.read}>
                                 <RegisterSchool />
@@ -240,7 +240,7 @@ export const developerRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/plan-list/edit/:id",
+                        path: "/plan-list/edit",
                         element: (
                             <PermissionRoute permission={developerPermission?.plan?.update}>
                                 <AddEditPlan />
@@ -248,7 +248,7 @@ export const developerRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/plan-list/view/:id",
+                        path: "/plan-list/view",
                         element: (
                             <PermissionRoute permission={developerPermission?.plan?.read}>
                                 <AddEditPlan />

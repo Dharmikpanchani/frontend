@@ -300,12 +300,12 @@ export default function PlanList() {
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Typography sx={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary-color)' }}>
-                            {data.billingCycle === "monthly" ? data.monPrice : data.yerPrice}
+                            ₹{data.billingCycle === "monthly" ? data.monPrice : data.yerPrice}
                           </Typography>
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Typography sx={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary-color)' }}>
-                            {data.billingCycle === "monthly" ? (data.monOfferPrice || "-") : (data.yerOfferPrice || "-")}
+                            ₹{data.billingCycle === "monthly" ? (data.monOfferPrice || "-") : (data.yerOfferPrice || "-")}
                           </Typography>
                         </TableCell>
                         <TableCell align="center" className="table-td">
@@ -343,14 +343,14 @@ export default function PlanList() {
                               <Box className="admin-table-data-btn-flex" sx={{ justifyContent: 'flex-end' }}>
                                 {hasPermission(developerPermission.plan.read) && (
                                   <Tooltip title="View" arrow placement="bottom">
-                                    <Button className="admin-table-data-btn admin-table-view-btn" onClick={() => navigate(`/plan-list/view/${data._id}`)}>
+                                    <Button className="admin-table-data-btn admin-table-view-btn" onClick={() => navigate("/plan-list/view", { state: { id: data._id } })}>
                                       <img src={Svg.yellowEye} className="admin-icon" alt="View" />
                                     </Button>
                                   </Tooltip>
                                 )}
                                 {hasPermission(developerPermission.plan.update) && (
                                   <Tooltip title="Edit" arrow placement="bottom">
-                                    <Button className="admin-table-data-btn admin-table-edit-btn" onClick={() => navigate(`/plan-list/edit/${data._id}`)}>
+                                    <Button className="admin-table-data-btn admin-table-edit-btn" onClick={() => navigate("/plan-list/edit", { state: { id: data._id } })}>
                                       <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
                                     </Button>
                                   </Tooltip>

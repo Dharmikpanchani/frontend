@@ -368,7 +368,7 @@ export default function Subject() {
                                       <Button
                                         className="admin-table-data-btn admin-table-view-btn"
                                         onClick={() => {
-                                          navigate(`/master/subject/view/${data?._id}`);
+                                          navigate("/master/subject/view", { state: { id: data?._id } });
                                         }}
                                       >
                                         <img
@@ -390,7 +390,7 @@ export default function Subject() {
                                       <Button
                                         className="admin-table-data-btn admin-table-edit-btn"
                                         onClick={() => {
-                                          navigate(`/master/subject/edit/${data?._id}`);
+                                          navigate("/master/subject/edit", { state: { id: data?._id } });
                                         }}
                                       >
                                         <img

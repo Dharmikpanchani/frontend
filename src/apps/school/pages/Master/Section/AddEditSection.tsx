@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     Box,
     Typography,
@@ -25,12 +25,13 @@ import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
 
 export default function AddEditSection() {
-    const { id } = useParams();
-    const { pathname } = useLocation();
+    const location = useLocation();
+    const id = location.state?.id;
+    const { pathname } = location;
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const isView = pathname.includes("/view/");
-    const isEdit = pathname.includes("/edit/");
+    const isView = pathname.endsWith("/view");
+    const isEdit = !!id && pathname.endsWith("/edit");
 
     const { classes } = useSelector((state: RootState) => state.ClassReducer);
     const { actionLoading, loading, selectedSection } = useSelector((state: RootState) => state.SectionReducer);

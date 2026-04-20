@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useMemo } from "react";
 import {
     Box,
@@ -24,13 +24,13 @@ import { CommonLoader } from "@/apps/common/loader/Loader";
 
 
 export default function AddEditDepartment() {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const location = useLocation();
+    const id = location.state?.id;
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const isView = location.pathname.includes("/view/");
-    const isEdit = !!id && !isView;
+    const isView = location.pathname.endsWith("/view");
+    const isEdit = !!id && location.pathname.endsWith("/edit");
 
     const { selectedDepartment, loading, actionLoading } = useSelector((state: RootState) => state.DepartmentReducer);
 

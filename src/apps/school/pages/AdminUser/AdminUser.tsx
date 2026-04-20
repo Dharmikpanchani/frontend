@@ -450,7 +450,7 @@ export default function AdminUser() {
                                       <Button
                                         className="admin-table-data-btn admin-table-view-btn"
                                         onClick={() => {
-                                          navigate(`/admin-list/view/${data?._id}`);
+                                          navigate("/admin-list/view", { state: { id: data?._id } });
                                         }}
                                       >
                                         <img
@@ -472,7 +472,7 @@ export default function AdminUser() {
                                       <Button
                                         className="admin-table-data-btn admin-table-edit-btn"
                                         onClick={() => {
-                                          navigate(`/admin-list/edit/${data?._id}`);
+                                          navigate("/admin-list/edit", { state: { id: data?._id } });
                                         }}
                                       >
                                         <img

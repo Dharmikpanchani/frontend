@@ -550,7 +550,7 @@ export default function Teacher() {
                                   <Tooltip title="View" arrow placement="bottom">
                                     <Button
                                       className="admin-table-data-btn admin-table-view-btn"
-                                      onClick={() => navigate(`/teacher/view/${data?._id}`)}
+                                      onClick={() => navigate("/teacher/view", { state: { id: data?._id } })}
                                     >
                                       <img src={Svg.yellowEye} className="admin-icon" alt="View" />
                                     </Button>
@@ -560,7 +560,7 @@ export default function Teacher() {
                                   <Tooltip title="Edit" arrow placement="bottom">
                                     <Button
                                       className="admin-table-data-btn admin-table-edit-btn"
-                                      onClick={() => navigate(`/teacher/edit/${data?._id}`)}
+                                      onClick={() => navigate("/teacher/edit", { state: { id: data?._id } })}
                                     >
                                       <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
                                     </Button>

@@ -162,7 +162,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/role-list/edit/:id",
+                        path: "/role-list/edit",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.role?.update}>
                                 <AddEditRole />
@@ -170,7 +170,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/role-list/view/:id",
+                        path: "/role-list/view",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.role?.read}>
                                 <AddEditRole />
@@ -194,7 +194,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/admin-list/edit/:id",
+                        path: "/admin-list/edit",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.admin_user?.update}>
                                 <AddEditAdminUser />
@@ -202,7 +202,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/admin-list/view/:id",
+                        path: "/admin-list/view",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.admin_user?.read}>
                                 <AddEditAdminUser />
@@ -227,7 +227,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/master/department/edit/:id",
+                        path: "/master/department/edit",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.department?.update}>
                                 <AddEditDepartment />
@@ -235,7 +235,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/master/department/view/:id",
+                        path: "/master/department/view",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.department?.read}>
                                 <AddEditDepartment />
@@ -260,7 +260,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/master/subject/edit/:id",
+                        path: "/master/subject/edit",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.subject?.update}>
                                 <AddEditSubject />
@@ -268,7 +268,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/master/subject/view/:id",
+                        path: "/master/subject/view",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.subject?.read}>
                                 <AddEditSubject />
@@ -293,7 +293,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/master/class/edit/:id",
+                        path: "/master/class/edit",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.class?.update}>
                                 <AddEditClass />
@@ -301,7 +301,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/master/class/view/:id",
+                        path: "/master/class/view",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.class?.read}>
                                 <AddEditClass />
@@ -326,7 +326,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/master/section/edit/:id",
+                        path: "/master/section/edit",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.section?.update}>
                                 <AddEditSection />
@@ -334,7 +334,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/master/section/view/:id",
+                        path: "/master/section/view",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.section?.read}>
                                 <AddEditSection />
@@ -359,7 +359,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/teacher/edit/:id",
+                        path: "/teacher/edit",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.teacher?.update}>
                                 <AddEditTeacher />
@@ -367,7 +367,7 @@ export const schoolRoutes: RouteConfig[] = [
                         ),
                     },
                     {
-                        path: "/teacher/view/:id",
+                        path: "/teacher/view",
                         element: (
                             <PermissionRoute permission={schoolAdminPermission?.teacher?.read}>
                                 <AddEditTeacher />

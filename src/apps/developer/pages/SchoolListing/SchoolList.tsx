@@ -74,6 +74,28 @@ export default function SchoolList() {
   const [selectedData, setSelectedData] = useState<any>(null);
   const [buttonStatusSpinner, setButtonStatusSpinner] = useState(false);
 
+  const getRelativePlanExpiry = (expiryTimestamp: number, planStatus: boolean) => {
+    if (!expiryTimestamp) return "No expiry set";
+    const now = moment();
+    const expiry = moment.unix(expiryTimestamp);
+
+    if (!planStatus || expiry.isBefore(now)) {
+      return `Expired on ${expiry.format('DD MMM YY')}`;
+    }
+
+    const duration = moment.duration(expiry.diff(now));
+    const years = duration.years();
+    const months = duration.months();
+    const days = duration.days();
+
+    let parts = [];
+    if (years > 0) parts.push(`${years}y`);
+    if (months > 0) parts.push(`${months}m`);
+    if (days > 0) parts.push(`${days}d`);
+
+    return parts.length > 0 ? `${parts.join(' ')} left` : "Expiring soon";
+  };
+
   const handleOpenDelete = (data: any) => {
     setSelectedData(data);
     setOpenDelete(true);
@@ -488,26 +510,34 @@ export default function SchoolList() {
                           <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>Medium: {data?.medium}</Typography>
                         </TableCell>
                         <TableCell className="table-td">
-                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                            <Typography sx={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>
+                            <Typography sx={{ fontSize: '14px', fontWeight: 700, color: '#111827', textTransform: 'capitalize' }}>
                               {data?.planId?.planName || '---'}
                             </Typography>
                             <Box sx={{
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: 0.5,
-                              px: 1.2,
-                              py: 0.3,
+                              px: 1,
+                              py: 0.2,
                               borderRadius: '20px',
                               backgroundColor: data?.planStatus ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
                               color: data?.planStatus ? '#4caf50' : '#f44336',
                               width: 'fit-content'
                             }}>
-                              <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'currentColor' }} />
-                              <Typography sx={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' }}>
+                              <Box sx={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: 'currentColor' }} />
+                              <Typography sx={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>
                                 {data?.planStatus ? "Active" : "Expired"}
                               </Typography>
                             </Box>
+                            <Typography sx={{ 
+                              fontSize: '11px', 
+                              color: data?.planStatus ? '#6b7280' : '#ef4444', 
+                              fontWeight: 500,
+                              fontFamily: "'Inter', sans-serif"
+                            }}>
+                              {getRelativePlanExpiry(data?.PlanExptyDate, data?.planStatus)}
+                            </Typography>
                           </Box>
                         </TableCell>
                         <TableCell className="table-td">
@@ -558,7 +588,7 @@ export default function SchoolList() {
                                   <Tooltip title="View" arrow placement="bottom" className="admin-tooltip">
                                     <Button
                                       className="admin-table-data-btn admin-table-view-btn"
-                                      onClick={() => navigate(`/school-list/view/${data?._id}`)}
+                                      onClick={() => navigate("/school-list/view", { state: { id: data?._id } })}
                                     >
                                       <img src={Svg.yellowEye} className="admin-icon" alt="View" />
                                     </Button>
@@ -568,7 +598,7 @@ export default function SchoolList() {
                                   <Tooltip title="Edit" arrow placement="bottom" className="admin-tooltip">
                                     <Button
                                       className="admin-table-data-btn admin-table-edit-btn"
-                                      onClick={() => navigate(`/school-list/edit/${data?._id}`)}
+                                      onClick={() => navigate("/school-list/edit", { state: { id: data?._id } })}
                                     >
                                       <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
                                     </Button>

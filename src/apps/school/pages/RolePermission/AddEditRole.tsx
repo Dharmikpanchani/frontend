@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     Box,
     Typography,
@@ -33,13 +33,13 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
 
 export default function AddEditRole() {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const location = useLocation();
+    const id = location.state?.id;
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const isView = location.pathname.includes("/view/");
-    const isEdit = !!id && !isView;
+    const isView = location.pathname.endsWith("/view");
+    const isEdit = !!id && location.pathname.endsWith("/edit");
 
     const { selectedRole, loading } = useSelector((state: RootState) => state.RoleReducer);
     const [permissions, setPermissions] = useState<string[]>([]);

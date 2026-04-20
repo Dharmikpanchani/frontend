@@ -292,7 +292,7 @@ export default function Department() {
                                       <Button
                                         className="admin-table-data-btn admin-table-view-btn"
                                         onClick={() => {
-                                          navigate(`/master/department/view/${data?._id}`);
+                                          navigate("/master/department/view", { state: { id: data?._id } });
                                         }}
                                       >
                                         <img
@@ -314,7 +314,7 @@ export default function Department() {
                                       <Button
                                         className="admin-table-data-btn admin-table-edit-btn"
                                         onClick={() => {
-                                          navigate(`/master/department/edit/${data?._id}`);
+                                          navigate("/master/department/edit", { state: { id: data?._id } });
                                         }}
                                       >
                                         <img

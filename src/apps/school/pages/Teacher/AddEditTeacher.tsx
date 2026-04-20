@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     Box,
     Typography,
@@ -56,11 +56,12 @@ import {
 } from "@/apps/common/StaticArrayData";
 
 export default function AddEditTeacher() {
-    const { id } = useParams();
+    const location = useLocation();
+    const id = location.state?.id;
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { pathname } = useLocation();
-    const isView = pathname.includes("/view/");
+    const { pathname } = location;
+    const isView = pathname.endsWith("/view");
     const { hasPermission } = usePermissions();
 
     const canAdd = hasPermission(schoolAdminPermission.teacher.create);

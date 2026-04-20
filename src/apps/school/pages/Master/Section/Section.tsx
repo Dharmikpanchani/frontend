@@ -363,7 +363,7 @@ export default function Section() {
                                       <Button
                                         className="admin-table-data-btn admin-table-edit-btn"
                                         onClick={() => {
-                                          navigate(`/master/section/edit/${data?._id}`);
+                                          navigate("/master/section/edit", { state: { id: data?._id } });
                                         }}
                                       >
                                         <img
