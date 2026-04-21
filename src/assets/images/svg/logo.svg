@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img" aria-label="SmartEdu logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200" role="img" aria-label="VidyaSetu logo">
   <defs>
     <style>
       .navy{fill:#03245b}
@@ -72,7 +72,7 @@
 
   <!-- Brand name -->
   <text x="600" y="875" text-anchor="middle" class="text" font-size="125">
-    <tspan class="navy">Smart</tspan><tspan class="blue">Edu</tspan>
+    <tspan class="navy">Vidya</tspan><tspan class="blue">Setu</tspan>
   </text>
 
   <!-- Accent lines -->
