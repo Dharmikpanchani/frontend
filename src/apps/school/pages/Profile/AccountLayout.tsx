@@ -66,7 +66,7 @@ export default function AccountLayout() {
           sx={{
             width: 35,
             height: 35,
-            backgroundColor: 'var(--primary-color, #942F15)',
+            backgroundColor: 'var(--primary-color)',
             borderRadius: '10px',
             display: 'flex',
             justifyContent: 'center',
@@ -122,7 +122,7 @@ export default function AccountLayout() {
             className="admin-tabs-main"
             sx={{
               '& .MuiTabs-indicator': {
-                backgroundColor: 'var(--primary-color, #942F15)',
+                backgroundColor: 'var(--primary-color)',
                 height: '2px',
                 borderRadius: '3px 3px 0 0'
               },
@@ -143,7 +143,7 @@ export default function AccountLayout() {
                   marginBottom: '0 !important',
                 },
                 '&.Mui-selected': {
-                  color: 'var(--primary-color, #942F15)',
+                  color: 'var(--primary-color)',
                   fontWeight: 700,
                   backgroundColor: 'transparent',
                 },

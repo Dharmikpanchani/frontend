@@ -16,6 +16,7 @@ import {
   Tooltip,
   debounce,
 } from "@mui/material";
+import { Search as SearchIcon, Add as AddIcon } from "@mui/icons-material";
 import { developerPermission } from "@/apps/common/StaticArrayData";
 import { getAllRoles, deleteRole } from "@/redux/slices/roleSlice";
 import Svg from "@/assets/Svg";
@@ -110,11 +111,10 @@ export default function RoleList() {
                   }}
                   inputProps={{ maxLength: 80 }}
                 />
-                <img
-                  src={Svg.search}
-                  className="admin-search-grey-img admin-icon admin-icon-theme"
-                  alt="search"
-                ></img>
+                <SearchIcon
+                  sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                  className="school-admin-search-grey-img admin-icon"
+                />
               </Box>
             </Box>
           </Box>
@@ -126,11 +126,8 @@ export default function RoleList() {
                   navigate("/role-list/add");
                 }}
               >
-                <img
-                  src={Svg.plus}
-                  className="admin-plus-icon"
-                  alt="plus"
-                  style={{ filter: 'brightness(0) invert(1)' }}
+                <AddIcon
+                  sx={{ color: 'var(--button-text, #fff)', fontSize: '18px', mr: 1 }}
                 />
                 Add Roles
               </Button>

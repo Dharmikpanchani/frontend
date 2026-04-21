@@ -13,7 +13,7 @@
       .admin-dashboard-left-main.active {
             left: 0;
             width: 100% !important;
-            max-width: 250px !important;
+            max-width: 220px !important;
       }
 
       .admin-header-main {

@@ -436,11 +436,11 @@ export default function SchoolList() {
                                 </Box>
                               </Tooltip>
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.4 }}>
-                                <EmailIcon sx={{ fontSize: 14, color: '#942F15' }} />
+                                <EmailIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                                 <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>{data?.email}</Typography>
                               </Box>
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <PhoneIcon sx={{ fontSize: 14, color: '#942F15' }} />
+                                <PhoneIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                                 <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>{data?.phoneNumber}</Typography>
                               </Box>
                             </Box>

@@ -90,7 +90,7 @@ export default function Header(props: any) {
                     width: "38px",
                     height: "38px",
                     borderRadius: "10px",
-                    background: "linear-gradient(135deg, #9c0000 0%, #3a0000 100%)",
+                    background: "var(--theme-gradient, var(--primary-color))",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -155,7 +155,7 @@ export default function Header(props: any) {
                   fontSize: '14px',
                   fontFamily: 'Poppins, sans-serif',
                   '&:hover': {
-                    backgroundColor: 'rgba(156, 0, 0, 0.05)',
+                    backgroundColor: 'rgba(0, 33, 71, 0.05)',
                   }
                 }
               }
@@ -170,7 +170,7 @@ export default function Header(props: any) {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <img
                   src={Svg.settings}
-                  style={{ width: '18px', height: '18px', filter: 'brightness(0) saturate(100%) invert(18%) sepia(34%) saturate(5412%) hue-rotate(346deg) brightness(84%) contrast(109%)' }}
+                  style={{ width: '18px', height: '18px', filter: 'brightness(0) saturate(100%) invert(8%) sepia(87%) saturate(3065%) hue-rotate(200deg) brightness(92%) contrast(106%)' }}
                   alt="Settings"
                 />
                 Account Settings

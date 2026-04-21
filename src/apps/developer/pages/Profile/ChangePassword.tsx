@@ -95,7 +95,7 @@ export default function ChangePassword() {
               borderColor: '#ced4da',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#ff8c00',
+              borderColor: 'var(--primary-color)',
               borderWidth: '1.5px',
             },
           },
@@ -135,7 +135,7 @@ export default function ChangePassword() {
                     boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
                   }}
                 >
-                  <LockOutlinedIcon sx={{ color: '#942F15', fontSize: 18 }} />
+                  <LockOutlinedIcon sx={{ color: 'var(--primary-color)', fontSize: 18 }} />
                 </Box>
                 <Box>
                   <Typography
@@ -166,7 +166,7 @@ export default function ChangePassword() {
                 <Grid size={{ xs: 12 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <LockOutlinedIcon sx={{ fontSize: 14, color: '#942F15' }} />
+                      <LockOutlinedIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                       Current Password <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
@@ -198,7 +198,7 @@ export default function ChangePassword() {
                 <Grid size={{ xs: 12 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <KeyOutlinedIcon sx={{ fontSize: 14, color: '#942F15' }} />
+                      <KeyOutlinedIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                       New Password <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
@@ -230,7 +230,7 @@ export default function ChangePassword() {
                 <Grid size={{ xs: 12 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <CheckCircleOutlinedIcon sx={{ fontSize: 14, color: '#942F15' }} />
+                      <CheckCircleOutlinedIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                       Confirm New Password <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
@@ -293,12 +293,13 @@ export default function ChangePassword() {
                     minWidth: '150px',
                     height: '40px',
                     borderRadius: '8px',
-                    backgroundColor: '#942F15 !important',
+                    backgroundColor: 'var(--primary-color) !important',
                     textTransform: 'none',
                     fontWeight: 600,
                     boxShadow: 'none',
                     '&:hover': {
-                      backgroundColor: '#7A2711',
+                      backgroundColor: 'var(--primary-color)',
+                      opacity: 0.8,
                       boxShadow: 'none',
                     },
                   }}

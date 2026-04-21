@@ -55,12 +55,12 @@ export default function AccountLayout() {
           sx={{
             width: 35,
             height: 35,
-            backgroundColor: '#942F15',
+            backgroundColor: 'var(--primary-color)',
             borderRadius: '10px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            boxShadow: '0 4px 12px rgba(148, 47, 21, 0.2)'
+            boxShadow: '0 4px 12px var(--divider-color, rgba(0,0,0,0.1))'
           }}
         >
           <img src={Svg.settings} style={{ width: 18, filter: 'brightness(0) invert(1)' }} alt="settings" />
@@ -108,7 +108,7 @@ export default function AccountLayout() {
             className="admin-tabs-main"
             sx={{
               '& .MuiTabs-indicator': {
-                backgroundColor: '#942F15',
+                backgroundColor: 'var(--primary-color)',
                 height: '2px',
                 borderRadius: '3px 3px 0 0'
               },
@@ -128,7 +128,7 @@ export default function AccountLayout() {
                   marginBottom: '0 !important',
                 },
                 '&.Mui-selected': {
-                  color: '#942F15',
+                  color: 'var(--primary-color)',
                   fontWeight: 700,
                   backgroundColor: 'transparent',
                 },

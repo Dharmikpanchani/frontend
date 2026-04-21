@@ -131,8 +131,8 @@ export default function AddEditPlan() {
                 width: 32,
                 height: 32,
                 borderRadius: '8px',
-                backgroundColor: '#fff7ed',
-                color: '#ff8c00'
+                backgroundColor: 'rgba(0, 33, 71, 0.05)',
+                color: 'var(--primary-color)'
             }}>
                 <Icon sx={{ fontSize: 20 }} />
             </Box>
@@ -366,7 +366,7 @@ export default function AddEditPlan() {
 
                                                         if (module.mainTitleId === "role") rows.push(
                                                             <TableRow key="admin_hr" sx={{ bgcolor: '#f0f4f8' }}>
-                                                                <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #ff8c00)', py: 1.5 }}>Admin & Management</TableCell>
+                                                                <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color)', py: 1.5 }}>Admin & Management</TableCell>
                                                                 <TableCell className="table-td" align="center">
                                                                     <BpCheckbox checked={isGroupChecked(adminModuleIds)} onChange={(e: any) => checkUncheckGroup(e.target.checked ? "add" : "remove", adminModuleIds)} disabled={isView} />
                                                                 </TableCell>
@@ -375,7 +375,7 @@ export default function AddEditPlan() {
                                                         );
                                                         if (module.mainTitleId === "student") rows.push(
                                                             <TableRow key="master_hr" sx={{ bgcolor: '#f0f4f8' }}>
-                                                                <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #ff8c00)', py: 1.5 }}>Teacher Master</TableCell>
+                                                                <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color)', py: 1.5 }}>Teacher Master</TableCell>
                                                                 <TableCell className="table-td" align="center">
                                                                     <BpCheckbox checked={isGroupChecked(masterModuleIds)} onChange={(e: any) => checkUncheckGroup(e.target.checked ? "add" : "remove", masterModuleIds)} disabled={isView} />
                                                                 </TableCell>
@@ -392,7 +392,7 @@ export default function AddEditPlan() {
                                                                             <Box sx={{ 
                                                                                 fontSize: '10px', 
                                                                                 fontWeight: 700, 
-                                                                                bgcolor: 'rgba(255, 140, 0, 0.08)', 
+                                                                                bgcolor: 'rgba(255, 140, 0, 0.1)', 
                                                                                 color: '#ff8c00', 
                                                                                 px: 0.8, 
                                                                                 py: 0.1, 

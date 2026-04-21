@@ -32,7 +32,7 @@ export const IOSSwitch = styled((props: SwitchProps) => (
       transform: "translateX(16px)",
       color: "#fff",
       "& + .MuiSwitch-track": {
-        backgroundColor: theme.palette.mode === "dark" ? "#2ECA45" : "#4E1111",
+        backgroundColor: theme.palette.mode === "dark" ? "#2ECA45" : "var(--primary-color)",
         opacity: 1,
         border: 0,
       },
@@ -142,7 +142,7 @@ const BpIcon = styled("span")(({ theme }) => ({
 }));
 
 const BpCheckedIcon = styled(BpIcon)({
-  backgroundColor: "#ff4500",
+  backgroundColor: "var(--primary-color)",
   backgroundImage:
     "linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))",
   "&::before": {
@@ -156,10 +156,10 @@ const BpCheckedIcon = styled(BpIcon)({
     content: '""',
   },
   "input:hover ~ &": {
-    backgroundColor: "#b22222",
+    backgroundColor: "var(--primary-color)",
   },
   "input:disabled ~ &": {
-    backgroundColor: "#ff4c09",
+    backgroundColor: "var(--primary-color)",
     cursor: "not-allowed",
   },
 });

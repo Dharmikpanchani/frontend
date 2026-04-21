@@ -85,8 +85,8 @@ export default function PlanView() {
                 width: 32,
                 height: 32,
                 borderRadius: '8px',
-                backgroundColor: (theme) => alpha(theme.palette.primary.main || '#942F15', 0.1),
-                color: 'var(--primary-color, #942F15)'
+                backgroundColor: (theme) => alpha(theme.palette.primary.main || '#002147', 0.1),
+                color: 'var(--primary-color)'
             }}>
                 <Icon sx={{ fontSize: 20 }} />
             </Box>
@@ -131,14 +131,14 @@ export default function PlanView() {
                     mb: 4, 
                     p: { xs: 2.5, sm: 3.5 }, 
                     borderRadius: '16px', 
-                    background: 'var(--theme-gradient, linear-gradient(135deg, #942F15 0%, #E35D5B 100%))',
+                    background: 'var(--theme-gradient)',
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 3,
                     flexDirection: { xs: 'column', sm: 'row' },
-                    boxShadow: '0 10px 30px -10px var(--primary-color, rgba(148, 47, 21, 0.4))',
+                    boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.4)',
                     position: 'relative',
                     overflow: 'hidden'
                 }}
@@ -198,7 +198,7 @@ export default function PlanView() {
                         variant="contained"
                         onClick={() => navigate("/user-plan")}
                         sx={{
-                            bgcolor: 'var(--primary-color, #942F15) !important',
+                            bgcolor: 'var(--primary-color) !important',
                             color: '#FFFFFF !important',
                             textTransform: 'none',
                             fontWeight: 800,
@@ -210,7 +210,7 @@ export default function PlanView() {
                             border: '1px solid rgba(255,255,255,0.4)',
                             boxShadow: '0 8px 16px -4px rgba(0,0,0,0.2)',
                             '&:hover': {
-                                bgcolor: 'var(--primary-color, #942F15) !important',
+                                bgcolor: 'var(--primary-color) !important',
                                 opacity: 0.9,
                                 transform: 'translateY(-2px)',
                                 boxShadow: '0 12px 20px -5px rgba(0,0,0,0.2)'
@@ -325,7 +325,7 @@ export default function PlanView() {
 
                                 if (module.mainTitleId === "role") rows.push(
                                     <TableRow key="admin_hr" sx={{ bgcolor: '#f0f4f8' }}>
-                                        <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #942F15)', py: 1.5 }}>Admin & Management</TableCell>
+                                        <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color)', py: 1.5 }}>Admin & Management</TableCell>
                                         <TableCell className="table-td" align="center">
                                             <BpCheckbox checked={isGroupChecked(adminModuleIds)} disabled />
                                         </TableCell>
@@ -334,7 +334,7 @@ export default function PlanView() {
                                 );
                                 if (module.mainTitleId === "teacher") rows.push(
                                     <TableRow key="master_hr" sx={{ bgcolor: '#f0f4f8' }}>
-                                        <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color, #942F15)', py: 1.5 }}>Teacher Master</TableCell>
+                                        <TableCell className="table-td" sx={{ fontWeight: 700, color: 'var(--primary-color)', py: 1.5 }}>Teacher Master</TableCell>
                                         <TableCell className="table-td" align="center">
                                             <BpCheckbox checked={isGroupChecked(masterModuleIds)} disabled />
                                         </TableCell>

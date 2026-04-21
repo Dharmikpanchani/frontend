@@ -550,11 +550,11 @@ export default function AddEditAdminUser() {
                                                                     </Box>
                                                                 </Tooltip>
                                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.2 }}>
-                                                                    <EmailIcon sx={{ fontSize: 12, color: 'var(--primary-color, #942F15)' }} />
+                                                                    <EmailIcon sx={{ fontSize: 12, color: 'var(--primary-color)' }} />
                                                                     <Typography sx={{ fontSize: '11px', color: 'var(--text-secondary, #6b7280)' }}>{data?.email}</Typography>
                                                                 </Box>
                                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                    <PhoneIcon sx={{ fontSize: 12, color: 'var(--primary-color, #942F15)' }} />
+                                                                    <PhoneIcon sx={{ fontSize: 12, color: 'var(--primary-color)' }} />
                                                                     <Typography sx={{ fontSize: '11px', color: 'var(--text-secondary, #6b7280)' }}>{data?.phoneNumber}</Typography>
                                                                 </Box>
                                                             </Box>

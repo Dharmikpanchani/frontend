@@ -12,7 +12,7 @@ export const labelSx: SxProps<Theme> = {
     minHeight: 'auto',
     '& svg': {
         fontSize: '16px',
-        color: 'var(--primary-color, #942F15)',
+        color: 'var(--primary-color, #002147)',
     }
 };
 
@@ -37,7 +37,7 @@ export const inputSx: SxProps<Theme> = {
         },
         // focus
         '&.Mui-focused .MuiOutlinedInput-notchedOutline, &.Mui-focused fieldset': {
-            borderColor: 'var(--primary-color, #942F15) !important',
+            borderColor: 'var(--primary-color, #002147) !important',
             borderWidth: '1px !important',
             boxShadow: 'none !important',
         },
@@ -105,7 +105,7 @@ export const multiInputSx: SxProps<Theme> = {
             opacity: 1,
         },
         '&.Mui-focused .MuiOutlinedInput-notchedOutline, &.Mui-focused fieldset': {
-            borderColor: 'var(--primary-color, #942F15) !important',
+            borderColor: 'var(--primary-color, #002147) !important',
             borderWidth: '1px !important',
             boxShadow: 'none !important',
         },

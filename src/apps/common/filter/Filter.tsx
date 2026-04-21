@@ -168,7 +168,7 @@ const Filter: React.FC<FilterProps> = ({
                     borderColor: 'var(--input-border, #ced4da) !important',
                   },
                   '&:focus-within': {
-                    borderColor: 'var(--primary-color, #942F15) !important',
+                    borderColor: 'var(--primary-color) !important',
                   }
                 }}
               >

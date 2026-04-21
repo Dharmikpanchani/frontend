@@ -285,7 +285,7 @@ export default function SchoolDetails() {
                       minWidth: 32,
                       width: 32,
                       height: 32,
-                      background: 'var(--theme-gradient, var(--primary-color, #942F15)) !important',
+                      background: 'var(--theme-gradient, var(--primary-color)) !important',
                       borderRadius: '50%',
                       p: 0,
                       transition: 'all 0.3s ease',
@@ -323,7 +323,7 @@ export default function SchoolDetails() {
               <Grid container spacing={3}>
                 {/* School Access Info */}
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography sx={labelSx}><SchoolIcon sx={{ fontSize: 16, color: 'var(--primary-color, #942F15)' }} /> School Code</Typography>
+                  <Typography sx={labelSx}><SchoolIcon sx={{ fontSize: 16, color: 'var(--primary-color)' }} /> School Code</Typography>
                   <OutlinedInput
                     fullWidth
                     disabled
@@ -338,10 +338,10 @@ export default function SchoolDetails() {
                             size="small"
                             sx={{
                               color: copyCodeLabel === "Copied!" ? "var(--primary-color)" : "inherit",
-                              backgroundColor: copyCodeLabel === "Copied!" ? "rgba(148, 47, 21, 0.05)" : "transparent",
+                              backgroundColor: copyCodeLabel === "Copied!" ? "var(--primary-light, rgba(235, 245, 255, 0.5))" : "transparent",
                               transition: "all 0.3s ease",
                               "&:hover": {
-                                backgroundColor: "rgba(148, 47, 21, 0.1)",
+                                backgroundColor: "var(--primary-light, rgba(235, 245, 255, 0.8))",
                               }
                             }}
                           >
@@ -354,7 +354,7 @@ export default function SchoolDetails() {
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography sx={labelSx}><LinkIcon sx={{ fontSize: 16, color: 'var(--primary-color, #942F15)' }} /> School URL</Typography>
+                  <Typography sx={labelSx}><LinkIcon sx={{ fontSize: 16, color: 'var(--primary-color)' }} /> School URL</Typography>
                   <OutlinedInput
                     fullWidth
                     disabled
@@ -368,11 +368,11 @@ export default function SchoolDetails() {
                             edge="end"
                             size="small"
                             sx={{
-                              color: copyUrlLabel === "Copied!" ? "var(--primary-color, #942F15)" : "inherit",
-                              backgroundColor: copyUrlLabel === "Copied!" ? "rgba(148, 47, 21, 0.05)" : "transparent",
+                              color: copyUrlLabel === "Copied!" ? "var(--primary-color)" : "inherit",
+                              backgroundColor: copyUrlLabel === "Copied!" ? "var(--primary-light, rgba(235, 245, 255, 0.5))" : "transparent",
                               transition: "all 0.3s ease",
                               "&:hover": {
-                                backgroundColor: "rgba(148, 47, 21, 0.1)",
+                                backgroundColor: "var(--primary-light, rgba(235, 245, 255, 0.8))",
                               }
                             }}
                           >
@@ -386,7 +386,7 @@ export default function SchoolDetails() {
 
                 {/* Basic Info */}
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography sx={labelSx}><SchoolIcon sx={{ fontSize: 16, color: 'var(--primary-color, #942F15)' }} /> School Name <span className="astrick-sing">*</span></Typography>
+                  <Typography sx={labelSx}><BoardIcon sx={{ fontSize: 16, color: 'var(--primary-color)' }} /> Board <span className="astrick-sing">*</span></Typography>
                   <OutlinedInput
                     fullWidth
                     name="schoolName"
@@ -400,7 +400,7 @@ export default function SchoolDetails() {
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography sx={labelSx}><PersonIcon sx={{ fontSize: 16, color: 'var(--primary-color, #942F15)' }} /> Owner Name <span className="astrick-sing">*</span></Typography>
+                  <Typography sx={labelSx}><PersonIcon sx={{ fontSize: 16, color: 'var(--primary-color)' }} /> Owner Name <span className="astrick-sing">*</span></Typography>
                   <OutlinedInput
                     fullWidth
                     name="ownerName"
@@ -414,7 +414,7 @@ export default function SchoolDetails() {
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography sx={labelSx}><EmailIcon sx={{ fontSize: 16, color: 'var(--primary-color, #942F15)' }} /> Email</Typography>
+                  <Typography sx={labelSx}><EmailIcon sx={{ fontSize: 16, color: 'var(--primary-color)' }} /> Email</Typography>
                   <OutlinedInput
                     fullWidth
                     disabled
@@ -424,7 +424,7 @@ export default function SchoolDetails() {
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography sx={labelSx}><PhoneIcon sx={{ fontSize: 16, color: 'var(--primary-color, #942F15)' }} /> Phone Number <span className="astrick-sing">*</span></Typography>
+                  <Typography sx={labelSx}><PhoneIcon sx={{ fontSize: 16, color: 'var(--primary-color)' }} /> Phone Number <span className="astrick-sing">*</span></Typography>
                   <OutlinedInput
                     fullWidth
                     name="phoneNumber"
@@ -439,7 +439,7 @@ export default function SchoolDetails() {
 
                 {/* School Specifics */}
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                  <Typography sx={labelSx}><BoardIcon sx={{ fontSize: 16, color: 'var(--primary-color, #942F15)' }} /> Board <span className="astrick-sing">*</span></Typography>
+                  <Typography sx={labelSx}><BoardIcon sx={{ fontSize: 16, color: 'var(--primary-color)' }} /> Board <span className="astrick-sing">*</span></Typography>
                   <Autocomplete
                     options={boardOptions}
                     getOptionLabel={(option: any) => option.label}
@@ -645,7 +645,7 @@ export default function SchoolDetails() {
                                 borderColor: "var(--input-border, #ced4da) !important",
                               },
                               "&.Mui-focused:not(.Mui-error) fieldset": {
-                                borderColor: "var(--primary-color, #942F15) !important",
+                                borderColor: "var(--primary-color) !important",
                                 borderWidth: "1px !important",
                               },
                             },

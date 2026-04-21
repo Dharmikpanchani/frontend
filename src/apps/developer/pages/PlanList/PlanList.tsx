@@ -282,13 +282,13 @@ export default function PlanList() {
                                     {data.adminId?.name || "N/A"}
                                   </Typography>
                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.4 }}>
-                                    <EmailIcon sx={{ fontSize: 13, color: '#942F15' }} />
+                                    <EmailIcon sx={{ fontSize: 13, color: 'var(--primary-color)' }} />
                                     <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>
                                       {data.adminId?.email || "N/A"}
                                     </Typography>
                                   </Box>
                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <PhoneIcon sx={{ fontSize: 13, color: '#942F15' }} />
+                                    <PhoneIcon sx={{ fontSize: 13, color: 'var(--primary-color)' }} />
                                     <Typography sx={{ fontSize: '12px', color: '#6b7280' }}>
                                       {data.adminId?.phoneNumber || "N/A"}
                                     </Typography>

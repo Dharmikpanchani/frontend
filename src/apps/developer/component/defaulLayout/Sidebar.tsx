@@ -116,9 +116,8 @@ export default function Sidebar(props: any) {
           <Link to={"/dashboard"} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textDecoration: 'none' }}>
             <img
               src={Png.logoImg}
-              className="admin-logo"
+              className="admin-sidebar-logo"
               alt="logo"
-              style={{ display: 'block', height: '38px', width: 'auto' }}
             />
           </Link>
           <Button

@@ -463,7 +463,7 @@ export default function AddEditTeacher() {
                                                                             borderColor: "var(--input-border, #ced4da) !important",
                                                                         },
                                                                         "&.Mui-focused:not(.Mui-error) fieldset": {
-                                                                            borderColor: "var(--primary-color, #942F15) !important",
+                                                                            borderColor: "var(--primary-color) !important",
                                                                             borderWidth: "1px !important",
                                                                         },
                                                                     },
@@ -606,7 +606,7 @@ export default function AddEditTeacher() {
                                                                             borderColor: "var(--input-border, #ced4da) !important",
                                                                         },
                                                                         "&.Mui-focused:not(.Mui-error) fieldset": {
-                                                                            borderColor: "var(--primary-color, #942F15) !important",
+                                                                            borderColor: "var(--primary-color) !important",
                                                                             borderWidth: "1px !important",
                                                                         },
                                                                     },
@@ -1122,7 +1122,7 @@ export default function AddEditTeacher() {
                                                                             borderColor: "var(--input-border, #ced4da) !important",
                                                                         },
                                                                         "&.Mui-focused:not(.Mui-error) fieldset": {
-                                                                            borderColor: "var(--primary-color, #942F15) !important",
+                                                                            borderColor: "var(--primary-color) !important",
                                                                             borderWidth: "1px !important",
                                                                         },
                                                                     },
@@ -1182,7 +1182,7 @@ export default function AddEditTeacher() {
                                                                             borderColor: "var(--input-border, #ced4da) !important",
                                                                         },
                                                                         "&.Mui-focused:not(.Mui-error) fieldset": {
-                                                                            borderColor: "var(--primary-color, #942F15) !important",
+                                                                            borderColor: "var(--primary-color) !important",
                                                                             borderWidth: "1px !important",
                                                                         },
                                                                         "&.Mui-disabled": {

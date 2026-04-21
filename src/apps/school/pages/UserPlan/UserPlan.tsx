@@ -23,76 +23,86 @@ interface PlanCardProps {
 const PlanCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== 'isPopular',
 })<PlanCardProps>(({ isPopular }) => ({
-  borderRadius: "24px",
-  padding: "32px",
+  borderRadius: "32px",
+  padding: "40px",
   background: isPopular
-    ? "rgba(255, 255, 255, 0.98)"
-    : "rgba(255, 255, 255, 0.75)",
+    ? "#ffffff"
+    : "rgba(255, 255, 255, 0.8)",
   backdropFilter: "blur(20px)",
   border: isPopular
-    ? "2.5px solid var(--primary-color)"
-    : "1px solid rgba(255, 255, 255, 0.4)",
+    ? "2px solid var(--primary-color)"
+    : "1px solid rgba(0, 33, 71, 0.1)",
   boxShadow: isPopular
-    ? "0 20px 40px -15px var(--primary-color-rgb, rgba(148, 47, 21, 0.3))"
-    : "0 10px 30px -10px rgba(0,0,0,0.1)",
+    ? "0 25px 50px -12px rgba(0, 33, 71, 0.25)"
+    : "0 10px 30px -10px rgba(0, 33, 71, 0.05)",
   transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
   height: "100%",
-  minWidth: "340px",
   display: "flex",
   flexDirection: "column",
   position: "relative",
   overflow: "visible",
-  flex: 1,
   "&:hover": {
-    transform: "translateY(-10px)",
-    borderColor: "var(--primary-color)",
-    boxShadow: isPopular
-      ? "0 35px 70px -20px var(--primary-color-rgb, rgba(148, 47, 21, 0.45))"
-      : "0 20px 45px -15px rgba(0,0,0,0.15)",
+    transform: "translateY(-12px)",
+    boxShadow: "0 40px 80px -20px rgba(0, 33, 71, 0.2)",
+    borderColor: "var(--secondary-color)",
   },
 }));
 
 const PopularBadge = styled(Box)(() => ({
   position: "absolute",
-  top: "-10px",
+  top: "-14px",
   left: "50%",
   transform: "translateX(-50%)",
-  background: "var(--theme-gradient)",
-  color: "white",
-  padding: "2px 10px",
-  borderRadius: "15px",
-  fontSize: "9px",
-  fontWeight: 700,
+  background: "var(--accent-color, #f1b000)",
+  color: "#000",
+  padding: "4px 16px",
+  borderRadius: "20px",
+  fontSize: "10px",
+  fontWeight: 800,
   textTransform: "uppercase",
-  letterSpacing: "0.5px",
-  boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+  letterSpacing: "1px",
+  boxShadow: "0 4px 12px rgba(241, 176, 0, 0.3)",
+  zIndex: 2,
   whiteSpace: "nowrap",
-  zIndex: 2
 }));
 
 const CustomSwitch = styled(Box)(() => ({
   display: "flex",
   alignItems: "center",
-  gap: "12px",
-  padding: "4px",
-  background: "rgba(255, 255, 255, 0.5)",
-  borderRadius: "30px",
-  border: "1px solid rgba(0,0,0,0.05)",
+  padding: "6px",
+  background: "rgba(0, 33, 71, 0.05)",
+  borderRadius: "40px",
   width: "fit-content",
   margin: "0 auto",
   "& .toggle-tab": {
-    padding: "8px 20px",
-    borderRadius: "25px",
+    padding: "10px 24px",
+    borderRadius: "32px",
     cursor: "pointer",
-    transition: "all 0.3s ease",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
     fontSize: "14px",
-    fontWeight: 600,
+    fontWeight: 700,
+    color: "var(--text-secondary)",
   },
   "& .active": {
-    background: "var(--theme-gradient)",
-    color: "white",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    background: "var(--primary-color)",
+    color: "#fff",
+    boxShadow: "0 8px 16px -4px rgba(0, 33, 71, 0.3)",
   },
+}));
+
+const PriceTag = styled(Typography)(() => ({
+  fontSize: "48px",
+  fontWeight: 900,
+  color: "var(--text-primary)",
+  lineHeight: 1,
+  display: "flex",
+  alignItems: "baseline",
+  gap: "4px",
+  "& span": {
+    fontSize: "20px",
+    fontWeight: 600,
+    color: "var(--text-muted)",
+  }
 }));
 
 export default function UserPlan() {
@@ -125,184 +135,182 @@ export default function UserPlan() {
         flex: 1,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        background: `radial-gradient(circle at 50% 0%, var(--primary-color-rgb, rgba(148, 47, 21, 0.08)) 0%, transparent 50%), 
-                    radial-gradient(circle at 100% 100%, var(--secondary-color-rgb, rgba(0, 0, 0, 0.03)) 0%, transparent 50%)`,
-        fontFamily: "var(--font-family)",
-        overflowX: "hidden",
+        background: `radial-gradient(circle at 100% 0%, rgba(0, 80, 157, 0.08) 0%, transparent 40%),
+                     radial-gradient(circle at 0% 100%, rgba(241, 176, 0, 0.05) 0%, transparent 40%),
+                     #fcfcfd`,
         width: "100%",
-        py: 2
+        py: 8,
+        minHeight: "100vh"
       }}
     >
-      <Container maxWidth={false} sx={{ maxWidth: '1400px' }}>
-        <Box sx={{ textAlign: "center", mb: 6 }}>
-          <Box
+      <Container maxWidth="lg">
+        <Box sx={{ textAlign: "center", mb: 8 }}>
+          <Typography
+            variant="overline"
             sx={{
-              display: "inline-block",
-              px: 1.5,
-              py: 0.2,
-              borderRadius: "20px",
-              border: "1px solid var(--primary-color)",
-              color: "var(--primary-color)",
-              fontSize: "10px",
-              fontWeight: 700,
-              mb: 1,
-              textTransform: "uppercase",
-              letterSpacing: "0.5px"
+              fontWeight: 800,
+              color: "var(--secondary-color)",
+              letterSpacing: "2px",
+              mb: 2,
+              display: "block"
             }}
           >
-            Pricing
-          </Box>
+            Flexible Pricing
+          </Typography>
           <Typography
             variant="h2"
             sx={{
-              fontWeight: 800,
-              mb: 0.5,
-              fontSize: { xs: "24px", md: "36px" },
+              fontWeight: 900,
+              mb: 3,
+              fontSize: { xs: "32px", md: "56px" },
               color: "var(--text-primary)",
-              letterSpacing: "-0.5px"
+              letterSpacing: "-1.5px"
             }}
           >
-            Choose the Plan That Fits You
+            Upgrade Your School Experience
           </Typography>
           <Typography
             sx={{
               color: "var(--text-secondary)",
-              maxWidth: "500px",
+              maxWidth: "600px",
               mx: "auto",
-              fontSize: "13px",
-              lineHeight: 1.4,
+              fontSize: "18px",
+              lineHeight: 1.6,
               opacity: 0.8
             }}
           >
-            Find the perfect plan for your needs, whether you're just getting
-            started or looking for advanced tools.
+            Select the perfect plan to streamline your school operations.
+            Simple, transparent pricing for institutions of all sizes.
           </Typography>
         </Box>
 
-        <Box sx={{ mb: 6, display: "flex", justifyContent: "center" }}>
-          <CustomSwitch>
-            <Box 
-              className={`toggle-tab ${billingCycle === "yearly" ? "active" : ""}`}
-              onClick={() => setBillingCycle("yearly")}
-              sx={{ py: "6px !important", px: "20px !important" }}
-            >
-              Yearly
-            </Box>
-            <Box 
-              className={`toggle-tab ${billingCycle === "monthly" ? "active" : ""}`}
-              onClick={() => setBillingCycle("monthly")}
-              sx={{ py: "6px !important", px: "20px !important" }}
-            >
-              Monthly
-            </Box>
-          </CustomSwitch>
+        <Box sx={{ mb: 8, display: "flex", justifyContent: "center" }}>
+          <Box sx={{ position: 'relative' }}>
+             <CustomSwitch>
+                <Box 
+                  className={`toggle-tab ${billingCycle === "yearly" ? "active" : ""}`}
+                  onClick={() => setBillingCycle("yearly")}
+                >
+                  Yearly Billing
+                </Box>
+                <Box 
+                  className={`toggle-tab ${billingCycle === "monthly" ? "active" : ""}`}
+                  onClick={() => setBillingCycle("monthly")}
+                >
+                  Monthly
+                </Box>
+              </CustomSwitch>
+              {billingCycle === "yearly" && (
+                <Box sx={{ 
+                  position: 'absolute', 
+                  right: -80, 
+                  top: -10, 
+                  background: 'var(--accent-color)', 
+                  px: 1.5, 
+                  py: 0.5, 
+                  borderRadius: '10px',
+                  transform: 'rotate(12deg)',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                }}>
+                  <Typography sx={{ fontSize: '10px', fontWeight: 800 }}>SAVE 20%</Typography>
+                </Box>
+              )}
+          </Box>
         </Box>
 
-        <Grid container spacing={4} justifyContent="center">
+        <Grid container spacing={4} justifyContent="center" alignItems="stretch">
           {filteredPlans.map((plan: any, index: number) => {
             const price = billingCycle === "monthly" ? plan.monPrice : plan.yerPrice;
             const offerPrice = billingCycle === "monthly" ? plan.monOfferPrice : plan.yerOfferPrice;
-            const isPopular = false; // Add logic if API provides this in future
+            const isPopular = index === 1; // Highlight the middle plan for better UX
 
             return (
-              <Grid
-                size={{ xs: 12, md: 6, lg: 4, xl: 3 }}
-                key={index}
-                sx={{ display: 'flex', justifyContent: 'center' }}
-              >
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} key={index}>
                 <PlanCard isPopular={isPopular}>
-                  {isPopular && <PopularBadge>Most Popular</PopularBadge>}
+                  {isPopular && <PopularBadge>Recommended</PopularBadge>}
 
-                  <Typography variant="h6" sx={{ 
-                    fontWeight: 800, 
-                    mb: 1.2, 
-                    color: "var(--text-primary)", 
-                    fontSize: "24px", 
-                    textTransform: "capitalize",
-                    borderBottom: "1px solid var(--main-border)",
-                    pb: 1
-                  }}>
-                    {plan.planName}
-                  </Typography>
+                  <Box sx={{ mb: 4 }}>
+                    <Typography variant="h5" sx={{ 
+                      fontWeight: 800, 
+                      color: "var(--text-primary)", 
+                      mb: 1,
+                      textTransform: 'capitalize'
+                    }}>
+                      {plan.planName}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "var(--text-muted)" }}>
+                      Best for growing institutions
+                    </Typography>
+                  </Box>
 
-                  <Box sx={{ minHeight: "70px", display: "flex", flexDirection: "column", justifyContent: "flex-end", mb: 2 }}>
-                    <Box sx={{ display: "flex", alignItems: "baseline", mb: 0.2 }}>
-                      {offerPrice > 0 && (
-                        <Typography
-                          sx={{
-                            fontSize: "22px",
-                            fontWeight: 500,
-                            color: "var(--text-muted)",
-                            textDecoration: "line-through",
-                            mr: 0.25,
-                          }}
-                        >
-                          ₹{offerPrice}
-                        </Typography>
-                      )}
+                  <Box sx={{ mb: 4 }}>
+                    <PriceTag>
+                      ₹{price}
+                      <span>/{billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
+                    </PriceTag>
+                    {offerPrice > 0 && (
                       <Typography
                         sx={{
-                          fontSize: "36px",
-                          fontWeight: 800,
-                          color: "var(--text-primary)",
+                          fontSize: "16px",
+                          fontWeight: 600,
+                          color: "var(--text-muted)",
+                          textDecoration: "line-through",
+                          mt: 1
                         }}
                       >
-                        ₹{price}
+                        Was ₹{offerPrice}
                       </Typography>
-                    </Box>
-                    <Typography
-                      sx={{
-                        fontSize: "10px",
-                        color: "var(--text-muted)",
-                      }}
-                    >
-                      one-time payment + Local Taxes
-                    </Typography>
+                    )}
                   </Box>
 
                   <Button
                     variant="contained"
                     fullWidth
                     sx={{
-                      py: 1,
-                      borderRadius: "10px",
+                      py: 2,
+                      borderRadius: "16px",
                       textTransform: "none",
-                      fontWeight: 700,
-                      fontSize: "13px",
-                      background: "var(--theme-gradient)",
-                      color: "white",
-                      mb: 3,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      transition: "all 0.3s ease",
+                      fontWeight: 800,
+                      fontSize: "16px",
+                      background: isPopular ? "var(--theme-gradient)" : "rgba(0, 33, 71, 0.05)",
+                      color: isPopular ? "#fff" : "var(--primary-color)",
+                      mb: 5,
+                      boxShadow: isPopular ? "0 12px 24px -6px rgba(0, 33, 71, 0.3)" : "none",
                       "&:hover": {
-                        background: "var(--theme-gradient)",
-                        opacity: 0.9,
-                        transform: "translateY(-1px)",
+                        background: isPopular ? "var(--theme-gradient)" : "rgba(0, 33, 71, 0.1)",
+                        transform: "scale(1.02)",
                       },
                     }}
                   >
-                    Buy now <ExternalIcon sx={{ fontSize: 16 }} />
+                    Select Plan <ExternalIcon sx={{ ml: 1, fontSize: 18 }} />
                   </Button>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                    {plan.moduleDescription?.map((module: string, i: number) => (
-                      <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <CheckIcon sx={{ fontSize: 16, color: "var(--text-muted)" }} />
-                        <Typography sx={{ fontSize: "12.5px", color: "var(--text-secondary)" }}>
-                          {module}
-                        </Typography>
-                      </Box>
-                    ))}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ fontWeight: 700, mb: 3, fontSize: "14px", color: "var(--text-primary)" }}>
+                      WHAT'S INCLUDED:
+                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      {plan.moduleDescription?.map((module: string, i: number) => (
+                        <Box key={i} sx={{ display: "flex", alignItems: "flex-start", gap: 1.5 }}>
+                          <CheckIcon sx={{ fontSize: 20, color: "var(--secondary-color)", mt: "2px" }} />
+                          <Typography sx={{ fontSize: "14px", color: "var(--text-secondary)", fontWeight: 500 }}>
+                            {module}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
                   </Box>
                 </PlanCard>
               </Grid>
             );
           })}
         </Grid>
+
+        <Box sx={{ mt: 10, textAlign: "center" }}>
+          <Typography variant="body2" sx={{ color: "var(--text-muted)" }}>
+            Need a custom enterprise solution? <Box component="span" sx={{ color: 'var(--secondary-color)', fontWeight: 700, cursor: 'pointer' }}>Contact our team</Box>
+          </Typography>
+        </Box>
       </Container>
     </Box>
   );

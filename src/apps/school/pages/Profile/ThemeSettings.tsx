@@ -183,7 +183,7 @@ const ThemeSettings = () => {
       gap: 2
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        <Icon sx={{ color: 'var(--primary-color, #942F15)', fontSize: 24 }} />
+        <Icon sx={{ color: 'var(--primary-color)', fontSize: 24 }} />
         <Typography sx={{
           fontSize: '18px',
           fontWeight: 700,
@@ -206,7 +206,7 @@ const ThemeSettings = () => {
               textTransform: 'none',
               fontSize: '14px',
               fontWeight: 500,
-              '&:hover': { backgroundColor: 'transparent', color: 'var(--primary-color, #942F15)' }
+              '&:hover': { backgroundColor: 'transparent', color: 'var(--primary-color)' }
             }}
           >
             Reset
@@ -387,7 +387,7 @@ const ThemeSettings = () => {
               minWidth: { xs: '100%', sm: '150px' },
               height: '40px',
               borderRadius: '8px',
-              background: 'var(--theme-gradient, var(--primary-color, #942F15)) !important',
+              background: 'var(--theme-gradient, var(--primary-color)) !important',
               textTransform: 'none',
               fontWeight: 600,
               boxShadow: 'none',

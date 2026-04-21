@@ -88,7 +88,7 @@ export default function ChangeEmail() {
         borderColor: "#ced4da",
       },
       "&.Mui-focused fieldset": {
-        borderColor: "#ff8c00",
+        borderColor: "var(--primary-color)",
         borderWidth: "1.5px",
       },
     },
@@ -139,7 +139,7 @@ export default function ChangeEmail() {
                     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
                   }}
                 >
-                  <EmailIcon sx={{ color: "#942F15", fontSize: 18 }} />
+                  <EmailIcon sx={{ color: 'var(--primary-color)', fontSize: 18 }} />
                 </Box>
                 <Box>
                   <Typography
@@ -171,7 +171,7 @@ export default function ChangeEmail() {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <LockIcon sx={{ fontSize: 14, color: "#942F15" }} />
+                      <LockIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                       Password <span className="astrick-sing">*</span>
                     </Typography>
 
@@ -211,7 +211,7 @@ export default function ChangeEmail() {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <EmailIcon sx={{ fontSize: 14, color: "#942F15" }} />
+                      <EmailIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                       New Email Address <span className="astrick-sing">*</span>
                     </Typography>
 
@@ -271,12 +271,13 @@ export default function ChangeEmail() {
                     minWidth: "150px",
                     height: "40px",
                     borderRadius: "8px",
-                    backgroundColor: "#942F15 !important",
+                    backgroundColor: 'var(--primary-color) !important',
                     textTransform: "none",
                     fontWeight: 600,
                     boxShadow: "none",
                     "&:hover": {
-                      backgroundColor: "#7A2711",
+                      backgroundColor: 'var(--primary-color)',
+                      opacity: 0.8,
                       boxShadow: "none",
                     },
                   }}

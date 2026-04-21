@@ -15,7 +15,7 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#3a0000", // Fallback, but MUI will use the CSS variable more effectively if mapped
+      main: "#002147", // Updated from maroon to Navy Blue
     },
   },
   components: {
@@ -25,7 +25,7 @@ const theme = createTheme({
           borderRadius: "var(--button-radius, 5px)",
         },
         containedPrimary: {
-          background: "var(--theme-gradient, var(--button-bg, #3a0000))",
+          background: "var(--theme-gradient, var(--button-bg, #002147))",
           color: "var(--button-text, #ffffff)",
           transition: "all 0.3s ease",
           "&:hover": {

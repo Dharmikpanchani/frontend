@@ -186,7 +186,7 @@ export default function EditProfile() {
                           minWidth: 34,
                           width: 34,
                           height: 34,
-                          backgroundColor: '#942F15',
+                          backgroundColor: 'var(--primary-color)',
                           borderRadius: '50%',
                           display: 'flex',
                           justifyContent: 'center',
@@ -196,7 +196,8 @@ export default function EditProfile() {
                           boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                           p: 0,
                           '&:hover': {
-                            backgroundColor: '#7a2510'
+                            backgroundColor: 'var(--primary-color)',
+                            opacity: 0.8
                           }
                         }}
                       >
@@ -264,7 +265,7 @@ export default function EditProfile() {
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <PersonIcon sx={{ fontSize: 14, color: '#942F15' }} />
+                            <PersonIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                             Full Name <span className="astrick-sing">*</span>
                           </Typography>
                           <Box className="admin-form-group">
@@ -288,7 +289,7 @@ export default function EditProfile() {
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <EmailIcon sx={{ fontSize: 14, color: '#942F15' }} />
+                            <EmailIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                             Email <span className="astrick-sing">*</span>
                           </Typography>
                           <Box className="admin-form-group">
@@ -319,7 +320,7 @@ export default function EditProfile() {
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <PhoneIcon sx={{ fontSize: 14, color: '#942F15' }} />
+                            <PhoneIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                             Phone Number
                           </Typography>
                           <Box className="admin-form-group">
@@ -339,7 +340,7 @@ export default function EditProfile() {
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <LegalIcon sx={{ fontSize: 14, color: '#942F15' }} />
+                            <LegalIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
                             Address
                           </Typography>
                           <Box className="admin-form-group">
@@ -388,12 +389,13 @@ export default function EditProfile() {
                       minWidth: { xs: '100%', sm: '150px' },
                       height: '40px',
                       borderRadius: '8px',
-                      backgroundColor: '#942F15 !important',
+                      backgroundColor: 'var(--primary-color) !important',
                       textTransform: 'none',
                       fontWeight: 600,
                       boxShadow: 'none',
                       '&:hover': {
-                        backgroundColor: '#7A2711',
+                        backgroundColor: 'var(--primary-color)',
+                        opacity: 0.8,
                         boxShadow: 'none',
                       },
                     }}

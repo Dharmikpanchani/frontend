@@ -177,8 +177,8 @@ export default function RegisterSchool() {
                 width: 32,
                 height: 32,
                 borderRadius: '8px',
-                backgroundColor: '#fff7ed',
-                color: '#ff8c00'
+                backgroundColor: 'rgba(0, 33, 71, 0.05)',
+                color: 'var(--primary-color)'
             }}>
                 <Icon sx={{ fontSize: 20 }} />
             </Box>
@@ -605,7 +605,7 @@ export default function RegisterSchool() {
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     sx={{
-                                                                        color: '#ff8c00',
+                                                                        color: 'var(--primary-color)',
                                                                         textDecoration: 'underline',
                                                                         cursor: 'pointer',
                                                                         fontWeight: 500

@@ -104,7 +104,7 @@ export default function ChangeEmail() {
                     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
                   }}
                 >
-                  <EmailIcon sx={{ color: "var(--primary-color, #942F15)", fontSize: 18 }} />
+                  <EmailIcon sx={{ color: "var(--primary-color)", fontSize: 18 }} />
                 </Box>
                 <Box>
                   <Typography
@@ -136,7 +136,7 @@ export default function ChangeEmail() {
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <LockIcon sx={{ fontSize: 14, color: "var(--primary-color, #942F15)" }} />
+                      <LockIcon sx={{ fontSize: 14, color: "var(--primary-color)" }} />
                       Password <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
@@ -176,7 +176,7 @@ export default function ChangeEmail() {
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <EmailIcon sx={{ fontSize: 14, color: "var(--primary-color, #942F15)" }} />
+                      <EmailIcon sx={{ fontSize: 14, color: "var(--primary-color)" }} />
                       New Email Address <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
@@ -237,7 +237,7 @@ export default function ChangeEmail() {
                     minWidth: { xs: "100%", sm: "150px" },
                     height: "40px",
                     borderRadius: "8px",
-                    backgroundColor: "var(--primary-color, #942F15) !important",
+                    backgroundColor: "var(--primary-color) !important",
                     textTransform: "none",
                     fontWeight: 600,
                     boxShadow: "none",

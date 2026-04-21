@@ -16,7 +16,7 @@ body {
   line-height: 20px;
   font-weight: 400;
   font-family: var(--font-family, "Poppins", sans-serif);
-  color: var(--text-primary, #3a0000);
+  color: var(--text-primary, #111827);
   background-color: var(--page-bg, #f7f7f7);
 }
 
@@ -54,44 +54,47 @@ body {
 
 :root {
   --main-white: #fff;
-  --primary-color: #5c1a1a;
-  --secondary-color: #ad1e1e;
-  --selected-color: #5c1a1a;
+  --primary-color: #002147;
+  --secondary-color: #00509d;
+  --accent-color: #f1b000;
+  --selected-color: #002147;
   --main-border: #d1d5db85;
   --light-border: #d1d5db1f;
   --main-black: #000;
   --main-red: #5c1a1a;
-  --bg-color: #3a0000;
+  --bg-color: #002147;
   --body-color: #f7f7f7;
   --off-white: #ffffff91;
   --orange: #ff6200;
   --green: #46c700;
-  --dark-blue: #3a0000;
-  --main-yellow: #c8dc16;
+  --dark-blue: #001529;
+  --main-yellow: #f1b000;
   --input-bg: #fff;
-  --header-bg: #4E1111;
+  --header-bg: #002147;
   --apply-orange: #C0392B;
-  --header-maroon: #4E1111;
-  --sidebar-bg: linear-gradient(180deg, #3a0000 0%, #1a0000 100%);
-  --active-gradient: linear-gradient(90deg, #5c1a1a 0%, #3a0000 100%);
+  --header-maroon: #002147;
+  --sidebar-bg: linear-gradient(180deg, #002147 0%, #001529 100%);
+  --active-gradient: linear-gradient(90deg, #002147 0%, #00509d 100%);
+  --theme-gradient: linear-gradient(90deg, #002147 0%, #00509d 100%);
 
   /* Themed variables defaults */
   --font-family: 'Poppins', sans-serif;
-  --border-radius: 8px;
-  --card-shadow: none;
+  --border-radius: 12px;
+  --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
   --header-text: #ffffff;
   --button-bg: var(--primary-color);
-  --sidebar-active-bg: linear-gradient(90deg, #5c1a1a 0%, #3a0000 100%);
+  --sidebar-active-bg: linear-gradient(90deg, #002147 0%, #00509d 100%);
+  --button-radius: 8px;
 }
 
 /* Common Branding Scope (can be customized via theme manager) */
 .portal-school {
-  --primary-color: #5c1a1a;
-  --secondary-color: #ad1e1e;
-  --selected-color: #5c1a1a;
-  --bg-color: #5c1a1a;
+  --primary-color: #002147;
+  --secondary-color: #00509d;
+  --selected-color: #002147;
+  --bg-color: #002147;
   --body-color: #f7f7f7;
-  --header-bg: #4E1111;
+  --header-bg: #002147;
   --header-text: #ffffff;
   --button-bg: var(--primary-color);
   --font-family: 'Poppins', sans-serif;
@@ -258,7 +261,7 @@ input[type="number"] {
   line-height: 19px;
   font-family: var(--font-family, "PlusJakartaSans-SemiBold", sans-serif);
   margin: 0px 0px 6px;
-  color: var(--primary-color, #3a0000);
+  color: var(--primary-color, #002147);
   min-height: 19px;
 }
 
@@ -310,7 +313,7 @@ input[type="number"] {
 
 .btn-main-primary .btn-primary,
 .btn-main-primary .btn-primary:hover {
-  background: var(--theme-gradient, var(--button-bg, #3a0000)) !important;
+  background: var(--theme-gradient, var(--button-bg, #002147)) !important;
   border-radius: var(--button-radius, 5px);
   color: var(--button-text, #fff);
   padding: 8px 15px;
@@ -618,14 +621,17 @@ body .error-text-center {
 }
 
 .page-table-main .table-th {
-  font-size: 12px;
-  line-height: 18px;
+  font-size: 11px;
+  line-height: 1.5;
   color: var(--primary-color);
-  font-family: "PlusJakartaSans-SemiBold";
-  padding: 7px 10px 7px 10px;
-  border-bottom: 1px solid var(--main-border);
-  background-color: rgb(4 46 93 / 7%);
-  text-transform: capitalize;
+  font-family: "PlusJakartaSans-Bold";
+  padding: 14px 15px;
+  border-bottom: 2px solid rgba(0, 33, 71, 0.1);
+  background-color: #f8fafc;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .page-table-main .table-td {
@@ -1472,7 +1478,7 @@ img[alt] {
 /* start admin dashboard page structure css */
 
 .admin-dashboard-left-main {
-  max-width: 250px;
+  max-width: 220px;
   width: 100%;
   background: var(--theme-gradient, var(--sidebar-bg)) !important;
   height: 100vh;
@@ -1495,7 +1501,7 @@ img[alt] {
 .admin-dashboard-containt-main {
   background-color: var(--body-color);
   min-height: 100vh;
-  padding: 85px 24px 24px 274px;
+  padding: 85px 16px 24px 236px;
   transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1645,12 +1651,12 @@ img[alt] {
 }
 
 .admin-dashboard-banner {
-  background: linear-gradient(130deg, #1a0000, #3a0000 48%, #8c2600);
+  background: linear-gradient(135deg, #002147 0%, #004080 50%, #002147 100%);
   border-radius: 22px;
   padding: 30px;
   margin-bottom: 25px;
   color: white;
-  box-shadow: 0 18px 56px #3a00008c, 0 4px 18px #00000038;
+  box-shadow: 0 18px 56px rgba(0, 33, 71, 0.4), 0 4px 18px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -1661,23 +1667,23 @@ img[alt] {
 }
 
 .admin-dashboard-box1 {
-  background: linear-gradient(135deg, #3a0000, #7a1200) !important;
+  background: linear-gradient(135deg, #002147, #004080) !important;
 }
 
 .admin-dashboard-box2 {
-  background: linear-gradient(135deg, #7b0000, #b21e1e) !important;
+  background: linear-gradient(135deg, #003366, #00509d) !important;
 }
 
 .admin-dashboard-box3 {
-  background: linear-gradient(135deg, #ff6200, #ff8c00) !important;
+  background: linear-gradient(135deg, #002147, #001529) !important;
 }
 
 .admin-dashboard-box4 {
-  background: linear-gradient(135deg, #4b0000, #1a0000) !important;
+  background: linear-gradient(135deg, #004080, #0056b3) !important;
 }
 
 .admin-dashboard-box5 {
-  background: linear-gradient(135deg, #1f0101, #3a0000) !important;
+  background: linear-gradient(135deg, #001529, #002147) !important;
 }
 
 .admin-dashboard-box6 {
@@ -2160,9 +2166,21 @@ img[alt] {
 
 .admin-sidebar-logo {
   max-width: 100%;
-  height: auto;
+  height: 60px;
+  width: auto;
   object-fit: contain;
   cursor: pointer;
+  background: white;
+  padding: 2px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+}
+
+.admin-sidebar-logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .admin-close-icon {
@@ -2170,14 +2188,15 @@ img[alt] {
 }
 
 .admin-sidebar-logo-main {
-  padding: 20px 15px;
+  padding: 25px 15px;
   display: flex;
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  border-bottom: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   position: relative;
-  min-height: 75px;
+  min-height: 90px;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .admin-sidebar-list-main {
@@ -2231,10 +2250,11 @@ img[alt] {
 
 .admin-sidebar-list-main .admin-sidebar-link.active {
   color: var(--sidebar-active-text, var(--main-white)) !important;
-  background: var(--sidebar-active-bg, var(--primary-color)) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   border-radius: var(--border-radius, 8px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+  backdrop-filter: blur(4px);
 }
 
 .admin-sidebar-deactive .admin-sidebar-link.active {
@@ -2312,7 +2332,7 @@ img[alt] {
   background: var(--theme-gradient, var(--header-bg, var(--sidebar-bg))) !important;
   position: fixed;
   top: 0px;
-  left: 250px;
+  left: 220px;
   right: 0px;
   z-index: 1000;
   padding: 15px 20px 13px 20px;
@@ -3826,13 +3846,14 @@ span.admin-sidebar-link-text {
 /* start common card design */
 
 .card-border {
-  border-radius: 5px;
+  border-radius: var(--border-radius, 12px);
   border: 1px solid var(--main-border);
-  padding: 20px;
+  box-shadow: var(--card-shadow);
+  background: var(--main-white);
 }
 
 .card-bottom-space {
-  margin-bottom: 15px;
+  margin-bottom: 24px;
 }
 
 .common-card {
@@ -3841,7 +3862,7 @@ span.admin-sidebar-link-text {
   background-color: var(--main-white);
   border: 1px solid var(--main-border);
   border-radius: 10px;
-  padding: 10px;
+  /* padding: 10px; */
 }
 
 .common-card:last-child {
@@ -4386,7 +4407,7 @@ span.admin-sidebar-link-text {
   font-size: 20px;
   font-weight: 500;
   text-align: center;
-  color: #1f0000;
+  color: #111827;
   margin-bottom: 10px;
   font-family: 'Poppins', sans-serif !important;
 }
@@ -4474,7 +4495,7 @@ span.admin-sidebar-link-text {
 
 .login-card .forgot-password-link {
   align-self: flex-end;
-  color: #1f0000;
+  color: #111827;
   text-decoration: none !important;
   font-size: 12px;
   margin-bottom: 15px;
@@ -4565,7 +4586,7 @@ span.admin-sidebar-link-text {
 }
 
 .login-card .timer-text span {
-  color: #1f0000;
+  color: #111827;
   font-weight: 600;
 }
 
