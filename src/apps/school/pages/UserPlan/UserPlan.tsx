@@ -139,12 +139,12 @@ export default function UserPlan() {
                      radial-gradient(circle at 0% 100%, rgba(241, 176, 0, 0.05) 0%, transparent 40%),
                      #fcfcfd`,
         width: "100%",
-        py: 8,
+        py: 4,
         minHeight: "100vh"
       }}
     >
       <Container maxWidth="lg">
-        <Box sx={{ textAlign: "center", mb: 8 }}>
+        <Box sx={{ textAlign: "center", mb: 4 }}>
           <Typography
             variant="overline"
             sx={{
@@ -152,7 +152,13 @@ export default function UserPlan() {
               color: "var(--secondary-color)",
               letterSpacing: "2px",
               mb: 2,
-              display: "block"
+              display: "inline-block",
+              background: "rgba(0, 80, 157, 0.08)",
+              px: 2,
+              py: 0.5,
+              borderRadius: "100px",
+              fontSize: "10px",
+              border: "1px solid rgba(0, 80, 157, 0.1)"
             }}
           >
             Flexible Pricing
@@ -184,7 +190,7 @@ export default function UserPlan() {
           </Typography>
         </Box>
 
-        <Box sx={{ mb: 8, display: "flex", justifyContent: "center" }}>
+        <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
           <Box sx={{ position: 'relative' }}>
              <CustomSwitch>
                 <Box 
@@ -200,21 +206,6 @@ export default function UserPlan() {
                   Monthly
                 </Box>
               </CustomSwitch>
-              {billingCycle === "yearly" && (
-                <Box sx={{ 
-                  position: 'absolute', 
-                  right: -80, 
-                  top: -10, 
-                  background: 'var(--accent-color)', 
-                  px: 1.5, 
-                  py: 0.5, 
-                  borderRadius: '10px',
-                  transform: 'rotate(12deg)',
-                  boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                }}>
-                  <Typography sx={{ fontSize: '10px', fontWeight: 800 }}>SAVE 20%</Typography>
-                </Box>
-              )}
           </Box>
         </Box>
 
@@ -267,18 +258,20 @@ export default function UserPlan() {
                     variant="contained"
                     fullWidth
                     sx={{
-                      py: 2,
-                      borderRadius: "16px",
+                      py: 1.2,
+                      borderRadius: "12px",
                       textTransform: "none",
-                      fontWeight: 800,
-                      fontSize: "16px",
-                      background: isPopular ? "var(--theme-gradient)" : "rgba(0, 33, 71, 0.05)",
+                      fontWeight: 700,
+                      fontSize: "15px",
+                      background: isPopular ? "var(--theme-gradient)" : "rgba(0, 80, 157, 0.08)",
                       color: isPopular ? "#fff" : "var(--primary-color)",
-                      mb: 5,
-                      boxShadow: isPopular ? "0 12px 24px -6px rgba(0, 33, 71, 0.3)" : "none",
+                      mb: 4,
+                      boxShadow: isPopular ? "0 8px 20px -4px rgba(0, 33, 71, 0.25)" : "none",
+                      border: isPopular ? "none" : "1px solid rgba(0, 80, 157, 0.1)",
                       "&:hover": {
-                        background: isPopular ? "var(--theme-gradient)" : "rgba(0, 33, 71, 0.1)",
-                        transform: "scale(1.02)",
+                        background: isPopular ? "var(--theme-gradient)" : "rgba(0, 80, 157, 0.12)",
+                        transform: "scale(1.01)",
+                        boxShadow: isPopular ? "0 12px 28px -6px rgba(0, 33, 71, 0.35)" : "none",
                       },
                     }}
                   >

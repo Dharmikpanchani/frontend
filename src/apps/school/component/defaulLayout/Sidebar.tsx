@@ -2,8 +2,7 @@ import { useLocation, Link } from "react-router-dom";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import {
-  Box, Button, List, ListItem, Collapse,
-  Typography
+  Box, Button, List, ListItem, Collapse
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import Svg from "@/assets/Svg";
