@@ -168,17 +168,12 @@ export default function Sidebar(props: any) {
       <Box className="admin-sidebar-inner-main">
         {/* Logo Section */}
         <Box className="admin-sidebar-logo-main">
-          <Link to={"/dashboard"} className="admin-sidebar-logo-container">
-            <Box className="admin-logo-wrapper">
-              <img
-                src={import.meta.env.VITE_BASE_URL_IMAGE + "/" + adminDetails?.schoolData?.logo || Png.logoImg}
-                className="admin-logo"
-                alt="logo"
-              />
-            </Box>
-            <Typography variant="h6" className="admin-school-name">
-              {adminDetails?.schoolData?.schoolName || "School Pro"}
-            </Typography>
+          <Link to={"/dashboard"} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textDecoration: 'none', width: '100%' }}>
+            <img
+              src={adminDetails?.schoolData?.logo ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + adminDetails?.schoolData?.logo : Png.logoImg}
+              className="admin-sidebar-logo"
+              alt="logo"
+            />
           </Link>
           <Button
             onClick={(e) => {
