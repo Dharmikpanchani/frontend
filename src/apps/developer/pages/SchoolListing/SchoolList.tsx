@@ -64,7 +64,7 @@ export default function SchoolList() {
     gstNumber: "",
     registrationNumber: "",
     establishedYear: "",
-    planStatus: "",
+    isActivePlan: "",
     planName: "",
     adminId: "",
   });
@@ -74,12 +74,12 @@ export default function SchoolList() {
   const [selectedData, setSelectedData] = useState<any>(null);
   const [buttonStatusSpinner, setButtonStatusSpinner] = useState(false);
 
-  const getRelativePlanExpiry = (expiryTimestamp: number, planStatus: boolean) => {
+  const getRelativePlanExpiry = (expiryTimestamp: number, isActivePlan: boolean) => {
     if (!expiryTimestamp) return "No expiry set";
     const now = moment();
     const expiry = moment.unix(expiryTimestamp);
 
-    if (!planStatus || expiry.isBefore(now)) {
+    if (!isActivePlan || expiry.isBefore(now)) {
       return `Expired on ${expiry.format('DD MMM YY')}`;
     }
 
@@ -147,7 +147,7 @@ export default function SchoolList() {
       gstNumber: filters?.gstNumber ?? filterValues.gstNumber,
       registrationNumber: filters?.registrationNumber ?? filterValues.registrationNumber,
       establishedYear: filters?.establishedYear ?? filterValues.establishedYear,
-      planStatus: filters?.planStatus ?? filterValues.planStatus,
+      isActivePlan: filters?.isActivePlan ?? filterValues.isActivePlan,
       planName: filters?.planName ?? filterValues.planName,
       adminId: filters?.adminId ?? filterValues.adminId,
     }) as any);
@@ -178,7 +178,7 @@ export default function SchoolList() {
       gstNumber: "",
       registrationNumber: "",
       establishedYear: "",
-      planStatus: "",
+      isActivePlan: "",
       planName: "",
       adminId: "",
     };
@@ -256,7 +256,7 @@ export default function SchoolList() {
     },
     {
       type: "searchbaseSelect",
-      name: "planStatus",
+      name: "isActivePlan",
       label: "Plan Status",
       placeholder: "Select Plan Status",
       options: [
@@ -521,22 +521,22 @@ export default function SchoolList() {
                               px: 1,
                               py: 0.2,
                               borderRadius: '20px',
-                              backgroundColor: data?.planStatus ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-                              color: data?.planStatus ? '#4caf50' : '#f44336',
+                              backgroundColor: data?.isActivePlan ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                              color: data?.isActivePlan ? '#4caf50' : '#f44336',
                               width: 'fit-content'
                             }}>
                               <Box sx={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: 'currentColor' }} />
                               <Typography sx={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>
-                                {data?.planStatus ? "Active" : "Expired"}
+                                {data?.isActivePlan ? "Active" : "Expired"}
                               </Typography>
                             </Box>
-                            <Typography sx={{ 
-                              fontSize: '11px', 
-                              color: data?.planStatus ? '#6b7280' : '#ef4444', 
+                            <Typography sx={{
+                              fontSize: '11px',
+                              color: data?.isActivePlan ? '#6b7280' : '#ef4444',
                               fontWeight: 500,
                               fontFamily: "'Inter', sans-serif"
                             }}>
-                              {getRelativePlanExpiry(data?.PlanExptyDate, data?.planStatus)}
+                              {getRelativePlanExpiry(data?.PlanExptyDate, data?.isActivePlan)}
                             </Typography>
                           </Box>
                         </TableCell>

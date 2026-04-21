@@ -17,20 +17,21 @@ const PrivateRoutes: React.FC = () => {
   const canAccess = (isAdminLogin && adminDetails?.isLogin && isValid) || (!!cookieToken && isValid);
 
   const isSchoolAdmin = adminDetails?.type === "school_admin";
-  const planExptyDate = adminDetails?.schoolData?.PlanExptyDate;
-  const currentTime = Math.floor(Date.now() / 1000);
+  const isActivePlan = adminDetails?.schoolData?.isActivePlan;
 
-  // Safeguard: Only check expiry if the profile is fully loaded and the user is a school admin
-  const isExpired = !!(
+  // Safeguard: Only check plan status if the profile is fully loaded and the user is a school admin
+  const isPlanInactive = !!(
     isSchoolAdmin &&
     adminDetails?._id && // Ensure profile is loaded
-    planExptyDate &&
-    Number(planExptyDate) < currentTime
+    isActivePlan === false
   );
-  // If they should be on the plan page but aren't
-  const isPlanPage = window.location.pathname === "/user-plan" || window.location.pathname === "/login/otp";
 
-  if (canAccess && isExpired && !isPlanPage) {
+  // If they should be on the plan page but aren't
+  const isPlanPage =
+    window.location.pathname === "/user-plan" ||
+    window.location.pathname === "/login/otp";
+
+  if (canAccess && isPlanInactive && !isPlanPage) {
     return <Navigate to="/user-plan" replace={true} />;
   }
 

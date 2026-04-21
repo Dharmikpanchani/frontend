@@ -22,7 +22,7 @@ export const schoolService = {
     if (params.gstNumber) url += `&gstNumber=${params.gstNumber}`;
     if (params.registrationNumber) url += `&registrationNumber=${params.registrationNumber}`;
     if (params.establishedYear) url += `&establishedYear=${params.establishedYear}`;
-    if (params.planStatus !== undefined && params.planStatus !== "") url += `&planStatus=${params.planStatus}`;
+    if (params.isActivePlan !== undefined && params.isActivePlan !== "") url += `&isActivePlan=${params.isActivePlan}`;
     if (params.planName) url += `&planName=${encodeURIComponent(params.planName)}`;
     if (params.adminId) url += `&adminId=${params.adminId}`;
     

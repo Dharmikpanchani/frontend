@@ -85,12 +85,12 @@ export default function AddEditAdminUser() {
         establishedYear: "",
     });
 
-    const getRelativePlanExpiry = (expiryTimestamp: number, planStatus: boolean) => {
+    const getRelativePlanExpiry = (expiryTimestamp: number, isActivePlan: boolean) => {
         if (!expiryTimestamp) return "No expiry set";
         const now = moment();
         const expiry = moment.unix(expiryTimestamp);
 
-        if (!planStatus || expiry.isBefore(now)) {
+        if (!isActivePlan || expiry.isBefore(now)) {
             return `Expired on ${expiry.format('DD MMM YY')}`;
         }
 
@@ -255,12 +255,12 @@ export default function AddEditAdminUser() {
             setButtonSpinner(false);
             if (addEditAdminUser.fulfilled.match(resultAction)) {
                 if (resultAction.payload?.requireOtp) {
-                    navigate("/admin-user/otp", { 
-                        state: { 
-                            type: "admin_update", 
-                            email: resultAction.payload.email, 
-                            updateData: values 
-                        } 
+                    navigate("/admin-user/otp", {
+                        state: {
+                            type: "admin_update",
+                            email: resultAction.payload.email,
+                            updateData: values
+                        }
                     });
                     return;
                 }
@@ -632,22 +632,22 @@ export default function AddEditAdminUser() {
                                                                 px: 1,
                                                                 py: 0.2,
                                                                 borderRadius: '20px',
-                                                                backgroundColor: data?.planStatus ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-                                                                color: data?.planStatus ? '#4caf50' : '#f44336',
+                                                                backgroundColor: data?.isActivePlan ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                                                                color: data?.isActivePlan ? '#4caf50' : '#f44336',
                                                                 width: 'fit-content'
                                                             }}>
                                                                 <Box sx={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: 'currentColor' }} />
                                                                 <Typography sx={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase' }}>
-                                                                    {data?.planStatus ? "Active" : "Expired"}
+                                                                    {data?.isActivePlan ? "Active" : "Expired"}
                                                                 </Typography>
                                                             </Box>
-                                                            <Typography sx={{ 
-                                                                fontSize: '10px', 
-                                                                color: data?.planStatus ? '#6b7280' : '#ef4444', 
+                                                            <Typography sx={{
+                                                                fontSize: '10px',
+                                                                color: data?.isActivePlan ? '#6b7280' : '#ef4444',
                                                                 fontWeight: 500,
                                                                 fontFamily: "'Inter', sans-serif"
                                                             }}>
-                                                                {getRelativePlanExpiry(data?.PlanExptyDate, data?.planStatus)}
+                                                                {getRelativePlanExpiry(data?.PlanExptyDate, data?.isActivePlan)}
                                                             </Typography>
                                                         </Box>
                                                     </TableCell>
