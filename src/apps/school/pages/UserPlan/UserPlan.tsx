@@ -13,6 +13,7 @@ import {
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { schoolService } from "@/api/services/school.service";
+import { paymentService } from "@/api/services/payment.service";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/Store";
 
@@ -108,7 +109,64 @@ const PriceTag = styled(Typography)(() => ({
 export default function UserPlan() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
   const [apiPlans, setApiPlans] = useState<any[]>([]);
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
+  const theme = useSelector((state: RootState) => state.ThemeReducer);
+
+  const handlePayment = async (plan: any) => {
+    try {
+      setPaymentLoading(true);
+      const price = billingCycle === "monthly" ? plan.monPrice : plan.yerPrice;
+
+      const payload = {
+        amount: price,
+        schoolId: adminDetails?.schoolId,
+        userId: adminDetails?._id,
+        type: "SUBSCRIPTION",
+        planId: plan._id
+      };
+
+      const res = await paymentService.createSchoolPlan(payload);
+      const { order } = res.data;
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: adminDetails?.schoolData?.schoolName || "Vidya Setu School Management",
+        description: `${plan.planName} Plan - ${billingCycle}`,
+        image: adminDetails?.schoolData?.logo ? `${import.meta.env.VITE_BASE_URL_IMAGE}/${adminDetails.schoolData.logo}` : undefined,
+        order_id: order.id,
+        handler: async function (response: any) {
+          try {
+            await paymentService.verifyPayment(response);
+            alert("✅ Payment Successful and Verified!");
+            // Optionally refresh profile or redirect
+            window.location.reload();
+          } catch (err) {
+            alert("❌ Verification Failed");
+          }
+        },
+        prefill: {
+          name: adminDetails?.name,
+          email: adminDetails?.email,
+          contact: adminDetails?.phoneNumber || adminDetails?.phone
+        },
+        theme: { color: theme?.primaryColor || "#9c0000" }
+      };
+
+      console.log("options", options)
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
+    } catch (error: any) {
+      console.error("Payment Error:", error);
+      alert("❌ Payment Failed: " + (error.response?.data?.message || error.message));
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchPlanData = async () => {
@@ -192,20 +250,20 @@ export default function UserPlan() {
 
         <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
           <Box sx={{ position: 'relative' }}>
-             <CustomSwitch>
-                <Box 
-                  className={`toggle-tab ${billingCycle === "yearly" ? "active" : ""}`}
-                  onClick={() => setBillingCycle("yearly")}
-                >
-                  Yearly Billing
-                </Box>
-                <Box 
-                  className={`toggle-tab ${billingCycle === "monthly" ? "active" : ""}`}
-                  onClick={() => setBillingCycle("monthly")}
-                >
-                  Monthly
-                </Box>
-              </CustomSwitch>
+            <CustomSwitch>
+              <Box
+                className={`toggle-tab ${billingCycle === "yearly" ? "active" : ""}`}
+                onClick={() => setBillingCycle("yearly")}
+              >
+                Yearly Billing
+              </Box>
+              <Box
+                className={`toggle-tab ${billingCycle === "monthly" ? "active" : ""}`}
+                onClick={() => setBillingCycle("monthly")}
+              >
+                Monthly
+              </Box>
+            </CustomSwitch>
           </Box>
         </Box>
 
@@ -221,9 +279,9 @@ export default function UserPlan() {
                   {isPopular && <PopularBadge>Recommended</PopularBadge>}
 
                   <Box sx={{ mb: 4 }}>
-                    <Typography variant="h5" sx={{ 
-                      fontWeight: 800, 
-                      color: "var(--text-primary)", 
+                    <Typography variant="h5" sx={{
+                      fontWeight: 800,
+                      color: "var(--text-primary)",
                       mb: 1,
                       textTransform: 'capitalize'
                     }}>
@@ -257,6 +315,8 @@ export default function UserPlan() {
                   <Button
                     variant="contained"
                     fullWidth
+                    disabled={paymentLoading}
+                    onClick={() => handlePayment(plan)}
                     sx={{
                       py: 1.2,
                       borderRadius: "12px",
@@ -275,7 +335,7 @@ export default function UserPlan() {
                       },
                     }}
                   >
-                    Select Plan <ExternalIcon sx={{ ml: 1, fontSize: 18 }} />
+                    {paymentLoading ? "Processing..." : <>Select Plan <ExternalIcon sx={{ ml: 1, fontSize: 18 }} /></>}
                   </Button>
 
                   <Box sx={{ flex: 1 }}>

@@ -100,4 +100,8 @@ export const Api = {
   DELETE_PLAN: `${route}/delete-plan`,
   CHANGE_PLAN_STATUS: `${route}/plan-status`,
   GET_DEVELOPER_WISE_SCHOOL_PLAN: `${route}/get-developer-wise-school-plan`,
+  
+  // Payment
+  CREATE_SCHOOL_PLAN: `payment/create-school-plan`,
+  VERIFY_PAYMENT: `payment/verify`,
 };
