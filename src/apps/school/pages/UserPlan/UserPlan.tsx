@@ -128,6 +128,7 @@ export default function UserPlan() {
 
       const res = await paymentService.createSchoolPlan(payload);
       const { order } = res.data;
+      const isTestMode = import.meta.env.VITE_RAZORPAY_KEY_ID.startsWith("rzp_test");
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -150,9 +151,28 @@ export default function UserPlan() {
         prefill: {
           name: adminDetails?.name,
           email: adminDetails?.email,
-          contact: adminDetails?.phoneNumber || adminDetails?.phone
+          contact: adminDetails?.phoneNumber || adminDetails?.phone,
         },
-        theme: { color: theme?.primaryColor || "#9c0000" }
+        theme: { color: theme?.primaryColor || "#9c0000" },
+        config: isTestMode ? {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI ID",
+                instruments: [
+                  {
+                    method: "upi",
+                    flows: ["collect"],
+                  },
+                ],
+              },
+            },
+            sequence: ["block.upi"],
+            preferences: {
+              show_default_blocks: false,
+            },
+          },
+        } : undefined,
       };
 
       console.log("options", options)
