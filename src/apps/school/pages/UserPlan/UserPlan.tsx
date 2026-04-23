@@ -13,9 +13,10 @@ import {
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { schoolService } from "@/api/services/school.service";
-import { paymentService } from "@/api/services/payment.service";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/Store";
+import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 interface PlanCardProps {
   isPopular?: boolean;
@@ -110,79 +111,36 @@ export default function UserPlan() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
   const [apiPlans, setApiPlans] = useState<any[]>([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
   const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
-  const theme = useSelector((state: RootState) => state.ThemeReducer);
+
+  const schoolId = adminDetails?.schoolId || adminDetails?.schoolData?._id;
 
   const handlePayment = async (plan: any) => {
     try {
       setPaymentLoading(true);
-      const price = billingCycle === "monthly" ? plan.monPrice : plan.yerPrice;
 
-      const payload = {
-        amount: price,
-        schoolId: adminDetails?.schoolId,
-        userId: adminDetails?._id,
-        type: "SUBSCRIPTION",
-        planId: plan._id
-      };
+      const schoolCode = adminDetails?.schoolData?.schoolCode;
+      const token = Cookies.get("auth_token");
 
-      const res = await paymentService.createSchoolPlan(payload);
-      const { order } = res.data;
-      const isTestMode = import.meta.env.VITE_RAZORPAY_KEY_ID.startsWith("rzp_test");
+      if (!schoolCode) {
+        toast.error("School code not found");
+        return;
+      }
 
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: order.currency,
-        name: adminDetails?.schoolData?.schoolName || "Vidya Setu School Management",
-        description: `${plan.planName} Plan - ${billingCycle}`,
-        image: adminDetails?.schoolData?.logo ? `${import.meta.env.VITE_BASE_URL_IMAGE}/${adminDetails.schoolData.logo}` : undefined,
-        order_id: order.id,
-        handler: async function (response: any) {
-          try {
-            await paymentService.verifyPayment(response);
-            alert("✅ Payment Successful and Verified!");
-            // Optionally refresh profile or redirect
-            window.location.reload();
-          } catch (err) {
-            alert("❌ Verification Failed");
-          }
-        },
-        prefill: {
-          name: adminDetails?.name,
-          email: adminDetails?.email,
-          contact: adminDetails?.phoneNumber || adminDetails?.phone,
-        },
-        theme: { color: theme?.primaryColor || "#9c0000" },
-        config: isTestMode ? {
-          display: {
-            blocks: {
-              upi: {
-                name: "Pay via UPI ID",
-                instruments: [
-                  {
-                    method: "upi",
-                    flows: ["collect"],
-                  },
-                ],
-              },
-            },
-            sequence: ["block.upi"],
-            preferences: {
-              show_default_blocks: false,
-            },
-          },
-        } : undefined,
-      };
+      // Build central payment URL
+      const protocol = window.location.protocol;
+      const port = window.location.port ? `:${window.location.port}` : "";
+      const baseDomain = import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
 
-      console.log("options", options)
+      const checkoutUrl = `${protocol}//pay${baseDomain}${port}/checkout?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}&token=${token}`;
 
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
+      console.log("Redirecting to checkout:", checkoutUrl);
+      window.location.href = checkoutUrl;
 
     } catch (error: any) {
-      console.error("Payment Error:", error);
-      alert("❌ Payment Failed: " + (error.response?.data?.message || error.message));
+      console.error("Redirect Error:", error);
+      toast.error("Failed to initiate payment");
     } finally {
       setPaymentLoading(false);
     }
@@ -191,15 +149,38 @@ export default function UserPlan() {
   useEffect(() => {
     const fetchPlanData = async () => {
       try {
-        const res = await schoolService.getDeveloperWiseSchoolPlan(adminDetails?.schoolId);
+        setDataLoading(true);
+        const res = await schoolService.getDeveloperWiseSchoolPlan(schoolId);
         setApiPlans(res.data || []);
       } catch (error) {
         console.error("Error fetching plan data:", error);
+      } finally {
+        setDataLoading(false);
       }
     };
 
-    fetchPlanData();
-  }, [adminDetails?.schoolId]);
+    if (schoolId) {
+      fetchPlanData();
+    } else {
+      // If no schoolId yet, we still set loading to false after a timeout 
+      // or just wait for the profile fetch in Header to finish and trigger this again
+      const timer = setTimeout(() => setDataLoading(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [schoolId]);
+
+  if (dataLoading && apiPlans.length === 0) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', width: '100%' }}>
+        <Box className="loader-main">
+          <Box className="loader">
+            <span></span>
+            <span></span>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
   const filteredPlans = apiPlans.filter((plan: any) => {
     const isNotFree = plan.planName?.toLowerCase() !== "free";

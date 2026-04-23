@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
+import { getCookieDomain } from "@/apps/common/commonJsFunction";
 import { Api } from "../EndPoint";
 const { VITE_BASE_URL, VITE_END_WITH_DOMAIN, VITE_SUB_DOMAIN } = import.meta.env;
 const getBaseURL = () => {
@@ -42,13 +43,17 @@ DataService.interceptors.response.use(
         if (res.status === 200 || res.status === 201 || res.status === 304) {
           const newToken = res.data?.data?.accessToken;
           if (newToken) {
-            Cookies.set("auth_token", newToken, { expires: 7 });
+            Cookies.set("auth_token", newToken, { 
+              expires: 7, 
+              domain: getCookieDomain(),
+              path: "/"
+            });
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
             return DataService(originalRequest);
           }
         }
       } catch (refreshError) {
-        Cookies.remove("auth_token");
+        Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
         window.location.href = "/";
         return Promise.reject(refreshError);
       }

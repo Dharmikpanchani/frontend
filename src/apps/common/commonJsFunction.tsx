@@ -7,7 +7,7 @@ interface SubdomainResult {
 }
 
 export function formatCount(countData: number) {
-  let count = countData ? countData : 0
+  let count = countData ? countData : 0;
   if (count >= 1e9) {
     return (count / 1e9).toFixed(1) + "B";
   } else if (count >= 1e6) {
@@ -15,10 +15,9 @@ export function formatCount(countData: number) {
   } else if (count >= 1e3) {
     return (count / 1e3).toFixed(1) + "K";
   } else {
-    return count.toString(); // Return as string
+    return count.toString();
   }
 }
-
 
 export default function GoToTop({ pageNumber }: { pageNumber: number }) {
   const routePath = useLocation();
@@ -31,7 +30,6 @@ export default function GoToTop({ pageNumber }: { pageNumber: number }) {
 
   return null;
 }
-
 
 export function shortenString(
   str: string,
@@ -46,22 +44,40 @@ export function shortenString(
   return `${start}...${end}`;
 }
 
+const { VITE_END_WITH_DOMAIN } = import.meta.env;
+
 export const getSubdomain = (): SubdomainResult => {
   const host = window.location.hostname;
-  const parts = host.split(".");
+  
+  if (!VITE_END_WITH_DOMAIN) return { isSubdomain: false, name: "" };
 
-  // Handling localhost with subdomains (e.g., school.localhost)
-  if (host === "localhost" || host === "127.0.0.1") {
+  const baseDomainWithDot = VITE_END_WITH_DOMAIN.startsWith(".") ? VITE_END_WITH_DOMAIN : `.${VITE_END_WITH_DOMAIN}`;
+  const apexDomain = baseDomainWithDot.substring(1);
+
+  if (host === "localhost" || host === "127.0.0.1" || host === apexDomain) {
     return { isSubdomain: false, name: "" };
   }
 
-  // If we have more than 2 parts (e.g., school.example.com or school.localhost)
-  if (parts.length > 2 || (parts.length === 2 && parts[1] === "localhost")) {
-    return {
-      isSubdomain: true,
-      name: parts[0],
-    };
+  if (host.endsWith(baseDomainWithDot)) {
+    const subdomain = host.replace(baseDomainWithDot, "");
+    if (subdomain && subdomain !== "") {
+      return { isSubdomain: true, name: subdomain };
+    }
   }
 
   return { isSubdomain: false, name: "" };
+};
+
+export const getCookieDomain = () => {
+  const host = window.location.hostname;
+  if (!VITE_END_WITH_DOMAIN) return undefined;
+
+  const baseDomainWithDot = VITE_END_WITH_DOMAIN.startsWith(".") ? VITE_END_WITH_DOMAIN : `.${VITE_END_WITH_DOMAIN}`;
+  const apexDomain = baseDomainWithDot.substring(1);
+
+  if (host === "localhost" || host === "127.0.0.1" || host === apexDomain) {
+    return undefined;
+  }
+  
+  return VITE_END_WITH_DOMAIN;
 };

@@ -2,13 +2,21 @@ import { useMemo } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { developerRoutes } from "../apps/developer/routes";
 import { schoolRoutes } from "../apps/school/routes";
+import { paymentRoutes } from "../apps/payment/routes";
 import { getSubdomain } from "../apps/common/commonJsFunction";
 
 const Router: React.FC = () => {
-  const { isSubdomain } = getSubdomain();
+  const { isSubdomain, name } = getSubdomain();
 
   // Choose routes based on subdomain
-  const appRoutes = isSubdomain ? schoolRoutes : developerRoutes;
+  let appRoutes = developerRoutes;
+  if (isSubdomain) {
+    if (name === "pay") {
+      appRoutes = paymentRoutes;
+    } else {
+      appRoutes = schoolRoutes;
+    }
+  }
 
   const router = useMemo(() => createBrowserRouter(appRoutes), [appRoutes]);
 

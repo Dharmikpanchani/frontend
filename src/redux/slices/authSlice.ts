@@ -4,6 +4,7 @@ import type { AdminState } from "../../types/interfaces/reduxInterface";
 import { authService } from "../../api/services/auth.service";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
+import { getCookieDomain } from "../../apps/common/commonJsFunction";
 
 export interface AuthState extends AdminState {
   emailForReset: string;
@@ -191,7 +192,7 @@ const authSlice = createSlice({
       state.token = "";
       state.emailForReset = "";
       state.isOtpPending = false;
-      Cookies.remove("auth_token");
+      Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
     },
     setEmailForReset: (state, action: PayloadAction<string>) => {
       state.emailForReset = action.payload;
@@ -201,7 +202,7 @@ const authSlice = createSlice({
       state.isAdminLogin = true;
       const token = action.payload?.accessToken || action.payload?.token || state.token || Cookies.get("auth_token") || "";
       state.token = token;
-      if (token) Cookies.set("auth_token", token, { expires: 7 });
+      if (token) Cookies.set("auth_token", token, { expires: 7, domain: getCookieDomain(), path: "/" });
     },
   },
   extraReducers: (builder) => {
@@ -222,7 +223,7 @@ const authSlice = createSlice({
           state.adminDetails = { ...action.payload, isLogin: true };
           const token = action.payload?.accessToken || action.payload?.token || "";
           state.token = token;
-          if (token) Cookies.set("auth_token", token, { expires: 7 });
+          if (token) Cookies.set("auth_token", token, { expires: 7, domain: getCookieDomain(), path: "/" });
         }
       })
       .addCase(loginAdmin.rejected, (state) => {
@@ -255,7 +256,7 @@ const authSlice = createSlice({
             state.adminDetails = { ...action.payload, isLogin: true };
             const token = action.payload?.accessToken || action.payload?.token || state.token || Cookies.get("auth_token") || "";
             state.token = token;
-            if (token) Cookies.set("auth_token", token, { expires: 7 });
+            if (token) Cookies.set("auth_token", token, { expires: 7, domain: getCookieDomain(), path: "/" });
           }
         }
       })

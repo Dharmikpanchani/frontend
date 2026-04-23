@@ -38,4 +38,5 @@ export const schoolService = {
     if (schoolId) url += `?school_id=${schoolId}`;
     return adminApiService.get<any>(url);
   },
+  getSchoolByCode: (schoolCode: string) => adminApiService.get<any>(`${Api.GET_SCHOOL_BY_CODE}?schoolCode=${schoolCode}`),
 };
