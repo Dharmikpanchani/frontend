@@ -230,6 +230,7 @@ export default function AddEditAdminUser() {
         password: "",
         confirmPassword: "",
         role: (isEdit || isView) ? (selectedAdminUser?.role?._id || "") : "",
+        UPIId: (isEdit || isView) ? (selectedAdminUser?.UPIId || "") : "",
         id: id || "",
     }), [isEdit, isView, selectedAdminUser, id]);
 
@@ -243,6 +244,7 @@ export default function AddEditAdminUser() {
         urlencoded.append("email", values.email);
         urlencoded.append("phoneNumber", values.phoneNumber);
         urlencoded.append("role", values.role);
+        urlencoded.append("UPIId", values.UPIId);
 
         if (id) {
             urlencoded.append("id", id);
@@ -401,6 +403,23 @@ export default function AddEditAdminUser() {
                                                     disabled={isView}
                                                 />
                                                 <FormHelperText className="error-text">{(touched.phoneNumber && errors.phoneNumber) ? (errors.phoneNumber as string) : ""}</FormHelperText>
+                                            </Box>
+
+                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }} className="admin-input-box">
+                                                <Typography sx={labelSx}>UPI ID (For Commission)</Typography>
+                                                <TextField
+                                                    fullWidth
+                                                    name="UPIId"
+                                                    placeholder="Enter UPI ID (e.g. name@bank)"
+                                                    variant="outlined"
+                                                    sx={inputSx}
+                                                    value={values.UPIId}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    error={touched.UPIId && Boolean(errors.UPIId)}
+                                                    disabled={isView}
+                                                />
+                                                <FormHelperText className="error-text">{(touched.UPIId && errors.UPIId) ? (errors.UPIId as string) : ""}</FormHelperText>
                                             </Box>
 
 

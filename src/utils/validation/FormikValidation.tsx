@@ -250,7 +250,20 @@ export const dateValidation = (required = true, message = "Date is required") =>
 
   return required
     ? schema.required(message).typeError("Please enter a valid date")
-    : schema.nullable();
+    : schema;
+};
+
+export const upiIdValidation = (required = false) => {
+  let schema = Yup.string()
+    .test(
+      "no-whitespace",
+      "Please enter a valid UPI ID",
+      (_value, context) => typeof context.originalValue !== 'string' || context.originalValue.trim() === context.originalValue
+    )
+    .transform((value) => value?.trim())
+    .matches(/^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z0-9.]{2,64}$/, "Invalid UPI ID format (e.g. name@bank)");
+
+  return required ? schema.required("UPI ID is required") : schema;
 };
 
 export const dobValidation = (required = true) => {
@@ -366,6 +379,7 @@ export const adminUserValidationSchema = Yup.object({
   name: fullNameValidation("Name", true),
   email: emailValidation(true),
   phoneNumber: phoneNumberValidation(true),
+  UPIId: upiIdValidation(false),
   password: Yup.string().when("id", {
     is: (id: string) => !id,
     then: () => passwordValidation("Password", true),
