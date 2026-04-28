@@ -131,7 +131,12 @@ export const schoolCodeValidation = (required = true) => {
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z0-9-]+$/, "Please enter a valid school code")
     .min(3, "School code must be at least 3 characters")
-    .max(30, "School code must be at most 30 characters");
+    .max(30, "School code must be at most 30 characters")
+    .test(
+      "not-pay",
+      "'pay' is a reserved keyword for payments and cannot be used as School Code",
+      (value) => value?.toLowerCase() !== "pay"
+    );
 
   return required
     ? schema.required("School code is required")

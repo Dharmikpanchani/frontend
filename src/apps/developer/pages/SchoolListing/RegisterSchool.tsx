@@ -651,7 +651,7 @@ export default function RegisterSchool() {
                                                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                                                     <Box sx={{ position: 'relative' }}>
                                                         <Button
-                                                            variant="contained"
+                                                            variant="outlined"
                                                             component="label"
                                                             disabled={isView}
                                                             sx={{
@@ -719,7 +719,7 @@ export default function RegisterSchool() {
                                                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                                                     <Box sx={{ position: 'relative' }}>
                                                         <Button
-                                                            variant="contained"
+                                                            variant="outlined"
                                                             component="label"
                                                             disabled={isView}
                                                             sx={{

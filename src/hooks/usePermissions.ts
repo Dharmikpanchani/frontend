@@ -12,7 +12,7 @@ export const usePermissions = () => {
     const isSuperAdmin = adminDetails?.isSuperAdmin;
 
     const rolePermissions: string[] = adminDetails?.role?.permissions ?? [];
-    const planPermissions: string[] = adminDetails?.schoolData?.planId?.permissions ?? [];
+    const planPermissions: string[] = adminDetails?.schoolData?.plan?.permissions ?? [];
     const checkPermission = (p: string): boolean => {
         if (isSuperDeveloper) return true;
 

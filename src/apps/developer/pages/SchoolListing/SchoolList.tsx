@@ -512,7 +512,7 @@ export default function SchoolList() {
                         <TableCell className="table-td">
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>
                             <Typography sx={{ fontSize: '14px', fontWeight: 700, color: '#111827', textTransform: 'capitalize' }}>
-                              {data?.planId?.planName || '---'}
+                              {data?.plan?.planName || '---'}
                             </Typography>
                             <Box sx={{
                               display: 'inline-flex',

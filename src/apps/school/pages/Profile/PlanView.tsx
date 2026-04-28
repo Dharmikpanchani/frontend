@@ -275,24 +275,7 @@ export default function PlanView() {
                     </Box>
                 </Box>
 
-                {/* 2. Usage Limits */}
-                <SectionTitle icon={LimitsIcon} title="Usage & Limits" />
-                <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 6 }}>
-                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                        <Typography sx={labelSx}>Max Students</Typography>
-                        <TextField fullWidth variant="outlined" sx={inputSx} value={initialValues.maxStudents} disabled />
-                    </Box>
-                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                        <Typography sx={labelSx}>Max Teachers</Typography>
-                        <TextField fullWidth variant="outlined" sx={inputSx} value={initialValues.maxTeachers} disabled />
-                    </Box>
-                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                        <Typography sx={labelSx}>Max Classes</Typography>
-                        <TextField fullWidth variant="outlined" sx={inputSx} value={initialValues.maxClasses} disabled />
-                    </Box>
-                </Box>
-
-                {/* 3. Permissions */}
+                {/* 2. Permissions */}
                 <SectionTitle icon={SecurityIcon} title="Included Features" />
                 <TableContainer component={Paper} className="table-container permission-table-container" sx={{ boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: '12px', mb: 4 }}>
                     <Table className="table">
