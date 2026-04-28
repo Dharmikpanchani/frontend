@@ -88,7 +88,7 @@ export default function AddEditAdminUser() {
     const getRelativePlanExpiry = (expiryTimestamp: number, isActivePlan: boolean) => {
         if (!expiryTimestamp) return "No expiry set";
         const now = moment();
-        const expiry = moment.unix(expiryTimestamp);
+        const expiry = moment(expiryTimestamp);
 
         if (!isActivePlan || expiry.isBefore(now)) {
             return `Expired on ${expiry.format('DD MMM YY')}`;

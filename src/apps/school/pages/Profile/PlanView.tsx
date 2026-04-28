@@ -17,7 +17,6 @@ import {
 } from "@mui/material";
 import {
     Assignment as AssignmentIcon,
-    SignalCellularAlt as LimitsIcon,
     Security as SecurityIcon,
     Verified as VerifiedIcon,
     AccessTime as ExpiryIcon
@@ -175,7 +174,7 @@ export default function PlanView() {
                             fontFamily: "'Poppins', sans-serif",
                             lineHeight: 1
                         }}>
-                            {planExpiryDate ? moment.unix(planExpiryDate).format("MMMM DD, YYYY") : "No Expiry Set"}
+                            {planExpiryDate ? moment(planExpiryDate).format("MMMM DD, YYYY") : "No Expiry Set"}
                         </Typography>
                     </Box>
                 </Box>

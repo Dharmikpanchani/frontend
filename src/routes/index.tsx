@@ -18,6 +18,11 @@ const Router: React.FC = () => {
     }
   }
 
+  // Force payment routes for local dev testing
+  if ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") && window.location.pathname.startsWith("/checkout")) {
+    appRoutes = paymentRoutes;
+  }
+
   const router = useMemo(() => createBrowserRouter(appRoutes), [appRoutes]);
 
   return <RouterProvider router={router} />;

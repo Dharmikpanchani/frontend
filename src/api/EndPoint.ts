@@ -6,7 +6,12 @@ const schoolAdmin = "admin";
 
 const isSubdomain = getSubdomain();
 
-const route = isSubdomain?.isSubdomain ? schoolAdmin : developer;
+let route = isSubdomain?.isSubdomain ? schoolAdmin : developer;
+
+// Override route for local testing of Checkout page
+if (window.location.pathname.startsWith("/checkout")) {
+  route = schoolAdmin;
+}
 
 export const Api = {
   LOGIN: `${route}/login`,

@@ -153,11 +153,8 @@ export default function Checkout() {
             const protocol = window.location.protocol;
             const baseDomain = import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
             const port = window.location.port ? `:${window.location.port}` : "";
-            const redirectUrl = `${protocol}//${schoolCode}${baseDomain}${port}/dashboard?payment=success`;
-
-            setTimeout(() => {
-              window.location.href = redirectUrl;
-            }, 2000);
+            const redirectUrl = `${protocol}//${schoolCode?.toLowerCase() || ''}${baseDomain}${port}/dashboard?payment=success`;
+            window.location.href = redirectUrl;
           } catch (err) {
             toast.error("Verification Failed");
           }
@@ -244,7 +241,7 @@ export default function Checkout() {
                 const protocol = window.location.protocol;
                 const baseDomain = import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
                 const port = window.location.port ? `:${window.location.port}` : "";
-                window.location.href = `${protocol}//${schoolCode}${baseDomain}${port}/dashboard`;
+                window.location.href = `${protocol}//${schoolCode.toLowerCase()}${baseDomain}${port}/dashboard`;
               } else {
                 window.history.back();
               }
