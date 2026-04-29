@@ -6,10 +6,10 @@ const Checkout = lazy(() => import("./pages/Checkout/Checkout"));
 
 export const paymentRoutes: RouteConfig[] = [
   {
-    path: "/",
+    path: "/checkout",
     children: [
-      { path: "/checkout", element: <Checkout /> },
-      { path: "/", element: <Checkout /> },
+      { path: "school-plan", element: <Checkout /> },
+      { path: "", element: <Checkout /> },
     ],
   },
   {

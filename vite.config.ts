@@ -14,7 +14,10 @@ export default defineConfig({
     host: true,
     port: 5173,
     strictPort: true,
-    allowedHosts: ['.lvh.me'],
+    allowedHosts: [
+  '.lvh.me',
+  'https://0cf9-171-61-167-248.ngrok-free.app/'
+],
 
     proxy: {
       '/api': {

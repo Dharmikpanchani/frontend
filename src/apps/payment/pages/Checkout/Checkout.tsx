@@ -66,7 +66,7 @@ const StatusBadge = styled(Box)(() => ({
 }));
 
 export default function Checkout() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [schoolData, setSchoolData] = useState<any>(null);
@@ -75,30 +75,23 @@ export default function Checkout() {
   const schoolCode = searchParams.get("schoolCode");
   const planId = searchParams.get("planId");
   const billingCycle = searchParams.get("billingCycle") || "yearly";
-  const token = searchParams.get("token");
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (token) {
-      // Set the token on the apex domain to share it across subdomains
-      const hostParts = window.location.hostname.split(".");
-      const baseDomain = hostParts.length > 1 ? `.${hostParts.slice(-2).join(".")}` : window.location.hostname;
+    const token = Cookies.get("auth_token");
 
-      Cookies.set("auth_token", token, {
-        expires: 7,
-        domain: baseDomain === "localhost" ? undefined : baseDomain,
-        path: "/"
-      });
-
-      searchParams.delete("token");
-      setSearchParams(searchParams, { replace: true });
+    if (!token) {
+      toast.error("Session expired or invalid. Please login again.");
+      dispatch(logoutAdmin() as any);
+      setLoading(false);
+      return;
     }
 
     const fetchData = async () => {
       try {
         if (!schoolCode || !planId) {
           toast.error("Invalid checkout parameters");
-          dispatch(logoutAdmin() as any);
+          // dispatch(logoutAdmin() as any);
           return;
         }
 
@@ -106,8 +99,7 @@ export default function Checkout() {
         const schoolRes = await schoolService.getSchoolByCode(schoolCode);
         setSchoolData(schoolRes.data);
 
-        // Fetch Plan Details (optional if we trust backend, but good for UI)
-        // We'll use getDeveloperWiseSchoolPlan or similar if needed
+        // Fetch Plan Details
         const plansRes = await schoolService.getDeveloperWiseSchoolPlan(schoolRes.data._id);
         const selectedPlan = plansRes.data.find((p: any) => p._id === planId);
         setPlanData(selectedPlan);
@@ -121,7 +113,7 @@ export default function Checkout() {
     };
 
     fetchData();
-  }, [schoolCode, planId, token]);
+  }, [schoolCode, planId, dispatch]);
 
   const handlePayment = async () => {
     try {

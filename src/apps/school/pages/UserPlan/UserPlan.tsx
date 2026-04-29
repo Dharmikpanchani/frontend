@@ -136,8 +136,8 @@ export default function UserPlan() {
       // Razorpay doesn't accept lvh.me in local test mode. Force localhost for local dev.
       const isLocalDev = window.location.hostname.includes("lvh.me") || window.location.hostname === "localhost";
       const checkoutUrl = isLocalDev 
-          ? `${protocol}//localhost${port}/checkout?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}&token=${token}`
-          : `${protocol}//pay${baseDomain}${port}/checkout?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}&token=${token}`;
+          ? `${protocol}//localhost${port}/checkout/school-plan?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}`
+          : `${protocol}//pay${baseDomain}${port}/checkout/school-plan?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}`;
 
       console.log("Redirecting to checkout:", checkoutUrl);
       window.location.href = checkoutUrl;
