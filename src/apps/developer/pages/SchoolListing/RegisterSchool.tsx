@@ -660,11 +660,11 @@ export default function RegisterSchool() {
                                                                 height: '100px',
                                                                 borderRadius: '12px',
                                                                 border: '1px dashed #ced4da',
-                                                                bgcolor: '#f8f9fa',
+                                                                bgcolor: 'transparent',
                                                                 p: 0,
                                                                 overflow: 'hidden',
                                                                 flexShrink: 0,
-                                                                '&:hover': { bgcolor: isView ? '#f8f9fa' : '#f1f3f5' },
+                                                                '&:hover': { bgcolor: 'transparent' },
                                                                 cursor: isView ? 'default' : 'pointer'
                                                             }}
                                                         >
@@ -729,11 +729,11 @@ export default function RegisterSchool() {
                                                                 height: '100px',
                                                                 borderRadius: '8px',
                                                                 border: '1.5px dashed #D0D5DD',
-                                                                bgcolor: '#F9FAFB',
+                                                                bgcolor: 'transparent',
                                                                 p: 0,
                                                                 overflow: 'hidden',
                                                                 flexShrink: 0,
-                                                                '&:hover': { bgcolor: isView ? '#F8F9FA' : '#F1F3F5' },
+                                                                '&:hover': { bgcolor: 'transparent' },
                                                                 cursor: isView ? 'default' : 'pointer',
                                                                 display: 'flex',
                                                                 alignItems: 'center',

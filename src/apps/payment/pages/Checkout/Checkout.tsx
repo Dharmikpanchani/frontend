@@ -19,10 +19,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { paymentService } from "@/api/services/payment.service";
 import { schoolService } from "@/api/services/school.service";
-import Cookies from "js-cookie";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { logoutAdmin } from "@/redux/slices/authSlice";
 
 const GlassCard = styled(Card)(() => ({
   borderRadius: "32px",
@@ -75,23 +72,13 @@ export default function Checkout() {
   const schoolCode = searchParams.get("schoolCode");
   const planId = searchParams.get("planId");
   const billingCycle = searchParams.get("billingCycle") || "yearly";
-  const dispatch = useDispatch();
 
   useEffect(() => {
-    const token = Cookies.get("auth_token");
-
-    if (!token) {
-      toast.error("Session expired or invalid. Please login again.");
-      dispatch(logoutAdmin() as any);
-      setLoading(false);
-      return;
-    }
-
     const fetchData = async () => {
       try {
         if (!schoolCode || !planId) {
           toast.error("Invalid checkout parameters");
-          // dispatch(logoutAdmin() as any);
+          setLoading(false);
           return;
         }
 
@@ -113,7 +100,7 @@ export default function Checkout() {
     };
 
     fetchData();
-  }, [schoolCode, planId, dispatch]);
+  }, [schoolCode, planId]);
 
   const handlePayment = async () => {
     try {

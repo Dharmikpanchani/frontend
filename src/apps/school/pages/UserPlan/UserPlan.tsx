@@ -15,7 +15,6 @@ import { styled } from "@mui/material/styles";
 import { schoolService } from "@/api/services/school.service";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/Store";
-import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
 interface PlanCardProps {
@@ -121,7 +120,6 @@ export default function UserPlan() {
       setPaymentLoading(true);
 
       const schoolCode = adminDetails?.schoolData?.schoolCode;
-      const token = Cookies.get("auth_token");
 
       if (!schoolCode) {
         toast.error("School code not found");
@@ -133,11 +131,17 @@ export default function UserPlan() {
       const port = window.location.port ? `:${window.location.port}` : "";
       const baseDomain = import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
 
-      // Razorpay doesn't accept lvh.me in local test mode. Force localhost for local dev.
-      const isLocalDev = window.location.hostname.includes("lvh.me") || window.location.hostname === "localhost";
-      const checkoutUrl = isLocalDev 
-          ? `${protocol}//localhost${port}/checkout/school-plan?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}`
-          : `${protocol}//pay${baseDomain}${port}/checkout/school-plan?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}`;
+      let checkoutBase: string;
+      if (window.location.hostname.includes("lvh.me")) {
+        // Local dev on lvh.me subdomain → redirect to root lvh.me (no subdomain)
+        checkoutBase = `${protocol}//lvh.me${port}`;
+      } else if (window.location.hostname === "localhost") {
+        checkoutBase = `${protocol}//localhost${port}`;
+      } else {
+        checkoutBase = `${protocol}//pay${baseDomain}${port}`;
+      }
+
+      const checkoutUrl = `${checkoutBase}/checkout/school-plan?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}`;
 
       console.log("Redirecting to checkout:", checkoutUrl);
       window.location.href = checkoutUrl;

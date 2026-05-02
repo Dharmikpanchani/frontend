@@ -167,7 +167,7 @@ export default function Sidebar(props: any) {
       <Box className="admin-sidebar-inner-main">
         {/* Logo Section */}
         <Box className="admin-sidebar-logo-main">
-          <Link to={"/dashboard"} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textDecoration: 'none', width: '100%' }}>
+          <Link to={"/dashboard"} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textDecoration: 'none' }}>
             <img
               src={adminDetails?.schoolData?.logo ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + adminDetails?.schoolData?.logo : Png.logoImg}
               className="admin-sidebar-logo"

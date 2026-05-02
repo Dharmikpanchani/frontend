@@ -101,7 +101,7 @@ export default function Header(props: any) {
                   sx={{
                     width: "38px",
                     height: "38px",
-                    borderRadius: "10px",
+                    borderRadius: "5px",
                     background: "var(--primary-color, linear-gradient(135deg, #9c0000 0%, #3a0000 100%))",
                     display: "flex",
                     justifyContent: "center",
