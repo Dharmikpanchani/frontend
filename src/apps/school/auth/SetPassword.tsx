@@ -12,9 +12,11 @@ import type { RootState } from "@/redux/Store";
 import Spinner from "../component/schoolCommon/spinner/Spinner";
 import Png from "@/assets/Png";
 import { getSubdomain } from "@/apps/common/commonJsFunction";
+import { useThemeManager } from "../hooks/useThemeManager";
 
 export default function SetPassWord() {
   const isSubdomain = getSubdomain();
+  useThemeManager();
   const { schoolLogo } = useSelector((state: RootState) => state.SchoolReducer);
   const navigate = useNavigate();
   const dispatch = useDispatch();

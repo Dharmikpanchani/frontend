@@ -186,33 +186,31 @@ export default function Header(props: any) {
             }}
           >
             {!isUserPlanPage && (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    navigate("/profile");
-                    handleClose();
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <SettingsIcon sx={{ fontSize: '18px' }} />
-                    Account Settings
-                  </Box>
-                </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  navigate("/profile");
+                  handleClose();
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <SettingsIcon sx={{ fontSize: '18px' }} />
+                  Account Settings
+                </Box>
+              </MenuItem>
+            )}
 
-                {hasPermission(schoolAdminPermission.theme.read) && (
-                  <MenuItem
-                    onClick={() => {
-                      navigate("/theme-settings");
-                      handleClose();
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <PaletteIcon sx={{ fontSize: '18px' }} />
-                      Theme Settings
-                    </Box>
-                  </MenuItem>
-                )}
-              </>
+            {!isUserPlanPage && hasPermission(schoolAdminPermission.theme.read) && (
+              <MenuItem
+                onClick={() => {
+                  navigate("/theme-settings");
+                  handleClose();
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <PaletteIcon sx={{ fontSize: '18px' }} />
+                  Theme Settings
+                </Box>
+              </MenuItem>
             )}
 
             <MenuItem

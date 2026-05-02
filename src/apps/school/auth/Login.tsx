@@ -16,10 +16,12 @@ import { toasterError } from "@/utils/toaster/Toaster";
 import Spinner from "../component/schoolCommon/spinner/Spinner";
 import Png from "@/assets/Png";
 import type { RootState } from "@/redux/Store";
+import { useThemeManager } from "../hooks/useThemeManager";
 
 
 export default function Login() {
   const isSubdomain = getSubdomain();
+  useThemeManager();
   const { schoolLogo } = useSelector((state: RootState) => state.SchoolReducer);
   const [showPassword, setShowPassword] = React.useState(true);
   const handleClickShowPassword = () => setShowPassword((show) => !show);

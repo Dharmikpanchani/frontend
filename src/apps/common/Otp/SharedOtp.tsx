@@ -10,6 +10,7 @@ import Png from "@/assets/Png";
 import { getSubdomain } from "@/apps/common/commonJsFunction";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/Store";
+import { useThemeManager } from "@/apps/school/hooks/useThemeManager";
 
 interface SharedOtpProps {
     title?: string;
@@ -32,6 +33,7 @@ export default function SharedOtp({
     loading,
     resendLoading
 }: SharedOtpProps) {
+    useThemeManager();
     const isSubdomain = getSubdomain();
     const { schoolLogo } = useSelector((state: RootState) => state.SchoolReducer);
     const [timeLeft, setTimeLeft] = useState(120);

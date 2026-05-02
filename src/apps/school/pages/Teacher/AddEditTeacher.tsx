@@ -432,7 +432,7 @@ export default function AddEditTeacher() {
                                             </Box>
 
                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
-                                                <Typography sx={labelSx}>Date of Birth</Typography>
+                                                <Typography sx={labelSx}>Date of Birth<span style={{ color: '#ef4444' }}>*</span></Typography>
                                                 <LocalizationProvider dateAdapter={AdapterMoment}>
                                                     <DatePicker
                                                         format="DD/MM/YYYY"

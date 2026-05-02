@@ -54,11 +54,14 @@ DataService.interceptors.response.use(
         }
       } catch (refreshError) {
         Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
+        Cookies.remove("auth_token", { path: "/" });
         window.location.href = "/";
         return Promise.reject(refreshError);
       }
     }
     if (error.response?.status === 404 && (originalRequest.url === Api.GET_PROFILE || originalRequest.url === Api.GET_SCHOOL_PROFILE)) {
+      Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
+      Cookies.remove("auth_token", { path: "/" });
       window.location.href = "/";
     }
     return Promise.reject(error);

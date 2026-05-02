@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Outfit:wght@400;500;600;700&display=swap');
+/* Fonts loaded via index.html for better performance */
 
 * {
   box-sizing: border-box;
@@ -2165,14 +2165,14 @@ img[alt] {
 }
 
 .admin-sidebar-logo {
-  max-width: 90%;
+  max-width: 48px;
   height: 48px;
   width: auto;
   object-fit: contain;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: block;
-  border-radius: 5px;
+  border-radius: 10px;
   margin: 0 auto;
 }
 
@@ -4397,7 +4397,7 @@ span.admin-sidebar-link-text {
   height: 70px;
   align-self: center;
   margin-bottom: 8px;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .login-card .login-title {
@@ -5022,7 +5022,7 @@ span.admin-sidebar-link-text {
   flex-shrink: 0;
   width: 45px;
   height: 45px;
-  border-radius: 12px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.1);
   padding: 2px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -5037,7 +5037,7 @@ span.admin-sidebar-link-text {
   width: 85%;
   height: 85%;
   object-fit: contain;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 .admin-school-name {

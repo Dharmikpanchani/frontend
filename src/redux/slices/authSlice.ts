@@ -193,6 +193,7 @@ const authSlice = createSlice({
       state.emailForReset = "";
       state.isOtpPending = false;
       Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
+      Cookies.remove("auth_token", { path: "/" });
     },
     setEmailForReset: (state, action: PayloadAction<string>) => {
       state.emailForReset = action.payload;

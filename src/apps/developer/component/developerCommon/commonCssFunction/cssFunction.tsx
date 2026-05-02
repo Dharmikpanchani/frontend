@@ -160,6 +160,7 @@ const BpCheckedIcon = styled(BpIcon)({
   },
   "input:disabled ~ &": {
     backgroundColor: "var(--primary-color)",
+    opacity: 0.8, // Increased opacity for darker theme-based look
     cursor: "not-allowed",
   },
 });

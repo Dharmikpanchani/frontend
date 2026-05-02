@@ -12,12 +12,13 @@ import { emailValidationSchema } from "@/utils/validation/FormikValidation";
 import { toasterError } from "@/utils/toaster/Toaster";
 import Spinner from "../component/schoolCommon/spinner/Spinner";
 import Png from "@/assets/Png";
-import { getSubdomain } from "@/apps/common/commonJsFunction";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/Store";
+import { useThemeManager } from "../hooks/useThemeManager";
 
 export default function ForgotPassword() {
   const isSubdomain = getSubdomain();
+  useThemeManager();
   const { schoolLogo } = useSelector((state: RootState) => state.SchoolReducer);
   const [buttonSpinner, setButtonSpinner] = useState(false);
   const navigate = useNavigate();

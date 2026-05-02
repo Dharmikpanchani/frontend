@@ -242,14 +242,14 @@ export const countryValidation = (required = true) => {
 };
 
 export const dateValidation = (required = true, message = "Date is required") => {
-  let schema = Yup.mixed<moment.Moment>()
+  let schema = Yup.mixed<moment.Moment>().nullable()
     .test("is-valid", "Please enter a valid date", (value) => {
-      if (!value) return true;
+      if (value === null || value === undefined) return true;
       return moment(value).isValid();
     });
 
   return required
-    ? schema.required(message).typeError("Please enter a valid date")
+    ? schema.required(message)
     : schema;
 };
 
@@ -269,7 +269,7 @@ export const upiIdValidation = (required = false) => {
 export const dobValidation = (required = true) => {
   return dateValidation(required, "Date of birth is required")
     .test("age-check", "Teacher must be between 18 and 70 years old", (value) => {
-      if (!value) return true;
+      if (value === null || value === undefined) return true;
       const age = moment().diff(moment(value), 'years');
       return age >= 18 && age <= 70;
     });
@@ -278,7 +278,7 @@ export const dobValidation = (required = true) => {
 export const joiningDateValidation = (required = true) => {
   return dateValidation(required, "Joining date is required")
     .test("future-check", "Joining date must be today or in the future", (value) => {
-      if (!value) return true;
+      if (value === null || value === undefined) return true;
       return moment(value).isSameOrAfter(moment(), "day");
     });
 };
@@ -609,7 +609,7 @@ export const teacherValidationSchema = Yup.object().shape({
   phoneNumber: phoneNumberValidation(true),
   alternatePhoneNumber: phoneNumberValidation(false),
   gender: Yup.string().optional(),
-  dateOfBirth: dobValidation(false),
+  dateOfBirth: dobValidation(true),
   bloodGroup: Yup.string().optional(),
   // Address
   address: genericStringValidation("Address", 5, 200, false),
