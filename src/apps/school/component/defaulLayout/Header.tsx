@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import { ExpandMore, Settings as SettingsIcon, Logout as LogoutIcon, Palette as PaletteIcon } from "@mui/icons-material";
 import { authService } from "@/api/services/auth.service";
-import { logoutAdmin, getProfileAdmin } from "@/redux/slices/authSlice";
+import { logoutAdmin } from "@/redux/slices/authSlice";
 import Svg from "@/assets/Svg";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";

@@ -400,8 +400,15 @@ export const adminUserValidationSchema = Yup.object({
 export const profileValidationSchema = Yup.object({
   name: fullNameValidation("Name", true),
   email: emailValidation(true),
-  phoneNumber: phoneNumberValidation(false),
+  phoneNumber: phoneNumberValidation(true),
   address: addressValidation(false),
+  city: cityValidation(false),
+  state: stateValidation(false),
+  country: countryValidation(false),
+  zipCode: zipCodeValidation(false),
+  latitude: Yup.string().optional(),
+  longitude: Yup.string().optional(),
+  UPIId: upiIdValidation(false),
   profile: imageValidation("Profile photo", false),
   imageUrl: Yup.string().optional(),
 });
@@ -731,6 +738,7 @@ export const teacherValidationSchema = Yup.object().shape({
   idProof: imageValidation("ID Proof", false).nullable(),
   educationCertificates: Yup.array().of(Yup.mixed()).optional(),
   experienceCertificates: Yup.array().of(Yup.mixed()).optional(),
+  role: Yup.string().required("Please select role"),
 }, [["shiftTimeFrom", "shiftTimeTo"]]);
 
 import { calculateMinMonthlyPrice } from "@/apps/common/StaticArrayData";

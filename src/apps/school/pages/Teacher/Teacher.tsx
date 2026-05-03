@@ -433,6 +433,11 @@ export default function Teacher() {
                             <Typography sx={{ fontSize: '11px', color: '#111827', fontStyle: 'italic' }}>
                               {data?.designation || "N/A"}
                             </Typography>
+                            {data?.userId?.role?.role && (
+                              <Typography sx={{ fontSize: '10px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', mt: 0.2 }}>
+                                Role: {data?.userId?.role?.role}
+                              </Typography>
+                            )}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
                               <BadgeIcon sx={{ fontSize: 13, color: '#9ca3af' }} />
                               <Typography sx={{ fontSize: '10px', color: '#9ca3af', fontWeight: 600 }}>EXP:</Typography>

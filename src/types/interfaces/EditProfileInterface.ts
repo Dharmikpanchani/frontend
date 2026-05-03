@@ -5,6 +5,13 @@ export interface AddProfileInterFace {
     profile: File | Blob;
     imageUrl?: string;
     address: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    zipCode?: string;
+    latitude?: string;
+    longitude?: string;
+    UPIId?: string;
 }
 export interface GetProfileInterFace {
     email: string,
@@ -13,4 +20,11 @@ export interface GetProfileInterFace {
     profile?: File | Blob;
     image?: string;
     address: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    zipCode?: string;
+    latitude?: string;
+    longitude?: string;
+    UPIId?: string;
 }

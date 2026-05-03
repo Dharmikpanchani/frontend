@@ -38,6 +38,7 @@ import { getDepartments } from "@/redux/slices/departmentSlice";
 import { getSubjects } from "@/redux/slices/subjectSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import { getSections } from "@/redux/slices/sectionSlice";
+import { getAllRolesSimple } from "@/redux/slices/roleSlice";
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
@@ -72,6 +73,7 @@ export default function AddEditTeacher() {
     const { allSubjects: subjects } = useSelector((state: RootState) => state.SubjectReducer);
     const { allClasses: classes } = useSelector((state: RootState) => state.ClassReducer);
     const { allSections: sections } = useSelector((state: RootState) => state.SectionReducer);
+    const { allRoles } = useSelector((state: RootState) => state.RoleReducer);
     const { actionLoading, loading: teacherLoading } = useSelector((state: RootState) => state.TeacherReducer);
     const { loading: deptLoading } = useSelector((state: RootState) => state.DepartmentReducer);
     const { loading: subjectLoading } = useSelector((state: RootState) => state.SubjectReducer);
@@ -94,6 +96,7 @@ export default function AddEditTeacher() {
         dispatch(getSubjects(params) as any);
         dispatch(getClasses(params) as any);
         dispatch(getSections(params) as any);
+        dispatch(getAllRolesSimple("filter") as any);
 
         if (id) {
             fetchTeacherDetails();
@@ -161,6 +164,7 @@ export default function AddEditTeacher() {
         shiftTiming: teacherData?.shiftTiming || "",
         shiftTimeFrom: teacherData?.shiftTiming?.includes(" - ") ? moment(teacherData.shiftTiming.split(" - ")[0], "hh:mm A") : null,
         shiftTimeTo: teacherData?.shiftTiming?.includes(" - ") ? moment(teacherData.shiftTiming.split(" - ")[1], "hh:mm A") : null,
+        role: teacherData?.userId?.role?._id || teacherData?.userId?.role || "",
         isActive: teacherData?.isActive ?? true,
     }), [id, teacherData]);
 
@@ -241,6 +245,7 @@ export default function AddEditTeacher() {
             } else if (values.shiftTiming) {
                 formData.append("shiftTiming", values.shiftTiming);
             }
+            if (values.role) formData.append("role", values.role);
             if (values.isActive !== undefined) formData.append("isActive", values.isActive.toString());
 
             const resultAction = await dispatch(addEditTeacher({ payload: formData, id }) as any);
@@ -544,6 +549,45 @@ export default function AddEditTeacher() {
                                                     value={values.alternatePhoneNumber}
                                                     onChange={(e) => setFieldValue("alternatePhoneNumber", e.target.value.replace(/\D/g, '').slice(0, 10))}
                                                 />
+                                            </Box>
+                                            <Box gridColumn="span 12" className="admin-input-box">
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <Typography sx={labelSx}>Role<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                    <Tooltip title="Refresh Roles" arrow>
+                                                        <IconButton
+                                                            onClick={() => dispatch(getAllRolesSimple("filter") as any)}
+                                                            size="small"
+                                                            sx={{
+                                                                mb: 0.5,
+                                                                color: 'var(--primary-color)',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)'
+                                                                }
+                                                            }}
+                                                        >
+                                                            <RefreshIcon sx={{ fontSize: 18 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Box>
+                                                <Autocomplete
+                                                    options={allRoles || []}
+                                                    getOptionLabel={(option: any) => option.role || ""}
+                                                    value={allRoles?.find((role: any) => role._id === values.role) || null}
+                                                    onChange={(_, newValue) => {
+                                                        setFieldValue("role", newValue ? newValue._id : "");
+                                                    }}
+                                                    disabled={isView}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            placeholder="Select Role"
+                                                            variant="outlined"
+                                                            sx={inputSx}
+                                                            error={touched.role && Boolean(errors.role)}
+                                                        />
+                                                    )}
+                                                />
+                                                <FormHelperText className="error-text">{(touched.role && errors.role) ? (errors.role as string) : ""}</FormHelperText>
                                             </Box>
                                             <Box gridColumn="span 12">
                                                 <Typography sx={labelSx}>Address (Search Location)</Typography>

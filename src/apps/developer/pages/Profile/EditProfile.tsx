@@ -16,7 +16,8 @@ import {
   Save as SaveIcon,
   CameraAlt as CameraAltIcon,
   PhoneAndroid as PhoneIcon,
-  Description as LegalIcon
+  Description as LegalIcon,
+  AccountBalanceWallet as UPIIcon
 } from "@mui/icons-material";
 import type {
   AddProfileInterFace,
@@ -27,6 +28,7 @@ import { setAdminLogin } from "@/redux/slices/authSlice";
 import { CommonLoader } from "@/apps/common/loader/Loader";
 import { toasterError, toasterSuccess } from "@/utils/toaster/Toaster";
 import { profileValidationSchema } from "@/utils/validation/FormikValidation";
+import AutoCompleteLocation from "@/apps/common/AutoCompleteLocation";
 import Png from "@/assets/Png";
 import Spinner from "../../component/developerCommon/spinner/Spinner";
 import type { RootState } from "@/redux/Store";
@@ -46,19 +48,31 @@ export default function EditProfile() {
     profile: "" as any,
     image: "",
     address: "",
+    city: "",
+    state: "",
+    country: "",
+    zipCode: "",
+    latitude: "",
+    longitude: "",
+    UPIId: "",
   });
 
   const initialValues: AddProfileInterFace = {
     email: selectedData?.email ? selectedData?.email : "",
-    address: selectedData?.address ? selectedData?.address : "",
-    phoneNumber: selectedData?.phoneNumber
-      ? selectedData?.phoneNumber
-      : "",
     name: selectedData?.name ? selectedData?.name : "",
+    phoneNumber: selectedData?.phoneNumber ? selectedData?.phoneNumber : "",
     profile: "" as any,
+    address: selectedData?.address ? selectedData?.address : "",
+    city: selectedData?.city ? selectedData?.city : "",
+    state: selectedData?.state ? selectedData?.state : "",
+    country: selectedData?.country ? selectedData?.country : "India",
+    zipCode: selectedData?.zipCode ? selectedData?.zipCode : "",
+    latitude: selectedData?.latitude ? selectedData?.latitude : "",
+    longitude: selectedData?.longitude ? selectedData?.longitude : "",
     imageUrl: selectedData?.image
       ? `${imageBaseUrl}/${selectedData?.image}`
       : "",
+    UPIId: selectedData?.UPIId ? selectedData?.UPIId : "",
   };
 
   const handleGetData = async () => {
@@ -89,6 +103,13 @@ export default function EditProfile() {
     formData.append("name", values?.name);
     formData.append("phoneNumber", values?.phoneNumber);
     formData.append("address", values?.address);
+    formData.append("city", values?.city || "");
+    formData.append("state", values?.state || "");
+    formData.append("country", values?.country || "");
+    formData.append("zipCode", values?.zipCode || "");
+    formData.append("latitude", values?.latitude || "");
+    formData.append("longitude", values?.longitude || "");
+    formData.append("UPIId", values?.UPIId || "");
 
     setButtonSpinner(true);
     try {
@@ -321,7 +342,7 @@ export default function EditProfile() {
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
                             <PhoneIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
-                            Phone Number
+                            Phone Number <span className="astrick-sing">*</span>
                           </Typography>
                           <Box className="admin-form-group">
                             <OutlinedInput
@@ -331,6 +352,97 @@ export default function EditProfile() {
                               onBlur={handleBlur}
                               placeholder="Enter phone number"
                               value={values.phoneNumber}
+                              error={errors?.phoneNumber && touched?.phoneNumber ? true : false}
+                              sx={inputSx}
+                            />
+                            <FormHelperText className="error-text">
+                              {errors?.phoneNumber && touched?.phoneNumber ? errors.phoneNumber : null}
+                            </FormHelperText>
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                      <Grid size={{ xs: 12 }}>
+                        <Box className="admin-input-box" sx={{ mb: 1 }}>
+                          <Typography sx={labelSx}>
+                            <LegalIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                            Search Location (Auto-fill)
+                          </Typography>
+                          <Box className="admin-form-group">
+                            <AutoCompleteLocation
+                              name="address"
+                              placeholder="Search for your location..."
+                              values={values}
+                              setFieldValue={setFieldValue}
+                              touched={touched}
+                              errors={errors}
+                            />
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Box className="admin-input-box" sx={{ mb: 1 }}>
+                          <Typography sx={labelSx}>City</Typography>
+                          <Box className="admin-form-group">
+                            <OutlinedInput
+                              fullWidth
+                              name="city"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder="City"
+                              value={values.city}
+                              sx={inputSx}
+                            />
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Box className="admin-input-box" sx={{ mb: 1 }}>
+                          <Typography sx={labelSx}>State</Typography>
+                          <Box className="admin-form-group">
+                            <OutlinedInput
+                              fullWidth
+                              name="state"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder="State"
+                              value={values.state}
+                              sx={inputSx}
+                            />
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Box className="admin-input-box" sx={{ mb: 1 }}>
+                          <Typography sx={labelSx}>Zip Code</Typography>
+                          <Box className="admin-form-group">
+                            <OutlinedInput
+                              fullWidth
+                              name="zipCode"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder="Zip Code"
+                              value={values.zipCode}
+                              sx={inputSx}
+                            />
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Box className="admin-input-box" sx={{ mb: 1 }}>
+                          <Typography sx={labelSx}>Country</Typography>
+                          <Box className="admin-form-group">
+                            <OutlinedInput
+                              fullWidth
+                              name="country"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder="Country"
+                              value={values.country}
                               sx={inputSx}
                             />
                           </Box>
@@ -340,19 +452,23 @@ export default function EditProfile() {
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <LegalIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
-                            Address
+                            <UPIIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                            UPI ID
                           </Typography>
                           <Box className="admin-form-group">
                             <OutlinedInput
                               fullWidth
-                              name="address"
+                              name="UPIId"
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              placeholder="Enter address"
-                              value={values.address}
+                              placeholder="Enter UPI ID (e.g. username@bank)"
+                              value={values.UPIId}
+                              error={errors?.UPIId && touched?.UPIId ? true : false}
                               sx={inputSx}
                             />
+                            <FormHelperText className="error-text">
+                              {errors?.UPIId && touched?.UPIId ? errors.UPIId : null}
+                            </FormHelperText>
                           </Box>
                         </Box>
                       </Grid>

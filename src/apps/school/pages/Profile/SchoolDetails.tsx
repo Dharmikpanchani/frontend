@@ -386,7 +386,7 @@ export default function SchoolDetails() {
 
                 {/* Basic Info */}
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography sx={labelSx}><BoardIcon sx={{ fontSize: 16, color: 'var(--primary-color)' }} /> Board <span className="astrick-sing">*</span></Typography>
+                  <Typography sx={labelSx}><SchoolIcon sx={{ fontSize: 16, color: 'var(--primary-color)' }} /> School Name <span className="astrick-sing">*</span></Typography>
                   <OutlinedInput
                     fullWidth
                     name="schoolName"

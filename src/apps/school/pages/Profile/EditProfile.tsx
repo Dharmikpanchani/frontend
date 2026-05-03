@@ -27,6 +27,7 @@ import { setAdminLogin } from "@/redux/slices/authSlice";
 import { CommonLoader } from "@/apps/common/loader/Loader";
 import { toasterError, toasterSuccess } from "@/utils/toaster/Toaster";
 import { profileValidationSchema } from "@/utils/validation/FormikValidation";
+import AutoCompleteLocation from "@/apps/common/AutoCompleteLocation";
 import Png from "@/assets/Png";
 import Spinner from "../../component/schoolCommon/spinner/Spinner";
 import type { RootState } from "@/redux/Store";
@@ -46,16 +47,26 @@ export default function EditProfile() {
     profile: "" as any,
     image: "",
     address: "",
+    city: "",
+    state: "",
+    country: "",
+    zipCode: "",
+    latitude: "",
+    longitude: "",
   });
 
   const initialValues: AddProfileInterFace = {
     email: selectedData?.email ? selectedData?.email : "",
-    address: selectedData?.address ? selectedData?.address : "",
-    phoneNumber: selectedData?.phoneNumber
-      ? selectedData?.phoneNumber
-      : "",
+    phoneNumber: selectedData?.phoneNumber ? selectedData?.phoneNumber : "",
     name: selectedData?.name ? selectedData?.name : "",
     profile: "" as any,
+    address: selectedData?.address ? selectedData?.address : "",
+    city: selectedData?.city ? selectedData?.city : "",
+    state: selectedData?.state ? selectedData?.state : "",
+    country: selectedData?.country ? selectedData?.country : "India",
+    zipCode: selectedData?.zipCode ? selectedData?.zipCode : "",
+    latitude: selectedData?.latitude ? selectedData?.latitude : "",
+    longitude: selectedData?.longitude ? selectedData?.longitude : "",
     imageUrl: selectedData?.image
       ? `${imageBaseUrl}/${selectedData?.image}`
       : "",
@@ -89,6 +100,12 @@ export default function EditProfile() {
     formData.append("name", values?.name);
     formData.append("phoneNumber", values?.phoneNumber);
     formData.append("address", values?.address);
+    formData.append("city", values?.city || "");
+    formData.append("state", values?.state || "");
+    formData.append("country", values?.country || "");
+    formData.append("zipCode", values?.zipCode || "");
+    formData.append("latitude", values?.latitude || "");
+    formData.append("longitude", values?.longitude || "");
 
     setButtonSpinner(true);
     try {
@@ -322,7 +339,7 @@ export default function EditProfile() {
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
                             <PhoneIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
-                            Phone Number
+                            Phone Number <span className="astrick-sing">*</span>
                           </Typography>
                           <Box className="admin-form-group">
                             <OutlinedInput
@@ -332,6 +349,46 @@ export default function EditProfile() {
                               onBlur={handleBlur}
                               placeholder="Enter phone number"
                               value={values.phoneNumber}
+                              error={errors?.phoneNumber && touched?.phoneNumber ? true : false}
+                              sx={inputSx}
+                            />
+                            <FormHelperText className="error-text">
+                              {errors?.phoneNumber && touched?.phoneNumber ? errors.phoneNumber : null}
+                            </FormHelperText>
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                      <Grid size={{ xs: 12 }}>
+                        <Box className="admin-input-box" sx={{ mb: 1 }}>
+                          <Typography sx={labelSx}>
+                            <LegalIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                            Search Location (Auto-fill)
+                          </Typography>
+                          <Box className="admin-form-group">
+                            <AutoCompleteLocation
+                              name="address"
+                              placeholder="Search for your location..."
+                              values={values}
+                              setFieldValue={setFieldValue}
+                              touched={touched}
+                              errors={errors}
+                            />
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Box className="admin-input-box" sx={{ mb: 1 }}>
+                          <Typography sx={labelSx}>City</Typography>
+                          <Box className="admin-form-group">
+                            <OutlinedInput
+                              fullWidth
+                              name="city"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder="City"
+                              value={values.city}
                               sx={inputSx}
                             />
                           </Box>
@@ -340,26 +397,57 @@ export default function EditProfile() {
 
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
-                          <Typography sx={labelSx}>
-                            <LegalIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
-                            Address
-                          </Typography>
+                          <Typography sx={labelSx}>State</Typography>
                           <Box className="admin-form-group">
                             <OutlinedInput
                               fullWidth
-                              name="address"
+                              name="state"
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              placeholder="Enter address"
-                              value={values.address}
+                              placeholder="State"
+                              value={values.state}
                               sx={inputSx}
                             />
                           </Box>
                         </Box>
                       </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Box className="admin-input-box" sx={{ mb: 1 }}>
+                          <Typography sx={labelSx}>Zip Code</Typography>
+                          <Box className="admin-form-group">
+                            <OutlinedInput
+                              fullWidth
+                              name="zipCode"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder="Zip Code"
+                              value={values.zipCode}
+                              sx={inputSx}
+                            />
+                          </Box>
+                        </Box>
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Box className="admin-input-box" sx={{ mb: 1 }}>
+                          <Typography sx={labelSx}>Country</Typography>
+                          <Box className="admin-form-group">
+                            <OutlinedInput
+                              fullWidth
+                              name="country"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder="Country"
+                              value={values.country}
+                              sx={inputSx}
+                            />
+                          </Box>
+                        </Box>
+                      </Grid>
+
                     </Grid>
                   </Box>
-
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 4, flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
                   <Button
