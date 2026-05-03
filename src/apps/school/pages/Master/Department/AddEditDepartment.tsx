@@ -105,7 +105,9 @@ export default function AddEditDepartment() {
                                     <Box sx={{ maxWidth: 800 }}>
                                         <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }}>
                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
-                                                <Typography sx={labelSx}>Department Name<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', mb: '6px', height: '32px' }}>
+                                                    <Typography sx={{ ...labelSx, mb: 0 }}>Department Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                </Box>
                                                 <TextField
                                                     fullWidth
                                                     name="name"
@@ -127,7 +129,9 @@ export default function AddEditDepartment() {
                                             </Box>
 
                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
-                                                <Typography sx={labelSx}>Department Code<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', mb: '6px', height: '32px' }}>
+                                                    <Typography sx={{ ...labelSx, mb: 0 }}>Department Code<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                </Box>
                                                 <TextField
                                                     fullWidth
                                                     name="code"

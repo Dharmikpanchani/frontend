@@ -1,16 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom';
 import { Box } from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
 import Header from '../component/defaulLayout/Header';
 import Sidebar from '../component/defaulLayout/Sidebar';
-
-
+import PageLoader from '../../common/loader/PageLoader';
+import { getProfileAdmin } from '@/redux/slices/authSlice';
+import type { RootState } from '@/redux/Store';
 import { useThemeManager } from '../hooks/useThemeManager';
 
 export default function SchoolLayout() {
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(true);
   const { themeStyle, themeClasses } = useThemeManager();
   const location = useLocation();
+  const { loading } = useSelector((state: RootState) => state.AdminReducer);
+
+  useEffect(() => {
+    dispatch(getProfileAdmin() as any);
+  }, [dispatch]);
+
+  if (loading) {
+    return <PageLoader />;
+  }
 
   const isUserPlanPage = location.pathname === '/user-plan';
 

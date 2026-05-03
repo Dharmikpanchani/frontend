@@ -115,8 +115,10 @@ const classSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getClasses.pending, (state) => {
-        state.loading = true;
+      .addCase(getClasses.pending, (state, action) => {
+        if ((action.meta.arg as any)?.type !== "filter") {
+          state.loading = true;
+        }
       })
       .addCase(getClasses.fulfilled, (state, action) => {
         state.loading = false;

@@ -109,8 +109,10 @@ const departmentSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getDepartments.pending, (state) => {
-        state.loading = true;
+      .addCase(getDepartments.pending, (state, action) => {
+        if ((action.meta.arg as any)?.type !== "filter") {
+          state.loading = true;
+        }
       })
       .addCase(getDepartments.fulfilled, (state, action) => {
         state.loading = false;

@@ -109,8 +109,10 @@ const subjectSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getSubjects.pending, (state) => {
-        state.loading = true;
+      .addCase(getSubjects.pending, (state, action) => {
+        if ((action.meta.arg as any)?.type !== "filter") {
+          state.loading = true;
+        }
       })
       .addCase(getSubjects.fulfilled, (state, action) => {
         state.loading = false;

@@ -111,8 +111,10 @@ const sectionSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getSections.pending, (state) => {
-        state.loading = true;
+      .addCase(getSections.pending, (state, action) => {
+        if ((action.meta.arg as any)?.type !== "filter") {
+          state.loading = true;
+        }
       })
       .addCase(getSections.fulfilled, (state, action) => {
         state.loading = false;

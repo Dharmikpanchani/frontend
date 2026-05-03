@@ -30,15 +30,6 @@ export default function Header(props: any) {
     setAnchorEl(null);
   };
 
-  const handleGetData = async () => {
-    dispatch(getProfileAdmin() as any);
-  };
-
-
-
-  useEffect(() => {
-    handleGetData();
-  }, []);
 
   const handleLogOut = async () => {
     try {

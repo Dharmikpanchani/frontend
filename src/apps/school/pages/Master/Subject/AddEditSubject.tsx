@@ -10,6 +10,8 @@ import {
     Breadcrumbs,
     Link,
     Autocomplete,
+    IconButton,
+    Tooltip,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -20,7 +22,7 @@ import { getClasses } from "@/redux/slices/classSlice";
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
-import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
+import { AddCircleOutline as AddIcon, Edit as EditIcon, Refresh as RefreshIcon } from "@mui/icons-material";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx, multiInputSx } from "@/utils/styles/commonSx";
 
@@ -106,7 +108,9 @@ export default function AddEditSubject() {
                                 <Box sx={{ maxWidth: 1000 }}>
                                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }}>
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
-                                            <Typography sx={labelSx}>Subject Name<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: '6px', height: '32px' }}>
+                                                <Typography sx={{ ...labelSx, mb: 0 }}>Subject Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                            </Box>
                                             <TextField
                                                 fullWidth name="name" placeholder="Enter Subject Name"
                                                 variant="outlined" sx={inputSx}
@@ -125,7 +129,9 @@ export default function AddEditSubject() {
                                         </Box>
 
                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
-                                            <Typography sx={labelSx}>Subject Code<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: '6px', height: '32px' }}>
+                                                <Typography sx={{ ...labelSx, mb: 0 }}>Subject Code<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                            </Box>
                                             <TextField
                                                 fullWidth name="code" placeholder="Enter Subject Code"
                                                 variant="outlined" sx={inputSx}
@@ -142,7 +148,23 @@ export default function AddEditSubject() {
                                         </Box>
 
                                         <Box gridColumn="span 12">
-                                            <Typography sx={labelSx}>Departments<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '6px', height: '32px' }}>
+                                                <Typography sx={{ ...labelSx, mb: 0 }}>Departments<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <Tooltip title="Refresh Departments" arrow>
+                                                    <IconButton
+                                                        onClick={() => dispatch(getDepartments({ type: "filter" }) as any)}
+                                                        size="small"
+                                                        sx={{
+                                                            color: 'var(--primary-color)',
+                                                            '&:hover': {
+                                                                backgroundColor: 'rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)'
+                                                            }
+                                                        }}
+                                                    >
+                                                        <RefreshIcon sx={{ fontSize: 18 }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
                                             <Autocomplete
                                                 multiple
                                                 options={departments || []}

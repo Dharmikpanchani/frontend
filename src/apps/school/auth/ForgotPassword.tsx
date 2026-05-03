@@ -15,6 +15,7 @@ import Png from "@/assets/Png";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/Store";
 import { useThemeManager } from "../hooks/useThemeManager";
+import { getSubdomain } from "@/apps/common/commonJsFunction";
 
 export default function ForgotPassword() {
   const isSubdomain = getSubdomain();

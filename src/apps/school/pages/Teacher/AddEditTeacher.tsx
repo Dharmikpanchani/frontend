@@ -11,6 +11,7 @@ import {
     Breadcrumbs,
     Link,
     Autocomplete,
+    Tooltip,
 } from "@mui/material";
 import ProfileAvatar from "@/apps/common/ProfileAvatar";
 import {
@@ -26,6 +27,7 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     CameraAlt as CameraAltIcon,
+    Refresh as RefreshIcon
 } from "@mui/icons-material";
 import { InputAdornment, IconButton } from "@mui/material";
 import { Formik, Form } from "formik";
@@ -687,7 +689,24 @@ export default function AddEditTeacher() {
                                                 />
                                             </Box>
                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
-                                                <Typography sx={labelSx}>Department<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <Typography sx={labelSx}>Department<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                    <Tooltip title="Refresh Departments" arrow>
+                                                        <IconButton
+                                                            onClick={() => dispatch(getDepartments({ type: "filter" }) as any)}
+                                                            size="small"
+                                                            sx={{
+                                                                mb: 0.5,
+                                                                color: 'var(--primary-color)',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)'
+                                                                }
+                                                            }}
+                                                        >
+                                                            <RefreshIcon sx={{ fontSize: 18 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Box>
                                                 <Autocomplete
                                                     options={departments || []}
                                                     getOptionLabel={(o) => o.name || ""}
@@ -698,7 +717,24 @@ export default function AddEditTeacher() {
                                                 {touched.departmentId && errors.departmentId && <FormHelperText className="error-text">{errors.departmentId as string}</FormHelperText>}
                                             </Box>
                                             <Box gridColumn="span 12">
-                                                <Typography sx={labelSx}>Assigned Classes<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <Typography sx={labelSx}>Assigned Classes<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                    <Tooltip title="Refresh Classes" arrow>
+                                                        <IconButton
+                                                            onClick={() => dispatch(getClasses({ type: "filter" }) as any)}
+                                                            size="small"
+                                                            sx={{
+                                                                mb: 0.5,
+                                                                color: 'var(--primary-color)',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)'
+                                                                }
+                                                            }}
+                                                        >
+                                                            <RefreshIcon sx={{ fontSize: 18 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Box>
                                                 <Autocomplete
                                                     multiple
                                                     options={classes || []}
@@ -710,7 +746,24 @@ export default function AddEditTeacher() {
                                                 {touched.classesAssigned && errors.classesAssigned && <FormHelperText className="error-text">{errors.classesAssigned as string}</FormHelperText>}
                                             </Box>
                                             <Box gridColumn="span 12">
-                                                <Typography sx={labelSx}>Assigned Sections<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <Typography sx={labelSx}>Assigned Sections<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                    <Tooltip title="Refresh Sections" arrow>
+                                                        <IconButton
+                                                            onClick={() => dispatch(getSections({ type: "filter" }) as any)}
+                                                            size="small"
+                                                            sx={{
+                                                                mb: 0.5,
+                                                                color: 'var(--primary-color)',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)'
+                                                                }
+                                                            }}
+                                                        >
+                                                            <RefreshIcon sx={{ fontSize: 18 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Box>
                                                 <Autocomplete
                                                     multiple
                                                     options={sections || []}
@@ -722,7 +775,24 @@ export default function AddEditTeacher() {
                                                 {touched.sectionsAssigned && errors.sectionsAssigned && <FormHelperText className="error-text">{errors.sectionsAssigned as string}</FormHelperText>}
                                             </Box>
                                             <Box gridColumn="span 12">
-                                                <Typography sx={labelSx}>Subjects Specialty<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <Typography sx={labelSx}>Subjects Specialty<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                    <Tooltip title="Refresh Subjects" arrow>
+                                                        <IconButton
+                                                            onClick={() => dispatch(getSubjects({ type: "filter" }) as any)}
+                                                            size="small"
+                                                            sx={{
+                                                                mb: 0.5,
+                                                                color: 'var(--primary-color)',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)'
+                                                                }
+                                                            }}
+                                                        >
+                                                            <RefreshIcon sx={{ fontSize: 18 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Box>
                                                 <Autocomplete
                                                     multiple
                                                     options={subjects || []}

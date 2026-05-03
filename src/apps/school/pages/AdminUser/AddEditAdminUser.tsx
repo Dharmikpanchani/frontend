@@ -30,7 +30,8 @@ import {
     VisibilityOff,
     Email as EmailIcon,
     LocalPhone as PhoneIcon,
-    ContentCopy as CopyIcon
+    ContentCopy as CopyIcon,
+    Refresh as RefreshIcon
 } from "@mui/icons-material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -322,7 +323,24 @@ export default function AddEditAdminUser() {
                                             </Box>
 
                                             <Box gridColumn="span 12" className="admin-input-box">
-                                                <Typography sx={labelSx}>Role<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <Typography sx={labelSx}>Role<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                    <Tooltip title="Refresh Roles" arrow>
+                                                        <IconButton
+                                                            onClick={() => dispatch(getAllRolesSimple("filter") as any)}
+                                                            size="small"
+                                                            sx={{
+                                                                mb: 0.5,
+                                                                color: 'var(--primary-color)',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)'
+                                                                }
+                                                            }}
+                                                        >
+                                                            <RefreshIcon sx={{ fontSize: 18 }} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Box>
                                                 <Autocomplete
                                                     options={allRoles || []}
                                                     getOptionLabel={(option: any) => option.role || ""}

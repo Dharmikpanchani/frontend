@@ -10,6 +10,8 @@ import {
     Breadcrumbs,
     Link,
     Autocomplete,
+    IconButton,
+    Tooltip,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -20,7 +22,7 @@ import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import Svg from "@/assets/Svg";
-import { AddCircleOutline as AddIcon, Edit as EditIcon } from "@mui/icons-material";
+import { AddCircleOutline as AddIcon, Edit as EditIcon, Refresh as RefreshIcon } from "@mui/icons-material";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
 
@@ -103,7 +105,23 @@ export default function AddEditSection() {
                                 <Box sx={{ maxWidth: 800 }}>
                                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 1.5, sm: 2 }}>
                                         <Box gridColumn="span 6" className="admin-input-box">
-                                            <Typography sx={labelSx}>Class<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '6px', height: '32px' }}>
+                                                <Typography sx={{ ...labelSx, mb: 0 }}>Class<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                <Tooltip title="Refresh Classes" arrow>
+                                                    <IconButton
+                                                        onClick={() => dispatch(getClasses({ type: "filter" }) as any)}
+                                                        size="small"
+                                                        sx={{
+                                                            color: 'var(--primary-color)',
+                                                            '&:hover': {
+                                                                backgroundColor: 'rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)'
+                                                            }
+                                                        }}
+                                                    >
+                                                        <RefreshIcon sx={{ fontSize: 18 }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
                                             <Autocomplete
                                                 options={classes || []}
                                                 getOptionLabel={(option: any) => option.name || ""}
@@ -141,7 +159,9 @@ export default function AddEditSection() {
                                         </Box>
 
                                         <Box gridColumn="span 6" className="admin-input-box">
-                                            <Typography sx={labelSx}>Section Code<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: '6px', height: '32px' }}>
+                                                <Typography sx={{ ...labelSx, mb: 0 }}>Section Code<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                            </Box>
                                             <TextField
                                                 fullWidth
                                                 name="code"
