@@ -435,7 +435,7 @@ export default function AddEditAdminUser() {
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     error={touched.UPIId && Boolean(errors.UPIId)}
-                                                    disabled={isView}
+                                                    disabled={isView || isEdit}
                                                 />
                                                 <FormHelperText className="error-text">{(touched.UPIId && errors.UPIId) ? (errors.UPIId as string) : ""}</FormHelperText>
                                             </Box>
