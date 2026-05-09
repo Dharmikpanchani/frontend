@@ -9,6 +9,7 @@ interface SchoolState {
   total: number;
   selectedSchool: any;
   schoolLogo: string;
+  schoolBanner: string;
 }
 
 const initialState: SchoolState = {
@@ -18,6 +19,7 @@ const initialState: SchoolState = {
   total: 0,
   selectedSchool: null,
   schoolLogo: "",
+  schoolBanner: "",
 };
 
 export const getAllSchools = createAsyncThunk(
@@ -209,10 +211,12 @@ const schoolSlice = createSlice({
       .addCase(getSchoolLogo.fulfilled, (state, action) => {
         state.loading = false;
         state.schoolLogo = action.payload?.logo || "";
+        state.schoolBanner = action.payload?.banner || "";
       })
       .addCase(getSchoolLogo.rejected, (state) => {
         state.loading = false;
         state.schoolLogo = "";
+        state.schoolBanner = "";
       });
   },
 });

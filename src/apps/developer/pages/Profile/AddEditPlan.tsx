@@ -36,7 +36,7 @@ import { addEditPlan, getPlanById, clearSelectedPlan } from "@/redux/slices/plan
 import type { RootState } from "@/redux/Store";
 
 const billingCycleOptions = [
-    { label: "Monthly", value: "monthly" },
+    { label: "6 Months", value: "6month" },
     { label: "Yearly", value: "yearly" },
 ];
 
@@ -71,7 +71,7 @@ export default function AddEditPlan() {
             return {
                 id: id,
                 planName: selectedPlan.planName || "",
-                billingCycle: selectedPlan.billingCycle || "monthly",
+                billingCycle: selectedPlan.billingCycle || "6month",
                 monPrice: selectedPlan.monPrice || "",
                 monOfferPrice: selectedPlan.monOfferPrice || "",
                 yerPrice: selectedPlan.yerPrice || "",
@@ -86,7 +86,7 @@ export default function AddEditPlan() {
             monOfferPrice: "",
             yerPrice: "",
             yerOfferPrice: "",
-            billingCycle: "monthly",
+            billingCycle: "6month",
             permissions: [],
         };
     }, [selectedPlan, id]);
@@ -101,19 +101,29 @@ export default function AddEditPlan() {
 
         setPermissionsError("");
 
+        const isFreePlan = values.planName?.trim().toLowerCase() === "free";
+
         const payload: any = {
             ...values,
             permissions: [...new Set(values.permissions)],
         };
         if (id) payload.id = id;
 
-        // Ensure we only send fields relevant to the selected billing cycle
-        if (values.billingCycle === "monthly") {
+        if (isFreePlan) {
+            payload.billingCycle = "6month";
+            payload.monPrice = 0;
+            payload.monOfferPrice = 0;
             delete payload.yerPrice;
             delete payload.yerOfferPrice;
-        } else if (values.billingCycle === "yearly") {
-            delete payload.monPrice;
-            delete payload.monOfferPrice;
+        } else {
+            // Ensure we only send fields relevant to the selected billing cycle
+            if (values.billingCycle === "6month") {
+                delete payload.yerPrice;
+                delete payload.yerOfferPrice;
+            } else if (values.billingCycle === "yearly") {
+                delete payload.monPrice;
+                delete payload.monOfferPrice;
+            }
         }
 
         const res = await dispatch(addEditPlan(payload) as any);
@@ -235,103 +245,114 @@ export default function AddEditPlan() {
                             return (
                                 <Form>
                                     <Box sx={{ maxWidth: 1100 }}>
-                                        {/* 1. Plan Details */}
-                                        <SectionTitle icon={AssignmentIcon} title="Plan Details" />
-                                        <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 6 }}>
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 12' }}>
-                                                <Typography sx={labelSx}>Plan Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                <TextField fullWidth name="planName" placeholder="Enter Plan Name" variant="outlined" sx={inputSx} value={values.planName} onChange={handleChange} onBlur={handleBlur} error={touched.planName && Boolean(errors.planName)} disabled={isView || isEdit} />
-                                                <FormHelperText className="error-text">{(touched.planName && errors.planName) ? (errors.planName as string) : ""}</FormHelperText>
-                                            </Box>
+                                         {/* 1. Plan Details */}
+                                         <SectionTitle icon={AssignmentIcon} title="Plan Details" />
+                                         {(() => {
+                                             const isFreePlan = values.planName?.trim().toLowerCase() === "free";
+                                             return (
+                                                 <>
+                                                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: isFreePlan ? 6 : 0 }}>
+                                                         <Box gridColumn={{ xs: 'span 12', sm: 'span 12' }}>
+                                                             <Typography sx={labelSx}>Plan Name<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                             <TextField fullWidth name="planName" placeholder="Enter Plan Name" variant="outlined" sx={inputSx} value={values.planName} onChange={handleChange} onBlur={handleBlur} error={touched.planName && Boolean(errors.planName)} disabled={isView || isEdit} />
+                                                             <FormHelperText className="error-text">{(touched.planName && errors.planName) ? (errors.planName as string) : ""}</FormHelperText>
+                                                         </Box>
+                                                     </Box>
 
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                <Typography sx={labelSx}>Billing Cycle<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                <Autocomplete
-                                                    options={billingCycleOptions}
-                                                    getOptionLabel={(o) => o.label}
-                                                    value={billingCycleOptions.find(o => o.value === values.billingCycle) || null}
-                                                    onChange={(_, v) => {
-                                                        const newCycle = v ? v.value : "";
-                                                        setFieldValue("billingCycle", newCycle);
-                                                        // Clear non-relevant fields when cycle changes
-                                                        if (newCycle === "monthly") {
-                                                            setFieldValue("yerPrice", "");
-                                                            setFieldValue("yerOfferPrice", "");
-                                                        } else if (newCycle === "yearly") {
-                                                            setFieldValue("monPrice", "");
-                                                            setFieldValue("monOfferPrice", "");
-                                                        }
-                                                    }}
-                                                    disabled={isView}
-                                                    renderInput={(params) => <TextField {...params} placeholder="Select Cycle" variant="outlined" sx={inputSx} error={touched.billingCycle && Boolean(errors.billingCycle)} />}
-                                                />
-                                                <FormHelperText className="error-text">{(touched.billingCycle && errors.billingCycle) ? (errors.billingCycle as string) : ""}</FormHelperText>
-                                            </Box>
+                                                     {!isFreePlan && (
+                                                         <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 6, mt: 3 }}>
+                                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                                 <Typography sx={labelSx}>Billing Cycle<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                                 <Autocomplete
+                                                                     options={billingCycleOptions}
+                                                                     getOptionLabel={(o) => o.label}
+                                                                     value={billingCycleOptions.find(o => o.value === values.billingCycle) || null}
+                                                                     onChange={(_, v) => {
+                                                                         const newCycle = v ? v.value : "";
+                                                                         setFieldValue("billingCycle", newCycle);
+                                                                         // Clear non-relevant fields when cycle changes
+                                                                         if (newCycle === "6month") {
+                                                                             setFieldValue("yerPrice", "");
+                                                                             setFieldValue("yerOfferPrice", "");
+                                                                         } else if (newCycle === "yearly") {
+                                                                             setFieldValue("monPrice", "");
+                                                                             setFieldValue("monOfferPrice", "");
+                                                                         }
+                                                                     }}
+                                                                     disabled={isView}
+                                                                     renderInput={(params) => <TextField {...params} placeholder="Select Cycle" variant="outlined" sx={inputSx} error={touched.billingCycle && Boolean(errors.billingCycle)} />}
+                                                                 />
+                                                                 <FormHelperText className="error-text">{(touched.billingCycle && errors.billingCycle) ? (errors.billingCycle as string) : ""}</FormHelperText>
+                                                             </Box>
 
-                                            {values.billingCycle === "monthly" ? (
-                                                <>
-                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                        <Typography sx={labelSx}>Monthly Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                        <TextField 
-                                                            fullWidth 
-                                                            name="monPrice" 
-                                                            placeholder="Enter Monthly Price" 
-                                                            variant="outlined" 
-                                                            sx={inputSx} 
-                                                            value={values.monPrice} 
-                                                            onChange={(e) => {
-                                                                const val = e.target.value;
-                                                                setFieldValue("monPrice", val);
-                                                                if (!isNaN(Number(val)) && val !== "") {
-                                                                    setFieldValue("monOfferPrice", Math.round(Number(val) * 0.20));
-                                                                }
-                                                            }} 
-                                                            onBlur={handleBlur} 
-                                                            error={touched.monPrice && Boolean(errors.monPrice)} 
-                                                            disabled={isView} 
-                                                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} 
-                                                        />
-                                                        <FormHelperText className="error-text">{(touched.monPrice && errors.monPrice) ? (errors.monPrice as string) : ""}</FormHelperText>
-                                                    </Box>
-                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                        <Typography sx={labelSx}>Monthly Offer Price</Typography>
-                                                        <TextField fullWidth name="monOfferPrice" placeholder="Enter Monthly Offer Price" variant="outlined" sx={inputSx} value={values.monOfferPrice} onChange={handleChange} onBlur={handleBlur} error={touched.monOfferPrice && Boolean(errors.monOfferPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
-                                                        <FormHelperText className="error-text">{(touched.monOfferPrice && errors.monOfferPrice) ? (errors.monOfferPrice as string) : ""}</FormHelperText>
-                                                    </Box>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                        <Typography sx={labelSx}>Yearly Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
-                                                        <TextField 
-                                                            fullWidth 
-                                                            name="yerPrice" 
-                                                            placeholder="Enter Yearly Price" 
-                                                            variant="outlined" 
-                                                            sx={inputSx} 
-                                                            value={values.yerPrice} 
-                                                            onChange={(e) => {
-                                                                const val = e.target.value;
-                                                                setFieldValue("yerPrice", val);
-                                                                if (!isNaN(Number(val)) && val !== "") {
-                                                                    setFieldValue("yerOfferPrice", Math.round(Number(val) * 0.20));
-                                                                }
-                                                            }} 
-                                                            onBlur={handleBlur} 
-                                                            error={touched.yerPrice && Boolean(errors.yerPrice)} 
-                                                            disabled={isView} 
-                                                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} 
-                                                        />
-                                                        <FormHelperText className="error-text">{(touched.yerPrice && errors.yerPrice) ? (errors.yerPrice as string) : ""}</FormHelperText>
-                                                    </Box>
-                                                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                        <Typography sx={labelSx}>Yearly Offer Price</Typography>
-                                                        <TextField fullWidth name="yerOfferPrice" placeholder="Enter Yearly Offer Price" variant="outlined" sx={inputSx} value={values.yerOfferPrice} onChange={handleChange} onBlur={handleBlur} error={touched.yerOfferPrice && Boolean(errors.yerOfferPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
-                                                        <FormHelperText className="error-text">{(touched.yerOfferPrice && errors.yerOfferPrice) ? (errors.yerOfferPrice as string) : ""}</FormHelperText>
-                                                    </Box>
-                                                </>
-                                            )}
-                                        </Box>
+                                                             {values.billingCycle === "6month" ? (
+                                                                 <>
+                                                                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                                         <Typography sx={labelSx}>6 Months Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                                         <TextField 
+                                                                             fullWidth 
+                                                                             name="monPrice" 
+                                                                             placeholder="Enter 6 Months Price" 
+                                                                             variant="outlined" 
+                                                                             sx={inputSx} 
+                                                                             value={values.monPrice} 
+                                                                             onChange={(e) => {
+                                                                                 const val = e.target.value;
+                                                                                 setFieldValue("monPrice", val);
+                                                                                 if (!isNaN(Number(val)) && val !== "") {
+                                                                                     setFieldValue("monOfferPrice", Math.round(Number(val) * 0.20));
+                                                                                 }
+                                                                             }} 
+                                                                             onBlur={handleBlur} 
+                                                                             error={touched.monPrice && Boolean(errors.monPrice)} 
+                                                                             disabled={isView} 
+                                                                             InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} 
+                                                                         />
+                                                                         <FormHelperText className="error-text">{(touched.monPrice && errors.monPrice) ? (errors.monPrice as string) : ""}</FormHelperText>
+                                                                     </Box>
+                                                                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                                         <Typography sx={labelSx}>6 Months Offer Price</Typography>
+                                                                         <TextField fullWidth name="monOfferPrice" placeholder="Enter 6 Months Offer Price" variant="outlined" sx={inputSx} value={values.monOfferPrice} onChange={handleChange} onBlur={handleBlur} error={touched.monOfferPrice && Boolean(errors.monOfferPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
+                                                                         <FormHelperText className="error-text">{(touched.monOfferPrice && errors.monOfferPrice) ? (errors.monOfferPrice as string) : ""}</FormHelperText>
+                                                                     </Box>
+                                                                 </>
+                                                             ) : (
+                                                                 <>
+                                                                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                                         <Typography sx={labelSx}>Yearly Price<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                                                         <TextField 
+                                                                             fullWidth 
+                                                                             name="yerPrice" 
+                                                                             placeholder="Enter Yearly Price" 
+                                                                             variant="outlined" 
+                                                                             sx={inputSx} 
+                                                                             value={values.yerPrice} 
+                                                                             onChange={(e) => {
+                                                                                 const val = e.target.value;
+                                                                                 setFieldValue("yerPrice", val);
+                                                                                 if (!isNaN(Number(val)) && val !== "") {
+                                                                                     setFieldValue("yerOfferPrice", Math.round(Number(val) * 0.20));
+                                                                                 }
+                                                                             }} 
+                                                                             onBlur={handleBlur} 
+                                                                             error={touched.yerPrice && Boolean(errors.yerPrice)} 
+                                                                             disabled={isView} 
+                                                                             InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} 
+                                                                         />
+                                                                         <FormHelperText className="error-text">{(touched.yerPrice && errors.yerPrice) ? (errors.yerPrice as string) : ""}</FormHelperText>
+                                                                     </Box>
+                                                                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                                         <Typography sx={labelSx}>Yearly Offer Price</Typography>
+                                                                         <TextField fullWidth name="yerOfferPrice" placeholder="Enter Yearly Offer Price" variant="outlined" sx={inputSx} value={values.yerOfferPrice} onChange={handleChange} onBlur={handleBlur} error={touched.yerOfferPrice && Boolean(errors.yerOfferPrice)} disabled={isView} InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }} />
+                                                                         <FormHelperText className="error-text">{(touched.yerOfferPrice && errors.yerOfferPrice) ? (errors.yerOfferPrice as string) : ""}</FormHelperText>
+                                                                     </Box>
+                                                                 </>
+                                                             )}
+                                                         </Box>
+                                                     )}
+                                                 </>
+                                             );
+                                         })()}
 
                                         {/* 3. Permissions */}
                                         <SectionTitle icon={SecurityIcon} title="Permissions Configuration" />

@@ -77,7 +77,7 @@ export default function SchoolList() {
   const getRelativePlanExpiry = (expiryTimestamp: number, isActivePlan: boolean) => {
     if (!expiryTimestamp) return "No expiry set";
     const now = moment();
-    const expiry = moment(expiryTimestamp);
+    const expiry = expiryTimestamp < 10000000000 ? moment.unix(expiryTimestamp) : moment(expiryTimestamp);
 
     if (!isActivePlan || expiry.isBefore(now)) {
       return `Expired on ${expiry.format('DD MMM YY')}`;

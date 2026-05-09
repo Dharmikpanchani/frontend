@@ -17,7 +17,7 @@ import { useThemeManager } from "../hooks/useThemeManager";
 export default function SetPassWord() {
   const isSubdomain = getSubdomain();
   useThemeManager();
-  const { schoolLogo } = useSelector((state: RootState) => state.SchoolReducer);
+  const { schoolLogo, schoolBanner } = useSelector((state: RootState) => state.SchoolReducer);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const emailForReset = useSelector((state: RootState) => state.AdminReducer.emailForReset);
@@ -84,7 +84,14 @@ export default function SetPassWord() {
         } = formikProps;
         return (
           <Form onSubmit={handleSubmit}>
-            <Box className="login-page-container set-password-page">
+            <Box 
+              className="login-page-container set-password-page"
+              sx={{
+                backgroundImage: isSubdomain?.isSubdomain && schoolBanner 
+                  ? `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolBanner}')`
+                  : undefined
+              }}
+            >
               <Box className="login-card">
                 <Box component="img" src={isSubdomain?.isSubdomain ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo : Png?.logoImg} alt="Logo" className="login-logo" />
 

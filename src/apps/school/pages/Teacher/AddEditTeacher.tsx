@@ -864,18 +864,30 @@ export default function AddEditTeacher() {
                                                 {touched.employmentType && errors.employmentType && <FormHelperText className="error-text">{errors.employmentType as string}</FormHelperText>}
                                             </Box>
                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                <Typography sx={labelSx}>Salary Amount</Typography>
-                                                <TextField fullWidth name="salary" placeholder="Amount" type="number" variant="outlined" sx={inputSx} value={values.salary} onChange={handleChange} />
+                                                <Typography sx={labelSx}>Salary Amount<span style={{ color: '#ef4444' }}>*</span></Typography>
+                                                <TextField
+                                                    fullWidth
+                                                    name="salary"
+                                                    placeholder="Amount"
+                                                    type="number"
+                                                    variant="outlined"
+                                                    sx={inputSx}
+                                                    value={values.salary}
+                                                    onChange={handleChange}
+                                                    error={touched.salary && Boolean(errors.salary)}
+                                                />
+                                                {touched.salary && errors.salary && <FormHelperText className="error-text">{errors.salary as string}</FormHelperText>}
                                             </Box>
                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                                                <Typography sx={labelSx}>Salary Type</Typography>
+                                                <Typography sx={labelSx}>Salary Type<span style={{ color: '#ef4444' }}>*</span></Typography>
                                                 <Autocomplete
                                                     options={salaryTypeOptions}
                                                     getOptionLabel={(o) => o.label}
                                                     value={salaryTypeOptions.find(o => o.value === values.salaryType) || null}
                                                     onChange={(_, v) => setFieldValue("salaryType", v?.value || "")}
-                                                    renderInput={(p) => <TextField {...p} placeholder="Select" variant="outlined" sx={inputSx} />}
+                                                    renderInput={(p) => <TextField {...p} placeholder="Select" variant="outlined" sx={inputSx} error={touched.salaryType && Boolean(errors.salaryType)} />}
                                                 />
+                                                {touched.salaryType && errors.salaryType && <FormHelperText className="error-text">{errors.salaryType as string}</FormHelperText>}
                                             </Box>
                                             <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
                                                 <Typography sx={labelSx}>Bank Name</Typography>

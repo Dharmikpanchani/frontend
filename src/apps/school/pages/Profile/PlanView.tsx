@@ -65,7 +65,7 @@ export default function PlanView() {
                 monOfferPrice: selectedPlan.monOfferPrice || "0",
                 yerPrice: selectedPlan.yerPrice || "0",
                 yerOfferPrice: selectedPlan.yerOfferPrice || "0",
-                billingCycle: selectedPlan.billingCycle || "monthly",
+                billingCycle: selectedPlan.billingCycle || "6month",
                 maxStudents: selectedPlan.maxStudents || "",
                 maxTeachers: selectedPlan.maxTeachers || "",
                 maxClasses: selectedPlan.maxClasses || "",
@@ -174,7 +174,7 @@ export default function PlanView() {
                             fontFamily: "'Poppins', sans-serif",
                             lineHeight: 1
                         }}>
-                            {planExpiryDate ? moment(planExpiryDate).format("MMMM DD, YYYY") : "No Expiry Set"}
+                            {planExpiryDate ? (planExpiryDate < 10000000000 ? moment.unix(planExpiryDate).format("MMMM DD, YYYY") : moment(planExpiryDate).format("MMMM DD, YYYY")) : "No Expiry Set"}
                         </Typography>
                     </Box>
                 </Box>
@@ -236,13 +236,13 @@ export default function PlanView() {
 
                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                         <Typography sx={labelSx}>
-                            {initialValues.billingCycle === "monthly" ? "Monthly Price" : "Yearly Price"}
+                            {initialValues.billingCycle === "6month" ? "6 Months Price" : "Yearly Price"}
                         </Typography>
                         <TextField
                             fullWidth
                             variant="outlined"
                             sx={inputSx}
-                            value={initialValues.billingCycle === "monthly" ? initialValues.monPrice : initialValues.yerPrice}
+                            value={initialValues.billingCycle === "6month" ? initialValues.monPrice : initialValues.yerPrice}
                             disabled
                             InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
                         />
@@ -250,13 +250,13 @@ export default function PlanView() {
  
                     <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
                         <Typography sx={labelSx}>
-                            {initialValues.billingCycle === "monthly" ? "Monthly Offer Price" : "Yearly Offer Price"}
+                            {initialValues.billingCycle === "6month" ? "6 Months Offer Price" : "Yearly Offer Price"}
                         </Typography>
                         <TextField
                             fullWidth
                             variant="outlined"
                             sx={inputSx}
-                            value={initialValues.billingCycle === "monthly" ? initialValues.monOfferPrice : initialValues.yerOfferPrice}
+                            value={initialValues.billingCycle === "6month" ? initialValues.monOfferPrice : initialValues.yerOfferPrice}
                             disabled
                             InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
                         />
@@ -268,7 +268,7 @@ export default function PlanView() {
                             fullWidth
                             variant="outlined"
                             sx={inputSx}
-                            value={initialValues.billingCycle.charAt(0).toUpperCase() + initialValues.billingCycle.slice(1)}
+                            value={initialValues.billingCycle === "6month" ? "6 Months" : initialValues.billingCycle.charAt(0).toUpperCase() + initialValues.billingCycle.slice(1)}
                             disabled
                         />
                     </Box>

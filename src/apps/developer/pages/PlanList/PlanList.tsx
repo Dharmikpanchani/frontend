@@ -300,16 +300,18 @@ export default function PlanList() {
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Typography sx={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary-color)' }}>
-                            ₹{data.billingCycle === "monthly" ? data.monPrice : data.yerPrice}
+                            {data.planName?.toLowerCase() === "free" ? "-" : `₹${data.billingCycle === "6month" ? data.monPrice : data.yerPrice}`}
                           </Typography>
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Typography sx={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary-color)' }}>
-                            ₹{data.billingCycle === "monthly" ? (data.monOfferPrice || "-") : (data.yerOfferPrice || "-")}
+                            {data.planName?.toLowerCase() === "free" ? "-" : (data.billingCycle === "6month" ? (data.monOfferPrice ? `₹${data.monOfferPrice}` : "-") : (data.yerOfferPrice ? `₹${data.yerOfferPrice}` : "-"))}
                           </Typography>
                         </TableCell>
                         <TableCell align="center" className="table-td">
-                          <Typography sx={{ fontSize: '13px', textTransform: 'capitalize' }}>{data.billingCycle}</Typography>
+                          <Typography sx={{ fontSize: '13px', textTransform: 'capitalize' }}>
+                            {data.planName?.toLowerCase() === "free" ? "-" : (data.billingCycle === "6month" ? "6 Months" : "Yearly")}
+                          </Typography>
                         </TableCell>
                         <TableCell align="center" className="table-td">
                           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>

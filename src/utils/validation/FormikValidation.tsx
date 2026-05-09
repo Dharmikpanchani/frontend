@@ -653,8 +653,8 @@ export const teacherValidationSchema = Yup.object().shape({
   salary: Yup.number()
     .transform((value, originalValue) => originalValue === "" ? undefined : value)
     .positive("Salary must be positive")
-    .optional(),
-  salaryType: Yup.string().optional(),
+    .required("Salary amount is required"),
+  salaryType: Yup.string().required("Salary type is required"),
   bankName: Yup.string()
     .test(
       "no-whitespace",
@@ -748,24 +748,25 @@ export const planValidationSchema = Yup.object().shape({
   planName: genericStringValidation("Plan name", 3, 50, true),
   permissions: Yup.array().of(Yup.string()).optional(),
   monPrice: Yup.number()
-    .typeError("Monthly Price must be a number")
+    .typeError("6 Months Price must be a number")
     .min(0, "Price cannot be negative")
-    .test("min-monthly-price", "Minimum price not met", function (value) {
-      const { permissions, billingCycle } = this.parent;
-      if (billingCycle !== "monthly") return true;
-      const minPrice = calculateMinMonthlyPrice(permissions || []);
+    .test("min-6month-price", "Minimum price not met", function (value) {
+      const { planName, permissions, billingCycle } = this.parent;
+      if (planName && planName.trim().toLowerCase() === "free") return true;
+      if (billingCycle !== "6month") return true;
+      const minPrice = calculateMinMonthlyPrice(permissions || []) * 6;
       if ((value || 0) < minPrice) {
-        return this.createError({ message: `Monthly price must be at least ₹ ${minPrice}` });
+        return this.createError({ message: `6 Months price must be at least ₹ ${minPrice}` });
       }
       return true;
     })
-    .when("billingCycle", {
-      is: "monthly",
-      then: (schema) => schema.required("Monthly price is required"),
+    .when(["billingCycle", "planName"], {
+      is: (billingCycle: string, planName: string) => billingCycle === "6month" && (!planName || planName.trim().toLowerCase() !== "free"),
+      then: (schema) => schema.required("6 Months price is required"),
       otherwise: (schema) => schema.optional().nullable(),
     }),
   monOfferPrice: Yup.number()
-    .typeError("Monthly Offer Price must be a number")
+    .typeError("6 Months Offer Price must be a number")
     .min(0, "Offer price cannot be negative")
     .optional()
     .nullable(),
@@ -773,7 +774,8 @@ export const planValidationSchema = Yup.object().shape({
     .typeError("Yearly Price must be a number")
     .min(0, "Price cannot be negative")
     .test("min-yearly-price", "Minimum price not met", function (value) {
-      const { permissions, billingCycle } = this.parent;
+      const { planName, permissions, billingCycle } = this.parent;
+      if (planName && planName.trim().toLowerCase() === "free") return true;
       if (billingCycle !== "yearly") return true;
       const minPrice = calculateMinMonthlyPrice(permissions || []) * 12;
       if ((value || 0) < minPrice) {
@@ -781,8 +783,8 @@ export const planValidationSchema = Yup.object().shape({
       }
       return true;
     })
-    .when("billingCycle", {
-      is: "yearly",
+    .when(["billingCycle", "planName"], {
+      is: (billingCycle: string, planName: string) => billingCycle === "yearly" && (!planName || planName.trim().toLowerCase() !== "free"),
       then: (schema) => schema.required("Yearly price is required"),
       otherwise: (schema) => schema.optional().nullable(),
     }),

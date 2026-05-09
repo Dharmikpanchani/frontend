@@ -22,7 +22,7 @@ import { useThemeManager } from "../hooks/useThemeManager";
 export default function Login() {
   const isSubdomain = getSubdomain();
   useThemeManager();
-  const { schoolLogo } = useSelector((state: RootState) => state.SchoolReducer);
+  const { schoolLogo, schoolBanner } = useSelector((state: RootState) => state.SchoolReducer);
   const [showPassword, setShowPassword] = React.useState(true);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const [buttonSpinner, setButtonSpinner] = useState(false);
@@ -89,7 +89,14 @@ export default function Login() {
           formikProps;
         return (
           <Form onSubmit={handleSubmit}>
-            <Box className="login-page-container">
+            <Box 
+              className="login-page-container"
+              sx={{
+                backgroundImage: isSubdomain?.isSubdomain && schoolBanner 
+                  ? `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolBanner}')`
+                  : undefined
+              }}
+            >
               <Box className="login-card">
                 <Box component="img" src={isSubdomain?.isSubdomain && schoolLogo ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo : Png?.logoImg} alt="Logo" className="login-logo" />
 

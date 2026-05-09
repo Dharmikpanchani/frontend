@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 import {
   Box,
   Typography,
@@ -406,6 +407,20 @@ export default function AdminUser() {
                                   {data?.isVerified ? "Verified" : "Not Verified"}
                                 </Typography>
                               </Box>
+                              {data?.lastLogin ? (
+                                <Box sx={{ display: 'flex', flexDirection: 'column', mt: 0.5 }}>
+                                  <Typography sx={{ fontSize: '11px', fontWeight: 600, color: '#1f2937' }}>
+                                    {moment(data.lastLogin).format('DD MMM YY')}
+                                  </Typography>
+                                  <Typography sx={{ fontSize: '10px', color: '#6b7280', textTransform: 'capitalize' }}>
+                                    {moment(data.lastLogin).fromNow()}
+                                  </Typography>
+                                </Box>
+                              ) : (
+                                <Typography sx={{ fontSize: '10px', color: '#9ca3af', mt: 0.5, fontStyle: 'italic' }}>
+                                  Never Logged In
+                                </Typography>
+                              )}
                             </Box>
                           </TableCell>
                           {hasPermission(developerPermission.admin_user.status) && (<TableCell

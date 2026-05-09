@@ -107,7 +107,7 @@ const PriceTag = styled(Typography)(() => ({
 }));
 
 export default function UserPlan() {
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
+  const [billingCycle, setBillingCycle] = useState<"6month" | "yearly">("yearly");
   const [apiPlans, setApiPlans] = useState<any[]>([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
@@ -267,10 +267,10 @@ export default function UserPlan() {
                 Yearly Billing
               </Box>
               <Box
-                className={`toggle-tab ${billingCycle === "monthly" ? "active" : ""}`}
-                onClick={() => setBillingCycle("monthly")}
+                className={`toggle-tab ${billingCycle === "6month" ? "active" : ""}`}
+                onClick={() => setBillingCycle("6month")}
               >
-                Monthly
+                6 Months
               </Box>
             </CustomSwitch>
           </Box>
@@ -278,8 +278,8 @@ export default function UserPlan() {
 
         <Grid container spacing={4} justifyContent="center" alignItems="stretch">
           {filteredPlans.map((plan: any, index: number) => {
-            const price = billingCycle === "monthly" ? plan.monPrice : plan.yerPrice;
-            const offerPrice = billingCycle === "monthly" ? plan.monOfferPrice : plan.yerOfferPrice;
+            const price = billingCycle === "6month" ? plan.monPrice : plan.yerPrice;
+            const offerPrice = billingCycle === "6month" ? plan.monOfferPrice : plan.yerOfferPrice;
             const isPopular = index === 1; // Highlight the middle plan for better UX
 
             return (
@@ -304,7 +304,7 @@ export default function UserPlan() {
                   <Box sx={{ mb: 4 }}>
                     <PriceTag>
                       ₹{price}
-                      <span>/{billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
+                      <span>/{billingCycle === '6month' ? '6 mo' : 'yr'}</span>
                     </PriceTag>
                     {offerPrice > 0 && (
                       <Typography

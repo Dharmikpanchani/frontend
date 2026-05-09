@@ -243,7 +243,7 @@ export default function Checkout() {
     );
   }
 
-  const price = billingCycle === "monthly" ? planData.monPrice : planData.yerPrice;
+  const price = billingCycle === "6month" ? planData.monPrice : planData.yerPrice;
 
   return (
     <Box
@@ -291,7 +291,7 @@ export default function Checkout() {
                     {planData.planName} Plan
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#64748b" }}>
-                    Billed {billingCycle}
+                    Billed {billingCycle === "6month" ? "6 Months" : "Yearly"}
                   </Typography>
                 </Box>
                 <Typography variant="h5" sx={{ fontWeight: 900, color: primaryColor }}>

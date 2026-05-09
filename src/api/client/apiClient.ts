@@ -36,34 +36,56 @@ DataService.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+
+    const handleLogout = async () => {
       try {
-        const res: any = await axios.post(`${getBaseURL()}/${Api.REFRESH_TOKEN}`, {}, { withCredentials: true });
-        if (res.status === 200 || res.status === 201 || res.status === 304) {
-          const newToken = res.data?.data?.accessToken;
-          if (newToken) {
-            Cookies.set("auth_token", newToken, { 
-              expires: 7, 
-              domain: getCookieDomain(),
-              path: "/"
-            });
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            return DataService(originalRequest);
-          }
-        }
-      } catch (refreshError) {
-        Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
-        Cookies.remove("auth_token", { path: "/" });
-        window.location.href = "/";
-        return Promise.reject(refreshError);
+        await axios.post(`${getBaseURL()}/${Api.LOGOUT}`, {}, { withCredentials: true });
+      } catch (logoutError) {
+        console.error("Logout API call failed during authentication error:", logoutError);
       }
-    }
-    if (error.response?.status === 404 && (originalRequest.url === Api.GET_PROFILE || originalRequest.url === Api.GET_SCHOOL_PROFILE)) {
       Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
       Cookies.remove("auth_token", { path: "/" });
-      window.location.href = "/";
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      }
+    };
+
+    if (error.response?.status === 401) {
+      if (!originalRequest._retry) {
+        originalRequest._retry = true;
+        try {
+          const res: any = await axios.post(`${getBaseURL()}/${Api.REFRESH_TOKEN}`, {}, { withCredentials: true });
+          if (res.status === 200 || res.status === 201 || res.status === 304) {
+            const newToken = res.data?.data?.accessToken;
+            if (newToken) {
+              Cookies.set("auth_token", newToken, { 
+                expires: 7, 
+                domain: getCookieDomain(),
+                path: "/"
+              });
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              return DataService(originalRequest);
+            }
+          }
+        } catch (refreshError) {
+          await handleLogout();
+          return Promise.reject(refreshError);
+        }
+      } else {
+        // If _retry is already true and we get 401, force logout
+        await handleLogout();
+        return Promise.reject(error);
+      }
     }
+
+    if (
+      error.response?.status === 404 &&
+      (originalRequest.url === Api.GET_PROFILE || originalRequest.url === Api.GET_SCHOOL_PROFILE)
+    ) {
+      await handleLogout();
+      return Promise.reject(error);
+    }
+
     return Promise.reject(error);
   }
 );
