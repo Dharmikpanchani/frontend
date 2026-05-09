@@ -40,6 +40,13 @@ const billingCycleOptions = [
     { label: "Yearly", value: "yearly" },
 ];
 
+const get6MonthPrice = (priceStr?: string) => {
+    if (!priceStr) return "";
+    const priceNum = parseInt(priceStr.replace(/[^\d]/g, ""), 10);
+    if (isNaN(priceNum)) return "";
+    return `₹ ${priceNum * 6}`;
+};
+
 
 export default function AddEditPlan() {
     const dispatch = useDispatch();
@@ -421,7 +428,7 @@ export default function AddEditPlan() {
                                                                                 border: '1px solid rgba(255, 140, 0, 0.15)',
                                                                                 fontFamily: "'Inter', sans-serif"
                                                                             }}>
-                                                                                {module.price}
+                                                                                {get6MonthPrice(module.price)}
                                                                             </Box>
                                                                         )}
                                                                     </Box>
