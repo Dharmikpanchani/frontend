@@ -16,7 +16,7 @@ export interface RoleStaticItem {
 const dashboardModule: RoleStaticItem = {
   mainTitle: "Dashboard",
   mainTitleId: "dashboard",
-  price: "₹ 200",
+  price: "₹ 2",
   subRole: [
     { title: "Add", titleId: "add", is_show: false },
     { title: "Edit", titleId: "edit", is_show: false },
@@ -29,7 +29,7 @@ const dashboardModule: RoleStaticItem = {
 const rolesModule: RoleStaticItem = {
   mainTitle: "Roles",
   mainTitleId: "role",
-  price: "₹ 300",
+  price: "₹ 3",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -42,7 +42,7 @@ const rolesModule: RoleStaticItem = {
 const adminUserModule: RoleStaticItem = {
   mainTitle: "Admin User",
   mainTitleId: "admin_user",
-  price: "₹ 500",
+  price: "₹ 5",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -55,7 +55,7 @@ const adminUserModule: RoleStaticItem = {
 const teacherModule: RoleStaticItem = {
   mainTitle: "Teacher",
   mainTitleId: "teacher",
-  price: "₹ 1000",
+  price: "₹ 10",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -68,7 +68,7 @@ const teacherModule: RoleStaticItem = {
 const departmentModule: RoleStaticItem = {
   mainTitle: "Department",
   mainTitleId: "department",
-  price: "₹ 400",
+  price: "₹ 4",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -81,7 +81,7 @@ const departmentModule: RoleStaticItem = {
 const subjectModule: RoleStaticItem = {
   mainTitle: "Subject",
   mainTitleId: "subject",
-  price: "₹ 400",
+  price: "₹ 4",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -94,7 +94,7 @@ const subjectModule: RoleStaticItem = {
 const classModule: RoleStaticItem = {
   mainTitle: "Class",
   mainTitleId: "class",
-  price: "₹ 600",
+  price: "₹ 6",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -107,7 +107,7 @@ const classModule: RoleStaticItem = {
 const sectionModule: RoleStaticItem = {
   mainTitle: "Section",
   mainTitleId: "section",
-  price: "₹ 300",
+  price: "₹ 3",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -120,7 +120,7 @@ const sectionModule: RoleStaticItem = {
 const schoolListModule: RoleStaticItem = {
   mainTitle: "School List",
   mainTitleId: "school",
-  price: "₹ 800",
+  price: "₹ 8",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
@@ -133,7 +133,7 @@ const schoolListModule: RoleStaticItem = {
 const themeModule: RoleStaticItem = {
   mainTitle: "Theme Settings",
   mainTitleId: "theme",
-  price: "₹ 500",
+  price: "₹ 5",
   subRole: [
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
@@ -143,7 +143,7 @@ const themeModule: RoleStaticItem = {
 const schoolProfileModule: RoleStaticItem = {
   mainTitle: "School Profile",
   mainTitleId: "school_profile",
-  price: "₹ 700",
+  price: "₹ 7",
   subRole: [
     { title: "Edit", titleId: "edit", is_show: true },
     { title: "View", titleId: "view", is_show: true },
@@ -153,7 +153,7 @@ const schoolProfileModule: RoleStaticItem = {
 const planModule: RoleStaticItem = {
   mainTitle: "Plan",
   mainTitleId: "plan",
-  price: "₹ 1200",
+  price: "₹ 10",
   subRole: [
     { title: "Add", titleId: "add", is_show: true },
     { title: "Edit", titleId: "edit", is_show: true },
