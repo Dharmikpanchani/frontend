@@ -52,6 +52,7 @@ function App() {
       <div className="App">
         <Toaster
           reverseOrder={false}
+          containerStyle={{ zIndex: 999999 }}
           toastOptions={{
             duration: 3000,
             style: {
