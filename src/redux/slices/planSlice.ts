@@ -8,6 +8,8 @@ interface PlanState {
   plans: any[];
   total: number;
   selectedPlan: any;
+  minPriceLimit: number;
+  maxPriceLimit: number;
 }
 
 const initialState: PlanState = {
@@ -16,6 +18,8 @@ const initialState: PlanState = {
   plans: [],
   total: 0,
   selectedPlan: null,
+  minPriceLimit: 0,
+  maxPriceLimit: 10000,
 };
 
 export const getAllPlans = createAsyncThunk(
@@ -138,6 +142,8 @@ const planSlice = createSlice({
         state.loading = false;
         state.plans = action.payload?.data || [];
         state.total = action.payload?.pagination?.totalArrayLength || 0;
+        state.minPriceLimit = action.payload?.pagination?.minPriceLimit ?? 0;
+        state.maxPriceLimit = action.payload?.pagination?.maxPriceLimit ?? 10000;
       })
       .addCase(getAllPlans.rejected, (state) => { state.loading = false; })
 

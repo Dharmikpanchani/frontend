@@ -40,7 +40,7 @@ import type { RootState } from "@/redux/Store";
 export default function PlanList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { plans, total, loading, actionLoading } = useSelector((state: RootState) => state.PlanReducer);
+  const { plans, total, loading, actionLoading, minPriceLimit, maxPriceLimit } = useSelector((state: RootState) => state.PlanReducer);
   const { allAdminUsersSimple } = useSelector((state: RootState) => state.AdminUserReducer);
   const { hasPermission, hasAnyPermission, isSuperDeveloper } = usePermissions();
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -54,10 +54,10 @@ export default function PlanList() {
 
   const [filterValues, setFilterValues] = useState({
     planName: "",
-    developerId: "",
-    developerEmail: "",
     developerName: "",
-    developerPhoneNumber: "",
+    billingCycle: "",
+    priceMin: "",
+    priceMax: "",
     isActive: "",
   });
 
@@ -90,10 +90,10 @@ export default function PlanList() {
   const handleResetFilter = () => {
     const resetValues = {
       planName: "",
-      developerId: "",
-      developerEmail: "",
       developerName: "",
-      developerPhoneNumber: "",
+      billingCycle: "",
+      priceMin: "",
+      priceMax: "",
       isActive: "",
     };
     setFilterValues(resetValues);
@@ -137,15 +137,9 @@ export default function PlanList() {
   const filterFields: any[] = [
     {
       type: "inputSelect",
-      name: "developerEmail",
-      label: "Creator Email",
-      placeholder: "Enter Creator Email",
-    },
-    {
-      type: "inputSelect",
-      name: "developerPhoneNumber",
-      label: "Creator Number",
-      placeholder: "Enter Creator Number",
+      name: "developerName",
+      label: "Developer Name",
+      placeholder: "Enter Developer Name",
     },
     {
       type: "inputSelect",
@@ -153,27 +147,27 @@ export default function PlanList() {
       label: "Plan Name",
       placeholder: "Enter Plan Name",
     },
-    ...(isSuperDeveloper ? [
-      {
-        type: "searchbaseSelect",
-        name: "developerId",
-        label: "Developer User",
-        placeholder: "Select Developer",
-        options: allAdminUsersSimple,
-        getOptionLabel: (option: any) => option.name || option.email || "",
-        getOptionValue: (option: any) => option._id,
-      },
-      {
-        type: "inputSelect",
-        name: "developerName",
-        label: "Creator Name",
-        placeholder: "Enter Creator Name",
-      },
-    ] : []),
+    {
+      type: "priceRange",
+      name: "price",
+      label: "Price Range",
+      minLimit: minPriceLimit,
+      maxLimit: maxPriceLimit,
+    },
+    {
+      type: "searchbaseSelect",
+      name: "billingCycle",
+      label: "Cycle",
+      placeholder: "Select Cycle",
+      options: [
+        { label: "6 Months", value: "6month" },
+        { label: "Yearly", value: "yearly" },
+      ],
+    },
     {
       type: "searchbaseSelect",
       name: "isActive",
-      label: "Plan Status",
+      label: "Status",
       placeholder: "Select Status",
       options: [
         { label: "Active", value: "true" },
@@ -197,7 +191,7 @@ export default function PlanList() {
                   fullWidth
                   id="search"
                   className="admin-form-control"
-                  placeholder="Search Plans"
+                  placeholder="Search by Developer Email"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setSearchNameValue(e.target.value);
                     debouncedCallGetApi(e.target.value);
@@ -211,17 +205,15 @@ export default function PlanList() {
               </Box>
             </Box>
           </Box>
-          {isSuperDeveloper && (
-            <Box className="admin-filter-btn-main">
-              <Button
-                className="admin-btn-theme"
-                onClick={() => setOpenFilter(true)}
-                sx={{ ml: 1, minWidth: '45px', p: '0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                <FilterIcon sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }} />
-              </Button>
-            </Box>
-          )}
+          <Box className="admin-filter-btn-main">
+            <Button
+              className="admin-btn-theme"
+              onClick={() => setOpenFilter(true)}
+              sx={{ ml: 1, minWidth: '45px', p: '0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              <FilterIcon sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }} />
+            </Button>
+          </Box>
           {hasPermission(developerPermission.plan.create) && (
             <Box className="admin-add-user-btn-main">
               <Button

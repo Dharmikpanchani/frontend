@@ -10,6 +10,7 @@ import {
   MenuItem,
   Select,
   FormControl,
+  Slider,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { Formik, Form } from "formik";
@@ -19,13 +20,15 @@ import moment from "moment";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
 
 export interface FilterField {
-  type: "select" | "searchbaseSelect" | "date" | "inputSelect" | "dateRange";
+  type: "select" | "searchbaseSelect" | "date" | "inputSelect" | "dateRange" | "priceRange";
   name: string;
   label: string;
   placeholder?: string;
   options?: any[];
   getOptionLabel?: (option: any) => string;
   getOptionValue?: (option: any) => any;
+  minLimit?: number;
+  maxLimit?: number;
 }
 
 interface FilterProps {
@@ -246,6 +249,91 @@ const Filter: React.FC<FilterProps> = ({
               placeholder={field.placeholder || "Enter text"}
               sx={inputSx}
             />
+          </Box>
+        );
+      case "priceRange":
+        const minLimit = field.minLimit ?? 0;
+        const maxLimit = field.maxLimit ?? 10000;
+        
+        // Ensure values are within limits, default to limit bounds if undefined
+        const currentVal = [
+          values[`${field.name}Min`] !== undefined && values[`${field.name}Min`] !== "" ? Number(values[`${field.name}Min`]) : minLimit,
+          values[`${field.name}Max`] !== undefined && values[`${field.name}Max`] !== "" ? Number(values[`${field.name}Max`]) : maxLimit,
+        ];
+
+        return (
+          <Box key={field.name}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
+              <Typography sx={labelSx}>{field.label}</Typography>
+              <Typography
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  fontFamily: "var(--font-family, 'Poppins', sans-serif)",
+                }}
+              >
+                ₹{currentVal[0]} - ₹{currentVal[1]}
+              </Typography>
+            </Box>
+            <Box sx={{ px: 1 }}>
+              <Slider
+                value={currentVal}
+                onChange={(_, newValue: any) => {
+                  setFieldValue(`${field.name}Min`, newValue[0]);
+                  setFieldValue(`${field.name}Max`, newValue[1]);
+                }}
+                valueLabelDisplay="auto"
+                min={minLimit}
+                max={maxLimit}
+                sx={{
+                  color: "var(--primary-color)",
+                  height: 6,
+                  "& .MuiSlider-track": {
+                    border: "none",
+                    background: "linear-gradient(90deg, #3f51b5 0%, #1a237e 100%)",
+                  },
+                  "& .MuiSlider-rail": {
+                    opacity: 0.3,
+                    backgroundColor: "#bfbfbf",
+                  },
+                  "& .MuiSlider-thumb": {
+                    height: 20,
+                    width: 20,
+                    backgroundColor: "#fff",
+                    border: "2px solid currentColor",
+                    boxShadow: "0 0 8px rgba(26, 35, 126, 0.3)",
+                    "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
+                      boxShadow: "0 0 0 8px rgba(63, 81, 181, 0.16)",
+                    },
+                    "&::before": {
+                      display: "none",
+                    },
+                  },
+                  "& .MuiSlider-valueLabel": {
+                    lineHeight: 1.2,
+                    fontSize: 12,
+                    background: "unset",
+                    padding: 0,
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50% 50% 50% 0",
+                    backgroundColor: "var(--primary-color)",
+                    transformOrigin: "bottom left",
+                    transform: "translate(50%, -100%) rotate(-45deg) scale(0)",
+                    "&::before": { display: "none" },
+                    "&.MuiSlider-valueLabelOpen": {
+                      transform: "translate(50%, -100%) rotate(-45deg) scale(1)",
+                    },
+                    "& > *": {
+                      transform: "rotate(45deg)",
+                    },
+                  },
+                }}
+              />
+            </Box>
           </Box>
         );
       default:
