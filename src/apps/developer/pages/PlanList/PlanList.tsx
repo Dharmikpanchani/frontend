@@ -41,7 +41,6 @@ export default function PlanList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { plans, total, loading, actionLoading, minPriceLimit, maxPriceLimit } = useSelector((state: RootState) => state.PlanReducer);
-  const { allAdminUsersSimple } = useSelector((state: RootState) => state.AdminUserReducer);
   const { hasPermission, hasAnyPermission, isSuperDeveloper } = usePermissions();
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
