@@ -10,8 +10,6 @@ import {
   Assignment as AssignmentIcon,
   Description as DocumentIcon
 } from "@mui/icons-material";
-import { usePermissions } from "@/hooks/usePermissions";
-import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import Svg from "@/assets/Svg";
 import EditProfile from "./EditProfile";
 import ChangePassword from "./ChangePassword";
@@ -53,14 +51,12 @@ function a11yprops(index: number) {
 
 export default function AccountLayout() {
   const [value, setValue] = useState(0);
-  const { hasPermission } = usePermissions();
   const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-  const showSchoolDetails = hasPermission(schoolAdminPermission.school_profile.read);
   const isTeacher = adminDetails?.userType === "teacher";
 
   const tabsConfig = [
@@ -80,7 +76,7 @@ export default function AccountLayout() {
       label: "School Details",
       icon: <SchoolIcon />,
       component: <SchoolDetails />,
-      show: showSchoolDetails
+      show: true
     },
     {
       label: "Change Email",
@@ -92,7 +88,7 @@ export default function AccountLayout() {
       label: "My Plan",
       icon: <AssignmentIcon />,
       component: <PlanView />,
-      show: showSchoolDetails
+      show: adminDetails?.isSuperAdmin === true
     },
     {
       label: "My Documents",

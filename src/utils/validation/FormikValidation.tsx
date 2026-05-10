@@ -779,7 +779,12 @@ export const planValidationSchema = Yup.object().shape({
       const { planName, permissions, billingCycle } = this.parent;
       if (planName && planName.trim().toLowerCase() === "free") return true;
       if (billingCycle !== "yearly") return true;
-      const minPrice = calculateMinMonthlyPrice(permissions || []) * 11.4;
+      
+      const sixMonthPrice = calculateMinMonthlyPrice(permissions || []) * 6;
+      const yearlyBasePrice = sixMonthPrice * 2;
+      const discount = (yearlyBasePrice * 5) / 100;
+      const minPrice = yearlyBasePrice - discount;
+      
       if ((value || 0) < minPrice) {
         return this.createError({ message: `Yearly price must be at least ₹ ${minPrice}` });
       }
