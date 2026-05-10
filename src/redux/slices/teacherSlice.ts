@@ -7,6 +7,8 @@ interface TeacherState {
   actionLoading: boolean;
   teachers: any[];
   total: number;
+  pendingTeachers: any[];
+  pendingLoading: boolean;
 }
 
 const initialState: TeacherState = {
@@ -14,6 +16,8 @@ const initialState: TeacherState = {
   actionLoading: false,
   teachers: [],
   total: 0,
+  pendingTeachers: [],
+  pendingLoading: false,
 };
 
 export const getTeachers = createAsyncThunk(
@@ -22,6 +26,19 @@ export const getTeachers = createAsyncThunk(
     try {
       const res: any = await masterService.getTeachers(params);
       if (res.status === 200) return res;
+      return rejectWithValue(res.message);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+export const getPendingTeachers = createAsyncThunk(
+  "teacher/getPending",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res: any = await masterService.getPendingTeachers();
+      if (res.status === 200) return res.data || [];
       return rejectWithValue(res.message);
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
@@ -153,6 +170,17 @@ const teacherSlice = createSlice({
       })
       .addCase(deleteTeacher.rejected, (state) => {
         state.actionLoading = false;
+      })
+
+      .addCase(getPendingTeachers.pending, (state) => {
+        state.pendingLoading = true;
+      })
+      .addCase(getPendingTeachers.fulfilled, (state, action) => {
+        state.pendingLoading = false;
+        state.pendingTeachers = action.payload || [];
+      })
+      .addCase(getPendingTeachers.rejected, (state) => {
+        state.pendingLoading = false;
       });
   },
 });

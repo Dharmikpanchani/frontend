@@ -2242,16 +2242,57 @@ img[alt] {
 
 .admin-sidebar-list-main .admin-sidebar-link:hover {
   color: var(--sidebar-active-text, var(--main-white));
-  background: var(--primary-color, rgba(255, 255, 255, 0.1));
+  background: rgba(255, 255, 255, 0.12) !important;
 }
 
 .admin-sidebar-list-main .admin-sidebar-link.active {
   color: var(--sidebar-active-text, var(--main-white)) !important;
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: var(--primary-color) !important;
   border-radius: var(--border-radius, 8px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   font-weight: 600;
   backdrop-filter: blur(4px);
+}
+
+/* 🏷️ Side Bar Badge State-based Styling */
+
+/* 1️⃣ State 1: Default State (glassmorphic transparent white) */
+.admin-sidebar-list-main .admin-sidebar-link span[style*="position: absolute"],
+.admin-sidebar-list-main .admin-sidebar-link span:last-child:not(.admin-sidebar-link-text) {
+  position: absolute !important;
+  right: 15px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background-color: rgba(255, 255, 255, 0.18) !important; /* glassmorphic transparent white */
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important; /* thin white border to stand out on the red gradient background */
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  padding: 1px 7px !important;
+  line-height: 1.4 !important;
+  display: inline-block !important;
+  z-index: 10 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 2️⃣ State 2: Hover State (glassmorphic link, solid white badge, theme text color) */
+.admin-sidebar-list-main .admin-sidebar-link:hover span[style*="position: absolute"],
+.admin-sidebar-list-main .admin-sidebar-link:hover span:last-child:not(.admin-sidebar-link-text) {
+  background-color: #ffffff !important;
+  color: var(--primary-color) !important; /* dynamically uses the selected school theme color for the text! */
+  border-color: #ffffff !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* 3️⃣ State 3: Active State (solid brand background link, solid white badge, theme text color) */
+.admin-sidebar-list-main .admin-sidebar-link.active span[style*="position: absolute"],
+.admin-sidebar-list-main .admin-sidebar-link.active span:last-child:not(.admin-sidebar-link-text) {
+  background-color: #ffffff !important;
+  color: var(--primary-color) !important; /* dynamically uses the selected school theme color for the text! */
+  border-color: #ffffff !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
 .admin-sidebar-deactive .admin-sidebar-link.active {

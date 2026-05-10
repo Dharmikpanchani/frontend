@@ -8,13 +8,23 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import Svg from "@/assets/Svg";
 import Png from "@/assets/Png";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/redux/Store";
+import { getPendingTeachers } from "@/redux/slices/teacherSlice";
 
 export default function Sidebar(props: any) {
   const location = useLocation();
+  const dispatch = useDispatch<any>();
   const { hasPermission, hasAnyPermission } = usePermissions();
   const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
+  const { pendingTeachers } = useSelector((state: RootState) => state.TeacherReducer);
+  const pendingDocCount = pendingTeachers.length;
+
+  useEffect(() => {
+    if (hasPermission(schoolAdminPermission.teacher.read)) {
+      dispatch(getPendingTeachers());
+    }
+  }, [location.pathname, dispatch, hasPermission]);
   // Handle responsive menu open/close
   useEffect(() => {
     const handleResize = () => {
@@ -377,6 +387,25 @@ export default function Sidebar(props: any) {
                                 <span className="admin-sidebar-link-text">
                                   {dt?.title}
                                 </span>
+                                {dt?.title === "Teachers" && pendingDocCount > 0 && (
+                                  <span style={{
+                                    position: 'absolute',
+                                    right: '15px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    backgroundColor: '#d92d20',
+                                    color: '#fff',
+                                    fontSize: '10px',
+                                    fontWeight: 700,
+                                    borderRadius: '10px',
+                                    padding: '2px 8px',
+                                    lineHeight: 1,
+                                    display: 'inline-block',
+                                    zIndex: 10
+                                  }}>
+                                    {pendingDocCount}
+                                  </span>
+                                )}
                               </Link>
                             </ListItem>
                           ) : null

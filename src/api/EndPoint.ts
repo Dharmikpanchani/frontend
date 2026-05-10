@@ -110,4 +110,14 @@ export const Api = {
   // Payment
   CREATE_SCHOOL_PLAN: `payment/create-school-plan`,
   VERIFY_PAYMENT: `payment/verify`,
+
+  // Teacher Documents (User Side)
+  GET_TEACHER_DOCUMENTS: `user/teacher/documents`,
+  REUPLOAD_TEACHER_DOCUMENT: `user/teacher/document/reupload`,
+  GET_TEACHER_DOCUMENT_HISTORY: `user/teacher/document/history`,
+
+  // Teacher Documents (Admin Side Verification)
+  ADMIN_GET_PENDING_TEACHERS: `${route}/teacher-documents/pending`,
+  ADMIN_GET_TEACHER_DOCUMENTS: `${route}/teacher-documents/teacher`,
+  ADMIN_VERIFY_TEACHER_DOCUMENT: `${route}/teacher-documents/verify`,
 };

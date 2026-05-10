@@ -736,6 +736,8 @@ export const teacherValidationSchema = Yup.object().shape({
   profileImage: imageValidation("Profile Image", false).nullable(),
   resume: fileValidation("Resume", false, ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/jpeg", "image/jpg", "image/png", "image/svg+xml"]).nullable(),
   idProof: imageValidation("ID Proof", false).nullable(),
+  aadharCard: fileValidation("Aadhar Card", false, ["application/pdf", "image/jpeg", "image/jpg", "image/png"]).nullable(),
+  panCard: fileValidation("PAN Card", false, ["application/pdf", "image/jpeg", "image/jpg", "image/png"]).nullable(),
   educationCertificates: Yup.array().of(Yup.mixed()).optional(),
   experienceCertificates: Yup.array().of(Yup.mixed()).optional(),
   role: Yup.string().required("Please select role"),
@@ -795,3 +797,8 @@ export const planValidationSchema = Yup.object().shape({
     .nullable(),
   billingCycle: Yup.string().required("Billing cycle is required"),
 });
+
+export const documentRejectionValidationSchema = Yup.object().shape({
+  rejectReason: genericStringValidation("Rejection reason", 3, 250, true),
+});
+

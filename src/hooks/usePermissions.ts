@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/Store";
+import { useCallback, useMemo } from "react";
 
 export const usePermissions = () => {
     const { adminDetails, loading, isAdminLogin } = useSelector(
@@ -11,9 +12,15 @@ export const usePermissions = () => {
     const isSchoolAdmin = adminDetails?.type === "school_admin";
     const isSuperAdmin = adminDetails?.isSuperAdmin;
 
-    const rolePermissions: string[] = adminDetails?.role?.permissions ?? [];
-    const planPermissions: string[] = adminDetails?.schoolData?.plan?.permissions ?? [];
-    const checkPermission = (p: string): boolean => {
+    const rolePermissions = useMemo((): string[] => {
+        return adminDetails?.role?.permissions ?? [];
+    }, [adminDetails?.role?.permissions]);
+
+    const planPermissions = useMemo((): string[] => {
+        return adminDetails?.schoolData?.plan?.permissions ?? [];
+    }, [adminDetails?.schoolData?.plan?.permissions]);
+
+    const checkPermission = useCallback((p: string): boolean => {
         if (isSuperDeveloper) return true;
 
         if (isSchoolAdmin) {
@@ -28,24 +35,24 @@ export const usePermissions = () => {
 
         // Third layer: Role check
         return rolePermissions.includes(p);
-    };
+    }, [isSuperDeveloper, isSchoolAdmin, planPermissions, isSuperAdmin, rolePermissions]);
 
     // ✅ Single permission
-    const hasPermission = (permission: string): boolean => {
+    const hasPermission = useCallback((permission: string): boolean => {
         return checkPermission(permission);
-    };
+    }, [checkPermission]);
 
     // ✅ ALL permissions required
-    const hasAllPermissions = (requiredPermissions: string[]): boolean => {
+    const hasAllPermissions = useCallback((requiredPermissions: string[]): boolean => {
         if (isSuperDeveloper) return true;
         return requiredPermissions.every((p) => checkPermission(p));
-    };
+    }, [isSuperDeveloper, checkPermission]);
 
     // ✅ ANY one permission
-    const hasAnyPermission = (requiredPermissions: string[]): boolean => {
+    const hasAnyPermission = useCallback((requiredPermissions: string[]): boolean => {
         if (isSuperDeveloper) return true;
         return requiredPermissions.some((p) => checkPermission(p));
-    };
+    }, [isSuperDeveloper, checkPermission]);
 
     return {
         permissions: rolePermissions,

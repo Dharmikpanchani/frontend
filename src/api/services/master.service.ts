@@ -110,4 +110,9 @@ export const masterService = {
   getTeacherById: (id: string) => adminApiService.get<any>(`${Api.GET_TEACHER}/${id}`),
   deleteTeacher: (id: string) => adminApiService.delete<any>(`${Api.DELETE_TEACHER}/${id}`),
   changeTeacherStatus: (id: string) => adminApiService.post<any>(`${Api.CHANGE_TEACHER_STATUS}/${id}`, {}),
+
+  // Teacher Document Verification (Admin)
+  getPendingTeachers: () => adminApiService.get<any>(Api.ADMIN_GET_PENDING_TEACHERS),
+  getTeacherDocumentsForAdmin: (teacherId: string) => adminApiService.get<any>(`${Api.ADMIN_GET_TEACHER_DOCUMENTS}/${teacherId}`),
+  verifyTeacherDocument: (payload: { documentId: string; status: 'APPROVED' | 'REJECTED'; rejectReason?: string }) => adminApiService.post<any>(Api.ADMIN_VERIFY_TEACHER_DOCUMENT, payload),
 };

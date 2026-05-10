@@ -1,11 +1,14 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/Store";
 import { Box, Tabs, Tab, Typography } from "@mui/material";
 import {
   Person as PersonIcon,
   Lock as LockIcon,
   Business as SchoolIcon,
   AlternateEmail as EmailIcon,
-  Assignment as AssignmentIcon
+  Assignment as AssignmentIcon,
+  Description as DocumentIcon
 } from "@mui/icons-material";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
@@ -15,6 +18,7 @@ import ChangePassword from "./ChangePassword";
 import SchoolDetails from "./SchoolDetails";
 import ChangeEmail from "./ChangeEmail";
 import PlanView from "./PlanView";
+import TeacherDocuments from "./TeacherDocuments";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -50,14 +54,53 @@ function a11yprops(index: number) {
 export default function AccountLayout() {
   const [value, setValue] = useState(0);
   const { hasPermission } = usePermissions();
-
-
+  const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   const showSchoolDetails = hasPermission(schoolAdminPermission.school_profile.read);
+  const isTeacher = adminDetails?.userType === "teacher";
+
+  const tabsConfig = [
+    {
+      label: "Edit Profile",
+      icon: <PersonIcon />,
+      component: <EditProfile />,
+      show: true
+    },
+    {
+      label: "Change Password",
+      icon: <LockIcon />,
+      component: <ChangePassword />,
+      show: true
+    },
+    {
+      label: "School Details",
+      icon: <SchoolIcon />,
+      component: <SchoolDetails />,
+      show: showSchoolDetails
+    },
+    {
+      label: "Change Email",
+      icon: <EmailIcon />,
+      component: <ChangeEmail />,
+      show: true
+    },
+    {
+      label: "My Plan",
+      icon: <AssignmentIcon />,
+      component: <PlanView />,
+      show: showSchoolDetails
+    },
+    {
+      label: "My Documents",
+      icon: <DocumentIcon />,
+      component: <TeacherDocuments />,
+      show: isTeacher
+    }
+  ].filter(t => t.show);
 
   return (
     <Box className="admin-dashboard-content admin-edit-profile-containt" sx={{ backgroundColor: "#F8F9FA", minHeight: '100vh', p: { xs: 0, sm: 3 } }}>
@@ -153,76 +196,25 @@ export default function AccountLayout() {
               }
             }}
           >
-            <Tab
-              icon={<PersonIcon />}
-              iconPosition="start"
-              label="Edit Profile"
-              {...a11yprops(0)}
-              className="admin-tab"
-            />
-            <Tab
-              icon={<LockIcon />}
-              iconPosition="start"
-              label="Change Password"
-              {...a11yprops(1)}
-              className="admin-tab"
-            />
-            {showSchoolDetails && (
+            {tabsConfig.map((tab, idx) => (
               <Tab
-                icon={<SchoolIcon />}
+                key={tab.label}
+                icon={tab.icon}
                 iconPosition="start"
-                label="School Details"
-                {...a11yprops(2)}
+                label={tab.label}
+                {...a11yprops(idx)}
                 className="admin-tab"
               />
-            )}
-            <Tab
-              icon={<EmailIcon />}
-              iconPosition="start"
-              label="Change Email"
-              {...a11yprops(3)}
-              className="admin-tab"
-            />
-            {showSchoolDetails && (
-              <Tab
-                icon={<AssignmentIcon />}
-                iconPosition="start"
-                label="My Plan"
-                {...a11yprops(4)}
-                className="admin-tab"
-              />
-            )}
+            ))}
           </Tabs>
         </Box>
-        <TabPanel value={value} index={0} className="admin-tabpanel">
-          <Box className="admin-tabpanel-main" sx={{ p: { xs: 2, sm: "32px" } }}>
-            <EditProfile />
-          </Box>
-        </TabPanel>
-        <TabPanel value={value} index={1} className="admin-tabpanel">
-          <Box className="admin-tabpanel-main" sx={{ p: { xs: 2, sm: "32px" } }}>
-            <ChangePassword />
-          </Box>
-        </TabPanel>
-        {showSchoolDetails && (
-          <TabPanel value={value} index={2} className="admin-tabpanel">
+        {tabsConfig.map((tab, idx) => (
+          <TabPanel key={tab.label} value={value} index={idx} className="admin-tabpanel">
             <Box className="admin-tabpanel-main" sx={{ p: { xs: 2, sm: "32px" } }}>
-              <SchoolDetails />
+              {tab.component}
             </Box>
           </TabPanel>
-        )}
-        <TabPanel value={value} index={3} className="admin-tabpanel">
-          <Box className="admin-tabpanel-main" sx={{ p: { xs: 2, sm: "32px" } }}>
-            <ChangeEmail />
-          </Box>
-        </TabPanel>
-        {showSchoolDetails && (
-          <TabPanel value={value} index={4} className="admin-tabpanel">
-            <Box className="admin-tabpanel-main" sx={{ p: { xs: 2, sm: "32px" } }}>
-              <PlanView />
-            </Box>
-          </TabPanel>
-        )}
+        ))}
       </Box>
     </Box>
   );
