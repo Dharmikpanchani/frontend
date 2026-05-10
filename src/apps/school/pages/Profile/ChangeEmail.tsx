@@ -11,6 +11,8 @@ import {
   OutlinedInput,
   InputAdornment,
   IconButton,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   Visibility,
@@ -19,8 +21,8 @@ import {
   LockOutlined as LockIcon,
   Save as SaveIcon,
 } from "@mui/icons-material";
-import type { EmailChangeInterface } from "@/types/interfaces/LoginInterface";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/redux/Store";
 import { changeEmailRequestAdmin } from "@/redux/slices/authSlice";
 import { emailChangeValidationSchema } from "@/utils/validation/FormikValidation";
 import Spinner from "../../component/schoolCommon/spinner/Spinner";
@@ -32,17 +34,24 @@ export default function ChangeEmail() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const initialValues: EmailChangeInterface = {
+  const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
+  const isSuperAdmin = adminDetails?.isSuperAdmin === true;
+
+  const initialValues = {
     password: "",
     newEmail: "",
+    targetType: "admin",
   };
 
   const handlePasswordVisibility = () => setShowPassword(!showPassword);
 
-  const handleSubmit = async (values: EmailChangeInterface) => {
+  const handleSubmit = async (values: any) => {
     const urlencoded = new URLSearchParams();
     urlencoded.append("password", values.password);
     urlencoded.append("newEmail", values.newEmail.toLowerCase());
+    if (isSuperAdmin) {
+      urlencoded.append("targetType", values.targetType);
+    }
 
     setButtonSpinner(true);
     try {
@@ -55,6 +64,7 @@ export default function ChangeEmail() {
           state: {
             email: values.newEmail,
             type: "admin_email_change",
+            targetType: isSuperAdmin ? values.targetType : "admin",
           },
         });
       }
@@ -71,7 +81,7 @@ export default function ChangeEmail() {
       initialValues={initialValues}
       validationSchema={emailChangeValidationSchema}
     >
-      {(formikProps: FormikProps<EmailChangeInterface>) => {
+      {(formikProps: FormikProps<any>) => {
         const { values, errors, touched, handleChange, handleBlur, resetForm } =
           formikProps;
 
@@ -117,7 +127,7 @@ export default function ChangeEmail() {
                       marginBottom: "4px",
                     }}
                   >
-                    Update your email address
+                    Update email address
                   </Typography>
                   <Typography
                     sx={{
@@ -126,13 +136,37 @@ export default function ChangeEmail() {
                       fontFamily: "'PlusJakartaSans-Medium', sans-serif",
                     }}
                   >
-                    Provide your current password and a new email to receive a
+                    Provide current password and a new email to receive a
                     verification OTP.
                   </Typography>
                 </Box>
               </Box>
 
               <Grid container spacing={2}>
+                {isSuperAdmin && (
+                  <Grid size={{ xs: 12 }}>
+                    <Box className="admin-input-box" sx={{ mb: 1 }}>
+                      <Typography sx={labelSx}>
+                        <EmailIcon sx={{ fontSize: 14, color: "var(--primary-color)" }} />
+                        Change Email For <span className="astrick-sing">*</span>
+                      </Typography>
+                      <Box className="admin-form-group">
+                        <Select
+                          fullWidth
+                          name="targetType"
+                          value={values.targetType}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          sx={inputSx}
+                        >
+                          <MenuItem value="admin">Admin</MenuItem>
+                          <MenuItem value="school">School</MenuItem>
+                        </Select>
+                      </Box>
+                    </Box>
+                  </Grid>
+                )}
+
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>

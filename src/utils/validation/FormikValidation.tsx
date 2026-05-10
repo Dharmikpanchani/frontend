@@ -448,6 +448,7 @@ export const changePasswordValidationSchema = Yup.object({
 export const emailChangeValidationSchema = Yup.object({
   password: Yup.string().required("Please enter password"),
   newEmail: emailValidation(true),
+  targetType: Yup.string().optional(),
 });
 
 export const schoolValidationSchema = Yup.object({

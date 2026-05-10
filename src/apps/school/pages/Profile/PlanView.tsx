@@ -123,6 +123,8 @@ export default function PlanView() {
         );
     }
 
+    const isFreePlan = initialValues.planName?.trim().toLowerCase() === "free";
+
     return (
         <Box className="admin-tabpanel-main" sx={{ p: 0 }}>
             <Box 
@@ -229,49 +231,53 @@ export default function PlanView() {
                 {/* 1. Plan Details */}
                 <SectionTitle icon={AssignmentIcon} title="Plan Overview" />
                 <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={{ xs: 2, sm: 3 }} sx={{ mb: 6 }}>
-                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                    <Box gridColumn={{ xs: 'span 12', sm: isFreePlan ? 'span 12' : 'span 4' }}>
                         <Typography sx={labelSx}>Plan Name</Typography>
                         <TextField fullWidth variant="outlined" sx={inputSx} value={initialValues.planName} disabled />
                     </Box>
 
-                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                        <Typography sx={labelSx}>
-                            {initialValues.billingCycle === "6month" ? "6 Months Price" : "Yearly Price"}
-                        </Typography>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            sx={inputSx}
-                            value={initialValues.billingCycle === "6month" ? initialValues.monPrice : initialValues.yerPrice}
-                            disabled
-                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
-                        />
-                    </Box>
- 
-                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                        <Typography sx={labelSx}>
-                            {initialValues.billingCycle === "6month" ? "6 Months Offer Price" : "Yearly Offer Price"}
-                        </Typography>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            sx={inputSx}
-                            value={initialValues.billingCycle === "6month" ? initialValues.monOfferPrice : initialValues.yerOfferPrice}
-                            disabled
-                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
-                        />
-                    </Box>
+                    {!isFreePlan && (
+                        <>
+                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                <Typography sx={labelSx}>
+                                    {initialValues.billingCycle === "6month" ? "6 Months Price" : "Yearly Price"}
+                                </Typography>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    sx={inputSx}
+                                    value={initialValues.billingCycle === "6month" ? initialValues.monPrice : initialValues.yerPrice}
+                                    disabled
+                                    InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
+                                />
+                            </Box>
+         
+                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                <Typography sx={labelSx}>
+                                    {initialValues.billingCycle === "6month" ? "6 Months Offer Price" : "Yearly Offer Price"}
+                                </Typography>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    sx={inputSx}
+                                    value={initialValues.billingCycle === "6month" ? initialValues.monOfferPrice : initialValues.yerOfferPrice}
+                                    disabled
+                                    InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
+                                />
+                            </Box>
 
-                    <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
-                        <Typography sx={labelSx}>Billing Cycle</Typography>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            sx={inputSx}
-                            value={initialValues.billingCycle === "6month" ? "6 Months" : initialValues.billingCycle.charAt(0).toUpperCase() + initialValues.billingCycle.slice(1)}
-                            disabled
-                        />
-                    </Box>
+                            <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                <Typography sx={labelSx}>Billing Cycle</Typography>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    sx={inputSx}
+                                    value={initialValues.billingCycle === "6month" ? "6 Months" : initialValues.billingCycle.charAt(0).toUpperCase() + initialValues.billingCycle.slice(1)}
+                                    disabled
+                                />
+                            </Box>
+                        </>
+                    )}
                 </Box>
 
                 {/* 2. Permissions */}

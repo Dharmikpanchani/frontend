@@ -12,7 +12,7 @@ export default function EmailChangeOtp() {
     const dispatch = useDispatch();
     const location = useLocation();
     const isSubdomain = getSubdomain();
-    const { email, type } = location.state || {}; // type will be admin_email_change or developer_email_change
+    const { email, type, targetType } = location.state || {}; // type will be admin_email_change or developer_email_change
     const [loading, setLoading] = useState(false);
     const [resendLoading, setResendLoading] = useState(false);
 
@@ -28,6 +28,9 @@ export default function EmailChangeOtp() {
             const emailChangeData = new URLSearchParams();
             emailChangeData.append("newEmail", email);
             emailChangeData.append("otp", values?.code);
+            if (targetType) {
+                emailChangeData.append("targetType", targetType);
+            }
             
             const resultAction = await dispatch(verifyEmailChangeAdmin(emailChangeData) as any);
             setLoading(false);
