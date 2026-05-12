@@ -115,5 +115,4 @@ export const masterService = {
   getPendingTeachers: () => adminApiService.get<any>(Api.ADMIN_GET_PENDING_TEACHERS),
   getTeacherDocumentsForAdmin: (teacherId: string) => adminApiService.get<any>(`${Api.ADMIN_GET_TEACHER_DOCUMENTS}/${teacherId}`),
   verifyTeacherDocument: (payload: { documentId: string; status: 'APPROVED' | 'REJECTED'; rejectReason?: string }) => adminApiService.post<any>(Api.ADMIN_VERIFY_TEACHER_DOCUMENT, payload),
-  bulkAiVerifyTeachers: (payload: { teacherIds: string[] }) => adminApiService.post<any>(Api.ADMIN_BULK_AI_VERIFY_TEACHERS, payload),
 };
