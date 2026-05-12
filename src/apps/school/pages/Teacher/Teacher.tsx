@@ -26,6 +26,7 @@ import {
   Card,
   CardContent,
   IconButton,
+  Checkbox,
 } from "@mui/material";
 import {
   Email as EmailIcon,
@@ -43,6 +44,7 @@ import {
   ArrowBack as BackIcon,
   PictureAsPdf as PdfIcon,
   InsertDriveFile as FileIcon,
+  AutoMode as AutomationIcon,
 } from "@mui/icons-material";
 import moment from "moment";
 import { getTeachers, changeTeacherStatus, deleteTeacher, getPendingTeachers } from "@/redux/slices/teacherSlice";
@@ -89,6 +91,11 @@ export default function Teacher() {
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
 
+  // Bulk selection states
+  const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([]);
+  const [bulkVerifying, setBulkVerifying] = useState(false);
+
+
   const fetchPendingTeachers = async () => {
     dispatch(getPendingTeachers() as any);
   };
@@ -130,6 +137,40 @@ export default function Teacher() {
       setSelectedDocId(null);
     }
   };
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const allIds = pendingTeachers.map((t: any) => t.teacherId);
+      setSelectedTeacherIds(allIds);
+    } else {
+      setSelectedTeacherIds([]);
+    }
+  };
+
+  const handleSelectRow = (id: string) => {
+    setSelectedTeacherIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkAiVerify = async () => {
+    if (selectedTeacherIds.length === 0) return;
+    setBulkVerifying(true);
+    try {
+      const res = await masterService.bulkAiVerifyTeachers({ teacherIds: selectedTeacherIds });
+      if (res.status === 200) {
+        toast.success(`AI Verification triggered for ${selectedTeacherIds.length} teachers!`);
+        setSelectedTeacherIds([]);
+        fetchPendingTeachers();
+        handleGetData();
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Bulk AI verification failed");
+    } finally {
+      setBulkVerifying(false);
+    }
+  };
+
 
   useEffect(() => {
     if (!viewingTeacherId && hasPermission(schoolAdminPermission.teacher.read)) {
@@ -828,25 +869,48 @@ export default function Teacher() {
                       </Typography>
                     </Box>
 
-                    <Box sx={{ width: { xs: "100%", sm: "300px" } }}>
-                      <Box className="admin-search-box">
-                        <Box className="admin-form-group" sx={{ m: 0 }}>
-                          <TextField
-                            value={pendingSearchQuery}
-                            fullWidth
-                            id="pendingSearch"
-                            className="admin-form-control"
-                            placeholder="Search Name or Email"
-                            onChange={(e) => {
-                              setPendingSearchQuery(e.target.value);
-                              setPendingPage(0);
-                            }}
-                            inputProps={{ maxLength: 80 }}
-                          />
-                          <SearchIcon
-                            sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
-                            className="school-admin-search-grey-img admin-icon"
-                          />
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                      {selectedTeacherIds.length > 0 && (
+                        <Button
+                          variant="contained"
+                          className="admin-btn-theme"
+                          onClick={handleBulkAiVerify}
+                          disabled={bulkVerifying}
+                          startIcon={bulkVerifying ? <CommonLoader size={16} /> : <AutomationIcon />}
+                          sx={{
+                            textTransform: "none",
+                            borderRadius: "8px",
+                            fontWeight: 700,
+                            fontSize: "13px",
+                            backgroundColor: "var(--primary-color)",
+                            color: "#fff",
+                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                            "&:hover": { opacity: 0.9 }
+                          }}
+                        >
+                          {bulkVerifying ? "Processing..." : `AI Verify Selected (${selectedTeacherIds.length})`}
+                        </Button>
+                      )}
+                      <Box sx={{ width: { xs: "100%", sm: "300px" } }}>
+                        <Box className="admin-search-box">
+                          <Box className="admin-form-group" sx={{ m: 0 }}>
+                            <TextField
+                              value={pendingSearchQuery}
+                              fullWidth
+                              id="pendingSearch"
+                              className="admin-form-control"
+                              placeholder="Search Name or Email"
+                              onChange={(e) => {
+                                setPendingSearchQuery(e.target.value);
+                                setPendingPage(0);
+                              }}
+                              inputProps={{ maxLength: 80 }}
+                            />
+                            <SearchIcon
+                              sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                              className="school-admin-search-grey-img admin-icon"
+                            />
+                          </Box>
                         </Box>
                       </Box>
                     </Box>
@@ -858,6 +922,14 @@ export default function Teacher() {
                         <Table className="table">
                           <TableHead className="table-head">
                             <TableRow className="table-row">
+                              <TableCell className="table-th" width="50px">
+                                <Checkbox
+                                  indeterminate={selectedTeacherIds.length > 0 && selectedTeacherIds.length < filteredPending.length}
+                                  checked={filteredPending.length > 0 && selectedTeacherIds.length === filteredPending.length}
+                                  onChange={handleSelectAll}
+                                  sx={{ color: "#D0D5DD", '&.Mui-checked': { color: "var(--primary-color)" } }}
+                                />
+                              </TableCell>
                               <TableCell className="table-th">TEACHER NAME</TableCell>
                               <TableCell className="table-th">PENDING REQUESTS</TableCell>
                               <TableCell className="table-th">SUBMITTED DATE</TableCell>
@@ -871,6 +943,13 @@ export default function Teacher() {
                                   .slice(pendingPage * pendingRowsPerPage, (pendingPage + 1) * pendingRowsPerPage)
                                   .map((row) => (
                                     <TableRow key={row.teacherId} sx={{ '&:hover': { backgroundColor: 'rgba(0,0,0,0.02)' } }}>
+                                      <TableCell className="table-td">
+                                        <Checkbox
+                                          checked={selectedTeacherIds.includes(row.teacherId)}
+                                          onChange={() => handleSelectRow(row.teacherId)}
+                                          sx={{ color: "#D0D5DD", '&.Mui-checked': { color: "var(--primary-color)" } }}
+                                        />
+                                      </TableCell>
                                       <TableCell className="table-td">
                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                                           <ProfileAvatar name={row.fullName} imageUrl={row.profileImage} size={40} />
