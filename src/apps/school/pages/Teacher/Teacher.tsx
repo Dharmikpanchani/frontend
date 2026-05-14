@@ -26,6 +26,7 @@ import {
   Card,
   CardContent,
   IconButton,
+  Checkbox,
 } from "@mui/material";
 import {
   Email as EmailIcon,
@@ -89,8 +90,29 @@ export default function Teacher() {
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
 
+  // Bulk AI Verification states
+  const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([]);
+  const [bulkVerifying, setBulkVerifying] = useState(false);
+
   const fetchPendingTeachers = async () => {
     dispatch(getPendingTeachers() as any);
+  };
+
+  const handleBulkVerify = async () => {
+    if (selectedTeacherIds.length === 0) return;
+    setBulkVerifying(true);
+    try {
+      const res = await masterService.bulkAiVerifyTeacherDocuments({ teacherIds: selectedTeacherIds });
+      if (res.status === 200) {
+        toast.success(res.data.message || `${selectedTeacherIds.length} Teacher(s) documents successfully verified by Universal AI Engine!`);
+        setSelectedTeacherIds([]);
+        fetchPendingTeachers();
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to perform bulk AI verification");
+    } finally {
+      setBulkVerifying(false);
+    }
   };
 
   const fetchTeacherDocsForAdmin = async (id: string) => {
@@ -826,10 +848,31 @@ export default function Teacher() {
                       gap: 2,
                     }}
                   >
-                    <Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
                       <Typography variant="h5" sx={{ fontSize: "16px", fontWeight: 700, color: "#344054", fontFamily: "'PlusJakartaSans-Bold', sans-serif" }}>
                         Document Verification Requests
                       </Typography>
+                      {selectedTeacherIds.length > 0 && (
+                        <Button
+                          variant="contained"
+                          disabled={bulkVerifying}
+                          onClick={handleBulkVerify}
+                          sx={{
+                            backgroundColor: "var(--primary-color)",
+                            color: "#fff",
+                            textTransform: "none",
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            borderRadius: "8px",
+                            px: 2,
+                            py: 0.8,
+                            boxShadow: "none",
+                            "&:hover": { backgroundColor: "var(--primary-color)", opacity: 0.9 },
+                          }}
+                        >
+                          {bulkVerifying ? "Processing AI Engine..." : `Bulk AI Verify Selected (${selectedTeacherIds.length})`}
+                        </Button>
+                      )}
                     </Box>
 
                     <Box sx={{ width: { xs: "100%", sm: "300px" } }}>
@@ -862,6 +905,23 @@ export default function Teacher() {
                         <Table className="table">
                           <TableHead className="table-head">
                             <TableRow className="table-row">
+                              <TableCell className="table-th" width="5%" align="center">
+                                <Checkbox
+                                  size="small"
+                                  checked={filteredPending.length > 0 && selectedTeacherIds.length === filteredPending.length}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setSelectedTeacherIds(filteredPending.map((item) => item.teacherId));
+                                    } else {
+                                      setSelectedTeacherIds([]);
+                                    }
+                                  }}
+                                  sx={{
+                                    color: "var(--primary-color)",
+                                    "&.Mui-checked": { color: "var(--primary-color)" },
+                                  }}
+                                />
+                              </TableCell>
                               <TableCell className="table-th">TEACHER NAME</TableCell>
                               <TableCell className="table-th">PENDING REQUESTS</TableCell>
                               <TableCell className="table-th">SUBMITTED DATE</TableCell>
@@ -875,6 +935,23 @@ export default function Teacher() {
                                   .slice(pendingPage * pendingRowsPerPage, (pendingPage + 1) * pendingRowsPerPage)
                                   .map((row) => (
                                     <TableRow key={row.teacherId} sx={{ '&:hover': { backgroundColor: 'rgba(0,0,0,0.02)' } }}>
+                                      <TableCell className="table-td" align="center">
+                                        <Checkbox
+                                          size="small"
+                                          checked={selectedTeacherIds.includes(row.teacherId)}
+                                          onChange={(e) => {
+                                            if (e.target.checked) {
+                                              setSelectedTeacherIds((prev) => [...prev, row.teacherId]);
+                                            } else {
+                                              setSelectedTeacherIds((prev) => prev.filter((id) => id !== row.teacherId));
+                                            }
+                                          }}
+                                          sx={{
+                                            color: "var(--primary-color)",
+                                            "&.Mui-checked": { color: "var(--primary-color)" },
+                                          }}
+                                        />
+                                      </TableCell>
                                       <TableCell className="table-td">
                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                                           <ProfileAvatar name={row.fullName} imageUrl={row.profileImage} size={40} />

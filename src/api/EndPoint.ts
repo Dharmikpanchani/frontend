@@ -120,6 +120,7 @@ export const Api = {
   ADMIN_GET_PENDING_TEACHERS: `${route}/teacher-documents/pending`,
   ADMIN_GET_TEACHER_DOCUMENTS: `${route}/teacher-documents/teacher`,
   ADMIN_VERIFY_TEACHER_DOCUMENT: `${route}/teacher-documents/verify`,
+  ADMIN_BULK_AI_VERIFY: `${route}/teacher-documents/bulk-ai-verify`,
 
   // Subscription management
   GET_CURRENT_SUBSCRIPTION: `subscription/current`,
