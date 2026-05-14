@@ -14,14 +14,22 @@ import {
     TableCell,
     TableBody,
     InputAdornment,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    IconButton,
+    Chip,
 } from "@mui/material";
 import {
     Assignment as AssignmentIcon,
     Security as SecurityIcon,
     Verified as VerifiedIcon,
-    AccessTime as ExpiryIcon
+    AccessTime as ExpiryIcon,
+    Close as CloseIcon
 } from "@mui/icons-material";
 import { planStaticData as roleStaticData } from "@/apps/common/StaticArrayData";
+import { subscriptionService } from "@/api/services/subscription.service";
 import { BpCheckbox } from "../../component/schoolCommon/commonCssFunction/cssFunction";
 import { CommonLoader } from "@/apps/common/loader/Loader";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
@@ -32,6 +40,9 @@ import { toasterError } from "@/utils/toaster/Toaster";
 export default function PlanView() {
     const [loading, setLoading] = useState(true);
     const [profileData, setProfileData] = useState<any>(null);
+    const [futurePlan, setFuturePlan] = useState<any>(null);
+    const [openModal, setOpenModal] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
     const navigate = useNavigate();
 
     const fetchSchoolProfile = async () => {
@@ -50,8 +61,23 @@ export default function PlanView() {
         }
     };
 
+    const fetchFuturePlan = async () => {
+        try {
+            const res: any = await subscriptionService.getFuturePlan();
+            if (res?.status === 200 && res.data) {
+                setFuturePlan(res.data);
+            } else {
+                setFuturePlan(null);
+            }
+        } catch (error) {
+            console.error("Failed to fetch future plan:", error);
+            setFuturePlan(null);
+        }
+    };
+
     useEffect(() => {
         fetchSchoolProfile();
+        fetchFuturePlan();
     }, []);
 
     const selectedPlan = profileData?.planData;
@@ -138,85 +164,117 @@ export default function PlanView() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 3,
-                    flexDirection: { xs: 'column', sm: 'row' },
+                    flexDirection: { xs: 'column', md: 'row' },
                     boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.4)',
                     position: 'relative',
                     overflow: 'hidden'
                 }}
             >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, zIndex: 1, width: '100%' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, zIndex: 1 }}>
                     <Box sx={{ 
-                        width: 54, 
-                        height: 54, 
+                        width: 58, 
+                        height: 58, 
                         borderRadius: '14px', 
                         bgcolor: 'rgba(255,255,255,0.18)', 
                         display: 'flex', 
                         justifyContent: 'center', 
                         alignItems: 'center',
-                        backdropFilter: 'blur(4px)',
-                        border: '1px solid rgba(255,255,255,0.1)'
+                        backdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(255,255,255,0.25)',
+                        boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                        flexShrink: 0
                     }}>
-                        <ExpiryIcon sx={{ color: 'white', fontSize: 28 }} />
+                        <ExpiryIcon sx={{ color: 'white', fontSize: 30 }} />
                     </Box>
                     <Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.7 }}>
+                            <Typography sx={{ 
+                                fontSize: '12px', 
+                                fontWeight: 700, 
+                                opacity: 0.9, 
+                                textTransform: 'uppercase', 
+                                letterSpacing: '1.2px',
+                                fontFamily: "'Inter', sans-serif"
+                            }}>
+                                Subscription Expiry
+                            </Typography>
+                            <Box sx={{ 
+                                px: 1.5, 
+                                py: 0.3, 
+                                borderRadius: '20px', 
+                                bgcolor: 'rgba(255, 255, 255, 0.2)', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: 0.5,
+                                border: '1px solid rgba(255, 255, 255, 0.35)',
+                                backdropFilter: 'blur(4px)'
+                            }}>
+                                <VerifiedIcon sx={{ fontSize: 13, color: 'white' }} />
+                                <Typography sx={{ fontSize: '10px', fontWeight: 800, color: 'white', letterSpacing: '0.5px' }}>ACTIVE</Typography>
+                            </Box>
+                        </Box>
                         <Typography sx={{ 
-                            fontSize: '11px', 
-                            fontWeight: 700, 
-                            opacity: 0.85, 
-                            textTransform: 'uppercase', 
-                            letterSpacing: '1.2px',
-                            mb: 0.5,
-                            fontFamily: "'Inter', sans-serif"
-                        }}>
-                            Subscription Expiry
-                        </Typography>
-                        <Typography sx={{ 
-                            fontSize: { xs: '20px', sm: '24px' }, 
+                            fontSize: { xs: '20px', sm: '26px' }, 
                             fontWeight: 800, 
                             fontFamily: "'Poppins', sans-serif",
-                            lineHeight: 1
+                            lineHeight: 1.1
                         }}>
                             {planExpiryDate ? (planExpiryDate < 10000000000 ? moment.unix(planExpiryDate).format("MMMM DD, YYYY") : moment(planExpiryDate).format("MMMM DD, YYYY")) : "No Expiry Set"}
                         </Typography>
                     </Box>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, zIndex: 1, shrink: 0 }}>
-                    <Box sx={{ 
-                        px: 2, 
-                        py: 0.7, 
-                        borderRadius: '25px', 
-                        bgcolor: 'rgba(255,255,255,0.15)', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: 1,
-                        border: '1px solid rgba(255,255,255,0.3)',
-                        backdropFilter: 'blur(4px)'
-                    }}>
-                        <VerifiedIcon sx={{ fontSize: 14, color: 'white' }} />
-                        <Typography sx={{ fontSize: '12px', fontWeight: 700, color: 'white' }}>ACTIVE</Typography>
-                    </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, zIndex: 1, flexWrap: { xs: 'wrap', sm: 'nowrap' }, width: { xs: '100%', md: 'auto' }, justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+                    {futurePlan && (
+                        <Button
+                            variant="outlined"
+                            onClick={() => setOpenModal(true)}
+                            sx={{
+                                color: '#FFFFFF !important',
+                                background: 'rgba(255, 255, 255, 0.15) !important',
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                borderRadius: '25px',
+                                px: 3,
+                                py: 1.1,
+                                fontSize: '14px',
+                                whiteSpace: 'nowrap',
+                                border: '1px solid rgba(255, 255, 255, 0.5) !important',
+                                backdropFilter: 'blur(8px)',
+                                '&:hover': {
+                                    background: 'rgba(255, 255, 255, 0.25) !important',
+                                    border: '1px solid rgba(255, 255, 255, 0.9) !important',
+                                    transform: 'translateY(-2px)',
+                                },
+                                transition: 'all 0.3s ease',
+                                flex: { xs: 1, sm: 'initial' }
+                            }}
+                        >
+                            Available Future Plans
+                        </Button>
+                    )}
                     <Button
                         variant="contained"
                         onClick={() => navigate("/user-plan")}
                         sx={{
-                            bgcolor: 'var(--primary-color) !important',
+                            background: 'var(--primary-color) !important',
                             color: '#FFFFFF !important',
                             textTransform: 'none',
-                            fontWeight: 800,
+                            fontWeight: 700,
                             borderRadius: '25px',
-                            px: 4,
+                            px: 3.5,
                             py: 1.1,
-                            fontSize: '13px',
+                            fontSize: '14px',
                             whiteSpace: 'nowrap',
-                            border: '1px solid rgba(255,255,255,0.4)',
-                            boxShadow: '0 8px 16px -4px rgba(0,0,0,0.2)',
+                            border: '1px solid rgba(255, 255, 255, 0.2) !important',
+                            boxShadow: '0 8px 20px -4px rgba(0,0,0,0.3)',
                             '&:hover': {
-                                bgcolor: 'var(--primary-color) !important',
-                                opacity: 0.9,
+                                background: 'var(--selected-color, var(--primary-color)) !important',
+                                opacity: 0.95,
                                 transform: 'translateY(-2px)',
-                                boxShadow: '0 12px 20px -5px rgba(0,0,0,0.2)'
+                                boxShadow: '0 12px 24px -5px rgba(0,0,0,0.4)'
                             },
-                            transition: 'all 0.3s ease'
+                            transition: 'all 0.3s ease',
+                            flex: { xs: 1, sm: 'initial' }
                         }}
                     >
                         Upgrade Plan
@@ -357,6 +415,141 @@ export default function PlanView() {
                     </Table>
                 </TableContainer>
             </Box>
+
+            {/* Future Plan Modal */}
+            <Dialog 
+                open={openModal} 
+                onClose={() => !actionLoading && setOpenModal(false)}
+                PaperProps={{
+                    sx: {
+                        borderRadius: '20px',
+                        padding: 1,
+                        maxWidth: '500px',
+                        width: '100%',
+                        boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)'
+                    }
+                }}
+            >
+                <DialogTitle sx={{ pb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography sx={{ fontSize: '20px', fontWeight: 800, color: 'var(--primary-color)' }}>
+                        Upcoming Plan Details
+                    </Typography>
+                    <IconButton onClick={() => setOpenModal(false)} disabled={actionLoading}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ py: 2 }}>
+                    {futurePlan && (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                            <Box sx={{ p: 2.5, borderRadius: '14px', bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                                <Typography sx={{ fontSize: '13px', color: '#64748b', mb: 0.5, fontWeight: 600 }}>Plan Name</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', textTransform: 'capitalize' }}>
+                                    {futurePlan.newPlanSnapshot?.planName || futurePlan.newPlanId?.planName || 'Plan'}
+                                </Typography>
+                            </Box>
+                            
+                            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                                <Box sx={{ p: 2, borderRadius: '12px', bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                                    <Typography sx={{ fontSize: '12px', color: '#64748b', mb: 0.5, fontWeight: 600 }}>Billing Cycle</Typography>
+                                    <Typography sx={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', textTransform: 'capitalize' }}>
+                                        {futurePlan.newPlanSnapshot?.billingCycle || 'Yearly'}
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ p: 2, borderRadius: '12px', bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                                    <Typography sx={{ fontSize: '12px', color: '#64748b', mb: 0.5, fontWeight: 600 }}>Price</Typography>
+                                    <Typography sx={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
+                                        ₹{futurePlan.amountPaid || futurePlan.newPlanSnapshot?.price || 0}
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                                <Box sx={{ p: 2, borderRadius: '12px', bgcolor: 'rgba(0, 80, 157, 0.05)', border: '1px solid rgba(0, 80, 157, 0.15)' }}>
+                                    <Typography sx={{ fontSize: '12px', color: 'var(--primary-color)', mb: 0.5, fontWeight: 700 }}>Booked On (Today)</Typography>
+                                    <Typography sx={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
+                                        {moment(futurePlan.createdAt).format("MMMM DD, YYYY")}
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ p: 2, borderRadius: '12px', bgcolor: 'rgba(255, 165, 0, 0.08)', border: '1px solid rgba(255, 165, 0, 0.2)' }}>
+                                    <Typography sx={{ fontSize: '12px', color: 'var(--secondary-color)', mb: 0.5, fontWeight: 700 }}>Scheduled Expiry Date</Typography>
+                                    <Typography sx={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
+                                        {(() => {
+                                            const cycle = futurePlan.newPlanSnapshot?.billingCycle || 'yearly';
+                                            const baseDate = moment(futurePlan.createdAt);
+                                            if (cycle === 'monthly') baseDate.add(1, 'month');
+                                            else if (cycle === '6month') baseDate.add(6, 'months');
+                                            else if (cycle === 'yearly') baseDate.add(1, 'year');
+                                            else baseDate.add(30, 'days');
+                                            return baseDate.format("MMMM DD, YYYY");
+                                        })()}
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            <Box sx={{ p: 2.5, borderRadius: '14px', bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                                <Typography sx={{ fontSize: '13px', color: '#64748b', mb: 1.5, fontWeight: 700 }}>Included Modules & Features</Typography>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                    {roleStaticData
+                                        .filter((module: any) => {
+                                            const perms = futurePlan.newPlanSnapshot?.permissions || futurePlan.newPlanId?.permissions || [];
+                                            return module.subRole.some((sr: any) => perms.includes(`${module.mainTitleId}_${sr.titleId}`));
+                                        })
+                                        .map((module: any) => (
+                                            <Chip 
+                                                key={module.mainTitleId}
+                                                label={`✨ ${module.mainTitle}`}
+                                                sx={{ 
+                                                    bgcolor: 'white', 
+                                                    color: 'var(--primary-color)', 
+                                                    border: '1px solid var(--primary-color)', 
+                                                    fontWeight: 700,
+                                                    borderRadius: '10px',
+                                                    px: 1,
+                                                    py: 1.5,
+                                                    fontSize: '13px',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                                                }}
+                                            />
+                                        ))
+                                    }
+                                </Box>
+                            </Box>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 3, pt: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button 
+                        variant="contained" 
+                        disabled={actionLoading}
+                        onClick={async () => {
+                            try {
+                                setActionLoading(true);
+                                const res = await subscriptionService.instantUpgrade({ futurePlanId: futurePlan._id });
+                                if (res.status === 200) {
+                                    setOpenModal(false);
+                                    window.location.reload();
+                                }
+                            } catch (error: any) {
+                                console.error(error);
+                            } finally {
+                                setActionLoading(false);
+                            }
+                        }}
+                        sx={{ 
+                            borderRadius: '25px', 
+                            px: 4, 
+                            py: 1.2, 
+                            fontWeight: 700, 
+                            textTransform: 'none',
+                            background: 'var(--theme-gradient, var(--primary-color)) !important', 
+                            color: '#fff !important',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                        }}
+                    >
+                        {actionLoading ? "Activating..." : "Activate Instantly"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }

@@ -686,15 +686,19 @@ export default function Teacher() {
                                   <Typography sx={{ fontSize: '11px', fontWeight: 600, color: '#111827' }}>
                                     {data?.employmentType || 'NA'}
                                   </Typography>
-                                  <Tooltip title={data?.isActive ? "Active" : "Inactive"} arrow>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                      <IOSSwitch
-                                        checked={data?.isActive}
-                                        onChange={() => setOpenStatusChange(data)}
-                                        size="small"
-                                      />
-                                    </Box>
-                                  </Tooltip>
+                                  {data?.isVerified ? (
+                                    <Tooltip title={data?.isActive ? "Active" : "Inactive"} arrow>
+                                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <IOSSwitch
+                                          checked={data?.isActive}
+                                          onChange={() => setOpenStatusChange(data)}
+                                          size="small"
+                                        />
+                                      </Box>
+                                    </Tooltip>
+                                  ) : (
+                                    <Typography sx={{ fontSize: '10px', color: '#ff9800', fontStyle: 'italic' }}>Status locked</Typography>
+                                  )}
                                 </Box>
 
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

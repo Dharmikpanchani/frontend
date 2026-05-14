@@ -492,14 +492,18 @@ export default function SchoolList() {
                             </Box>
                             {hasPermission(developerPermission.school.status) && (
                               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Tooltip title={data?.isActive ? "Deactivate" : "Activate"} arrow placement="top">
-                                  <Box>
-                                    <IOSSwitch
-                                      checked={data?.isActive}
-                                      onChange={() => setOpenStatusChange(data)}
-                                    />
-                                  </Box>
-                                </Tooltip>
+                                {data?.isVerified ? (
+                                  <Tooltip title={data?.isActive ? "Deactivate" : "Activate"} arrow placement="top">
+                                    <Box>
+                                      <IOSSwitch
+                                        checked={data?.isActive}
+                                        onChange={() => setOpenStatusChange(data)}
+                                      />
+                                    </Box>
+                                  </Tooltip>
+                                ) : (
+                                  <Typography sx={{ fontSize: '10px', color: '#ff9800', fontStyle: 'italic' }}>Status locked</Typography>
+                                )}
                               </Box>
                             )}
                           </Box>

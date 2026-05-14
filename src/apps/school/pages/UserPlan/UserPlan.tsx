@@ -143,7 +143,6 @@ export default function UserPlan() {
 
       const checkoutUrl = `${checkoutBase}/checkout/school-plan?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}`;
 
-      console.log("Redirecting to checkout:", checkoutUrl);
       window.location.href = checkoutUrl;
 
     } catch (error: any) {

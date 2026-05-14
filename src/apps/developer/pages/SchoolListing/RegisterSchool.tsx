@@ -70,6 +70,7 @@ export default function RegisterSchool() {
         schoolName: (isEdit || isView) ? (selectedSchool?.schoolName || "") : "",
         ownerName: (isEdit || isView) ? (selectedSchool?.ownerName || "") : "",
         email: (isEdit || isView) ? (selectedSchool?.email || "") : "",
+        adminEmail: (isEdit || isView) ? (selectedSchool?.adminEmail || "") : "",
         phoneNumber: (isEdit || isView) ? (selectedSchool?.phoneNumber || "") : "",
         password: "",
         confirmPassword: "",
@@ -387,9 +388,9 @@ export default function RegisterSchool() {
                                                 <FormHelperText className="error-text">{(touched.medium && errors.medium) ? (errors.medium as string) : ""}</FormHelperText>
                                             </Box>
 
-                                            {/* Email */}
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
-                                                <Typography sx={labelSx}>Email<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
+                                            {/* School Email */}
+                                            <Box gridColumn={{ xs: 'span 12', sm: (isEdit || isView) ? 'span 4' : 'span 6' }}>
+                                                <Typography sx={labelSx}>{(isEdit || isView) ? "School Email" : "School / Admin Email"}<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
                                                 <TextField
                                                     fullWidth
                                                     name="email"
@@ -405,8 +406,24 @@ export default function RegisterSchool() {
                                                 <FormHelperText className="error-text">{(touched.email && errors.email) ? (errors.email as string) : ""}</FormHelperText>
                                             </Box>
 
+                                            {/* Admin Login Email (Only shown in Edit/View) */}
+                                            {(isEdit || isView) && (
+                                                <Box gridColumn={{ xs: 'span 12', sm: 'span 4' }}>
+                                                    <Typography sx={labelSx}>Admin Login Email</Typography>
+                                                    <TextField
+                                                        fullWidth
+                                                        name="adminEmail"
+                                                        placeholder="Admin Email"
+                                                        variant="outlined"
+                                                        sx={inputSx}
+                                                        value={values.adminEmail}
+                                                        disabled
+                                                    />
+                                                </Box>
+                                            )}
+
                                             {/* Phone Number */}
-                                            <Box gridColumn={{ xs: 'span 12', sm: 'span 6' }}>
+                                            <Box gridColumn={{ xs: 'span 12', sm: (isEdit || isView) ? 'span 4' : 'span 6' }}>
                                                 <Typography sx={labelSx}>Phone Number<span style={{ color: '#ef4444', marginLeft: '2px' }}>*</span></Typography>
                                                 <TextField
                                                     fullWidth

@@ -418,15 +418,19 @@ export default function AdminUser() {
                             className="table-td"
                           >
                             <Box className="admin-table-data-flex">
-                              <Tooltip title={data?.isActive ? "Deactivate" : "Activate"} arrow placement="top">
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <IOSSwitch
-                                    checked={data?.isActive}
-                                    onChange={() => handleStatusChange(data)}
-                                    disabled={data?.isSuperAdmin}
-                                  />
-                                </Box>
-                              </Tooltip>
+                              {data?.isVerified ? (
+                                <Tooltip title={data?.isActive ? "Deactivate" : "Activate"} arrow placement="top">
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <IOSSwitch
+                                      checked={data?.isActive}
+                                      onChange={() => handleStatusChange(data)}
+                                      disabled={data?.isSuperAdmin}
+                                    />
+                                  </Box>
+                                </Tooltip>
+                              ) : (
+                                <Typography sx={{ fontSize: '10px', color: '#ff9800', fontStyle: 'italic' }}>Status locked</Typography>
+                              )}
                             </Box>
                           </TableCell>)}
 

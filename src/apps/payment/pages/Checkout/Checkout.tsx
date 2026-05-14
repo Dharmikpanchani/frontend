@@ -244,6 +244,8 @@ export default function Checkout() {
   }
 
   const price = billingCycle === "6month" ? planData.monPrice : planData.yerPrice;
+  const gstAmount = Math.round(price * 0.18);
+  const totalPrice = price + gstAmount;
 
   return (
     <Box
@@ -285,7 +287,7 @@ export default function Checkout() {
                 <CheckIcon sx={{ color: "success.main" }} />
               </Stack>
               <Divider sx={{ my: 2, opacity: 0.1 }} />
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 800, textTransform: "capitalize" }}>
                     {planData.planName} Plan
@@ -294,8 +296,25 @@ export default function Checkout() {
                     Billed {billingCycle === "6month" ? "6 Months" : "Yearly"}
                   </Typography>
                 </Box>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: primaryColor }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#475569" }}>
                   ₹{price}
+                </Typography>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="body2" sx={{ color: "#64748b", fontWeight: 600 }}>
+                  18% GST
+                </Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#475569" }}>
+                  + ₹{gstAmount}
+                </Typography>
+              </Stack>
+              <Divider sx={{ my: 2, opacity: 0.1 }} />
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#1e293b" }}>
+                  Total Amount
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: primaryColor }}>
+                  ₹{totalPrice}
                 </Typography>
               </Stack>
             </Box>
@@ -323,7 +342,7 @@ export default function Checkout() {
               }
             }}
           >
-            {paymentLoading ? "Initialising Secure Payment..." : `Pay ₹${price} Now`}
+            {paymentLoading ? "Initialising Secure Payment..." : `Pay ₹${totalPrice} Now`}
           </Button>
 
           <Typography variant="caption" sx={{ display: "block", textAlign: "center", mt: 3, color: "#94a3b8" }}>
