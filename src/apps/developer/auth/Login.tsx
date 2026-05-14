@@ -27,13 +27,7 @@ export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    if (isSubdomain?.isSubdomain) {
-      const urlencoded = new URLSearchParams();
-      urlencoded.append("schoolCode", isSubdomain.name);
-      dispatch(getSchoolLogo(urlencoded) as any);
-    }
-  }, []);
+
 
   const initialValues: LoginInterface = {
     email: "",

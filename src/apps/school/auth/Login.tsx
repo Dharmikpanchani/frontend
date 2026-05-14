@@ -27,40 +27,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = React.useState(true);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const [buttonSpinner, setButtonSpinner] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    if (isSubdomain?.isSubdomain) {
-      const urlencoded = new URLSearchParams();
-      urlencoded.append("schoolCode", isSubdomain.name);
-      
-      const adminUrl = import.meta.env.VITE_MAIN_URL || "http://localhost:5173";
-
-      dispatch(getSchoolLogo(urlencoded) as any).then((actionResult: any) => {
-        if (getSchoolLogo.rejected.match(actionResult)) {
-          setIsRedirecting(true);
-          const errorMsg = (actionResult.payload as any) || "School domain not found!";
-          toasterError(errorMsg);
-          setTimeout(() => {
-            window.location.href = adminUrl;
-          }, 2000);
-        } else if (getSchoolLogo.fulfilled.match(actionResult)) {
-          const logoData = actionResult.payload;
-          if (!logoData || (!logoData.logo && !logoData.schoolName)) {
-            setIsRedirecting(true);
-            toasterError("School details not found!");
-            setTimeout(() => {
-              window.location.href = adminUrl;
-            }, 2000);
-          }
-        }
-      });
-    }
-  }, []);
-
-  if (schoolLoading || isRedirecting) {
+  if (schoolLoading) {
     return <PageLoader />;
   }
 
