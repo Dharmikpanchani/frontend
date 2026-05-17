@@ -120,4 +120,12 @@ export const Api = {
   ADMIN_GET_PENDING_TEACHERS: `${route}/teacher-documents/pending`,
   ADMIN_GET_TEACHER_DOCUMENTS: `${route}/teacher-documents/teacher`,
   ADMIN_VERIFY_TEACHER_DOCUMENT: `${route}/teacher-documents/verify`,
+
+  // Subscription management
+  GET_CURRENT_SUBSCRIPTION: `subscription/current`,
+  GET_FUTURE_PLAN: `subscription/future-plan`,
+  GET_SUBSCRIPTION_HISTORY: `subscription/history`,
+  UPGRADE_PLAN: `subscription/upgrade`,
+  INSTANT_UPGRADE: `subscription/instant-upgrade`,
+  CANCEL_FUTURE_PLAN: `subscription/cancel-future-plan`,
 };
