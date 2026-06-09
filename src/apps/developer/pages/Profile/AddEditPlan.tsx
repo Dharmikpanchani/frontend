@@ -64,7 +64,7 @@ export default function AddEditPlan() {
     (state: RootState) => state.PlanReducer,
   );
   const { adminDetails } = useSelector(
-    (state: RootState) => state.AuthReducer,
+    (state: RootState) => state.AdminReducer,
   );
   const [permissionsError, setPermissionsError] = useState("");
 
