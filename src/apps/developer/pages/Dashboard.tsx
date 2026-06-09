@@ -11,20 +11,20 @@ export default function Dashboard() {
   }, []);
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
     });
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -69,7 +69,14 @@ export default function Dashboard() {
 
   return (
     <Box className="admin-dashboard-content">
-      <Box className="admin-dashboard-banner" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        className="admin-dashboard-banner"
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
             Welcome back 👋
@@ -81,7 +88,7 @@ export default function Dashboard() {
             School Management Platform
           </Typography>
         </Box>
-        <Box sx={{ textAlign: 'right', display: { xs: 'none', md: 'block' } }}>
+        <Box sx={{ textAlign: "right", display: { xs: "none", md: "block" } }}>
           <Typography variant="h3" sx={{ fontWeight: 700 }}>
             {formatTime(time)}
           </Typography>
@@ -106,10 +113,7 @@ export default function Dashboard() {
                       placement="bottom"
                       className="admin-tooltip"
                     >
-                      <Typography
-                        className="admin-dash-text"
-                        component="p"
-                      >
+                      <Typography className="admin-dash-text" component="p">
                         {card.title}
                       </Typography>
                     </Tooltip>
@@ -117,21 +121,23 @@ export default function Dashboard() {
                       className="admin-dash-price"
                       variant="h1"
                       component="h1"
-                      sx={{ fontSize: '24px !important', fontWeight: 700 }}
+                      sx={{ fontSize: "24px !important", fontWeight: 700 }}
                     >
-                      {card.title === "Total Revenue" ? `₹${card.value}` : card.value}
+                      {card.title === "Total Revenue"
+                        ? `₹${card.value}`
+                        : card.value}
                     </Typography>
                   </Box>
                   <Box className="admin-dash-right">
                     <Box
                       className="admin-dash-icon-box"
-                      sx={{ background: 'rgba(255,255,255,0.1)' }}
+                      sx={{ background: "rgba(255,255,255,0.1)" }}
                     >
                       <img
                         src={card.icon}
                         className="admin-dash-icons"
                         alt="dashboard icon"
-                        style={{ filter: 'brightness(0) invert(1)' }}
+                        style={{ filter: "brightness(0) invert(1)" }}
                       />
                     </Box>
                   </Box>

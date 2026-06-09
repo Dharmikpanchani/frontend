@@ -30,7 +30,7 @@ export const getDepartments = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const addEditDepartmentAction = createAsyncThunk(
@@ -49,7 +49,7 @@ export const addEditDepartmentAction = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const deleteDepartment = createAsyncThunk(
@@ -68,7 +68,7 @@ export const deleteDepartment = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const getDepartmentById = createAsyncThunk(
@@ -81,7 +81,7 @@ export const getDepartmentById = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const changeDepartmentStatus = createAsyncThunk(
@@ -100,7 +100,7 @@ export const changeDepartmentStatus = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 const departmentSlice = createSlice({
@@ -140,7 +140,9 @@ const departmentSlice = createSlice({
       })
       .addCase(deleteDepartment.fulfilled, (state, action) => {
         state.actionLoading = false;
-        state.departments = state.departments.filter((d) => d._id !== action.payload);
+        state.departments = state.departments.filter(
+          (d) => d._id !== action.payload,
+        );
       })
       .addCase(deleteDepartment.rejected, (state) => {
         state.actionLoading = false;
@@ -163,7 +165,7 @@ const departmentSlice = createSlice({
         const { id, data } = action.payload;
         if (data && data._id) {
           state.departments = state.departments.map((d) =>
-            d._id === data._id ? data : d
+            d._id === data._id ? data : d,
           );
         } else {
           const dept = state.departments.find((d) => d._id === id);

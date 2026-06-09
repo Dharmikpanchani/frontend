@@ -4,7 +4,7 @@ import { Api } from "../EndPoint";
 export const contactUsService = {
   getAll: (page: number, perPage: number, search: string) =>
     adminApiService.get<any>(
-      `${Api.GET_CONTACT_US}?pageNumber=${page}&perPageData=${perPage}&searchRequest=${encodeURIComponent(search)}`
+      `${Api.GET_CONTACT_US}?pageNumber=${page}&perPageData=${perPage}&searchRequest=${encodeURIComponent(search)}`,
     ),
 };
 

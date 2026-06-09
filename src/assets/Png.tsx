@@ -9,15 +9,15 @@ import educationBg from "./images/png/education-bg.png";
 import pageNotFound from "./images/png/page-not-found-img.png";
 
 const Png = {
-    dummyUser,
-    dashboardIcon,
-    userListIcon,
-    cmsIcon,
-    roleIcon,
-    reportsIcon,
-    logoImg,
-    educationBg,
-    pageNotFound
+  dummyUser,
+  dashboardIcon,
+  userListIcon,
+  cmsIcon,
+  roleIcon,
+  reportsIcon,
+  logoImg,
+  educationBg,
+  pageNotFound,
 };
 
 export default Png;

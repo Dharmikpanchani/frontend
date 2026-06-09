@@ -18,7 +18,10 @@ const initialState: FaqState = {
 
 export const getAllFaqs = createAsyncThunk(
   "faq/getAll",
-  async ({ page, perPage }: { page: number; perPage: number }, { rejectWithValue }) => {
+  async (
+    { page, perPage }: { page: number; perPage: number },
+    { rejectWithValue },
+  ) => {
     try {
       const res: any = await faqService.getAll(page, perPage);
       if (res.status === 200 || res.status === 201) return res.data;
@@ -26,11 +29,12 @@ export const getAllFaqs = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch FAQs";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to fetch FAQs";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const addEditFaq = createAsyncThunk(
@@ -45,11 +49,12 @@ export const addEditFaq = createAsyncThunk(
       toast.error(res?.message || "Failed to save FAQ");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.message || "Failed to save FAQ";
+      const errorMessage =
+        err?.response?.data?.message || err?.message || "Failed to save FAQ";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const deleteFaq = createAsyncThunk(
@@ -64,11 +69,12 @@ export const deleteFaq = createAsyncThunk(
       toast.error(res?.message || "Failed to delete FAQ");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.message || "Failed to delete FAQ";
+      const errorMessage =
+        err?.response?.data?.message || err?.message || "Failed to delete FAQ";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const changeFaqStatus = createAsyncThunk(
@@ -83,11 +89,12 @@ export const changeFaqStatus = createAsyncThunk(
       toast.error(res.message || "Failed to update status");
       return rejectWithValue(res.message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to update status";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to update status";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 const faqSlice = createSlice({
@@ -96,32 +103,50 @@ const faqSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getAllFaqs.pending, (state) => { state.loading = true; })
+      .addCase(getAllFaqs.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(getAllFaqs.fulfilled, (state, action) => {
         state.loading = false;
         state.faqs = action.payload?.data || [];
         state.total = action.payload?.totalArrayLength || 0;
       })
-      .addCase(getAllFaqs.rejected, (state) => { state.loading = false; })
+      .addCase(getAllFaqs.rejected, (state) => {
+        state.loading = false;
+      })
 
-      .addCase(addEditFaq.pending, (state) => { state.actionLoading = true; })
-      .addCase(addEditFaq.fulfilled, (state) => { state.actionLoading = false; })
-      .addCase(addEditFaq.rejected, (state) => { state.actionLoading = false; })
+      .addCase(addEditFaq.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(addEditFaq.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(addEditFaq.rejected, (state) => {
+        state.actionLoading = false;
+      })
 
-      .addCase(deleteFaq.pending, (state) => { state.actionLoading = true; })
+      .addCase(deleteFaq.pending, (state) => {
+        state.actionLoading = true;
+      })
       .addCase(deleteFaq.fulfilled, (state, action) => {
         state.actionLoading = false;
         state.faqs = state.faqs.filter((f) => f._id !== action.payload);
       })
-      .addCase(deleteFaq.rejected, (state) => { state.actionLoading = false; })
+      .addCase(deleteFaq.rejected, (state) => {
+        state.actionLoading = false;
+      })
 
-      .addCase(changeFaqStatus.pending, (state) => { state.actionLoading = true; })
+      .addCase(changeFaqStatus.pending, (state) => {
+        state.actionLoading = true;
+      })
       .addCase(changeFaqStatus.fulfilled, (state, action) => {
         state.actionLoading = false;
         const faq = state.faqs.find((f) => f._id === action.payload);
         if (faq) faq.isActive = !faq.isActive;
       })
-      .addCase(changeFaqStatus.rejected, (state) => { state.actionLoading = false; });
+      .addCase(changeFaqStatus.rejected, (state) => {
+        state.actionLoading = false;
+      });
   },
 });
 

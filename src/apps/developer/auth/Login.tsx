@@ -2,7 +2,14 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  Box, Typography, TextField, FormHelperText, OutlinedInput, InputAdornment, IconButton, Button
+  Box,
+  Typography,
+  TextField,
+  FormHelperText,
+  OutlinedInput,
+  InputAdornment,
+  IconButton,
+  Button,
 } from "@mui/material";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 import { Formik, Form } from "formik";
@@ -10,13 +17,12 @@ import type { FormikProps } from "formik";
 import type { LoginInterface } from "@/types/interfaces/LoginInterface";
 import { loginAdmin } from "@/redux/slices/authSlice";
 import { getSubdomain } from "@/apps/common/commonJsFunction";
-import { getSchoolLogo } from "@/redux/slices/schoolSlice";
+
 import { loginValidationSchema } from "@/utils/validation/FormikValidation";
 import { toasterError } from "@/utils/toaster/Toaster";
 import Spinner from "../component/developerCommon/spinner/Spinner";
 import Png from "@/assets/Png";
 import type { RootState } from "@/redux/Store";
-
 
 export default function Login() {
   const isSubdomain = getSubdomain();
@@ -27,15 +33,13 @@ export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
-
   const initialValues: LoginInterface = {
     email: "",
     password: "",
   };
 
   const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
   };
@@ -56,7 +60,7 @@ export default function Login() {
           navigate("/login/otp", {
             state: {
               email: values?.email,
-              type: "login"
+              type: "login",
             },
           });
         } else {
@@ -83,7 +87,16 @@ export default function Login() {
           <Form onSubmit={handleSubmit}>
             <Box className="login-page-container">
               <Box className="login-card">
-                <Box component="img" src={isSubdomain?.isSubdomain && schoolLogo ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo : Png?.logoImg} alt="Logo" className="login-logo" />
+                <Box
+                  component="img"
+                  src={
+                    isSubdomain?.isSubdomain && schoolLogo
+                      ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo
+                      : Png?.logoImg
+                  }
+                  alt="Logo"
+                  className="login-logo"
+                />
 
                 <Typography className="login-title">
                   Login your account
@@ -93,7 +106,9 @@ export default function Login() {
                 </Typography>
 
                 <Box className="login-form-group email-group">
-                  <label htmlFor="email">Email<span className="required-asterisk">*</span></label>
+                  <label htmlFor="email">
+                    Email<span className="required-asterisk">*</span>
+                  </label>
                   <Box className="email-input-box">
                     <TextField
                       fullWidth
@@ -111,6 +126,7 @@ export default function Login() {
                           document.getElementById("password")?.focus();
                         }
                       }}
+                      slotProps={{ htmlInput: { maxLength: 70 } }}
                     />
                     {touched.email && errors.email && (
                       <FormHelperText className="error-text">
@@ -121,7 +137,9 @@ export default function Login() {
                 </Box>
 
                 <Box className="login-form-group">
-                  <label htmlFor="password">Password<span className="required-asterisk">*</span></label>
+                  <label htmlFor="password">
+                    Password<span className="required-asterisk">*</span>
+                  </label>
                   <Box className="password-input-box">
                     <OutlinedInput
                       fullWidth
@@ -142,10 +160,15 @@ export default function Login() {
                             edge="end"
                             className="password-eye-icon"
                           >
-                            {showPassword ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
+                            {showPassword ? (
+                              <VisibilityOff sx={{ fontSize: 18 }} />
+                            ) : (
+                              <Visibility sx={{ fontSize: 18 }} />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       }
+                      inputProps={{ maxLength: 16 }}
                     />
                     {touched.password && errors.password && (
                       <FormHelperText className="error-text">
@@ -165,7 +188,11 @@ export default function Login() {
                   className="login-btn-primary"
                   disabled={buttonSpinner}
                 >
-                  {buttonSpinner ? <Spinner size={20} color="white" /> : "Login"}
+                  {buttonSpinner ? (
+                    <Spinner size={20} color="white" />
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
               </Box>
             </Box>

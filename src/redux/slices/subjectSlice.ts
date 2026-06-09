@@ -30,7 +30,7 @@ export const getSubjects = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const addEditSubjectAction = createAsyncThunk(
@@ -49,7 +49,7 @@ export const addEditSubjectAction = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const deleteSubject = createAsyncThunk(
@@ -68,7 +68,7 @@ export const deleteSubject = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const getSubjectById = createAsyncThunk(
@@ -81,7 +81,7 @@ export const getSubjectById = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const changeSubjectStatus = createAsyncThunk(
@@ -100,7 +100,7 @@ export const changeSubjectStatus = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 const subjectSlice = createSlice({
@@ -163,7 +163,7 @@ const subjectSlice = createSlice({
         const { id, data } = action.payload;
         if (data && data._id) {
           state.subjects = state.subjects.map((s) =>
-            s._id === data._id ? data : s
+            s._id === data._id ? data : s,
           );
         } else {
           const subject = state.subjects.find((s) => s._id === id);

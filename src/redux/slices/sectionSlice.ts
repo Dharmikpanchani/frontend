@@ -30,7 +30,7 @@ export const getSections = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const getSectionById = createAsyncThunk(
@@ -43,7 +43,7 @@ export const getSectionById = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const addEditSection = createAsyncThunk(
@@ -62,7 +62,7 @@ export const addEditSection = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const deleteSection = createAsyncThunk(
@@ -82,7 +82,7 @@ export const deleteSection = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const changeSectionStatus = createAsyncThunk(
@@ -102,7 +102,7 @@ export const changeSectionStatus = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 const sectionSlice = createSlice({

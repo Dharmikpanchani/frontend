@@ -17,7 +17,7 @@ import {
   CameraAlt as CameraAltIcon,
   PhoneAndroid as PhoneIcon,
   Description as LegalIcon,
-  AccountBalanceWallet as UPIIcon
+  AccountBalanceWallet as UPIIcon,
 } from "@mui/icons-material";
 import type {
   AddProfileInterFace,
@@ -85,7 +85,10 @@ export default function EditProfile() {
         toasterError(res?.message || "Failed to fetch profile");
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Error fetching profile";
+      const errorMessage =
+        error.response?.data?.message ||
+        error?.message ||
+        "Error fetching profile";
       toasterError(errorMessage);
     }
   };
@@ -122,7 +125,10 @@ export default function EditProfile() {
         toasterError(res?.message || "Failed to update profile");
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Error updating profile";
+      const errorMessage =
+        error.response?.data?.message ||
+        error?.message ||
+        "Error updating profile";
       toasterError(errorMessage);
       setButtonSpinner(false);
     }
@@ -150,7 +156,6 @@ export default function EditProfile() {
           isSubmitting,
         } = formikProps;
 
-
         return (
           <Form onSubmit={formikSubmit}>
             {loading ? (
@@ -161,39 +166,44 @@ export default function EditProfile() {
                   <Box
                     className="profile-header-main"
                     sx={{
-                      display: 'flex',
-                      alignItems: { xs: 'flex-start', sm: 'center' },
-                      flexDirection: { xs: 'column', sm: 'row' },
+                      display: "flex",
+                      alignItems: { xs: "flex-start", sm: "center" },
+                      flexDirection: { xs: "column", sm: "row" },
                       gap: { xs: 2, sm: 4 },
                       mb: { xs: 3, sm: 6 },
                       pb: { xs: 3, sm: 4 },
-                      borderBottom: '1px solid #F0F0F0'
+                      borderBottom: "1px solid #F0F0F0",
                     }}
                   >
-                    <Box sx={{ position: 'relative' }}>
+                    <Box sx={{ position: "relative" }}>
                       <Box
                         sx={{
                           width: 120,
                           height: 120,
-                          borderRadius: '50%',
-                          overflow: 'hidden',
-                          backgroundColor: '#F0F2F5',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                          borderRadius: "50%",
+                          overflow: "hidden",
+                          backgroundColor: "#F0F2F5",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                         }}
                       >
                         <img
                           src={
                             values?.imageUrl
                               ? values.imageUrl
-                              : values?.profile && typeof values.profile === 'string'
+                              : values?.profile &&
+                                  typeof values.profile === "string"
                                 ? values.profile
                                 : Png.dummyUser
                           }
                           alt="Profile"
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
                         />
                       </Box>
                       <Button
@@ -201,28 +211,30 @@ export default function EditProfile() {
                         component="label"
                         disabled={isSubmitting || buttonSpinner}
                         sx={{
-                          position: 'absolute',
+                          position: "absolute",
                           bottom: 5,
                           right: 5,
                           minWidth: 34,
                           width: 34,
                           height: 34,
-                          backgroundColor: 'var(--primary-color)',
-                          borderRadius: '50%',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          border: '3px solid #FFFFFF',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                          backgroundColor: "var(--primary-color)",
+                          borderRadius: "50%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          cursor: "pointer",
+                          border: "3px solid #FFFFFF",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                           p: 0,
-                          '&:hover': {
-                            backgroundColor: 'var(--primary-color)',
-                            opacity: 0.8
-                          }
+                          "&:hover": {
+                            backgroundColor: "var(--primary-color)",
+                            opacity: 0.8,
+                          },
                         }}
                       >
-                        <CameraAltIcon sx={{ color: '#FFFFFF', fontSize: 18 }} />
+                        <CameraAltIcon
+                          sx={{ color: "#FFFFFF", fontSize: 18 }}
+                        />
                         <input
                           hidden
                           accept="image/*"
@@ -231,7 +243,10 @@ export default function EditProfile() {
                             const file = e.currentTarget.files?.[0];
                             if (file) {
                               setFieldValue("profile", file);
-                              setFieldValue("imageUrl", URL.createObjectURL(file));
+                              setFieldValue(
+                                "imageUrl",
+                                URL.createObjectURL(file),
+                              );
                               setFieldTouched("profile", true);
                               setFieldError("profile", undefined);
                               await formikProps.validateField("profile");
@@ -239,8 +254,18 @@ export default function EditProfile() {
                           }}
                         />
                       </Button>
-                      {(errors.profile && touched.profile) && (
-                        <FormHelperText error sx={{ position: 'absolute', bottom: -25, width: 'max-content', left: '75%', transform: 'translateX(-50%)', fontSize: '11px' }}>
+                      {errors.profile && touched.profile && (
+                        <FormHelperText
+                          error
+                          sx={{
+                            position: "absolute",
+                            bottom: -25,
+                            width: "max-content",
+                            left: "75%",
+                            transform: "translateX(-50%)",
+                            fontSize: "11px",
+                          }}
+                        >
                           {errors.profile as string}
                         </FormHelperText>
                       )}
@@ -248,32 +273,32 @@ export default function EditProfile() {
                     <Box>
                       <Typography
                         sx={{
-                          fontSize: '22px',
+                          fontSize: "22px",
                           fontWeight: 700,
-                          color: '#344054',
+                          color: "#344054",
                           lineHeight: 1.2,
                           mb: 0.5,
-                          fontFamily: "'PlusJakartaSans-Bold', sans-serif"
+                          fontFamily: "'PlusJakartaSans-Bold', sans-serif",
                         }}
                       >
                         {values?.name || "User Name"}
                       </Typography>
                       <Typography
                         sx={{
-                          fontSize: '15px',
-                          color: '#667085',
+                          fontSize: "15px",
+                          color: "#667085",
                           mb: 1.5,
-                          fontFamily: "'PlusJakartaSans-Medium', sans-serif"
+                          fontFamily: "'PlusJakartaSans-Medium', sans-serif",
                         }}
                       >
                         {values?.email || "user@example.com"}
                       </Typography>
                       <Typography
                         sx={{
-                          fontSize: '13px',
-                          color: '#98A2B3',
-                          fontStyle: 'italic',
-                          fontFamily: "'PlusJakartaSans-Regular', sans-serif"
+                          fontSize: "13px",
+                          color: "#98A2B3",
+                          fontStyle: "italic",
+                          fontFamily: "'PlusJakartaSans-Regular', sans-serif",
                         }}
                       >
                         Click the camera icon to update your photo
@@ -281,12 +306,17 @@ export default function EditProfile() {
                     </Box>
                   </Box>
 
-                  <Box component="div" sx={{ maxWidth: '100%', mx: '0 auto' }}>
+                  <Box component="div" sx={{ maxWidth: "100%", mx: "0 auto" }}>
                     <Grid container spacing={2}>
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <PersonIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                            <PersonIcon
+                              sx={{
+                                fontSize: 14,
+                                color: "var(--primary-color)",
+                              }}
+                            />
                             Full Name <span className="astrick-sing">*</span>
                           </Typography>
                           <Box className="admin-form-group">
@@ -297,11 +327,16 @@ export default function EditProfile() {
                               onBlur={handleBlur}
                               placeholder="Enter full name"
                               value={values.name}
-                              error={errors?.name && touched?.name ? true : false}
+                              error={
+                                errors?.name && touched?.name ? true : false
+                              }
                               sx={inputSx}
+                              inputProps={{ maxLength: 30 }}
                             />
                             <FormHelperText className="error-text">
-                              {errors?.name && touched?.name ? errors.name : null}
+                              {errors?.name && touched?.name
+                                ? errors.name
+                                : null}
                             </FormHelperText>
                           </Box>
                         </Box>
@@ -310,7 +345,12 @@ export default function EditProfile() {
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <EmailIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                            <EmailIcon
+                              sx={{
+                                fontSize: 14,
+                                color: "var(--primary-color)",
+                              }}
+                            />
                             Email <span className="astrick-sing">*</span>
                           </Typography>
                           <Box className="admin-form-group">
@@ -322,17 +362,24 @@ export default function EditProfile() {
                               onBlur={handleBlur}
                               placeholder="Enter email address"
                               value={values.email}
-                              error={errors?.email && touched?.email ? true : false}
+                              error={
+                                errors?.email && touched?.email ? true : false
+                              }
                               sx={{
                                 ...inputSx,
-                                '&.MuiOutlinedInput-root': {
-                                  ...(inputSx as any)['&.MuiOutlinedInput-root'],
-                                  backgroundColor: '#F3F4F6',
-                                }
+                                "&.MuiOutlinedInput-root": {
+                                  ...(inputSx as any)[
+                                    "&.MuiOutlinedInput-root"
+                                  ],
+                                  backgroundColor: "#F3F4F6",
+                                },
                               }}
+                              inputProps={{ maxLength: 70 }}
                             />
                             <FormHelperText className="error-text">
-                              {errors?.email && touched?.email ? errors.email : null}
+                              {errors?.email && touched?.email
+                                ? errors.email
+                                : null}
                             </FormHelperText>
                           </Box>
                         </Box>
@@ -341,7 +388,12 @@ export default function EditProfile() {
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <PhoneIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                            <PhoneIcon
+                              sx={{
+                                fontSize: 14,
+                                color: "var(--primary-color)",
+                              }}
+                            />
                             Phone Number <span className="astrick-sing">*</span>
                           </Typography>
                           <Box className="admin-form-group">
@@ -352,11 +404,18 @@ export default function EditProfile() {
                               onBlur={handleBlur}
                               placeholder="Enter phone number"
                               value={values.phoneNumber}
-                              error={errors?.phoneNumber && touched?.phoneNumber ? true : false}
+                              error={
+                                errors?.phoneNumber && touched?.phoneNumber
+                                  ? true
+                                  : false
+                              }
                               sx={inputSx}
+                              inputProps={{ maxLength: 10 }}
                             />
                             <FormHelperText className="error-text">
-                              {errors?.phoneNumber && touched?.phoneNumber ? errors.phoneNumber : null}
+                              {errors?.phoneNumber && touched?.phoneNumber
+                                ? errors.phoneNumber
+                                : null}
                             </FormHelperText>
                           </Box>
                         </Box>
@@ -365,7 +424,12 @@ export default function EditProfile() {
                       <Grid size={{ xs: 12 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <LegalIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                            <LegalIcon
+                              sx={{
+                                fontSize: 14,
+                                color: "var(--primary-color)",
+                              }}
+                            />
                             Search Location (Auto-fill)
                           </Typography>
                           <Box className="admin-form-group">
@@ -393,6 +457,7 @@ export default function EditProfile() {
                               placeholder="City"
                               value={values.city}
                               sx={inputSx}
+                              inputProps={{ maxLength: 50 }}
                             />
                           </Box>
                         </Box>
@@ -410,6 +475,7 @@ export default function EditProfile() {
                               placeholder="State"
                               value={values.state}
                               sx={inputSx}
+                              inputProps={{ maxLength: 50 }}
                             />
                           </Box>
                         </Box>
@@ -427,6 +493,7 @@ export default function EditProfile() {
                               placeholder="Zip Code"
                               value={values.zipCode}
                               sx={inputSx}
+                              inputProps={{ maxLength: 6 }}
                             />
                           </Box>
                         </Box>
@@ -444,6 +511,7 @@ export default function EditProfile() {
                               placeholder="Country"
                               value={values.country}
                               sx={inputSx}
+                              inputProps={{ maxLength: 50 }}
                             />
                           </Box>
                         </Box>
@@ -452,7 +520,12 @@ export default function EditProfile() {
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box className="admin-input-box" sx={{ mb: 1 }}>
                           <Typography sx={labelSx}>
-                            <UPIIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                            <UPIIcon
+                              sx={{
+                                fontSize: 14,
+                                color: "var(--primary-color)",
+                              }}
+                            />
                             UPI ID
                           </Typography>
                           <Box className="admin-form-group">
@@ -463,11 +536,16 @@ export default function EditProfile() {
                               onBlur={handleBlur}
                               placeholder="Enter UPI ID (e.g. username@bank)"
                               value={values.UPIId}
-                              error={errors?.UPIId && touched?.UPIId ? true : false}
+                              error={
+                                errors?.UPIId && touched?.UPIId ? true : false
+                              }
                               sx={inputSx}
+                              inputProps={{ maxLength: 320 }}
                             />
                             <FormHelperText className="error-text">
-                              {errors?.UPIId && touched?.UPIId ? errors.UPIId : null}
+                              {errors?.UPIId && touched?.UPIId
+                                ? errors.UPIId
+                                : null}
                             </FormHelperText>
                           </Box>
                         </Box>
@@ -475,22 +553,30 @@ export default function EditProfile() {
                     </Grid>
                   </Box>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 4, flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: 2,
+                    mt: 4,
+                    flexDirection: { xs: "column-reverse", sm: "row" },
+                  }}
+                >
                   <Button
                     variant="outlined"
                     disabled={isSubmitting || buttonSpinner}
                     onClick={() => resetForm()}
                     sx={{
-                      minWidth: { xs: '100%', sm: '130px' },
-                      height: '40px',
-                      borderRadius: '8px',
-                      color: '#667085',
-                      borderColor: '#D0D5DD',
-                      textTransform: 'none',
+                      minWidth: { xs: "100%", sm: "130px" },
+                      height: "40px",
+                      borderRadius: "8px",
+                      color: "#667085",
+                      borderColor: "#D0D5DD",
+                      textTransform: "none",
                       fontWeight: 600,
-                      '&:hover': {
-                        backgroundColor: '#F9FAFB',
-                        borderColor: '#D0D5DD',
+                      "&:hover": {
+                        backgroundColor: "#F9FAFB",
+                        borderColor: "#D0D5DD",
                       },
                     }}
                   >
@@ -502,24 +588,31 @@ export default function EditProfile() {
                     disabled={isSubmitting || buttonSpinner}
                     className="admin-btn-theme"
                     sx={{
-                      minWidth: { xs: '100%', sm: '150px' },
-                      height: '40px',
-                      borderRadius: '8px',
-                      backgroundColor: 'var(--primary-color) !important',
-                      textTransform: 'none',
+                      minWidth: { xs: "100%", sm: "150px" },
+                      height: "40px",
+                      borderRadius: "8px",
+                      backgroundColor: "var(--primary-color) !important",
+                      textTransform: "none",
                       fontWeight: 600,
-                      boxShadow: 'none',
-                      '&:hover': {
-                        backgroundColor: 'var(--primary-color)',
+                      boxShadow: "none",
+                      "&:hover": {
+                        backgroundColor: "var(--primary-color)",
                         opacity: 0.8,
-                        boxShadow: 'none',
+                        boxShadow: "none",
                       },
                     }}
                   >
                     {isSubmitting || buttonSpinner ? (
                       <Spinner />
                     ) : (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          justifyContent: "center",
+                        }}
+                      >
                         <SaveIcon sx={{ fontSize: 18 }} />
                         Save Changes
                       </Box>

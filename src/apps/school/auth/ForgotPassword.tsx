@@ -2,7 +2,11 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
-  Box, Typography, TextField, FormHelperText, Button
+  Box,
+  Typography,
+  TextField,
+  FormHelperText,
+  Button,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -20,7 +24,9 @@ import { getSubdomain } from "@/apps/common/commonJsFunction";
 export default function ForgotPassword() {
   const isSubdomain = getSubdomain();
   useThemeManager();
-  const { schoolLogo, schoolBanner } = useSelector((state: RootState) => state.SchoolReducer);
+  const { schoolLogo, schoolBanner } = useSelector(
+    (state: RootState) => state.SchoolReducer,
+  );
   const [buttonSpinner, setButtonSpinner] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -36,7 +42,9 @@ export default function ForgotPassword() {
 
     setButtonSpinner(true);
     try {
-      const resultAction = await dispatch(forgotPasswordAdmin(urlencoded) as any);
+      const resultAction = await dispatch(
+        forgotPasswordAdmin(urlencoded) as any,
+      );
       setButtonSpinner(false);
       if (forgotPasswordAdmin.fulfilled.match(resultAction)) {
         navigate("/forgot-password/otp", {
@@ -44,8 +52,7 @@ export default function ForgotPassword() {
           state: { type: "forgotPassword", email: values.email },
         });
       } else {
-        if (
-          resultAction.payload?.message?.includes('Too many OTP requests')) {
+        if (resultAction.payload?.message?.includes("Too many OTP requests")) {
           navigate("/");
         }
       }
@@ -67,16 +74,26 @@ export default function ForgotPassword() {
           formikProps;
         return (
           <Form onSubmit={handleSubmit}>
-            <Box 
+            <Box
               className="login-page-container forgot-password-page"
               sx={{
-                backgroundImage: isSubdomain?.isSubdomain && schoolBanner 
-                  ? `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolBanner}')`
-                  : undefined
+                backgroundImage:
+                  isSubdomain?.isSubdomain && schoolBanner
+                    ? `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolBanner}')`
+                    : undefined,
               }}
             >
               <Box className="login-card">
-                <Box component="img" src={isSubdomain?.isSubdomain && schoolLogo ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo : Png?.logoImg} alt="Logo" className="login-logo" />
+                <Box
+                  component="img"
+                  src={
+                    isSubdomain?.isSubdomain && schoolLogo
+                      ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo
+                      : Png?.logoImg
+                  }
+                  alt="Logo"
+                  className="login-logo"
+                />
 
                 <Typography className="login-title">
                   Forgot Password!
@@ -86,7 +103,9 @@ export default function ForgotPassword() {
                 </Typography>
 
                 <Box className="login-form-group email-group">
-                  <label htmlFor="email">Email<span className="required-asterisk">*</span></label>
+                  <label htmlFor="email">
+                    Email<span className="required-asterisk">*</span>
+                  </label>
                   <Box className="email-input-box">
                     <TextField
                       fullWidth
@@ -104,6 +123,7 @@ export default function ForgotPassword() {
                           handleSubmit();
                         }
                       }}
+                      slotProps={{ htmlInput: { maxLength: 70 } }}
                     />
                     {touched.email && errors.email && (
                       <FormHelperText className="error-text">
@@ -123,7 +143,11 @@ export default function ForgotPassword() {
                   className="login-btn-primary"
                   disabled={buttonSpinner}
                 >
-                  {buttonSpinner ? <Spinner size={20} color="white" /> : "Submit"}
+                  {buttonSpinner ? (
+                    <Spinner size={20} color="white" />
+                  ) : (
+                    "Submit"
+                  )}
                 </Button>
               </Box>
             </Box>

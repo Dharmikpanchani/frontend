@@ -1,4 +1,3 @@
-
 export interface SubRole {
   title: string;
   titleId: string;
@@ -162,7 +161,6 @@ const planModule: RoleStaticItem = {
     { title: "Status", titleId: "status", is_show: true },
   ],
 };
-
 
 export const developerRoleStaticData: RoleStaticItem[] = [
   dashboardModule,
@@ -352,7 +350,7 @@ export const calculateMinMonthlyPrice = (permissions: string[]): number => {
   planStaticData.forEach((module) => {
     // Check if any selected permission starts with this module's mainTitleId
     const isModuleSelected = permissions.some((p) =>
-      p.startsWith(`${module.mainTitleId}_`)
+      p.startsWith(`${module.mainTitleId}_`),
     );
     if (isModuleSelected && module.price) {
       const priceNum = parseInt(module.price.replace(/[^\d]/g, ""), 10);
@@ -363,4 +361,3 @@ export const calculateMinMonthlyPrice = (permissions: string[]): number => {
   });
   return total;
 };
-

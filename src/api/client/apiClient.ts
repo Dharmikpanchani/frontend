@@ -2,8 +2,10 @@ import axios from "axios";
 import type { AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
 import { getCookieDomain } from "@/apps/common/commonJsFunction";
+import { toasterInfo } from "@/utils/toaster/Toaster";
 import { Api } from "../EndPoint";
-const { VITE_BASE_URL, VITE_END_WITH_DOMAIN, VITE_SUB_DOMAIN } = import.meta.env;
+const { VITE_BASE_URL, VITE_END_WITH_DOMAIN, VITE_SUB_DOMAIN } = import.meta
+  .env;
 const getBaseURL = () => {
   const host = window.location.hostname;
   if (host.endsWith(VITE_END_WITH_DOMAIN)) {
@@ -14,7 +16,7 @@ const getBaseURL = () => {
 
 const DataService = axios.create({
   baseURL: getBaseURL(),
-  withCredentials: true
+  withCredentials: true,
 });
 
 DataService.interceptors.request.use(
@@ -27,7 +29,7 @@ DataService.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 DataService.interceptors.response.use(
@@ -39,9 +41,16 @@ DataService.interceptors.response.use(
 
     const handleLogout = async () => {
       try {
-        await axios.post(`${getBaseURL()}/${Api.LOGOUT}`, {}, { withCredentials: true });
+        await axios.post(
+          `${getBaseURL()}/${Api.LOGOUT}`,
+          {},
+          { withCredentials: true },
+        );
       } catch (logoutError) {
-        console.error("Logout API call failed during authentication error:", logoutError);
+        console.error(
+          "Logout API call failed during authentication error:",
+          logoutError,
+        );
       }
       Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
       Cookies.remove("auth_token", { path: "/" });
@@ -51,17 +60,38 @@ DataService.interceptors.response.use(
     };
 
     if (error.response?.status === 401) {
+      const SESSION_REPLACED_MSG =
+        "Your account has been logged in from another device. You have been logged out.";
+      if (error.response?.data?.message === SESSION_REPLACED_MSG) {
+        Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
+        Cookies.remove("auth_token", { path: "/" });
+        if (typeof window !== "undefined") {
+          toasterInfo({
+            title: "Session Expired",
+            body: "You have been logged out because your account was accessed from another device.",
+          });
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 3000);
+        }
+        return Promise.reject(error);
+      }
+
       if (!originalRequest._retry) {
         originalRequest._retry = true;
         try {
-          const res: any = await axios.post(`${getBaseURL()}/${Api.REFRESH_TOKEN}`, {}, { withCredentials: true });
+          const res: any = await axios.post(
+            `${getBaseURL()}/${Api.REFRESH_TOKEN}`,
+            {},
+            { withCredentials: true },
+          );
           if (res.status === 200 || res.status === 201 || res.status === 304) {
             const newToken = res.data?.data?.accessToken;
             if (newToken) {
-              Cookies.set("auth_token", newToken, { 
-                expires: 7, 
+              Cookies.set("auth_token", newToken, {
+                expires: 7,
                 domain: getCookieDomain(),
-                path: "/"
+                path: "/",
               });
               originalRequest.headers.Authorization = `Bearer ${newToken}`;
               return DataService(originalRequest);
@@ -80,14 +110,15 @@ DataService.interceptors.response.use(
 
     if (
       error.response?.status === 404 &&
-      (originalRequest.url === Api.GET_PROFILE || originalRequest.url === Api.GET_SCHOOL_PROFILE)
+      (originalRequest.url === Api.GET_PROFILE ||
+        originalRequest.url === Api.GET_SCHOOL_PROFILE)
     ) {
       await handleLogout();
       return Promise.reject(error);
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export const adminApiService = {
@@ -96,7 +127,11 @@ export const adminApiService = {
     return response.data;
   },
 
-  post: async <T = unknown>(url: string, payload?: object, config?: AxiosRequestConfig): Promise<T> => {
+  post: async <T = unknown>(
+    url: string,
+    payload?: object,
+    config?: AxiosRequestConfig,
+  ): Promise<T> => {
     const response = await DataService.post<T>(url, payload, config);
     return response.data;
   },
@@ -106,7 +141,11 @@ export const adminApiService = {
     return response.data;
   },
 
-  patch: async <T = unknown>(url: string, payload?: object, config?: AxiosRequestConfig): Promise<T> => {
+  patch: async <T = unknown>(
+    url: string,
+    payload?: object,
+    config?: AxiosRequestConfig,
+  ): Promise<T> => {
     const response = await DataService.patch<T>(url, payload, config);
     return response.data;
   },
@@ -116,7 +155,10 @@ export const adminApiService = {
     return response.data;
   },
 
-  getFile: async <T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+  getFile: async <T = unknown>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<T> => {
     const response = await DataService.get<T>(url, config);
     return response.data;
   },

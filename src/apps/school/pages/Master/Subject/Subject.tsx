@@ -16,8 +16,16 @@ import {
   Tooltip,
   debounce,
 } from "@mui/material";
-import { Search as SearchIcon, Add as AddIcon, FilterList as FilterIcon } from "@mui/icons-material";
-import { getSubjects, deleteSubject, changeSubjectStatus } from "@/redux/slices/subjectSlice";
+import {
+  Search as SearchIcon,
+  Add as AddIcon,
+  FilterList as FilterIcon,
+} from "@mui/icons-material";
+import {
+  getSubjects,
+  deleteSubject,
+  changeSubjectStatus,
+} from "@/redux/slices/subjectSlice";
 import { getDepartments } from "@/redux/slices/departmentSlice";
 import Svg from "@/assets/Svg";
 import Filter from "@/apps/common/filter/Filter";
@@ -33,8 +41,12 @@ import { IOSSwitch } from "@/apps/school/component/schoolCommon/commonCssFunctio
 export default function Subject() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { subjects, total, loading, actionLoading } = useSelector((state: RootState) => state.SubjectReducer);
-  const { departments } = useSelector((state: RootState) => state.DepartmentReducer);
+  const { subjects, total, loading, actionLoading } = useSelector(
+    (state: RootState) => state.SubjectReducer,
+  );
+  const { departments } = useSelector(
+    (state: RootState) => state.DepartmentReducer,
+  );
   const { hasPermission, hasAnyPermission } = usePermissions();
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -73,13 +85,21 @@ export default function Subject() {
   };
 
   const handleGetData = (searchQuery?: string, filters?: any) => {
-    dispatch(getSubjects({
-      page: currentPage + 1,
-      perPage: rowsPerPage > 0 ? rowsPerPage : 10,
-      search: searchQuery?.trim() ?? searchNameValue.trim(),
-      departmentId: filters?.departmentId !== undefined ? filters.departmentId : filterValues.departmentId,
-      isActive: filters?.isActive !== undefined ? filters.isActive : filterValues.isActive,
-    }) as any);
+    dispatch(
+      getSubjects({
+        page: currentPage + 1,
+        perPage: rowsPerPage > 0 ? rowsPerPage : 10,
+        search: searchQuery?.trim() ?? searchNameValue.trim(),
+        departmentId:
+          filters?.departmentId !== undefined
+            ? filters.departmentId
+            : filterValues.departmentId,
+        isActive:
+          filters?.isActive !== undefined
+            ? filters.isActive
+            : filterValues.isActive,
+      }) as any,
+    );
   };
 
   useEffect(() => {
@@ -114,17 +134,13 @@ export default function Subject() {
       handleGetData(query);
       setCurrentPage(0);
     }, 1000),
-    []
+    [],
   );
 
   return (
     <Box className="admin-dashboard-content">
       <Box className="admin-user-list-flex admin-page-title-main">
-        <Typography
-          className="admin-page-title"
-          component="h2"
-          variant="h2"
-        >
+        <Typography className="admin-page-title" component="h2" variant="h2">
           Subjects
         </Typography>
         <Box className="admin-flex-end">
@@ -142,11 +158,11 @@ export default function Subject() {
                     setSearchNameValue(value);
                     debouncedCallGetApi(value);
                   }}
-                  inputProps={{ maxLength: 80 }}
+                  slotProps={{ htmlInput: { maxLength: 100 } }}
                 />
                 <SearchIcon
                   className="school-admin-search-grey-img admin-icon"
-                  sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                  sx={{ color: "var(--primary-color)", fontSize: "20px" }}
                 />
               </Box>
             </Box>
@@ -157,15 +173,15 @@ export default function Subject() {
               onClick={() => setOpenFilter(true)}
               sx={{
                 ml: 1,
-                minWidth: '45px',
-                p: '0 12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                minWidth: "45px",
+                p: "0 12px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
             >
               <FilterIcon
-                sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }}
+                sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
               />
             </Button>
           </Box>
@@ -177,7 +193,11 @@ export default function Subject() {
               >
                 <AddIcon
                   className="admin-plus-icon"
-                  sx={{ color: 'var(--button-text, #fff)', fontSize: '18px', mr: 1 }}
+                  sx={{
+                    color: "var(--button-text, #fff)",
+                    fontSize: "18px",
+                    mr: 1,
+                  }}
                 />
                 Add Subject
               </Button>
@@ -188,47 +208,24 @@ export default function Subject() {
 
       <Box className="card-border common-card">
         <Box className="brand-table-main page-table-main">
-          <TableContainer
-            component={Paper}
-            className="table-container"
-          >
+          <TableContainer component={Paper} className="table-container">
             <Table aria-label="simple table" className="table">
               <TableHead className="table-head">
                 <TableRow className="table-row">
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="25%"
-                  >
+                  <TableCell component="th" className="table-th" width="25%">
                     Subject Name
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="20%"
-                  >
+                  <TableCell component="th" className="table-th" width="20%">
                     Code
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="20%"
-                  >
+                  <TableCell component="th" className="table-th" width="20%">
                     Departments
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="15%"
-                  >
+                  <TableCell component="th" className="table-th" width="15%">
                     Created At
                   </TableCell>
                   {hasPermission(schoolAdminPermission.subject.status) && (
-                    <TableCell
-                      component="th"
-                      className="table-th"
-                      width="10%"
-                    >
+                    <TableCell component="th" className="table-th" width="10%">
                       Status
                     </TableCell>
                   )}
@@ -237,15 +234,15 @@ export default function Subject() {
                     schoolAdminPermission.subject.update,
                     schoolAdminPermission.subject.delete,
                   ]) && (
-                      <TableCell
-                        component="th"
-                        className="table-th"
-                        width="10%"
-                        align="right"
-                      >
-                        Action
-                      </TableCell>
-                    )}
+                    <TableCell
+                      component="th"
+                      className="table-th"
+                      width="10%"
+                      align="right"
+                    >
+                      Action
+                    </TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
@@ -303,18 +300,23 @@ export default function Subject() {
                             <Box className="admin-table-data-flex">
                               {data?.departmentIds?.length > 0 ? (
                                 <Tooltip
-                                  title={data.departmentIds.map((d: any) => d.name).join(", ")}
+                                  title={data.departmentIds
+                                    .map((d: any) => d.name)
+                                    .join(", ")}
                                   arrow
                                   placement="bottom"
                                   className="admin-tooltip"
                                 >
                                   <Typography className="admin-table-data-text">
                                     {data.departmentIds[0].name}
-                                    {data.departmentIds.length > 1 && ` (+${data.departmentIds.length - 1} more)`}
+                                    {data.departmentIds.length > 1 &&
+                                      ` (+${data.departmentIds.length - 1} more)`}
                                   </Typography>
                                 </Tooltip>
                               ) : (
-                                <Typography className="admin-table-data-text">N/A</Typography>
+                                <Typography className="admin-table-data-text">
+                                  N/A
+                                </Typography>
                               )}
                             </Box>
                           </TableCell>
@@ -329,15 +331,29 @@ export default function Subject() {
                               </Typography>
                             </Box>
                           </TableCell>
-                          {hasPermission(schoolAdminPermission.subject.status) && (
+                          {hasPermission(
+                            schoolAdminPermission.subject.status,
+                          ) && (
                             <TableCell
                               component="td"
                               scope="row"
                               className="table-td"
                             >
                               <Box className="admin-table-data-flex">
-                                <Tooltip title={data?.isActive ? "Deactivate" : "Activate"} arrow placement="top">
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Tooltip
+                                  title={
+                                    data?.isActive ? "Deactivate" : "Activate"
+                                  }
+                                  arrow
+                                  placement="top"
+                                >
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 1,
+                                    }}
+                                  >
                                     <IOSSwitch
                                       checked={data?.isActive}
                                       onChange={() => handleStatusChange(data)}
@@ -353,77 +369,84 @@ export default function Subject() {
                             schoolAdminPermission.subject.update,
                             schoolAdminPermission.subject.delete,
                           ]) && (
-                              <TableCell
-                                component="td"
-                                className="table-td"
-                              >
-                                <Box className="admin-table-data-btn-flex">
-                                  {hasPermission(schoolAdminPermission.subject.read) && (
-                                    <Tooltip
-                                      title="View"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                            <TableCell component="td" className="table-td">
+                              <Box className="admin-table-data-btn-flex">
+                                {hasPermission(
+                                  schoolAdminPermission.subject.read,
+                                ) && (
+                                  <Tooltip
+                                    title="View"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-view-btn"
+                                      onClick={() => {
+                                        navigate("/master/subject/view", {
+                                          state: { id: data?._id },
+                                        });
+                                      }}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-view-btn"
-                                        onClick={() => {
-                                          navigate("/master/subject/view", { state: { id: data?._id } });
-                                        }}
-                                      >
-                                        <img
-                                          src={Svg.yellowEye}
-                                          className="admin-icon"
-                                          alt="View"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
+                                      <img
+                                        src={Svg.yellowEye}
+                                        className="admin-icon"
+                                        alt="View"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
 
-                                  {hasPermission(schoolAdminPermission.subject.update) && (
-                                    <Tooltip
-                                      title="Edit"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                                {hasPermission(
+                                  schoolAdminPermission.subject.update,
+                                ) && (
+                                  <Tooltip
+                                    title="Edit"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-edit-btn"
+                                      onClick={() => {
+                                        navigate("/master/subject/edit", {
+                                          state: { id: data?._id },
+                                        });
+                                      }}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-edit-btn"
-                                        onClick={() => {
-                                          navigate("/master/subject/edit", { state: { id: data?._id } });
-                                        }}
-                                      >
-                                        <img
-                                          src={Svg.editIcon}
-                                          className="admin-icon"
-                                          alt="Edit"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
+                                      <img
+                                        src={Svg.editIcon}
+                                        className="admin-icon"
+                                        alt="Edit"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
 
-                                  {hasPermission(schoolAdminPermission.subject.delete) && (
-                                    <Tooltip
-                                      title="Delete"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                                {hasPermission(
+                                  schoolAdminPermission.subject.delete,
+                                ) && (
+                                  <Tooltip
+                                    title="Delete"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-delete-btn"
+                                      onClick={() => handleOpenDelete(data)}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-delete-btn"
-                                        onClick={() => handleOpenDelete(data)}
-                                      >
-                                        <img
-                                          src={Svg.trash}
-                                          className="admin-icon"
-                                          alt="Trash"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
-                                </Box>
-                              </TableCell>
-                            )}
+                                      <img
+                                        src={Svg.trash}
+                                        className="admin-icon"
+                                        alt="Trash"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </TableCell>
+                          )}
                         </TableRow>
                       );
                     })

@@ -5,7 +5,10 @@ import Png from "@/assets/Png";
 
 const hexToRgb = (hex: string) => {
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  const fullHex = hex.replace(shorthandRegex, (_, r, g, b) => r + r + g + g + b + b);
+  const fullHex = hex.replace(
+    shorthandRegex,
+    (_, r, g, b) => r + r + g + g + b + b,
+  );
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex);
   return result
     ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
@@ -14,14 +17,18 @@ const hexToRgb = (hex: string) => {
 
 export const useThemeManager = () => {
   const reduxTheme = useSelector((state: RootState) => state.ThemeReducer);
-  const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
-  const { schoolLogo, selectedSchool } = useSelector((state: RootState) => state.SchoolReducer);
+  const { adminDetails } = useSelector(
+    (state: RootState) => state.AdminReducer,
+  );
+  const { schoolLogo, selectedSchool } = useSelector(
+    (state: RootState) => state.SchoolReducer,
+  );
 
   // Prioritize theme from adminDetails (backend response) over redux initial state
   const theme = useMemo(() => {
     return {
       ...reduxTheme,
-      ...(adminDetails?.schoolData?.theme || {})
+      ...(adminDetails?.schoolData?.theme || {}),
     };
   }, [reduxTheme, adminDetails?.schoolData?.theme]);
 
@@ -62,9 +69,10 @@ export const useThemeManager = () => {
       "--button-border": theme.buttonBorder,
       "--button-hover-bg": theme.buttonHoverBg,
       "--theme-gradient": `linear-gradient(45deg, ${theme.primaryColor} 30%, ${theme.secondaryColor || theme.primaryColor} 90%)`,
-      "--card-shadow": theme.cardShadow === "yes"
-        ? "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
-        : "none",
+      "--card-shadow":
+        theme.cardShadow === "yes"
+          ? "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
+          : "none",
     };
   }, [theme]);
 
@@ -73,7 +81,7 @@ export const useThemeManager = () => {
       `font-${theme.fontSize}`,
       `layout-${theme.layoutStyle}`,
       `sidebar-${theme.sidebarStyle}`,
-      `table-style-${theme.tableStyle}`
+      `table-style-${theme.tableStyle}`,
     ];
   }, [theme]);
 
@@ -94,14 +102,17 @@ export const useThemeManager = () => {
     }
 
     // Update Title and Favicon based on school details
-    const favicon = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
-    const schoolName = adminDetails?.schoolData?.schoolName || selectedSchool?.schoolName;
+    const favicon = document.querySelector(
+      "link[rel*='icon']",
+    ) as HTMLLinkElement;
+    const schoolName =
+      adminDetails?.schoolData?.schoolName || selectedSchool?.schoolName;
 
     // Store original title and favicon to restore on unmount
     const originalTitle = document.title;
 
     if (schoolName) {
-      document.title = `${schoolName} | ${adminDetails?.isLogin ? 'Admin' : 'Login'}`;
+      document.title = `${schoolName} | ${adminDetails?.isLogin ? "Admin" : "Login"}`;
     }
 
     const setRoundedFavicon = (url: string) => {
@@ -144,7 +155,8 @@ export const useThemeManager = () => {
 
             try {
               const dataUrl = canvas.toDataURL("image/png");
-              const faviconLinks = document.querySelectorAll("link[rel*='icon']");
+              const faviconLinks =
+                document.querySelectorAll("link[rel*='icon']");
               faviconLinks.forEach((link: any) => {
                 link.href = dataUrl;
               });
@@ -172,7 +184,9 @@ export const useThemeManager = () => {
 
     if (favicon) {
       if (schoolLogoUrl) {
-        setRoundedFavicon(`${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolLogoUrl}`);
+        setRoundedFavicon(
+          `${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolLogoUrl}`,
+        );
       } else {
         setRoundedFavicon(Png.logoImg);
       }
@@ -183,7 +197,11 @@ export const useThemeManager = () => {
       Object.keys(themeVariables).forEach((key) => {
         document.body.style.removeProperty(key);
       });
-      document.body.classList.remove("portal-school", "is-custom-theme", ...themeClasses);
+      document.body.classList.remove(
+        "portal-school",
+        "is-custom-theme",
+        ...themeClasses,
+      );
 
       // Restore original title and favicon
       document.title = originalTitle;
@@ -194,5 +212,8 @@ export const useThemeManager = () => {
     };
   }, [themeVariables, themeClasses, adminDetails, schoolLogo, selectedSchool]);
 
-  return { themeStyle: themeVariables as React.CSSProperties, themeClasses: themeClasses.join(" ") };
+  return {
+    themeStyle: themeVariables as React.CSSProperties,
+    themeClasses: themeClasses.join(" "),
+  };
 };

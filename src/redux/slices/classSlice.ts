@@ -30,7 +30,7 @@ export const getClasses = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const addEditClassAction = createAsyncThunk(
@@ -49,7 +49,7 @@ export const addEditClassAction = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const getClassById = createAsyncThunk(
@@ -62,7 +62,7 @@ export const getClassById = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const deleteClass = createAsyncThunk(
@@ -82,7 +82,7 @@ export const deleteClass = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const changeClassStatus = createAsyncThunk(
@@ -102,7 +102,7 @@ export const changeClassStatus = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 const classSlice = createSlice({

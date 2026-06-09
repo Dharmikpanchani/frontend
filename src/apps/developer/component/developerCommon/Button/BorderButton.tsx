@@ -12,16 +12,12 @@ const BorderButton: React.FC<BorderButtonProps> = React.memo(
   ({ btnLabel, className, onClick, disabled = false }) => {
     return (
       <Box className="border-btn-main">
-        <Button
-          className={className}
-          onClick={onClick}
-          disabled={disabled}
-        >
+        <Button className={className} onClick={onClick} disabled={disabled}>
           {btnLabel}
         </Button>
       </Box>
     );
-  }
+  },
 );
 
 export default BorderButton;

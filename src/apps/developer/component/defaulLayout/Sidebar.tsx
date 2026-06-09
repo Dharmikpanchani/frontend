@@ -1,9 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 import { usePermissions } from "@/hooks/usePermissions";
 import { developerPermission } from "@/apps/common/StaticArrayData";
-import {
-  Box, Button, List, ListItem, Collapse
-} from "@mui/material";
+import { Box, Button, List, ListItem, Collapse } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import Svg from "@/assets/Svg";
 import Png from "@/assets/Png";
@@ -33,14 +31,12 @@ export default function Sidebar(props: any) {
   useEffect(() => {
     if (window.innerWidth < 1024) {
       document.body.classList[props?.open ? "add" : "remove"](
-        "admin-body-overflow"
+        "admin-body-overflow",
       );
     } else {
       document.body.classList.remove("admin-body-overflow");
     }
   }, [props?.open]);
-
-
 
   const [openRoleManagement, setOpenRoleManagement] = useState(false);
   const handleClickRoleManagement = () => {
@@ -66,7 +62,7 @@ export default function Sidebar(props: any) {
 
   const checkActive = (menuItems: any[]) => {
     return menuItems.some((item) =>
-      item.menuHighlight.includes(location?.pathname?.split("/")[1])
+      item.menuHighlight.includes(location?.pathname?.split("/")[1]),
     );
   };
 
@@ -98,10 +94,8 @@ export default function Sidebar(props: any) {
       icon: Png.reportsIcon,
       show: hasPermission(developerPermission.plan.read),
       menuHighlight: ["plan-list"],
-    }
+    },
   ];
-
-
 
   const rolePermission = hasAnyPermission([
     developerPermission.role.read,
@@ -113,12 +107,16 @@ export default function Sidebar(props: any) {
       <Box className="admin-sidebar-inner-main">
         {/* Logo Section */}
         <Box className="admin-sidebar-logo-main">
-          <Link to={"/dashboard"} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textDecoration: 'none' }}>
-            <img
-              src={Png.logoImg}
-              className="admin-sidebar-logo"
-              alt="logo"
-            />
+          <Link
+            to={"/dashboard"}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+          >
+            <img src={Png.logoImg} className="admin-sidebar-logo" alt="logo" />
           </Link>
           <Button
             onClick={(e) => {
@@ -128,18 +126,22 @@ export default function Sidebar(props: any) {
             }}
             className="admin-sidebar-close-btn"
             sx={{
-              minWidth: 'auto',
+              minWidth: "auto",
               p: 0.5,
-              display: { xs: 'block', lg: 'none' },
-              position: 'absolute',
-              right: '15px'
+              display: { xs: "block", lg: "none" },
+              position: "absolute",
+              right: "15px",
             }}
           >
             <img
               src={Svg.close}
               className="admin-close-icon"
               alt="close"
-              style={{ width: '24px', height: '24px', filter: 'brightness(0) invert(1)' }}
+              style={{
+                width: "24px",
+                height: "24px",
+                filter: "brightness(0) invert(1)",
+              }}
             />
           </Button>
         </Box>
@@ -159,7 +161,7 @@ export default function Sidebar(props: any) {
                     }}
                     className={
                       ele?.menuHighlight?.includes(
-                        location?.pathname?.split("/")[1]
+                        location?.pathname?.split("/")[1],
                       )
                         ? "admin-sidebar-link active"
                         : "admin-sidebar-link"
@@ -170,13 +172,13 @@ export default function Sidebar(props: any) {
                       alt={ele?.title}
                       className="admin-sidebar-icons"
                     />
-                    <span className="admin-sidebar-link-text">{ele?.title}</span>
+                    <span className="admin-sidebar-link-text">
+                      {ele?.title}
+                    </span>
                   </Link>
                 </ListItem>
-              ) : null
+              ) : null,
             )}
-
-
 
             {/* Role Management */}
             {rolePermission && (
@@ -194,9 +196,7 @@ export default function Sidebar(props: any) {
                       alt="Admin"
                       className="admin-sidebar-icons"
                     />
-                    <span className="admin-sidebar-link-text">
-                      Admin
-                    </span>
+                    <span className="admin-sidebar-link-text">Admin</span>
                     {openRoleManagement ? (
                       <ExpandLess className="expandless-icon" />
                     ) : (
@@ -231,7 +231,7 @@ export default function Sidebar(props: any) {
                                 }}
                                 className={
                                   data?.menuHighlight?.includes(
-                                    location?.pathname?.split("/")[1]
+                                    location?.pathname?.split("/")[1],
                                   )
                                     ? "admin-sidebar-link active"
                                     : "admin-sidebar-link"
@@ -247,7 +247,7 @@ export default function Sidebar(props: any) {
                                 </span>
                               </Link>
                             </ListItem>
-                          ) : null
+                          ) : null,
                         )}
                       </List>
                     </Collapse>
@@ -255,7 +255,6 @@ export default function Sidebar(props: any) {
                 </Box>
               </ListItem>
             )}
-
           </List>
         </Box>
       </Box>

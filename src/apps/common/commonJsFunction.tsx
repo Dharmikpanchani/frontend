@@ -34,7 +34,7 @@ export default function GoToTop({ pageNumber }: { pageNumber: number }) {
 export function shortenString(
   str: string,
   startLength: number = 4,
-  endLength: number = 4
+  endLength: number = 4,
 ): string {
   if (str?.length <= startLength + endLength) {
     return str;
@@ -48,10 +48,12 @@ const { VITE_END_WITH_DOMAIN } = import.meta.env;
 
 export const getSubdomain = (): SubdomainResult => {
   const host = window.location.hostname;
-  
+
   if (!VITE_END_WITH_DOMAIN) return { isSubdomain: false, name: "" };
 
-  const baseDomainWithDot = VITE_END_WITH_DOMAIN.startsWith(".") ? VITE_END_WITH_DOMAIN : `.${VITE_END_WITH_DOMAIN}`;
+  const baseDomainWithDot = VITE_END_WITH_DOMAIN.startsWith(".")
+    ? VITE_END_WITH_DOMAIN
+    : `.${VITE_END_WITH_DOMAIN}`;
   const apexDomain = baseDomainWithDot.substring(1);
 
   if (host === "localhost" || host === "127.0.0.1" || host === apexDomain) {
@@ -72,12 +74,14 @@ export const getCookieDomain = () => {
   const host = window.location.hostname;
   if (!VITE_END_WITH_DOMAIN) return undefined;
 
-  const baseDomainWithDot = VITE_END_WITH_DOMAIN.startsWith(".") ? VITE_END_WITH_DOMAIN : `.${VITE_END_WITH_DOMAIN}`;
+  const baseDomainWithDot = VITE_END_WITH_DOMAIN.startsWith(".")
+    ? VITE_END_WITH_DOMAIN
+    : `.${VITE_END_WITH_DOMAIN}`;
   const apexDomain = baseDomainWithDot.substring(1);
 
   if (host === "localhost" || host === "127.0.0.1" || host === apexDomain) {
     return undefined;
   }
-  
+
   return VITE_END_WITH_DOMAIN;
 };

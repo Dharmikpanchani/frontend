@@ -20,7 +20,7 @@ const PublicRoutes: React.FC = () => {
   }
 
   const { isAdminLogin, adminDetails, token } = useSelector(
-    (state: RootState | any) => state.AdminReducer
+    (state: RootState | any) => state.AdminReducer,
   );
 
   const cookieToken = Cookies.get("auth_token");
@@ -41,7 +41,10 @@ const PublicRoutes: React.FC = () => {
     }
   }, [token, cookieToken, isValid, dispatch]);
 
-  if ((isAdminLogin && adminDetails?.isLogin && isValid) || (!!cookieToken && isValid)) {
+  if (
+    (isAdminLogin && adminDetails?.isLogin && isValid) ||
+    (!!cookieToken && isValid)
+  ) {
     return <Navigate to="/dashboard" replace={true} />;
   }
   return <Outlet />;

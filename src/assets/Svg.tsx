@@ -25,7 +25,7 @@ import bergerMenu from "./images/svg/bergur-menu.svg";
 import roleIcon from "./images/svg/role-managment.svg";
 import brand from "./images/svg/brand.svg";
 import latestUpdate from "./images/svg/latest-update.svg";
-import policy from "./images/svg/policy.svg"
+import policy from "./images/svg/policy.svg";
 import faqIcon from "./images/svg/faq.svg";
 import about from "./images/svg/about.svg";
 import contactUs from "./images/svg/contact-us.svg";

@@ -16,8 +16,16 @@ import {
   Tooltip,
   debounce,
 } from "@mui/material";
-import { Search as SearchIcon, Add as AddIcon, FilterList as FilterIcon } from "@mui/icons-material";
-import { getSections, deleteSection, changeSectionStatus } from "@/redux/slices/sectionSlice";
+import {
+  Search as SearchIcon,
+  Add as AddIcon,
+  FilterList as FilterIcon,
+} from "@mui/icons-material";
+import {
+  getSections,
+  deleteSection,
+  changeSectionStatus,
+} from "@/redux/slices/sectionSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import Svg from "@/assets/Svg";
 import Filter from "@/apps/common/filter/Filter";
@@ -33,7 +41,9 @@ import { IOSSwitch } from "@/apps/school/component/schoolCommon/commonCssFunctio
 export default function Section() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { sections, total, loading, actionLoading } = useSelector((state: RootState) => state.SectionReducer);
+  const { sections, total, loading, actionLoading } = useSelector(
+    (state: RootState) => state.SectionReducer,
+  );
   const { classes } = useSelector((state: RootState) => state.ClassReducer);
   const { hasPermission, hasAnyPermission } = usePermissions();
 
@@ -75,13 +85,21 @@ export default function Section() {
   };
 
   const handleGetData = (searchQuery?: string, filters?: any) => {
-    dispatch(getSections({
-      page: currentPage + 1,
-      perPage: rowsPerPage > 0 ? rowsPerPage : 10,
-      search: searchQuery?.trim() ?? searchNameValue.trim(),
-      classId: filters?.classId !== undefined ? filters.classId : filterValues.classId,
-      isActive: filters?.isActive !== undefined ? filters.isActive : filterValues.isActive,
-    }) as any);
+    dispatch(
+      getSections({
+        page: currentPage + 1,
+        perPage: rowsPerPage > 0 ? rowsPerPage : 10,
+        search: searchQuery?.trim() ?? searchNameValue.trim(),
+        classId:
+          filters?.classId !== undefined
+            ? filters.classId
+            : filterValues.classId,
+        isActive:
+          filters?.isActive !== undefined
+            ? filters.isActive
+            : filterValues.isActive,
+      }) as any,
+    );
   };
 
   useEffect(() => {
@@ -117,17 +135,13 @@ export default function Section() {
       handleGetData(query);
       setCurrentPage(0);
     }, 1000),
-    []
+    [],
   );
 
   return (
     <Box className="admin-dashboard-content">
       <Box className="admin-user-list-flex admin-page-title-main">
-        <Typography
-          className="admin-page-title"
-          component="h2"
-          variant="h2"
-        >
+        <Typography className="admin-page-title" component="h2" variant="h2">
           Sections
         </Typography>
         <Box className="admin-flex-end">
@@ -145,11 +159,11 @@ export default function Section() {
                     setSearchNameValue(value);
                     debouncedCallGetApi(value);
                   }}
-                  inputProps={{ maxLength: 80 }}
+                  slotProps={{ htmlInput: { maxLength: 100 } }}
                 />
                 <SearchIcon
                   className="school-admin-search-grey-img admin-icon"
-                  sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                  sx={{ color: "var(--primary-color)", fontSize: "20px" }}
                 />
               </Box>
             </Box>
@@ -160,14 +174,14 @@ export default function Section() {
               onClick={() => setOpenFilter(true)}
               sx={{
                 ml: 1,
-                textTransform: 'capitalize',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                textTransform: "capitalize",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
             >
               <FilterIcon
-                sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }}
+                sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
               />
             </Button>
           </Box>
@@ -179,7 +193,11 @@ export default function Section() {
               >
                 <AddIcon
                   className="admin-plus-icon"
-                  sx={{ color: 'var(--button-text, #fff)', fontSize: '18px', mr: 1 }}
+                  sx={{
+                    color: "var(--button-text, #fff)",
+                    fontSize: "18px",
+                    mr: 1,
+                  }}
                 />
                 Add Section
               </Button>
@@ -190,40 +208,21 @@ export default function Section() {
 
       <Box className="card-border common-card">
         <Box className="brand-table-main page-table-main">
-          <TableContainer
-            component={Paper}
-            className="table-container"
-          >
+          <TableContainer component={Paper} className="table-container">
             <Table aria-label="simple table" className="table">
               <TableHead className="table-head">
                 <TableRow className="table-row">
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="25%"
-                  >
+                  <TableCell component="th" className="table-th" width="25%">
                     Section Code
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="25%"
-                  >
+                  <TableCell component="th" className="table-th" width="25%">
                     Class
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="20%"
-                  >
+                  <TableCell component="th" className="table-th" width="20%">
                     Created At
                   </TableCell>
                   {hasPermission(schoolAdminPermission.section.status) && (
-                    <TableCell
-                      component="th"
-                      className="table-th"
-                      width="15%"
-                    >
+                    <TableCell component="th" className="table-th" width="15%">
                       Status
                     </TableCell>
                   )}
@@ -232,15 +231,15 @@ export default function Section() {
                     schoolAdminPermission.section.update,
                     schoolAdminPermission.section.delete,
                   ]) && (
-                      <TableCell
-                        component="th"
-                        className="table-th"
-                        width="15%"
-                        align="right"
-                      >
-                        Action
-                      </TableCell>
-                    )}
+                    <TableCell
+                      component="th"
+                      className="table-th"
+                      width="15%"
+                      align="right"
+                    >
+                      Action
+                    </TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
@@ -301,15 +300,29 @@ export default function Section() {
                               </Typography>
                             </Box>
                           </TableCell>
-                          {hasPermission(schoolAdminPermission.section.status) && (
+                          {hasPermission(
+                            schoolAdminPermission.section.status,
+                          ) && (
                             <TableCell
                               component="td"
                               scope="row"
                               className="table-td"
                             >
                               <Box className="admin-table-data-flex">
-                                <Tooltip title={data?.isActive ? "Deactivate" : "Activate"} arrow placement="top">
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Tooltip
+                                  title={
+                                    data?.isActive ? "Deactivate" : "Activate"
+                                  }
+                                  arrow
+                                  placement="top"
+                                >
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 1,
+                                    }}
+                                  >
                                     <IOSSwitch
                                       checked={data?.isActive}
                                       onChange={() => handleStatusChange(data)}
@@ -325,13 +338,16 @@ export default function Section() {
                             schoolAdminPermission.section.update,
                             schoolAdminPermission.section.delete,
                           ]) && (
-                              <TableCell
-                                component="td"
-                                className="table-td"
-                                align="right"
+                            <TableCell
+                              component="td"
+                              className="table-td"
+                              align="right"
+                            >
+                              <Box
+                                className="admin-table-data-btn-flex"
+                                sx={{ justifyContent: "flex-end" }}
                               >
-                                <Box className="admin-table-data-btn-flex" sx={{ justifyContent: 'flex-end' }}>
-                                  {/* {hasPermission(schoolAdminPermission.section.read) && (
+                                {/* {hasPermission(schoolAdminPermission.section.read) && (
                                     <Tooltip
                                       title="View"
                                       arrow
@@ -353,50 +369,56 @@ export default function Section() {
                                     </Tooltip>
                                   )} */}
 
-                                  {hasPermission(schoolAdminPermission.section.update) && (
-                                    <Tooltip
-                                      title="Edit"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                                {hasPermission(
+                                  schoolAdminPermission.section.update,
+                                ) && (
+                                  <Tooltip
+                                    title="Edit"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-edit-btn"
+                                      onClick={() => {
+                                        navigate("/master/section/edit", {
+                                          state: { id: data?._id },
+                                        });
+                                      }}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-edit-btn"
-                                        onClick={() => {
-                                          navigate("/master/section/edit", { state: { id: data?._id } });
-                                        }}
-                                      >
-                                        <img
-                                          src={Svg.editIcon}
-                                          className="admin-icon"
-                                          alt="Edit"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
+                                      <img
+                                        src={Svg.editIcon}
+                                        className="admin-icon"
+                                        alt="Edit"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
 
-                                  {hasPermission(schoolAdminPermission.section.delete) && (
-                                    <Tooltip
-                                      title="Delete"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                                {hasPermission(
+                                  schoolAdminPermission.section.delete,
+                                ) && (
+                                  <Tooltip
+                                    title="Delete"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-delete-btn"
+                                      onClick={() => handleOpenDelete(data)}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-delete-btn"
-                                        onClick={() => handleOpenDelete(data)}
-                                      >
-                                        <img
-                                          src={Svg.trash}
-                                          className="admin-icon"
-                                          alt="Trash"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
-                                </Box>
-                              </TableCell>
-                            )}
+                                      <img
+                                        src={Svg.trash}
+                                        className="admin-icon"
+                                        alt="Trash"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </TableCell>
+                          )}
                         </TableRow>
                       );
                     })

@@ -2,7 +2,14 @@ import { Box, CircularProgress, circularProgressClasses } from "@mui/material";
 
 export default function Spinner(props: any) {
   return (
-    <Box sx={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
+    <Box
+      sx={{
+        position: "relative",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <CircularProgress
         variant="determinate"
         sx={{

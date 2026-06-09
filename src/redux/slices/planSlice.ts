@@ -36,7 +36,7 @@ export const getAllPlans = createAsyncThunk(
       search: string;
       filters?: any;
     },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     try {
       const res: any = await planService.getAll(page, perPage, search, filters);
@@ -50,7 +50,7 @@ export const getAllPlans = createAsyncThunk(
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const getPlanById = createAsyncThunk(
@@ -63,11 +63,12 @@ export const getPlanById = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch plan";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to fetch plan";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const addEditPlan = createAsyncThunk(
@@ -82,11 +83,12 @@ export const addEditPlan = createAsyncThunk(
       toast.error(res?.message || "Failed to save");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.message || "Failed to save";
+      const errorMessage =
+        err?.response?.data?.message || err?.message || "Failed to save";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const deletePlan = createAsyncThunk(
@@ -101,11 +103,12 @@ export const deletePlan = createAsyncThunk(
       toast.error(res?.message || "Failed to delete plan");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to delete plan";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to delete plan";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const changePlanStatus = createAsyncThunk(
@@ -120,11 +123,12 @@ export const changePlanStatus = createAsyncThunk(
       toast.error(res?.message || "Failed to update status");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to update status";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to update status";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 const planSlice = createSlice({
@@ -137,35 +141,56 @@ const planSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllPlans.pending, (state) => { state.loading = true; })
+      .addCase(getAllPlans.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(getAllPlans.fulfilled, (state, action) => {
         state.loading = false;
         state.plans = action.payload?.data || [];
         state.total = action.payload?.pagination?.totalArrayLength || 0;
         state.minPriceLimit = action.payload?.pagination?.minPriceLimit ?? 0;
-        state.maxPriceLimit = action.payload?.pagination?.maxPriceLimit ?? 10000;
+        state.maxPriceLimit =
+          action.payload?.pagination?.maxPriceLimit ?? 10000;
       })
-      .addCase(getAllPlans.rejected, (state) => { state.loading = false; })
+      .addCase(getAllPlans.rejected, (state) => {
+        state.loading = false;
+      })
 
-      .addCase(getPlanById.pending, (state) => { state.loading = true; })
+      .addCase(getPlanById.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(getPlanById.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedPlan = action.payload;
       })
-      .addCase(getPlanById.rejected, (state) => { state.loading = false; })
+      .addCase(getPlanById.rejected, (state) => {
+        state.loading = false;
+      })
 
-      .addCase(addEditPlan.pending, (state) => { state.actionLoading = true; })
-      .addCase(addEditPlan.fulfilled, (state) => { state.actionLoading = false; })
-      .addCase(addEditPlan.rejected, (state) => { state.actionLoading = false; })
+      .addCase(addEditPlan.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(addEditPlan.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(addEditPlan.rejected, (state) => {
+        state.actionLoading = false;
+      })
 
-      .addCase(deletePlan.pending, (state) => { state.actionLoading = true; })
+      .addCase(deletePlan.pending, (state) => {
+        state.actionLoading = true;
+      })
       .addCase(deletePlan.fulfilled, (state, action) => {
         state.actionLoading = false;
         state.plans = state.plans.filter((p) => p._id !== action.payload);
       })
-      .addCase(deletePlan.rejected, (state) => { state.actionLoading = false; })
+      .addCase(deletePlan.rejected, (state) => {
+        state.actionLoading = false;
+      })
 
-      .addCase(changePlanStatus.pending, (state) => { state.actionLoading = true; })
+      .addCase(changePlanStatus.pending, (state) => {
+        state.actionLoading = true;
+      })
       .addCase(changePlanStatus.fulfilled, (state, action) => {
         state.actionLoading = false;
         const plan = state.plans.find((p) => p._id === action.payload);

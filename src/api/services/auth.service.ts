@@ -50,14 +50,12 @@ export const authService = {
   changePassword: (payload: any) =>
     adminApiService.post<any>(Api.CHANGE_PASSWORD, payload),
 
-  getProfile: () =>
-    adminApiService.get<any>(Api.GET_PROFILE),
+  getProfile: () => adminApiService.get<any>(Api.GET_PROFILE),
 
   updateProfile: (payload: FormData) =>
     adminApiService.patch<any>(Api.EDIT_PROFILE, payload),
 
-  getSchoolProfile: () =>
-    adminApiService.get<any>(Api.GET_SCHOOL_PROFILE),
+  getSchoolProfile: () => adminApiService.get<any>(Api.GET_SCHOOL_PROFILE),
 
   updateSchoolProfile: (payload: FormData) =>
     adminApiService.post<any>(Api.UPDATE_SCHOOL_PROFILE, payload),
@@ -68,8 +66,7 @@ export const authService = {
   verifyEmailChange: (payload: URLSearchParams) =>
     adminApiService.post<any>(Api.VERIFY_EMAIL_CHANGE, payload),
 
-  refreshToken: () =>
-    adminApiService.post<any>(Api.REFRESH_TOKEN, {}),
+  refreshToken: () => adminApiService.post<any>(Api.REFRESH_TOKEN, {}),
 
   logout: () =>
     adminApiService.post<any>(Api.LOGOUT, {}, { withCredentials: true }),

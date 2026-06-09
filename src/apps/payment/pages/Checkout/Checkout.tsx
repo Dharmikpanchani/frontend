@@ -59,7 +59,7 @@ const StatusBadge = styled(Box)(() => ({
   transition: "all 0.3s ease",
   "&:hover": {
     transform: "scale(1.05)",
-  }
+  },
 }));
 
 export default function Checkout() {
@@ -87,10 +87,11 @@ export default function Checkout() {
         setSchoolData(schoolRes.data);
 
         // Fetch Plan Details
-        const plansRes = await schoolService.getDeveloperWiseSchoolPlan(schoolRes.data._id);
+        const plansRes = await schoolService.getDeveloperWiseSchoolPlan(
+          schoolRes.data._id,
+        );
         const selectedPlan = plansRes.data.find((p: any) => p._id === planId);
         setPlanData(selectedPlan);
-
       } catch (error) {
         console.error("Fetch Error:", error);
         toast.error("Failed to load checkout details");
@@ -110,7 +111,7 @@ export default function Checkout() {
         schoolCode,
         planId,
         billingCycle,
-        type: "SUBSCRIPTION"
+        type: "SUBSCRIPTION",
       };
 
       const res = await paymentService.createSchoolPlan(payload);
@@ -130,9 +131,10 @@ export default function Checkout() {
 
             // Redirect back to school dashboard
             const protocol = window.location.protocol;
-            const baseDomain = import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
+            const baseDomain =
+              import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
             const port = window.location.port ? `:${window.location.port}` : "";
-            const redirectUrl = `${protocol}//${schoolCode?.toLowerCase() || ''}${baseDomain}${port}/dashboard?payment=success`;
+            const redirectUrl = `${protocol}//${schoolCode?.toLowerCase() || ""}${baseDomain}${port}/dashboard?payment=success`;
             window.location.href = redirectUrl;
           } catch (err) {
             toast.error("Verification Failed");
@@ -147,7 +149,6 @@ export default function Checkout() {
 
       const rzp = new (window as any).Razorpay(options);
       rzp.open();
-
     } catch (error: any) {
       console.error("Payment Error:", error);
       toast.error(error.response?.data?.message || "Payment Failed");
@@ -169,11 +170,18 @@ export default function Checkout() {
           alignItems: "center",
           minHeight: "100vh",
           background: "#f8fafc",
-          gap: 3
+          gap: 3,
         }}
       >
-        <CircularProgress size={60} thickness={4} sx={{ color: primaryColor }} />
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "#475569", letterSpacing: "0.5px" }}>
+        <CircularProgress
+          size={60}
+          thickness={4}
+          sx={{ color: primaryColor }}
+        />
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 700, color: "#475569", letterSpacing: "0.5px" }}
+        >
           Preparing Secure Checkout...
         </Typography>
       </Box>
@@ -189,10 +197,16 @@ export default function Checkout() {
           alignItems: "center",
           justifyContent: "center",
           background: `radial-gradient(circle at 0% 0%, ${primaryColor}0D 0%, transparent 50%), #f8fafc`,
-          p: 3
+          p: 3,
         }}
       >
-        <GlassCard sx={{ textAlign: "center", py: 8, borderTop: `6px solid ${primaryColor}` }}>
+        <GlassCard
+          sx={{
+            textAlign: "center",
+            py: 8,
+            borderTop: `6px solid ${primaryColor}`,
+          }}
+        >
           <Box
             sx={{
               width: 80,
@@ -202,24 +216,33 @@ export default function Checkout() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto 24px"
+              margin: "0 auto 24px",
             }}
           >
             <BackIcon sx={{ fontSize: 40, color: primaryColor }} />
           </Box>
-          <Typography variant="h4" sx={{ fontWeight: 900, mb: 2, color: "#1e293b" }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 900, mb: 2, color: "#1e293b" }}
+          >
             Invalid Checkout
           </Typography>
-          <Typography sx={{ color: "#64748b", mb: 4, maxWidth: "400px", mx: "auto" }}>
-            We couldn't find the school or plan details associated with this link. Please try again from your dashboard.
+          <Typography
+            sx={{ color: "#64748b", mb: 4, maxWidth: "400px", mx: "auto" }}
+          >
+            We couldn't find the school or plan details associated with this
+            link. Please try again from your dashboard.
           </Typography>
           <Button
             variant="contained"
             onClick={() => {
               if (schoolCode) {
                 const protocol = window.location.protocol;
-                const baseDomain = import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
-                const port = window.location.port ? `:${window.location.port}` : "";
+                const baseDomain =
+                  import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
+                const port = window.location.port
+                  ? `:${window.location.port}`
+                  : "";
                 window.location.href = `${protocol}//${schoolCode.toLowerCase()}${baseDomain}${port}/dashboard`;
               } else {
                 window.history.back();
@@ -233,7 +256,7 @@ export default function Checkout() {
               py: 1.5,
               textTransform: "none",
               fontWeight: 700,
-              "&:hover": { background: primaryColor, opacity: 0.9 }
+              "&:hover": { background: primaryColor, opacity: 0.9 },
             }}
           >
             Go Back to Dashboard
@@ -243,7 +266,8 @@ export default function Checkout() {
     );
   }
 
-  const price = billingCycle === "6month" ? planData.monPrice : planData.yerPrice;
+  const price =
+    billingCycle === "6month" ? planData.monPrice : planData.yerPrice;
   const gstAmount = Math.round(price * 0.18);
   const totalPrice = price + gstAmount;
 
@@ -263,11 +287,16 @@ export default function Checkout() {
     >
       <Container maxWidth="lg">
         <GlassCard sx={{ borderTop: `6px solid ${primaryColor}` }}>
-          <StatusBadge sx={{ background: `${primaryColor}14`, color: primaryColor }}>
+          <StatusBadge
+            sx={{ background: `${primaryColor}14`, color: primaryColor }}
+          >
             <ShieldIcon sx={{ fontSize: 16 }} /> Secure Checkout
           </StatusBadge>
 
-          <Typography variant="h4" sx={{ fontWeight: 900, mb: 1, color: "#1e293b" }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 900, mb: 1, color: "#1e293b" }}
+          >
             Complete Subscription
           </Typography>
           <Typography sx={{ color: "#64748b", mb: 4 }}>
@@ -275,45 +304,93 @@ export default function Checkout() {
           </Typography>
 
           <Stack spacing={3} sx={{ mb: 4 }}>
-            <Box sx={{ p: 3, borderRadius: "20px", background: `${primaryColor}08`, border: `1px solid ${primaryColor}1A` }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+            <Box
+              sx={{
+                p: 3,
+                borderRadius: "20px",
+                background: `${primaryColor}08`,
+                border: `1px solid ${primaryColor}1A`,
+              }}
+            >
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ mb: 2 }}
+              >
                 <Stack direction="row" spacing={2} alignItems="center">
                   <SchoolIcon sx={{ color: primaryColor }} />
                   <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{schoolData.schoolName}</Typography>
-                    <Typography variant="caption" sx={{ color: "#94a3b8" }}>{schoolCode}{import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com"}</Typography>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                      {schoolData.schoolName}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "#94a3b8" }}>
+                      {schoolCode}
+                      {import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com"}
+                    </Typography>
                   </Box>
                 </Stack>
                 <CheckIcon sx={{ color: "success.main" }} />
               </Stack>
               <Divider sx={{ my: 2, opacity: 0.1 }} />
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ mb: 1.5 }}
+              >
                 <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 800, textTransform: "capitalize" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 800, textTransform: "capitalize" }}
+                  >
                     {planData.planName} Plan
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#64748b" }}>
                     Billed {billingCycle === "6month" ? "6 Months" : "Yearly"}
                   </Typography>
                 </Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#475569" }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 700, color: "#475569" }}
+                >
                   ₹{price}
                 </Typography>
               </Stack>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2" sx={{ color: "#64748b", fontWeight: 600 }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#64748b", fontWeight: 600 }}
+                >
                   18% GST
                 </Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#475569" }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "#475569" }}
+                >
                   + ₹{gstAmount}
                 </Typography>
               </Stack>
               <Divider sx={{ my: 2, opacity: 0.1 }} />
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "#1e293b" }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 800, color: "#1e293b" }}
+                >
                   Total Amount
                 </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: primaryColor }}>
+                <Typography
+                  variant="h5"
+                  sx={{ fontWeight: 900, color: primaryColor }}
+                >
                   ₹{totalPrice}
                 </Typography>
               </Stack>
@@ -339,13 +416,23 @@ export default function Checkout() {
                 opacity: 0.9,
                 transform: "translateY(-2px)",
                 boxShadow: `0 20px 40px -8px ${primaryColor}66`,
-              }
+              },
             }}
           >
-            {paymentLoading ? "Initialising Secure Payment..." : `Pay ₹${totalPrice} Now`}
+            {paymentLoading
+              ? "Initialising Secure Payment..."
+              : `Pay ₹${totalPrice} Now`}
           </Button>
 
-          <Typography variant="caption" sx={{ display: "block", textAlign: "center", mt: 3, color: "#94a3b8" }}>
+          <Typography
+            variant="caption"
+            sx={{
+              display: "block",
+              textAlign: "center",
+              mt: 3,
+              color: "#94a3b8",
+            }}
+          >
             By proceeding, you agree to our Terms of Service and Privacy Policy.
           </Typography>
         </GlassCard>

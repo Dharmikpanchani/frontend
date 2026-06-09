@@ -1,9 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
-import {
-  Box, Button, List, ListItem, Collapse
-} from "@mui/material";
+import { Box, Button, List, ListItem, Collapse } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import Svg from "@/assets/Svg";
 import Png from "@/assets/Png";
@@ -16,8 +14,12 @@ export default function Sidebar(props: any) {
   const location = useLocation();
   const dispatch = useDispatch<any>();
   const { hasPermission, hasAnyPermission } = usePermissions();
-  const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
-  const { pendingTeachers } = useSelector((state: RootState) => state.TeacherReducer);
+  const { adminDetails } = useSelector(
+    (state: RootState) => state.AdminReducer,
+  );
+  const { pendingTeachers } = useSelector(
+    (state: RootState) => state.TeacherReducer,
+  );
   const pendingDocCount = pendingTeachers.length;
 
   useEffect(() => {
@@ -45,14 +47,12 @@ export default function Sidebar(props: any) {
   useEffect(() => {
     if (window.innerWidth < 1024) {
       document.body.classList[props?.open ? "add" : "remove"](
-        "admin-body-overflow"
+        "admin-body-overflow",
       );
     } else {
       document.body.classList.remove("admin-body-overflow");
     }
   }, [props?.open]);
-
-
 
   const [openRoleManagement, setOpenRoleManagement] = useState(false);
   const handleClickRoleManagement = () => {
@@ -128,7 +128,7 @@ export default function Sidebar(props: any) {
 
   const checkActive = (menuItems: any[]) => {
     return menuItems.some((item) =>
-      item.menuHighlight.includes(location?.pathname?.split("/")[1])
+      item.menuHighlight.includes(location?.pathname?.split("/")[1]),
     );
   };
 
@@ -155,8 +155,6 @@ export default function Sidebar(props: any) {
     },
   ];
 
-
-
   const cmsPermission = true;
 
   const rolePermission = hasAnyPermission([
@@ -177,9 +175,23 @@ export default function Sidebar(props: any) {
       <Box className="admin-sidebar-inner-main">
         {/* Logo Section */}
         <Box className="admin-sidebar-logo-main">
-          <Link to={"/dashboard"} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textDecoration: 'none' }}>
+          <Link
+            to={"/dashboard"}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+          >
             <img
-              src={adminDetails?.schoolData?.logo ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + adminDetails?.schoolData?.logo : Png.logoImg}
+              src={
+                adminDetails?.schoolData?.logo
+                  ? import.meta.env.VITE_BASE_URL_IMAGE +
+                    "/" +
+                    adminDetails?.schoolData?.logo
+                  : Png.logoImg
+              }
               className="admin-sidebar-logo"
               alt="logo"
             />
@@ -192,18 +204,22 @@ export default function Sidebar(props: any) {
             }}
             className="admin-sidebar-close-btn"
             sx={{
-              minWidth: 'auto',
+              minWidth: "auto",
               p: 0.5,
-              display: { xs: 'block', lg: 'none' },
-              position: 'absolute',
-              right: '15px'
+              display: { xs: "block", lg: "none" },
+              position: "absolute",
+              right: "15px",
             }}
           >
             <img
               src={Svg.close}
               className="admin-close-icon"
               alt="close"
-              style={{ width: '24px', height: '24px', filter: 'brightness(0) invert(1)' }}
+              style={{
+                width: "24px",
+                height: "24px",
+                filter: "brightness(0) invert(1)",
+              }}
             />
           </Button>
         </Box>
@@ -223,7 +239,7 @@ export default function Sidebar(props: any) {
                     }}
                     className={
                       ele?.menuHighlight?.includes(
-                        location?.pathname?.split("/")[1]
+                        location?.pathname?.split("/")[1],
                       )
                         ? "admin-sidebar-link active"
                         : "admin-sidebar-link"
@@ -234,13 +250,13 @@ export default function Sidebar(props: any) {
                       alt={ele?.title}
                       className="admin-sidebar-icons"
                     />
-                    <span className="admin-sidebar-link-text">{ele?.title}</span>
+                    <span className="admin-sidebar-link-text">
+                      {ele?.title}
+                    </span>
                   </Link>
                 </ListItem>
-              ) : null
+              ) : null,
             )}
-
-
 
             {/* Role Management */}
             {rolePermission && (
@@ -258,9 +274,7 @@ export default function Sidebar(props: any) {
                       alt="Admin"
                       className="admin-sidebar-icons"
                     />
-                    <span className="admin-sidebar-link-text">
-                      Admin
-                    </span>
+                    <span className="admin-sidebar-link-text">Admin</span>
                     {openRoleManagement ? (
                       <ExpandLess className="expandless-icon" />
                     ) : (
@@ -295,7 +309,7 @@ export default function Sidebar(props: any) {
                                 }}
                                 className={
                                   data?.menuHighlight?.includes(
-                                    location?.pathname?.split("/")[1]
+                                    location?.pathname?.split("/")[1],
                                   )
                                     ? "admin-sidebar-link active"
                                     : "admin-sidebar-link"
@@ -311,7 +325,7 @@ export default function Sidebar(props: any) {
                                 </span>
                               </Link>
                             </ListItem>
-                          ) : null
+                          ) : null,
                         )}
                       </List>
                     </Collapse>
@@ -373,8 +387,13 @@ export default function Sidebar(props: any) {
                                 }}
                                 className={
                                   dt?.menuHighlight?.includes(
-                                    location?.pathname?.split("/")[1]
-                                  ) || (location?.pathname?.split("/")[1] === "master" && dt?.menuHighlight?.includes(location?.pathname?.split("/")[2]))
+                                    location?.pathname?.split("/")[1],
+                                  ) ||
+                                  (location?.pathname?.split("/")[1] ===
+                                    "master" &&
+                                    dt?.menuHighlight?.includes(
+                                      location?.pathname?.split("/")[2],
+                                    ))
                                     ? "admin-sidebar-link active"
                                     : "admin-sidebar-link"
                                 }
@@ -387,28 +406,31 @@ export default function Sidebar(props: any) {
                                 <span className="admin-sidebar-link-text">
                                   {dt?.title}
                                 </span>
-                                {dt?.title === "Teachers" && pendingDocCount > 0 && (
-                                  <span style={{
-                                    position: 'absolute',
-                                    right: '15px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    backgroundColor: '#d92d20',
-                                    color: '#fff',
-                                    fontSize: '10px',
-                                    fontWeight: 700,
-                                    borderRadius: '10px',
-                                    padding: '2px 8px',
-                                    lineHeight: 1,
-                                    display: 'inline-block',
-                                    zIndex: 10
-                                  }}>
-                                    {pendingDocCount}
-                                  </span>
-                                )}
+                                {dt?.title === "Teachers" &&
+                                  pendingDocCount > 0 && (
+                                    <span
+                                      style={{
+                                        position: "absolute",
+                                        right: "15px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        backgroundColor: "#d92d20",
+                                        color: "#fff",
+                                        fontSize: "10px",
+                                        fontWeight: 700,
+                                        borderRadius: "10px",
+                                        padding: "2px 8px",
+                                        lineHeight: 1,
+                                        display: "inline-block",
+                                        zIndex: 10,
+                                      }}
+                                    >
+                                      {pendingDocCount}
+                                    </span>
+                                  )}
                               </Link>
                             </ListItem>
-                          ) : null
+                          ) : null,
                         )}
                       </List>
                     </Collapse>
@@ -454,9 +476,11 @@ export default function Sidebar(props: any) {
                         className="admin-sidebar-submenulist"
                       >
                         {cms?.map((data: any) => {
-                          const pathSegments = location?.pathname?.split("/") || [];
-                          const isActive = pathSegments.some((segment: string) =>
-                            data?.menuHighlight?.includes(segment)
+                          const pathSegments =
+                            location?.pathname?.split("/") || [];
+                          const isActive = pathSegments.some(
+                            (segment: string) =>
+                              data?.menuHighlight?.includes(segment),
                           );
                           return data.show ? (
                             <ListItem

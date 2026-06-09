@@ -24,19 +24,49 @@ const initialState: AdminUserState = {
 
 export const getAllAdminUsers = createAsyncThunk(
   "adminUser/getAll",
-  async ({ page, perPage, search, role, isActive, isLogin, isVerified }: { page: number; perPage: number; search: string, role?: string, isActive?: string, isLogin?: string, isVerified?: string }, { rejectWithValue }) => {
+  async (
+    {
+      page,
+      perPage,
+      search,
+      role,
+      isActive,
+      isLogin,
+      isVerified,
+    }: {
+      page: number;
+      perPage: number;
+      search: string;
+      role?: string;
+      isActive?: string;
+      isLogin?: string;
+      isVerified?: string;
+    },
+    { rejectWithValue },
+  ) => {
     try {
-      const res: any = await adminUserService.getAll(page, perPage, search, role, isActive, isLogin, isVerified);
+      const res: any = await adminUserService.getAll(
+        page,
+        perPage,
+        search,
+        role,
+        isActive,
+        isLogin,
+        isVerified,
+      );
       if (res.status === 200) return res;
       const message = res?.message || "Failed to fetch admin users";
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch admin users";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to fetch admin users";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const getAllAdminUsersSimple = createAsyncThunk(
@@ -49,11 +79,14 @@ export const getAllAdminUsersSimple = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch admin users";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to fetch admin users";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const getAdminUserById = createAsyncThunk(
@@ -66,11 +99,14 @@ export const getAdminUserById = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch admin user";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to fetch admin user";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const addEditAdminUser = createAsyncThunk(
@@ -85,11 +121,12 @@ export const addEditAdminUser = createAsyncThunk(
       toast.error(res?.message || "Failed to save");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.message || "Failed to save";
+      const errorMessage =
+        err?.response?.data?.message || err?.message || "Failed to save";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const deleteAdminUser = createAsyncThunk(
@@ -104,11 +141,14 @@ export const deleteAdminUser = createAsyncThunk(
       toast.error(res?.message || "Failed to delete admin user");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to delete admin user";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to delete admin user";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const changeAdminUserStatus = createAsyncThunk(
@@ -123,11 +163,12 @@ export const changeAdminUserStatus = createAsyncThunk(
       toast.error(res?.message || "Failed to update status");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to update status";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to update status";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 const adminUserSlice = createSlice({
@@ -140,37 +181,59 @@ const adminUserSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllAdminUsers.pending, (state) => { state.loading = true; })
+      .addCase(getAllAdminUsers.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(getAllAdminUsers.fulfilled, (state, action) => {
         state.loading = false;
         state.adminUsers = action.payload?.data || [];
         state.total = action.payload?.pagination?.totalArrayLength || 0;
       })
-      .addCase(getAllAdminUsers.rejected, (state) => { state.loading = false; })
+      .addCase(getAllAdminUsers.rejected, (state) => {
+        state.loading = false;
+      })
       .addCase(getAllAdminUsersSimple.fulfilled, (state, action) => {
         state.allAdminUsersSimple = action.payload || [];
       })
 
-      .addCase(getAdminUserById.pending, (state) => { state.loading = true; })
+      .addCase(getAdminUserById.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(getAdminUserById.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedAdminUser = action.payload?.data || null;
         state.schoolPagination = action.payload?.pagination || null;
       })
-      .addCase(getAdminUserById.rejected, (state) => { state.loading = false; })
+      .addCase(getAdminUserById.rejected, (state) => {
+        state.loading = false;
+      })
 
-      .addCase(addEditAdminUser.pending, (state) => { state.actionLoading = true; })
-      .addCase(addEditAdminUser.fulfilled, (state) => { state.actionLoading = false; })
-      .addCase(addEditAdminUser.rejected, (state) => { state.actionLoading = false; })
+      .addCase(addEditAdminUser.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(addEditAdminUser.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(addEditAdminUser.rejected, (state) => {
+        state.actionLoading = false;
+      })
 
-      .addCase(deleteAdminUser.pending, (state) => { state.actionLoading = true; })
+      .addCase(deleteAdminUser.pending, (state) => {
+        state.actionLoading = true;
+      })
       .addCase(deleteAdminUser.fulfilled, (state, action) => {
         state.actionLoading = false;
-        state.adminUsers = state.adminUsers.filter((u) => u._id !== action.payload);
+        state.adminUsers = state.adminUsers.filter(
+          (u) => u._id !== action.payload,
+        );
       })
-      .addCase(deleteAdminUser.rejected, (state) => { state.actionLoading = false; })
+      .addCase(deleteAdminUser.rejected, (state) => {
+        state.actionLoading = false;
+      })
 
-      .addCase(changeAdminUserStatus.pending, (state) => { state.actionLoading = true; })
+      .addCase(changeAdminUserStatus.pending, (state) => {
+        state.actionLoading = true;
+      })
       .addCase(changeAdminUserStatus.fulfilled, (state, action) => {
         state.actionLoading = false;
         const admin = state.adminUsers.find((u) => u._id === action.payload);

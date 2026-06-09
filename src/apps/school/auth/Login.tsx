@@ -2,7 +2,14 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  Box, Typography, TextField, FormHelperText, OutlinedInput, InputAdornment, IconButton, Button
+  Box,
+  Typography,
+  TextField,
+  FormHelperText,
+  OutlinedInput,
+  InputAdornment,
+  IconButton,
+  Button,
 } from "@mui/material";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 import { Formik, Form } from "formik";
@@ -10,7 +17,7 @@ import type { FormikProps } from "formik";
 import type { LoginInterface } from "@/types/interfaces/LoginInterface";
 import { loginAdmin } from "@/redux/slices/authSlice";
 import { getSubdomain } from "@/apps/common/commonJsFunction";
-import { getSchoolLogo } from "@/redux/slices/schoolSlice";
+
 import { loginValidationSchema } from "@/utils/validation/FormikValidation";
 import { toasterError } from "@/utils/toaster/Toaster";
 import Spinner from "../component/schoolCommon/spinner/Spinner";
@@ -19,11 +26,14 @@ import type { RootState } from "@/redux/Store";
 import { useThemeManager } from "../hooks/useThemeManager";
 import PageLoader from "../../common/loader/PageLoader";
 
-
 export default function Login() {
   const isSubdomain = getSubdomain();
   useThemeManager();
-  const { schoolLogo, schoolBanner, loading: schoolLoading } = useSelector((state: RootState) => state.SchoolReducer);
+  const {
+    schoolLogo,
+    schoolBanner,
+    loading: schoolLoading,
+  } = useSelector((state: RootState) => state.SchoolReducer);
   const [showPassword, setShowPassword] = React.useState(true);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const [buttonSpinner, setButtonSpinner] = useState(false);
@@ -40,7 +50,7 @@ export default function Login() {
   };
 
   const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
   };
@@ -61,7 +71,7 @@ export default function Login() {
           navigate("/login/otp", {
             state: {
               email: values?.email,
-              type: "login"
+              type: "login",
             },
           });
         } else {
@@ -86,16 +96,26 @@ export default function Login() {
           formikProps;
         return (
           <Form onSubmit={handleSubmit}>
-            <Box 
+            <Box
               className="login-page-container"
               sx={{
-                backgroundImage: isSubdomain?.isSubdomain && schoolBanner 
-                  ? `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolBanner}')`
-                  : undefined
+                backgroundImage:
+                  isSubdomain?.isSubdomain && schoolBanner
+                    ? `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolBanner}')`
+                    : undefined,
               }}
             >
               <Box className="login-card">
-                <Box component="img" src={isSubdomain?.isSubdomain && schoolLogo ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo : Png?.logoImg} alt="Logo" className="login-logo" />
+                <Box
+                  component="img"
+                  src={
+                    isSubdomain?.isSubdomain && schoolLogo
+                      ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo
+                      : Png?.logoImg
+                  }
+                  alt="Logo"
+                  className="login-logo"
+                />
 
                 <Typography className="login-title">
                   Login your account
@@ -105,7 +125,9 @@ export default function Login() {
                 </Typography>
 
                 <Box className="login-form-group email-group">
-                  <label htmlFor="email">Email<span className="required-asterisk">*</span></label>
+                  <label htmlFor="email">
+                    Email<span className="required-asterisk">*</span>
+                  </label>
                   <Box className="email-input-box">
                     <TextField
                       fullWidth
@@ -123,6 +145,7 @@ export default function Login() {
                           document.getElementById("password")?.focus();
                         }
                       }}
+                      slotProps={{ htmlInput: { maxLength: 70 } }}
                     />
                     {touched.email && errors.email && (
                       <FormHelperText className="error-text">
@@ -133,7 +156,9 @@ export default function Login() {
                 </Box>
 
                 <Box className="login-form-group">
-                  <label htmlFor="password">Password<span className="required-asterisk">*</span></label>
+                  <label htmlFor="password">
+                    Password<span className="required-asterisk">*</span>
+                  </label>
                   <Box className="password-input-box">
                     <OutlinedInput
                       fullWidth
@@ -154,10 +179,15 @@ export default function Login() {
                             edge="end"
                             className="password-eye-icon"
                           >
-                            {showPassword ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
+                            {showPassword ? (
+                              <VisibilityOff sx={{ fontSize: 18 }} />
+                            ) : (
+                              <Visibility sx={{ fontSize: 18 }} />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       }
+                      inputProps={{ maxLength: 16 }}
                     />
                     {touched.password && errors.password && (
                       <FormHelperText className="error-text">
@@ -177,7 +207,11 @@ export default function Login() {
                   className="login-btn-primary"
                   disabled={buttonSpinner}
                 >
-                  {buttonSpinner ? <Spinner size={20} color="white" /> : "Login"}
+                  {buttonSpinner ? (
+                    <Spinner size={20} color="white" />
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
               </Box>
             </Box>

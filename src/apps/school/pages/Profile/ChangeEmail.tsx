@@ -34,7 +34,9 @@ export default function ChangeEmail() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
+  const { adminDetails } = useSelector(
+    (state: RootState) => state.AdminReducer,
+  );
   const isSuperAdmin = adminDetails?.isSuperAdmin === true;
 
   const initialValues = {
@@ -56,7 +58,7 @@ export default function ChangeEmail() {
     setButtonSpinner(true);
     try {
       const resultAction = await dispatch(
-        changeEmailRequestAdmin(urlencoded) as any
+        changeEmailRequestAdmin(urlencoded) as any,
       );
       setButtonSpinner(false);
       if (changeEmailRequestAdmin.fulfilled.match(resultAction)) {
@@ -72,7 +74,6 @@ export default function ChangeEmail() {
       setButtonSpinner(false);
     }
   };
-
 
   return (
     <Formik
@@ -114,7 +115,9 @@ export default function ChangeEmail() {
                     boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
                   }}
                 >
-                  <EmailIcon sx={{ color: "var(--primary-color)", fontSize: 18 }} />
+                  <EmailIcon
+                    sx={{ color: "var(--primary-color)", fontSize: 18 }}
+                  />
                 </Box>
                 <Box>
                   <Typography
@@ -147,7 +150,9 @@ export default function ChangeEmail() {
                   <Grid size={{ xs: 12 }}>
                     <Box className="admin-input-box" sx={{ mb: 1 }}>
                       <Typography sx={labelSx}>
-                        <EmailIcon sx={{ fontSize: 14, color: "var(--primary-color)" }} />
+                        <EmailIcon
+                          sx={{ fontSize: 14, color: "var(--primary-color)" }}
+                        />
                         Change Email For <span className="astrick-sing">*</span>
                       </Typography>
                       <Box className="admin-form-group">
@@ -170,7 +175,9 @@ export default function ChangeEmail() {
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <LockIcon sx={{ fontSize: 14, color: "var(--primary-color)" }} />
+                      <LockIcon
+                        sx={{ fontSize: 14, color: "var(--primary-color)" }}
+                      />
                       Password <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
@@ -199,9 +206,14 @@ export default function ChangeEmail() {
                             </IconButton>
                           </InputAdornment>
                         }
+                        inputProps={{ maxLength: 16 }}
                       />
                       <FormHelperText className="error-text">
-                        {errors?.password && touched?.password && typeof errors.password === 'string' ? errors.password : null}
+                        {errors?.password &&
+                        touched?.password &&
+                        typeof errors.password === "string"
+                          ? errors.password
+                          : null}
                       </FormHelperText>
                     </Box>
                   </Box>
@@ -210,7 +222,9 @@ export default function ChangeEmail() {
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <EmailIcon sx={{ fontSize: 14, color: "var(--primary-color)" }} />
+                      <EmailIcon
+                        sx={{ fontSize: 14, color: "var(--primary-color)" }}
+                      />
                       New Email Address <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
@@ -224,16 +238,21 @@ export default function ChangeEmail() {
                         value={values.newEmail}
                         error={touched.newEmail && !!errors.newEmail}
                         sx={inputSx}
+                        inputProps={{ maxLength: 70 }}
                       />
                       <FormHelperText className="error-text">
-                        {errors?.newEmail && touched?.newEmail && typeof errors.newEmail === 'string' ? errors.newEmail : null}
+                        {errors?.newEmail &&
+                        touched?.newEmail &&
+                        typeof errors.newEmail === "string"
+                          ? errors.newEmail
+                          : null}
                       </FormHelperText>
                     </Box>
                   </Box>
                 </Grid>
               </Grid>
 
-               <Box
+              <Box
                 sx={{
                   display: "flex",
                   justifyContent: "flex-end",
@@ -285,7 +304,14 @@ export default function ChangeEmail() {
                   {buttonSpinner ? (
                     <Spinner />
                   ) : (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "center" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        justifyContent: "center",
+                      }}
+                    >
                       <SaveIcon sx={{ fontSize: 18 }} />
                       Update Email
                     </Box>

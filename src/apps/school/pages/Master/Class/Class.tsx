@@ -17,7 +17,11 @@ import {
   debounce,
 } from "@mui/material";
 import { Search as SearchIcon, Add as AddIcon } from "@mui/icons-material";
-import { getClasses, deleteClass, changeClassStatus } from "@/redux/slices/classSlice";
+import {
+  getClasses,
+  deleteClass,
+  changeClassStatus,
+} from "@/redux/slices/classSlice";
 import Svg from "@/assets/Svg";
 import Loader from "@/apps/common/loader/Loader";
 import Pagination from "@/apps/common/pagination/Pagination";
@@ -31,7 +35,9 @@ import { IOSSwitch } from "@/apps/school/component/schoolCommon/commonCssFunctio
 export default function Class() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { classes, total, loading, actionLoading } = useSelector((state: RootState) => state.ClassReducer);
+  const { classes, total, loading, actionLoading } = useSelector(
+    (state: RootState) => state.ClassReducer,
+  );
   const { hasPermission, hasAnyPermission } = usePermissions();
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -64,11 +70,13 @@ export default function Class() {
   };
 
   const handleGetData = (searchQuery?: string) => {
-    dispatch(getClasses({
-      page: currentPage + 1,
-      perPage: rowsPerPage > 0 ? rowsPerPage : 10,
-      search: searchQuery?.trim() ?? searchNameValue.trim(),
-    }) as any);
+    dispatch(
+      getClasses({
+        page: currentPage + 1,
+        perPage: rowsPerPage > 0 ? rowsPerPage : 10,
+        search: searchQuery?.trim() ?? searchNameValue.trim(),
+      }) as any,
+    );
   };
 
   useEffect(() => {
@@ -86,17 +94,13 @@ export default function Class() {
       handleGetData(query);
       setCurrentPage(0);
     }, 1000),
-    []
+    [],
   );
 
   return (
     <Box className="admin-dashboard-content">
       <Box className="admin-user-list-flex admin-page-title-main">
-        <Typography
-          className="admin-page-title"
-          component="h2"
-          variant="h2"
-        >
+        <Typography className="admin-page-title" component="h2" variant="h2">
           Classes
         </Typography>
         <Box className="admin-flex-end">
@@ -114,11 +118,11 @@ export default function Class() {
                     setSearchNameValue(value);
                     debouncedCallGetApi(value);
                   }}
-                  inputProps={{ maxLength: 80 }}
+                  slotProps={{ htmlInput: { maxLength: 100 } }}
                 />
                 <SearchIcon
                   className="school-admin-search-grey-img admin-icon"
-                  sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                  sx={{ color: "var(--primary-color)", fontSize: "20px" }}
                 />
               </Box>
             </Box>
@@ -131,7 +135,11 @@ export default function Class() {
               >
                 <AddIcon
                   className="admin-plus-icon"
-                  sx={{ color: 'var(--button-text, #fff)', fontSize: '18px', mr: 1 }}
+                  sx={{
+                    color: "var(--button-text, #fff)",
+                    fontSize: "18px",
+                    mr: 1,
+                  }}
                 />
                 Add Class
               </Button>
@@ -142,40 +150,21 @@ export default function Class() {
 
       <Box className="card-border common-card">
         <Box className="brand-table-main page-table-main">
-          <TableContainer
-            component={Paper}
-            className="table-container"
-          >
+          <TableContainer component={Paper} className="table-container">
             <Table aria-label="simple table" className="table">
               <TableHead className="table-head">
                 <TableRow className="table-row">
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="25%"
-                  >
+                  <TableCell component="th" className="table-th" width="25%">
                     Class Name
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="20%"
-                  >
+                  <TableCell component="th" className="table-th" width="20%">
                     Code
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="20%"
-                  >
+                  <TableCell component="th" className="table-th" width="20%">
                     Created At
                   </TableCell>
                   {hasPermission(schoolAdminPermission.class.status) && (
-                    <TableCell
-                      component="th"
-                      className="table-th"
-                      width="15%"
-                    >
+                    <TableCell component="th" className="table-th" width="15%">
                       Status
                     </TableCell>
                   )}
@@ -184,15 +173,15 @@ export default function Class() {
                     schoolAdminPermission.class.update,
                     schoolAdminPermission.class.delete,
                   ]) && (
-                      <TableCell
-                        component="th"
-                        className="table-th"
-                        width="20%"
-                        align="right"
-                      >
-                        Action
-                      </TableCell>
-                    )}
+                    <TableCell
+                      component="th"
+                      className="table-th"
+                      width="20%"
+                      align="right"
+                    >
+                      Action
+                    </TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
@@ -253,15 +242,29 @@ export default function Class() {
                               </Typography>
                             </Box>
                           </TableCell>
-                          {hasPermission(schoolAdminPermission.class.status) && (
+                          {hasPermission(
+                            schoolAdminPermission.class.status,
+                          ) && (
                             <TableCell
                               component="td"
                               scope="row"
                               className="table-td"
                             >
                               <Box className="admin-table-data-flex">
-                                <Tooltip title={data?.isActive ? "Deactivate" : "Activate"} arrow placement="top">
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Tooltip
+                                  title={
+                                    data?.isActive ? "Deactivate" : "Activate"
+                                  }
+                                  arrow
+                                  placement="top"
+                                >
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 1,
+                                    }}
+                                  >
                                     <IOSSwitch
                                       checked={data?.isActive}
                                       onChange={() => handleStatusChange(data)}
@@ -277,77 +280,84 @@ export default function Class() {
                             schoolAdminPermission.class.update,
                             schoolAdminPermission.class.delete,
                           ]) && (
-                              <TableCell
-                                component="td"
-                                className="table-td"
-                              >
-                                <Box className="admin-table-data-btn-flex">
-                                  {hasPermission(schoolAdminPermission.class.read) && (
-                                    <Tooltip
-                                      title="View"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                            <TableCell component="td" className="table-td">
+                              <Box className="admin-table-data-btn-flex">
+                                {hasPermission(
+                                  schoolAdminPermission.class.read,
+                                ) && (
+                                  <Tooltip
+                                    title="View"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-view-btn"
+                                      onClick={() => {
+                                        navigate("/master/class/view", {
+                                          state: { id: data?._id },
+                                        });
+                                      }}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-view-btn"
-                                        onClick={() => {
-                                          navigate("/master/class/view", { state: { id: data?._id } });
-                                        }}
-                                      >
-                                        <img
-                                          src={Svg.yellowEye}
-                                          className="admin-icon"
-                                          alt="View"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
+                                      <img
+                                        src={Svg.yellowEye}
+                                        className="admin-icon"
+                                        alt="View"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
 
-                                  {hasPermission(schoolAdminPermission.class.update) && (
-                                    <Tooltip
-                                      title="Edit"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                                {hasPermission(
+                                  schoolAdminPermission.class.update,
+                                ) && (
+                                  <Tooltip
+                                    title="Edit"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-edit-btn"
+                                      onClick={() => {
+                                        navigate("/master/class/edit", {
+                                          state: { id: data?._id },
+                                        });
+                                      }}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-edit-btn"
-                                        onClick={() => {
-                                          navigate("/master/class/edit", { state: { id: data?._id } });
-                                        }}
-                                      >
-                                        <img
-                                          src={Svg.editIcon}
-                                          className="admin-icon"
-                                          alt="Edit"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
+                                      <img
+                                        src={Svg.editIcon}
+                                        className="admin-icon"
+                                        alt="Edit"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
 
-                                  {hasPermission(schoolAdminPermission.class.delete) && (
-                                    <Tooltip
-                                      title="Delete"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                                {hasPermission(
+                                  schoolAdminPermission.class.delete,
+                                ) && (
+                                  <Tooltip
+                                    title="Delete"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-delete-btn"
+                                      onClick={() => handleOpenDelete(data)}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-delete-btn"
-                                        onClick={() => handleOpenDelete(data)}
-                                      >
-                                        <img
-                                          src={Svg.trash}
-                                          className="admin-icon"
-                                          alt="Trash"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
-                                </Box>
-                              </TableCell>
-                            )}
+                                      <img
+                                        src={Svg.trash}
+                                        className="admin-icon"
+                                        alt="Trash"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </TableCell>
+                          )}
                         </TableRow>
                       );
                     })

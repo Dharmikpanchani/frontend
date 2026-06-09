@@ -49,21 +49,28 @@ export default function AccountLayout() {
   };
 
   return (
-    <Box className="admin-dashboard-content admin-edit-profile-containt" sx={{ backgroundColor: "#F8F9FA", minHeight: '100vh', p: 3 }}>
-      <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+    <Box
+      className="admin-dashboard-content admin-edit-profile-containt"
+      sx={{ backgroundColor: "#F8F9FA", minHeight: "100vh", p: 3 }}
+    >
+      <Box sx={{ mb: 4, display: "flex", alignItems: "center", gap: 2 }}>
         <Box
           sx={{
             width: 35,
             height: 35,
-            backgroundColor: 'var(--primary-color)',
-            borderRadius: '10px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            boxShadow: '0 4px 12px var(--divider-color, rgba(0,0,0,0.1))'
+            backgroundColor: "var(--primary-color)",
+            borderRadius: "10px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            boxShadow: "0 4px 12px var(--divider-color, rgba(0,0,0,0.1))",
           }}
         >
-          <img src={Svg.settings} style={{ width: 18, filter: 'brightness(0) invert(1)' }} alt="settings" />
+          <img
+            src={Svg.settings}
+            style={{ width: 18, filter: "brightness(0) invert(1)" }}
+            alt="settings"
+          />
         </Box>
         <Box>
           <Typography
@@ -73,7 +80,7 @@ export default function AccountLayout() {
               fontWeight: 700,
               color: "#344054",
               fontFamily: "'PlusJakartaSans-Bold', sans-serif",
-              lineHeight: 1.2
+              lineHeight: 1.2,
             }}
           >
             Account Settings
@@ -82,7 +89,7 @@ export default function AccountLayout() {
             sx={{
               fontSize: "12px",
               color: "#667085",
-              fontFamily: "'PlusJakartaSans-Medium', sans-serif"
+              fontFamily: "'PlusJakartaSans-Medium', sans-serif",
             }}
           >
             Manage your profile and security
@@ -96,46 +103,53 @@ export default function AccountLayout() {
           backgroundColor: "#FFFFFF",
           borderRadius: "12px",
           p: "0",
-          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
-          overflow: 'hidden'
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
+          overflow: "hidden",
         }}
       >
-        <Box sx={{ borderBottom: 1, borderColor: "#E9ECEF", px: "32px", pt: "20px" }}>
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: "#E9ECEF",
+            px: "32px",
+            pt: "20px",
+          }}
+        >
           <Tabs
             value={value}
             onChange={handleChange}
             aria-label="account settings tabs"
             className="admin-tabs-main"
             sx={{
-              '& .MuiTabs-indicator': {
-                backgroundColor: 'var(--primary-color)',
-                height: '2px',
-                borderRadius: '3px 3px 0 0'
+              "& .MuiTabs-indicator": {
+                backgroundColor: "var(--primary-color)",
+                height: "2px",
+                borderRadius: "3px 3px 0 0",
               },
-              '& .MuiTab-root': {
-                textTransform: 'none',
-                fontSize: '12px',
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontSize: "12px",
                 fontWeight: 600,
-                minHeight: '48px',
-                color: '#667085',
+                minHeight: "48px",
+                color: "#667085",
                 px: 0,
                 mr: 5,
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                '& .MuiSvgIcon-root': {
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                "& .MuiSvgIcon-root": {
                   fontSize: 18,
-                  marginBottom: '0 !important',
+                  marginBottom: "0 !important",
                 },
-                '&.Mui-selected': {
-                  color: 'var(--primary-color)',
+                "&.Mui-selected": {
+                  color: "var(--primary-color)",
                   fontWeight: 700,
-                  backgroundColor: 'transparent',
+                  backgroundColor: "transparent",
                 },
-                '&:hover': {
-                  backgroundColor: 'transparent',
+                "&:hover": {
+                  backgroundColor: "transparent",
                 },
-              }
+              },
             }}
           >
             <Tab

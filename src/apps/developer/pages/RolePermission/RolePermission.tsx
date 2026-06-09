@@ -37,7 +37,9 @@ let initialState = {
 export default function RoleList() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { roles, total, loading } = useSelector((state: RootState) => state.RoleReducer);
+  const { roles, total, loading } = useSelector(
+    (state: RootState) => state.RoleReducer,
+  );
   const { hasPermission, hasAnyPermission } = usePermissions();
 
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -58,16 +60,19 @@ export default function RoleList() {
     setSelectedData(initialState);
   };
 
-
   const handleGetData = (searchQuery?: string) => {
-    dispatch(getAllRoles({
-      page: currentPage + 1,
-      perPage: rowsPerPage > 0 ? rowsPerPage : 10,
-      search: searchQuery?.trim() ?? searchNameValue.trim(),
-    }) as any);
+    dispatch(
+      getAllRoles({
+        page: currentPage + 1,
+        perPage: rowsPerPage > 0 ? rowsPerPage : 10,
+        search: searchQuery?.trim() ?? searchNameValue.trim(),
+      }) as any,
+    );
   };
 
-  useEffect(() => { handleGetData(searchNameValue); }, [currentPage, rowsPerPage]);
+  useEffect(() => {
+    handleGetData(searchNameValue);
+  }, [currentPage, rowsPerPage]);
 
   const handleDelete = async () => {
     setButtonStatusSpinner(true);
@@ -81,17 +86,13 @@ export default function RoleList() {
       handleGetData(query);
       setCurrentPage(0);
     }, 1000),
-    []
+    [],
   );
 
   return (
     <Box className="admin-dashboard-content">
       <Box className="admin-user-list-flex admin-page-title-main">
-        <Typography
-          className="admin-page-title"
-          component="h2"
-          variant="h2"
-        >
+        <Typography className="admin-page-title" component="h2" variant="h2">
           Roles
         </Typography>
         <Box className="admin-flex-end">
@@ -109,10 +110,10 @@ export default function RoleList() {
                     setSearchNameValue(value);
                     debouncedCallGetApi(value);
                   }}
-                  inputProps={{ maxLength: 80 }}
+                  slotProps={{ htmlInput: { maxLength: 100 } }}
                 />
                 <SearchIcon
-                  sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                  sx={{ color: "var(--primary-color)", fontSize: "20px" }}
                   className="school-admin-search-grey-img admin-icon"
                 />
               </Box>
@@ -127,7 +128,11 @@ export default function RoleList() {
                 }}
               >
                 <AddIcon
-                  sx={{ color: 'var(--button-text, #fff)', fontSize: '18px', mr: 1 }}
+                  sx={{
+                    color: "var(--button-text, #fff)",
+                    fontSize: "18px",
+                    mr: 1,
+                  }}
                 />
                 Add Roles
               </Button>
@@ -138,22 +143,19 @@ export default function RoleList() {
 
       <Box className="card-border common-card">
         <Box className="brand-table-main page-table-main">
-          <TableContainer
-            component={Paper}
-            className="table-container"
-          >
+          <TableContainer component={Paper} className="table-container">
             <Table aria-label="simple table" className="table">
               <TableHead className="table-head">
                 <TableRow className="table-row">
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="20%"
-                  >
+                  <TableCell component="th" className="table-th" width="20%">
                     Role Name
                   </TableCell>
 
-                  {hasAnyPermission([developerPermission.role.update, developerPermission.role.delete, developerPermission.role.read]) && (
+                  {hasAnyPermission([
+                    developerPermission.role.update,
+                    developerPermission.role.delete,
+                    developerPermission.role.read,
+                  ]) && (
                     <TableCell
                       component="th"
                       className="table-th"
@@ -195,32 +197,42 @@ export default function RoleList() {
                             </Box>
                           </TableCell>
 
-                          {hasAnyPermission([developerPermission?.role?.read, developerPermission?.role?.update, developerPermission?.role?.delete]) && (<TableCell component="td" className="table-td">
-                            <Box className="admin-table-data-btn-flex">
-                              {hasPermission(developerPermission?.role?.read) && (
-                                <Tooltip
-                                  title="View"
-                                  arrow
-                                  placement="bottom"
-                                  className="admin-tooltip"
-                                >
-                                  <Button
-                                    className="admin-table-data-btn admin-table-view-btn"
-                                    onClick={() => {
-                                      navigate("/role-list/view", { state: { id: data?._id } });
-                                    }}
+                          {hasAnyPermission([
+                            developerPermission?.role?.read,
+                            developerPermission?.role?.update,
+                            developerPermission?.role?.delete,
+                          ]) && (
+                            <TableCell component="td" className="table-td">
+                              <Box className="admin-table-data-btn-flex">
+                                {hasPermission(
+                                  developerPermission?.role?.read,
+                                ) && (
+                                  <Tooltip
+                                    title="View"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
                                   >
-                                    <img
-                                      src={Svg.yellowEye}
-                                      className="admin-icon"
-                                      alt="View"
-                                    />
-                                  </Button>
-                                </Tooltip>
-                              )}
+                                    <Button
+                                      className="admin-table-data-btn admin-table-view-btn"
+                                      onClick={() => {
+                                        navigate("/role-list/view", {
+                                          state: { id: data?._id },
+                                        });
+                                      }}
+                                    >
+                                      <img
+                                        src={Svg.yellowEye}
+                                        className="admin-icon"
+                                        alt="View"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
 
-                              {
-                                hasPermission(developerPermission?.role?.update) && (
+                                {hasPermission(
+                                  developerPermission?.role?.update,
+                                ) && (
                                   <Tooltip
                                     title="Edit"
                                     arrow
@@ -230,7 +242,9 @@ export default function RoleList() {
                                     <Button
                                       className="admin-table-data-btn admin-table-edit-btn"
                                       onClick={() => {
-                                        navigate("/role-list/edit", { state: { id: data?._id } });
+                                        navigate("/role-list/edit", {
+                                          state: { id: data?._id },
+                                        });
                                       }}
                                     >
                                       <img
@@ -240,30 +254,32 @@ export default function RoleList() {
                                       />
                                     </Button>
                                   </Tooltip>
-                                )
-                              }
+                                )}
 
-                              {hasPermission(developerPermission.role.delete) && (
-                                <Tooltip
-                                  title="Delete"
-                                  arrow
-                                  placement="bottom"
-                                  className="admin-tooltip"
-                                >
-                                  <Button
-                                    className="admin-table-data-btn admin-table-delete-btn"
-                                    onClick={() => handleOpenDelete(data)}
+                                {hasPermission(
+                                  developerPermission.role.delete,
+                                ) && (
+                                  <Tooltip
+                                    title="Delete"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
                                   >
-                                    <img
-                                      src={Svg.trash}
-                                      className="admin-icon"
-                                      alt="Trash"
-                                    />
-                                  </Button>
-                                </Tooltip>
-                              )}
-                            </Box>
-                          </TableCell>)}
+                                    <Button
+                                      className="admin-table-data-btn admin-table-delete-btn"
+                                      onClick={() => handleOpenDelete(data)}
+                                    >
+                                      <img
+                                        src={Svg.trash}
+                                        className="admin-icon"
+                                        alt="Trash"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </TableCell>
+                          )}
                         </TableRow>
                       );
                     })

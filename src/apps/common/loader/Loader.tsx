@@ -13,8 +13,19 @@ export const CommonLoader = () => (
 function Loader({ colSpan = 12 }: { colSpan?: number }) {
   return (
     <TableRow>
-      <TableCell className="table-not-found-td" colSpan={colSpan} sx={{ border: 'none', py: 8 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+      <TableCell
+        className="table-not-found-td"
+        colSpan={colSpan}
+        sx={{ border: "none", py: 8 }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
           <CommonLoader />
         </Box>
       </TableCell>

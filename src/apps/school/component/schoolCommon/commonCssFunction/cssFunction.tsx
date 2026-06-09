@@ -15,11 +15,7 @@ export const style = {
 // for custom switch design
 
 export const IOSSwitch = styled((props: SwitchProps) => (
-  <Switch
-    focusVisibleClassName=".Mui-focusVisible"
-    disableRipple
-    {...props}
-  />
+  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
 ))(({ theme }: any) => ({
   width: 34,
   height: 20,
@@ -32,7 +28,10 @@ export const IOSSwitch = styled((props: SwitchProps) => (
       transform: "translateX(16px)",
       color: "#fff",
       "& + .MuiSwitch-track": {
-        backgroundColor: theme.palette.mode === "dark" ? "#2ECA45" : "var(--primary-color, #4E1111)",
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? "#2ECA45"
+            : "var(--primary-color, #4E1111)",
         opacity: 1,
         border: 0,
       },
@@ -106,7 +105,7 @@ export const StyledMenu: any = styled((props: MenuProps) => (
       "&:active": {
         backgroundColor: alpha(
           theme.palette.primary.main,
-          theme.palette.action.selectedOpacity
+          theme.palette.action.selectedOpacity,
         ),
       },
     },

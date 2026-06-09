@@ -25,19 +25,19 @@ export const renderMultipleImage = (values: any, setFieldValue: any) => {
       ]);
       setFieldValue(
         "multipleImageUrl",
-        serverImages.filter((img: string) => img !== imgToRemove.id)
+        serverImages.filter((img: string) => img !== imgToRemove.id),
       );
     } else {
       setFieldValue(
         "multipleProfile",
         newImages.filter(
-          (_: File, idx: number) => idx !== index - serverImages.length
-        )
+          (_: File, idx: number) => idx !== index - serverImages.length,
+        ),
       );
     }
     // Clear file input so same image can be uploaded again
     const fileInput = document.querySelector<HTMLInputElement>(
-      'input[type="file"][accept="image/*"]'
+      'input[type="file"][accept="image/*"]',
     );
     if (fileInput) fileInput.value = "";
   };
@@ -152,13 +152,13 @@ export const renderMultipleMedia = (values: any, setFieldValue: any) => {
 
       setFieldValue(
         "multipleImageUrl",
-        serverImages.filter((s: string) => s !== item.id)
+        serverImages.filter((s: string) => s !== item.id),
       );
     } else {
       const newIndex = index - serverImages.length;
       setFieldValue(
         "multipleProfile",
-        newImages.filter((_: File, idx: number) => idx !== newIndex)
+        newImages.filter((_: File, idx: number) => idx !== newIndex),
       );
     }
   };

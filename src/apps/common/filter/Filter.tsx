@@ -20,7 +20,13 @@ import moment from "moment";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
 
 export interface FilterField {
-  type: "select" | "searchbaseSelect" | "date" | "inputSelect" | "dateRange" | "priceRange";
+  type:
+    | "select"
+    | "searchbaseSelect"
+    | "date"
+    | "inputSelect"
+    | "dateRange"
+    | "priceRange";
   name: string;
   label: string;
   placeholder?: string;
@@ -71,9 +77,15 @@ const Filter: React.FC<FilterProps> = ({
                 displayEmpty
                 renderValue={(selected: any) => {
                   if (selected === "" || selected === undefined) {
-                    return <span style={{ color: "#aaa" }}>{field.placeholder || "Select"}</span>;
+                    return (
+                      <span style={{ color: "#aaa" }}>
+                        {field.placeholder || "Select"}
+                      </span>
+                    );
                   }
-                  const option = field.options?.find(opt => opt.value === selected);
+                  const option = field.options?.find(
+                    (opt) => opt.value === selected,
+                  );
                   return option ? option.label : selected;
                 }}
               >
@@ -92,17 +104,30 @@ const Filter: React.FC<FilterProps> = ({
             <Typography sx={labelSx}>{field.label}</Typography>
             <Autocomplete
               options={field.options || []}
-              getOptionLabel={field.getOptionLabel || ((option: any) => option.label || option)}
+              getOptionLabel={
+                field.getOptionLabel ||
+                ((option: any) => option.label || option)
+              }
               value={
                 field.options?.find((opt: any) => {
-                  const val = field.getOptionValue ? field.getOptionValue(opt) : (typeof opt === 'object' && opt !== null ? (opt._id || opt.value) : opt);
+                  const val = field.getOptionValue
+                    ? field.getOptionValue(opt)
+                    : typeof opt === "object" && opt !== null
+                      ? opt._id || opt.value
+                      : opt;
                   return val === values[field.name];
                 }) || null
               }
               onChange={(_, newValue) => {
                 let val = "";
                 if (newValue !== null) {
-                  val = field.getOptionValue ? field.getOptionValue(newValue) : (typeof newValue === 'object' ? (newValue._id !== undefined ? newValue._id : newValue.value) : newValue);
+                  val = field.getOptionValue
+                    ? field.getOptionValue(newValue)
+                    : typeof newValue === "object"
+                      ? newValue._id !== undefined
+                        ? newValue._id
+                        : newValue.value
+                      : newValue;
                 }
                 setFieldValue(field.name, val ?? "");
               }}
@@ -140,7 +165,7 @@ const Filter: React.FC<FilterProps> = ({
                     placeholder: field.placeholder || "Select Date",
                     variant: "outlined",
                     onClick: () => toggleSelector(field.name, true),
-                    sx: inputSx
+                    sx: inputSx,
                   },
                   field: {
                     readOnly: true,
@@ -164,21 +189,28 @@ const Filter: React.FC<FilterProps> = ({
                   backgroundColor: "#ffffff !important",
                   borderRadius: "var(--button-radius, 6px) !important",
                   border: "1px solid var(--input-border, #ced4da) !important",
-                  transition: 'all 0.3s ease !important',
+                  transition: "all 0.3s ease !important",
                   px: 1,
                   cursor: "pointer",
-                  '&:hover': {
-                    borderColor: 'var(--input-border, #ced4da) !important',
+                  "&:hover": {
+                    borderColor: "var(--input-border, #ced4da) !important",
                   },
-                  '&:focus-within': {
-                    borderColor: 'var(--primary-color) !important',
-                  }
+                  "&:focus-within": {
+                    borderColor: "var(--primary-color) !important",
+                  },
                 }}
               >
                 <DatePicker
-                  value={values[`${field.name}Start`] ? moment(values[`${field.name}Start`]) : null}
+                  value={
+                    values[`${field.name}Start`]
+                      ? moment(values[`${field.name}Start`])
+                      : null
+                  }
                   onChange={(date) =>
-                    setFieldValue(`${field.name}Start`, date ? date.toISOString() : "")
+                    setFieldValue(
+                      `${field.name}Start`,
+                      date ? date.toISOString() : "",
+                    )
                   }
                   open={!!openSelectors[`${field.name}Start`]}
                   onOpen={() => toggleSelector(`${field.name}Start`, true)}
@@ -194,7 +226,8 @@ const Filter: React.FC<FilterProps> = ({
                         "& .MuiInputBase-input": {
                           padding: "0 4px !important",
                           fontSize: "14px !important",
-                          fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
+                          fontFamily:
+                            "var(--font-family, 'Poppins', sans-serif) !important",
                           cursor: "pointer",
                           textAlign: "center",
                           width: "100%",
@@ -206,9 +239,16 @@ const Filter: React.FC<FilterProps> = ({
                 />
                 <Box sx={{ color: "#aaa", mx: 0.5, fontWeight: "bold" }}>-</Box>
                 <DatePicker
-                  value={values[`${field.name}End`] ? moment(values[`${field.name}End`]) : null}
+                  value={
+                    values[`${field.name}End`]
+                      ? moment(values[`${field.name}End`])
+                      : null
+                  }
                   onChange={(date) =>
-                    setFieldValue(`${field.name}End`, date ? date.toISOString() : "")
+                    setFieldValue(
+                      `${field.name}End`,
+                      date ? date.toISOString() : "",
+                    )
                   }
                   open={!!openSelectors[`${field.name}End`]}
                   onOpen={() => toggleSelector(`${field.name}End`, true)}
@@ -224,7 +264,8 @@ const Filter: React.FC<FilterProps> = ({
                         "& .MuiInputBase-input": {
                           padding: "0 4px !important",
                           fontSize: "14px !important",
-                          fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
+                          fontFamily:
+                            "var(--font-family, 'Poppins', sans-serif) !important",
                           cursor: "pointer",
                           textAlign: "center",
                           width: "100%",
@@ -248,28 +289,42 @@ const Filter: React.FC<FilterProps> = ({
               onChange={(e) => setFieldValue(field.name, e.target.value)}
               placeholder={field.placeholder || "Enter text"}
               sx={inputSx}
-            />
+                          />
           </Box>
         );
       case "priceRange":
         const minLimit = field.minLimit ?? 0;
         const maxLimit = field.maxLimit ?? 10000;
-        
+
         // Ensure values are within limits, default to limit bounds if undefined
         const currentVal = [
-          values[`${field.name}Min`] !== undefined && values[`${field.name}Min`] !== "" ? Number(values[`${field.name}Min`]) : minLimit,
-          values[`${field.name}Max`] !== undefined && values[`${field.name}Max`] !== "" ? Number(values[`${field.name}Max`]) : maxLimit,
+          values[`${field.name}Min`] !== undefined &&
+          values[`${field.name}Min`] !== ""
+            ? Number(values[`${field.name}Min`])
+            : minLimit,
+          values[`${field.name}Max`] !== undefined &&
+          values[`${field.name}Max`] !== ""
+            ? Number(values[`${field.name}Max`])
+            : maxLimit,
         ];
 
         return (
           <Box key={field.name}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 1.5,
+              }}
+            >
               <Typography sx={labelSx}>{field.label}</Typography>
               <Typography
                 sx={{
                   fontSize: "14px",
                   fontWeight: 700,
-                  background: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
+                  background:
+                    "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   fontFamily: "var(--font-family, 'Poppins', sans-serif)",
@@ -293,7 +348,8 @@ const Filter: React.FC<FilterProps> = ({
                   height: 6,
                   "& .MuiSlider-track": {
                     border: "none",
-                    background: "linear-gradient(90deg, #3f51b5 0%, #1a237e 100%)",
+                    background:
+                      "linear-gradient(90deg, #3f51b5 0%, #1a237e 100%)",
                   },
                   "& .MuiSlider-rail": {
                     opacity: 0.3,
@@ -325,7 +381,8 @@ const Filter: React.FC<FilterProps> = ({
                     transform: "translate(50%, -100%) rotate(-45deg) scale(0)",
                     "&::before": { display: "none" },
                     "&.MuiSlider-valueLabelOpen": {
-                      transform: "translate(50%, -100%) rotate(-45deg) scale(1)",
+                      transform:
+                        "translate(50%, -100%) rotate(-45deg) scale(1)",
                     },
                     "& > *": {
                       transform: "rotate(45deg)",
@@ -349,7 +406,7 @@ const Filter: React.FC<FilterProps> = ({
       className="admin-filter-main"
       sx={{
         "& .MuiDrawer-paper": {
-          width: { xs: '100%', sm: '400px' },
+          width: { xs: "100%", sm: "400px" },
           display: "flex",
           flexDirection: "column",
           height: "100%",
@@ -359,20 +416,20 @@ const Filter: React.FC<FilterProps> = ({
       <Box
         className="admin-filter-header"
         sx={{
-          p: '12px 20px',
-          backgroundColor: 'var(--primary-color)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
+          p: "12px 20px",
+          backgroundColor: "var(--primary-color)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
         <Typography
           className="admin-filter-title"
           sx={{
-            fontSize: '18px',
+            fontSize: "18px",
             fontWeight: 700,
-            color: '#fff',
-            fontFamily: "'PlusJakartaSans-Bold', sans-serif"
+            color: "#fff",
+            fontFamily: "'PlusJakartaSans-Bold', sans-serif",
           }}
         >
           {title}
@@ -380,14 +437,14 @@ const Filter: React.FC<FilterProps> = ({
         <IconButton
           onClick={onClose}
           sx={{
-            p: '4px',
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
-            }
+            p: "4px",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+            },
           }}
         >
-          <CloseIcon sx={{ fontSize: '20px' }} />
+          <CloseIcon sx={{ fontSize: "20px" }} />
         </IconButton>
       </Box>
 
@@ -397,7 +454,14 @@ const Filter: React.FC<FilterProps> = ({
         onSubmit={handleApply}
       >
         {({ setFieldValue, values, resetForm }) => (
-          <Form style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+          <Form
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+              overflow: "hidden",
+            }}
+          >
             <Box
               className="admin-filter-inner-main"
               sx={{
@@ -406,7 +470,7 @@ const Filter: React.FC<FilterProps> = ({
                 p: "25px",
                 display: "flex",
                 flexDirection: "column",
-                gap: "20px"
+                gap: "20px",
               }}
             >
               {fields.map((field) => renderField(field, setFieldValue, values))}

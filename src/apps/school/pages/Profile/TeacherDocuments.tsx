@@ -13,7 +13,7 @@ import {
   HourglassEmpty as PendingIcon,
   Error as RejectedIcon,
   CloudUpload as UploadIcon,
-  Visibility as ViewIcon
+  Visibility as ViewIcon,
 } from "@mui/icons-material";
 import { teacherDocumentService } from "@/api/services/teacherDocument.service";
 import { toasterError, toasterSuccess } from "@/utils/toaster/Toaster";
@@ -33,7 +33,9 @@ export default function TeacherDocuments() {
   const [documents, setDocuments] = useState<DocumentData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [uploadingType, setUploadingType] = useState<string | null>(null);
-  const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File }>({});
+  const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File }>(
+    {},
+  );
 
   const imageBaseUrl = import.meta.env.VITE_BASE_URL_IMAGE;
 
@@ -47,7 +49,11 @@ export default function TeacherDocuments() {
         toasterError(res?.message || "Failed to fetch documents");
       }
     } catch (error: any) {
-      toasterError(error?.response?.data?.message || error?.message || "Error fetching documents");
+      toasterError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Error fetching documents",
+      );
     } finally {
       setLoading(false);
     }
@@ -91,7 +97,9 @@ export default function TeacherDocuments() {
         toasterError(res?.message || "Upload failed");
       }
     } catch (error: any) {
-      toasterError(error?.response?.data?.message || error?.message || "Upload failed");
+      toasterError(
+        error?.response?.data?.message || error?.message || "Upload failed",
+      );
     } finally {
       setUploadingType(null);
     }
@@ -103,7 +111,7 @@ export default function TeacherDocuments() {
         bg: "rgba(102, 112, 133, 0.08)",
         color: "#667085",
         text: "Not Uploaded",
-        icon: <PendingIcon sx={{ fontSize: 16, color: "#667085" }} />
+        icon: <PendingIcon sx={{ fontSize: 16, color: "#667085" }} />,
       };
     }
     switch (status) {
@@ -112,35 +120,42 @@ export default function TeacherDocuments() {
           bg: "rgba(76, 175, 80, 0.08)",
           color: "#4caf50",
           text: "Approved",
-          icon: <ApprovedIcon sx={{ fontSize: 16, color: "#4caf50" }} />
+          icon: <ApprovedIcon sx={{ fontSize: 16, color: "#4caf50" }} />,
         };
       case "PENDING":
         return {
           bg: "rgba(255, 152, 0, 0.08)",
           color: "#ff9800",
           text: "Pending Verification",
-          icon: <PendingIcon sx={{ fontSize: 16, color: "#ff9800" }} />
+          icon: <PendingIcon sx={{ fontSize: 16, color: "#ff9800" }} />,
         };
       case "REJECTED":
         return {
           bg: "rgba(244, 67, 54, 0.08)",
           color: "#f44336",
           text: "Rejected",
-          icon: <RejectedIcon sx={{ fontSize: 16, color: "#f44336" }} />
+          icon: <RejectedIcon sx={{ fontSize: 16, color: "#f44336" }} />,
         };
       default:
         return {
           bg: "rgba(102, 112, 133, 0.08)",
           color: "#667085",
           text: "Unknown",
-          icon: <PendingIcon sx={{ fontSize: 16, color: "#667085" }} />
+          icon: <PendingIcon sx={{ fontSize: 16, color: "#667085" }} />,
         };
     }
   };
 
   if (loading && documents.length === 0) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "300px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "300px",
+        }}
+      >
         <CircularProgress size={40} sx={{ color: "var(--primary-color)" }} />
       </Box>
     );
@@ -156,7 +171,7 @@ export default function TeacherDocuments() {
             fontWeight: 700,
             color: "#344054",
             fontFamily: "'PlusJakartaSans-Bold', sans-serif",
-            mb: 0.5
+            mb: 0.5,
           }}
         >
           Verification Documents
@@ -166,10 +181,11 @@ export default function TeacherDocuments() {
           sx={{
             fontSize: "13px",
             color: "#667085",
-            fontFamily: "'PlusJakartaSans-Medium', sans-serif"
+            fontFamily: "'PlusJakartaSans-Medium', sans-serif",
           }}
         >
-          View your uploaded documents and re-upload/update any document if required.
+          View your uploaded documents and re-upload/update any document if
+          required.
         </Typography>
       </Box>
 
@@ -195,26 +211,39 @@ export default function TeacherDocuments() {
                   transition: "all 0.2s ease-in-out",
                   "&:hover": {
                     boxShadow: "0 4px 12px rgba(16, 24, 40, 0.08)",
-                    borderColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.2)"
-                  }
+                    borderColor:
+                      "rgba(var(--primary-color-rgb, 92, 26, 26), 0.2)",
+                  },
                 }}
               >
                 <Box>
                   {/* Card Header */}
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      mb: 2,
+                    }}
+                  >
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                    >
                       <Box
                         sx={{
                           width: 40,
                           height: 40,
-                          backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.05)",
+                          backgroundColor:
+                            "rgba(var(--primary-color-rgb, 92, 26, 26), 0.05)",
                           borderRadius: "8px",
                           display: "flex",
                           justifyContent: "center",
-                          alignItems: "center"
+                          alignItems: "center",
                         }}
                       >
-                        <DocumentIcon sx={{ color: "var(--primary-color)", fontSize: 20 }} />
+                        <DocumentIcon
+                          sx={{ color: "var(--primary-color)", fontSize: 20 }}
+                        />
                       </Box>
                       <Box>
                         <Typography
@@ -222,7 +251,7 @@ export default function TeacherDocuments() {
                             fontSize: "14px",
                             fontWeight: 700,
                             color: "#344054",
-                            fontFamily: "'PlusJakartaSans-Bold', sans-serif"
+                            fontFamily: "'PlusJakartaSans-Bold', sans-serif",
                           }}
                         >
                           {doc.documentType}
@@ -232,7 +261,8 @@ export default function TeacherDocuments() {
                             sx={{
                               fontSize: "11px",
                               color: "#98A2B3",
-                              fontFamily: "'PlusJakartaSans-Regular', sans-serif"
+                              fontFamily:
+                                "'PlusJakartaSans-Regular', sans-serif",
                             }}
                           >
                             Version {doc.version}
@@ -252,11 +282,17 @@ export default function TeacherDocuments() {
                         borderRadius: "16px",
                         backgroundColor: statusStyle.bg,
                         color: statusStyle.color,
-                        border: `1px solid ${statusStyle.color}`
+                        border: `1px solid ${statusStyle.color}`,
                       }}
                     >
                       {statusStyle.icon}
-                      <Typography sx={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase" }}>
+                      <Typography
+                        sx={{
+                          fontSize: "10px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                        }}
+                      >
                         {statusStyle.text}
                       </Typography>
                     </Box>
@@ -270,10 +306,17 @@ export default function TeacherDocuments() {
                         borderLeft: "3px solid #f44336",
                         p: 1.2,
                         borderRadius: "4px",
-                        mb: 2
+                        mb: 2,
                       }}
                     >
-                      <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#f44336", mb: 0.2 }}>
+                      <Typography
+                        sx={{
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          color: "#f44336",
+                          mb: 0.2,
+                        }}
+                      >
                         Reason for Rejection:
                       </Typography>
                       <Typography sx={{ fontSize: "11px", color: "#667085" }}>
@@ -292,22 +335,28 @@ export default function TeacherDocuments() {
                       justifyContent: "space-between",
                       alignItems: "center",
                       backgroundColor: "#F9FAFB",
-                      mb: 2.5
+                      mb: 2.5,
                     }}
                   >
                     <Typography
                       variant="body2"
                       sx={{
-                        color: selectedFile ? "var(--primary-color)" : "#667085",
+                        color: selectedFile
+                          ? "var(--primary-color)"
+                          : "#667085",
                         fontSize: "12px",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
                         pr: 1,
-                        fontWeight: selectedFile ? 600 : 500
+                        fontWeight: selectedFile ? 600 : 500,
                       }}
                     >
-                      {selectedFile ? selectedFile.name : (doc.documentUrl ? "Document Uploaded" : "No file uploaded")}
+                      {selectedFile
+                        ? selectedFile.name
+                        : doc.documentUrl
+                          ? "Document Uploaded"
+                          : "No file uploaded"}
                     </Typography>
 
                     {doc.documentUrl && !selectedFile && (
@@ -325,7 +374,7 @@ export default function TeacherDocuments() {
                           display: "flex",
                           alignItems: "center",
                           gap: 0.5,
-                          "&:hover": { color: "#d97706" }
+                          "&:hover": { color: "#d97706" },
                         }}
                       >
                         <ViewIcon sx={{ fontSize: 14 }} />
@@ -336,7 +385,9 @@ export default function TeacherDocuments() {
                 </Box>
 
                 {/* Actions */}
-                <Box sx={{ mt: "auto", display: "flex", gap: 1.5, width: "100%" }}>
+                <Box
+                  sx={{ mt: "auto", display: "flex", gap: 1.5, width: "100%" }}
+                >
                   {selectedFile ? (
                     <>
                       <Button
@@ -358,7 +409,10 @@ export default function TeacherDocuments() {
                           fontWeight: 600,
                           color: "#667085",
                           borderColor: "#D0D5DD",
-                          "&:hover": { borderColor: "#667085", backgroundColor: "transparent" }
+                          "&:hover": {
+                            borderColor: "#667085",
+                            backgroundColor: "transparent",
+                          },
                         }}
                       >
                         Cancel
@@ -376,10 +430,17 @@ export default function TeacherDocuments() {
                           fontWeight: 600,
                           backgroundColor: "var(--primary-color) !important",
                           color: "#FFFFFF",
-                          "&:hover": { opacity: 0.9 }
+                          "&:hover": { opacity: 0.9 },
                         }}
                       >
-                        {isUploading ? <CircularProgress size={16} sx={{ color: "#FFFFFF" }} /> : "Upload"}
+                        {isUploading ? (
+                          <CircularProgress
+                            size={16}
+                            sx={{ color: "#FFFFFF" }}
+                          />
+                        ) : (
+                          "Upload"
+                        )}
                       </Button>
                     </>
                   ) : (
@@ -394,14 +455,16 @@ export default function TeacherDocuments() {
                         fontSize: "12px",
                         fontWeight: 600,
                         color: "var(--primary-color)",
-                        borderColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.3)",
+                        borderColor:
+                          "rgba(var(--primary-color-rgb, 92, 26, 26), 0.3)",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
                         "&:hover": {
                           borderColor: "var(--primary-color)",
-                          backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.02)"
-                        }
+                          backgroundColor:
+                            "rgba(var(--primary-color-rgb, 92, 26, 26), 0.02)",
+                        },
                       }}
                     >
                       <UploadIcon sx={{ fontSize: 16 }} />
@@ -410,7 +473,12 @@ export default function TeacherDocuments() {
                         hidden
                         type="file"
                         accept="application/pdf,image/jpeg,image/jpg,image/png"
-                        onChange={(e) => handleFileChange(doc.documentType, e.target.files?.[0])}
+                        onChange={(e) =>
+                          handleFileChange(
+                            doc.documentType,
+                            e.target.files?.[0],
+                          )
+                        }
                       />
                     </Button>
                   )}

@@ -30,7 +30,7 @@ export const getTeachers = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const getPendingTeachers = createAsyncThunk(
@@ -43,16 +43,24 @@ export const getPendingTeachers = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const addEditTeacher = createAsyncThunk(
   "teacher/addEdit",
-  async ({ payload, id }: { payload: any; id?: string }, { rejectWithValue }) => {
+  async (
+    { payload, id }: { payload: any; id?: string },
+    { rejectWithValue },
+  ) => {
     try {
       const res: any = await masterService.addEditTeacher(payload, id);
       if (res.status === 201 || res.status === 200) {
-        toast.success(res.message || (id ? "Teacher updated successfully" : "Teacher added successfully"));
+        toast.success(
+          res.message ||
+            (id
+              ? "Teacher updated successfully"
+              : "Teacher added successfully"),
+        );
         return res.data;
       }
       toast.error(res.message || "Operation failed");
@@ -62,7 +70,7 @@ export const addEditTeacher = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const getTeacherById = createAsyncThunk(
@@ -75,7 +83,7 @@ export const getTeacherById = createAsyncThunk(
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
-  }
+  },
 );
 
 export const changeTeacherStatus = createAsyncThunk(
@@ -93,7 +101,7 @@ export const changeTeacherStatus = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 export const deleteTeacher = createAsyncThunk(
@@ -111,7 +119,7 @@ export const deleteTeacher = createAsyncThunk(
       toast.error(msg);
       return rejectWithValue(msg);
     }
-  }
+  },
 );
 
 const teacherSlice = createSlice({

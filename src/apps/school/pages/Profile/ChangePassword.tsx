@@ -18,7 +18,7 @@ import {
   LockOutlined as LockOutlinedIcon,
   KeyOutlined as KeyOutlinedIcon,
   CheckCircleOutlined as CheckCircleOutlinedIcon,
-  Save as SaveIcon
+  Save as SaveIcon,
 } from "@mui/icons-material";
 import type { ChangePasswordInterface } from "@/types/interfaces/LoginInterface";
 import { authService } from "@/api/services/auth.service";
@@ -32,11 +32,13 @@ export default function ChangePassword() {
   const dispatch = useDispatch();
   const [oldPasswordVisible, setOldPasswordVisible] = useState<boolean>(true);
   const [newPasswordVisible, setNewPasswordVisible] = useState<boolean>(true);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState<boolean>(true);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] =
+    useState<boolean>(true);
 
   const toggleOldPassword = () => setOldPasswordVisible(!oldPasswordVisible);
   const toggleNewPassword = () => setNewPasswordVisible(!newPasswordVisible);
-  const toggleConfirmPassword = () => setConfirmPasswordVisible(!confirmPasswordVisible);
+  const toggleConfirmPassword = () =>
+    setConfirmPasswordVisible(!confirmPasswordVisible);
 
   const initialValues: ChangePasswordInterface = {
     oldPassword: "",
@@ -44,7 +46,10 @@ export default function ChangePassword() {
     confirmPassword: "",
   };
 
-  const handleSubmit = async (values: ChangePasswordInterface, { resetForm }: { resetForm: () => void }) => {
+  const handleSubmit = async (
+    values: ChangePasswordInterface,
+    { resetForm }: { resetForm: () => void },
+  ) => {
     try {
       const res: any = await authService.changePassword(values);
       if (res.status === 201 || res.status === 200) {
@@ -55,7 +60,10 @@ export default function ChangePassword() {
         toasterError(res?.message || "Failed to change password");
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Error changing password";
+      const errorMessage =
+        error.response?.data?.message ||
+        error?.message ||
+        "Error changing password";
       toasterError(errorMessage);
     }
   };
@@ -67,40 +75,49 @@ export default function ChangePassword() {
       onSubmit={handleSubmit}
     >
       {(formikProps: FormikProps<ChangePasswordInterface>) => {
-        const { values, errors, touched, handleChange, handleBlur, handleSubmit: formikSubmit, resetForm, isSubmitting } =
-          formikProps;
-
+        const {
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          handleSubmit: formikSubmit,
+          resetForm,
+          isSubmitting,
+        } = formikProps;
 
         return (
           <Form onSubmit={formikSubmit}>
-            <Box sx={{ maxWidth: '800px', mx: 'auto' }}>
+            <Box sx={{ maxWidth: "800px", mx: "auto" }}>
               <Box
                 sx={{
                   backgroundColor: "#F3F4F6",
                   borderRadius: "12px",
                   p: { xs: 2, sm: 3 },
                   mb: 4,
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  textAlign: { xs: 'center', sm: 'left' },
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: { xs: "column", sm: "row" },
+                  textAlign: { xs: "center", sm: "left" },
                   gap: { xs: 2, sm: 3 },
-                  border: '1px solid #E5E7EB'
+                  border: "1px solid #E5E7EB",
                 }}
               >
                 <Box
                   sx={{
                     width: 40,
                     height: 40,
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '12px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: "12px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
                   }}
                 >
-                  <LockOutlinedIcon sx={{ color: 'var(--primary-color)', fontSize: 18 }} />
+                  <LockOutlinedIcon
+                    sx={{ color: "var(--primary-color)", fontSize: 18 }}
+                  />
                 </Box>
                 <Box>
                   <Typography
@@ -110,7 +127,7 @@ export default function ChangePassword() {
                       fontWeight: 700,
                       color: "#344054",
                       fontFamily: "'PlusJakartaSans-Bold', sans-serif",
-                      marginBottom: '4px'
+                      marginBottom: "4px",
                     }}
                   >
                     Update your password
@@ -119,7 +136,7 @@ export default function ChangePassword() {
                     sx={{
                       fontSize: "12px",
                       color: "#667085",
-                      fontFamily: "'PlusJakartaSans-Medium', sans-serif"
+                      fontFamily: "'PlusJakartaSans-Medium', sans-serif",
                     }}
                   >
                     Ensure your account is using a strong password for security
@@ -131,7 +148,9 @@ export default function ChangePassword() {
                 <Grid size={{ xs: 12 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <LockOutlinedIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                      <LockOutlinedIcon
+                        sx={{ fontSize: 14, color: "var(--primary-color)" }}
+                      />
                       Current Password <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
@@ -143,18 +162,31 @@ export default function ChangePassword() {
                         onBlur={handleBlur}
                         placeholder="Enter current password"
                         value={values.oldPassword}
-                        error={errors?.oldPassword && touched?.oldPassword ? true : false}
+                        error={
+                          errors?.oldPassword && touched?.oldPassword
+                            ? true
+                            : false
+                        }
                         sx={inputSx}
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton onClick={toggleOldPassword} edge="end">
-                              {oldPasswordVisible ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+                              {oldPasswordVisible ? (
+                                <VisibilityOff sx={{ fontSize: 20 }} />
+                              ) : (
+                                <Visibility sx={{ fontSize: 20 }} />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         }
+                        inputProps={{ maxLength: 16 }}
                       />
                       <FormHelperText className="error-text">
-                        {errors?.oldPassword && touched?.oldPassword && typeof errors.oldPassword === 'string' ? errors.oldPassword : null}
+                        {errors?.oldPassword &&
+                        touched?.oldPassword &&
+                        typeof errors.oldPassword === "string"
+                          ? errors.oldPassword
+                          : null}
                       </FormHelperText>
                     </Box>
                   </Box>
@@ -163,7 +195,9 @@ export default function ChangePassword() {
                 <Grid size={{ xs: 12 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <KeyOutlinedIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
+                      <KeyOutlinedIcon
+                        sx={{ fontSize: 14, color: "var(--primary-color)" }}
+                      />
                       New Password <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
@@ -175,18 +209,31 @@ export default function ChangePassword() {
                         onBlur={handleBlur}
                         placeholder="Enter new password"
                         value={values.newPassword}
-                        error={errors?.newPassword && touched?.newPassword ? true : false}
+                        error={
+                          errors?.newPassword && touched?.newPassword
+                            ? true
+                            : false
+                        }
                         sx={inputSx}
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton onClick={toggleNewPassword} edge="end">
-                              {newPasswordVisible ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+                              {newPasswordVisible ? (
+                                <VisibilityOff sx={{ fontSize: 20 }} />
+                              ) : (
+                                <Visibility sx={{ fontSize: 20 }} />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         }
+                        inputProps={{ maxLength: 16 }}
                       />
                       <FormHelperText className="error-text">
-                        {errors?.newPassword && touched?.newPassword && typeof errors.newPassword === 'string' ? errors.newPassword : null}
+                        {errors?.newPassword &&
+                        touched?.newPassword &&
+                        typeof errors.newPassword === "string"
+                          ? errors.newPassword
+                          : null}
                       </FormHelperText>
                     </Box>
                   </Box>
@@ -195,8 +242,11 @@ export default function ChangePassword() {
                 <Grid size={{ xs: 12 }}>
                   <Box className="admin-input-box" sx={{ mb: 1 }}>
                     <Typography sx={labelSx}>
-                      <CheckCircleOutlinedIcon sx={{ fontSize: 14, color: 'var(--primary-color)' }} />
-                      Confirm New Password <span className="astrick-sing">*</span>
+                      <CheckCircleOutlinedIcon
+                        sx={{ fontSize: 14, color: "var(--primary-color)" }}
+                      />
+                      Confirm New Password{" "}
+                      <span className="astrick-sing">*</span>
                     </Typography>
                     <Box className="admin-form-group">
                       <OutlinedInput
@@ -207,43 +257,67 @@ export default function ChangePassword() {
                         onBlur={handleBlur}
                         placeholder="Confirm new password"
                         value={values.confirmPassword}
-                        error={errors?.confirmPassword && touched?.confirmPassword ? true : false}
+                        error={
+                          errors?.confirmPassword && touched?.confirmPassword
+                            ? true
+                            : false
+                        }
                         onPaste={(e) => e.preventDefault()}
                         onCopy={(e) => e.preventDefault()}
                         onContextMenu={(e) => e.preventDefault()}
                         sx={inputSx}
                         endAdornment={
                           <InputAdornment position="end">
-                            <IconButton onClick={toggleConfirmPassword} edge="end">
-                              {confirmPasswordVisible ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+                            <IconButton
+                              onClick={toggleConfirmPassword}
+                              edge="end"
+                            >
+                              {confirmPasswordVisible ? (
+                                <VisibilityOff sx={{ fontSize: 20 }} />
+                              ) : (
+                                <Visibility sx={{ fontSize: 20 }} />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         }
+                        inputProps={{ maxLength: 16 }}
                       />
                       <FormHelperText className="error-text">
-                        {errors?.confirmPassword && touched?.confirmPassword && typeof errors.confirmPassword === 'string' ? errors.confirmPassword : null}
+                        {errors?.confirmPassword &&
+                        touched?.confirmPassword &&
+                        typeof errors.confirmPassword === "string"
+                          ? errors.confirmPassword
+                          : null}
                       </FormHelperText>
                     </Box>
                   </Box>
                 </Grid>
               </Grid>
 
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 4, flexDirection: { xs: 'column-reverse', sm: 'row' } }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: 2,
+                  mt: 4,
+                  flexDirection: { xs: "column-reverse", sm: "row" },
+                }}
+              >
                 <Button
                   variant="outlined"
                   disabled={isSubmitting}
                   onClick={() => resetForm()}
                   sx={{
-                    minWidth: { xs: '100%', sm: '130px' },
-                    height: '40px',
-                    borderRadius: '8px',
-                    color: '#667085',
-                    borderColor: '#D0D5DD',
-                    textTransform: 'none',
+                    minWidth: { xs: "100%", sm: "130px" },
+                    height: "40px",
+                    borderRadius: "8px",
+                    color: "#667085",
+                    borderColor: "#D0D5DD",
+                    textTransform: "none",
                     fontWeight: 600,
-                    '&:hover': {
-                      backgroundColor: '#F9FAFB',
-                      borderColor: '#D0D5DD',
+                    "&:hover": {
+                      backgroundColor: "#F9FAFB",
+                      borderColor: "#D0D5DD",
                     },
                   }}
                 >
@@ -255,24 +329,31 @@ export default function ChangePassword() {
                   disabled={isSubmitting}
                   className="admin-btn-theme"
                   sx={{
-                    minWidth: { xs: '100%', sm: '150px' },
-                    height: '40px',
-                    borderRadius: '8px',
-                    backgroundColor: 'var(--primary-color) !important',
-                    textTransform: 'none',
+                    minWidth: { xs: "100%", sm: "150px" },
+                    height: "40px",
+                    borderRadius: "8px",
+                    backgroundColor: "var(--primary-color) !important",
+                    textTransform: "none",
                     fontWeight: 600,
-                    boxShadow: 'none',
-                    '&:hover': {
-                      backgroundColor: 'var(--primary-color)',
+                    boxShadow: "none",
+                    "&:hover": {
+                      backgroundColor: "var(--primary-color)",
                       opacity: 0.8,
-                      boxShadow: 'none'
+                      boxShadow: "none",
                     },
                   }}
                 >
                   {isSubmitting ? (
                     <Spinner />
                   ) : (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        justifyContent: "center",
+                      }}
+                    >
                       <SaveIcon sx={{ fontSize: 18 }} />
                       Update Password
                     </Box>

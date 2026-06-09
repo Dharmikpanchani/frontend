@@ -22,7 +22,14 @@ const initialState: RoleState = {
 
 export const getAllRoles = createAsyncThunk(
   "role/getAll",
-  async ({ page, perPage, search }: { page: number; perPage: number; search: string }, { rejectWithValue }) => {
+  async (
+    {
+      page,
+      perPage,
+      search,
+    }: { page: number; perPage: number; search: string },
+    { rejectWithValue },
+  ) => {
     try {
       const res: any = await roleService.getAll(page, perPage, search);
       if (res.status === 200) return res;
@@ -30,11 +37,12 @@ export const getAllRoles = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch roles";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to fetch roles";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const getAllRolesSimple = createAsyncThunk(
@@ -47,11 +55,12 @@ export const getAllRolesSimple = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch roles";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to fetch roles";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const getRoleById = createAsyncThunk(
@@ -64,11 +73,12 @@ export const getRoleById = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch role";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to fetch role";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const addEditRole = createAsyncThunk(
@@ -83,11 +93,12 @@ export const addEditRole = createAsyncThunk(
       toast.error(res?.message || "Failed to save role");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.message || "Failed to save role";
+      const errorMessage =
+        err?.response?.data?.message || err?.message || "Failed to save role";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const deleteRole = createAsyncThunk(
@@ -102,13 +113,13 @@ export const deleteRole = createAsyncThunk(
       toast.error(res?.message || "Failed to delete role");
       return rejectWithValue(res?.message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to delete role";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to delete role";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
-
 
 const roleSlice = createSlice({
   name: "role",
@@ -120,13 +131,17 @@ const roleSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllRoles.pending, (state) => { state.loading = true; })
+      .addCase(getAllRoles.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(getAllRoles.fulfilled, (state, action) => {
         state.loading = false;
         state.roles = action.payload?.data || [];
         state.total = action.payload?.pagination?.totalArrayLength || 0;
       })
-      .addCase(getAllRoles.rejected, (state) => { state.loading = false; })
+      .addCase(getAllRoles.rejected, (state) => {
+        state.loading = false;
+      })
 
       .addCase(getAllRolesSimple.fulfilled, (state, action) => {
         state.allRoles = action.payload?.data || [];
@@ -143,16 +158,26 @@ const roleSlice = createSlice({
         state.loading = false;
       })
 
-      .addCase(addEditRole.pending, (state) => { state.actionLoading = true; })
-      .addCase(addEditRole.fulfilled, (state) => { state.actionLoading = false; })
-      .addCase(addEditRole.rejected, (state) => { state.actionLoading = false; })
+      .addCase(addEditRole.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(addEditRole.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(addEditRole.rejected, (state) => {
+        state.actionLoading = false;
+      })
 
-      .addCase(deleteRole.pending, (state) => { state.actionLoading = true; })
+      .addCase(deleteRole.pending, (state) => {
+        state.actionLoading = true;
+      })
       .addCase(deleteRole.fulfilled, (state, action) => {
         state.actionLoading = false;
         state.roles = state.roles.filter((r) => r._id !== action.payload);
       })
-      .addCase(deleteRole.rejected, (state) => { state.actionLoading = false; })
+      .addCase(deleteRole.rejected, (state) => {
+        state.actionLoading = false;
+      });
   },
 });
 

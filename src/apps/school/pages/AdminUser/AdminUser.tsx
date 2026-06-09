@@ -17,8 +17,15 @@ import {
   debounce,
   Chip,
 } from "@mui/material";
-import { Search as SearchIcon, Add as AddIcon, FilterList as FilterIcon } from "@mui/icons-material";
-import { getAllAdminUsers, deleteAdminUser } from "@/redux/slices/adminUserSlice";
+import {
+  Search as SearchIcon,
+  Add as AddIcon,
+  FilterList as FilterIcon,
+} from "@mui/icons-material";
+import {
+  getAllAdminUsers,
+  deleteAdminUser,
+} from "@/redux/slices/adminUserSlice";
 import { getAllRolesSimple } from "@/redux/slices/roleSlice";
 import Svg from "@/assets/Svg";
 import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
@@ -36,7 +43,9 @@ import type { RootState } from "@/redux/Store";
 export default function AdminUser() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { adminUsers, total, loading } = useSelector((state: RootState) => state.AdminUserReducer);
+  const { adminUsers, total, loading } = useSelector(
+    (state: RootState) => state.AdminUserReducer,
+  );
   const { hasPermission, hasAnyPermission } = usePermissions();
 
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -66,18 +75,31 @@ export default function AdminUser() {
   };
 
   const handleGetData = (searchQuery?: string, filters?: any) => {
-    dispatch(getAllAdminUsers({
-      page: currentPage + 1,
-      perPage: rowsPerPage > 0 ? rowsPerPage : 10,
-      search: searchQuery?.trim() ?? searchNameValue.trim(),
-      role: filters?.role !== undefined ? filters.role : filterValues.role,
-      isActive: filters?.isActive !== undefined ? filters.isActive : filterValues.isActive,
-      isLogin: filters?.isLogin !== undefined ? filters.isLogin : filterValues.isLogin,
-      isVerified: filters?.isVerified !== undefined ? filters.isVerified : filterValues.isVerified,
-    }) as any);
+    dispatch(
+      getAllAdminUsers({
+        page: currentPage + 1,
+        perPage: rowsPerPage > 0 ? rowsPerPage : 10,
+        search: searchQuery?.trim() ?? searchNameValue.trim(),
+        role: filters?.role !== undefined ? filters.role : filterValues.role,
+        isActive:
+          filters?.isActive !== undefined
+            ? filters.isActive
+            : filterValues.isActive,
+        isLogin:
+          filters?.isLogin !== undefined
+            ? filters.isLogin
+            : filterValues.isLogin,
+        isVerified:
+          filters?.isVerified !== undefined
+            ? filters.isVerified
+            : filterValues.isVerified,
+      }) as any,
+    );
   };
 
-  useEffect(() => { handleGetData(searchNameValue); }, [currentPage, rowsPerPage]);
+  useEffect(() => {
+    handleGetData(searchNameValue);
+  }, [currentPage, rowsPerPage]);
 
   useEffect(() => {
     dispatch(getAllRolesSimple("filter") as any);
@@ -122,7 +144,7 @@ export default function AdminUser() {
       handleGetData(query);
       setCurrentPage(0);
     }, 1000),
-    []
+    [],
   );
 
   const { allRoles } = useSelector((state: RootState) => state.RoleReducer);
@@ -169,15 +191,10 @@ export default function AdminUser() {
     },
   ];
 
-
   return (
     <Box className="admin-dashboard-content">
       <Box className="admin-user-list-flex admin-page-title-main">
-        <Typography
-          className="admin-page-title"
-          component="h2"
-          variant="h2"
-        >
+        <Typography className="admin-page-title" component="h2" variant="h2">
           Admin User
         </Typography>
         <Box className="admin-flex-end">
@@ -195,11 +212,11 @@ export default function AdminUser() {
                     setSearchNameValue(value);
                     debouncedCallGetApi(value);
                   }}
-                  inputProps={{ maxLength: 80 }}
+                  slotProps={{ htmlInput: { maxLength: 100 } }}
                 />
                 <SearchIcon
                   className="school-admin-search-grey-img admin-icon"
-                  sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                  sx={{ color: "var(--primary-color)", fontSize: "20px" }}
                 />
               </Box>
             </Box>
@@ -210,14 +227,14 @@ export default function AdminUser() {
               onClick={() => setOpenFilter(true)}
               sx={{
                 ml: 1,
-                textTransform: 'capitalize',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                textTransform: "capitalize",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
             >
               <FilterIcon
-                sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }}
+                sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
               />
             </Button>
           </Box>
@@ -229,7 +246,11 @@ export default function AdminUser() {
               >
                 <AddIcon
                   className="admin-plus-icon"
-                  sx={{ color: 'var(--button-text, #fff)', fontSize: '18px', mr: 1 }}
+                  sx={{
+                    color: "var(--button-text, #fff)",
+                    fontSize: "18px",
+                    mr: 1,
+                  }}
                 />
                 Add Admin User
               </Button>
@@ -240,47 +261,24 @@ export default function AdminUser() {
 
       <Box className="card-border common-card">
         <Box className="brand-table-main page-table-main">
-          <TableContainer
-            component={Paper}
-            className="table-container"
-          >
+          <TableContainer component={Paper} className="table-container">
             <Table aria-label="simple table" className="table">
               <TableHead className="table-head">
                 <TableRow className="table-row">
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="20%"
-                  >
+                  <TableCell component="th" className="table-th" width="20%">
                     Name
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="30%"
-                  >
+                  <TableCell component="th" className="table-th" width="30%">
                     Email
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="15%"
-                  >
+                  <TableCell component="th" className="table-th" width="15%">
                     Role
                   </TableCell>
-                  <TableCell
-                    component="th"
-                    className="table-th"
-                    width="20%"
-                  >
+                  <TableCell component="th" className="table-th" width="20%">
                     Login / Verification
                   </TableCell>
                   {hasPermission(schoolAdminPermission.admin_user.status) && (
-                    <TableCell
-                      component="th"
-                      className="table-th"
-                      width="15%"
-                    >
+                    <TableCell component="th" className="table-th" width="15%">
                       Status
                     </TableCell>
                   )}
@@ -290,15 +288,15 @@ export default function AdminUser() {
                     schoolAdminPermission.admin_user.update,
                     schoolAdminPermission.admin_user.delete,
                   ]) && (
-                      <TableCell
-                        component="th"
-                        className="table-th"
-                        width="20%"
-                        align="right"
-                      >
-                        Action
-                      </TableCell>
-                    )}
+                    <TableCell
+                      component="th"
+                      className="table-th"
+                      width="20%"
+                      align="right"
+                    >
+                      Action
+                    </TableCell>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
@@ -317,7 +315,13 @@ export default function AdminUser() {
                             scope="row"
                             className="table-td"
                           >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1.5,
+                              }}
+                            >
                               <ProfileAvatar
                                 name={data?.name}
                                 imageUrl={data?.profileImage}
@@ -378,117 +382,180 @@ export default function AdminUser() {
                             scope="row"
                             className="table-td"
                           >
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 1,
+                              }}
+                            >
                               <Chip
                                 label={data?.isLogin ? "Online" : "Offline"}
                                 sx={{
-                                  backgroundColor: data?.isLogin ? "#e8f5e9" : "#ffebee",
+                                  backgroundColor: data?.isLogin
+                                    ? "#e8f5e9"
+                                    : "#ffebee",
                                   color: data?.isLogin ? "#2e7d32" : "#d32f2f",
                                   boxShadow: `0px 0px 8px ${data?.isLogin ? "rgba(76, 175, 80, 0.4)" : "rgba(244, 67, 54, 0.4)"}`,
                                   fontWeight: 600,
                                   fontSize: "11px",
                                   height: "22px",
-                                  width: 'fit-content',
+                                  width: "fit-content",
                                   "& .MuiChip-label": {
                                     padding: "0 8px",
                                   },
                                 }}
                               />
-                              <Box sx={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                px: 1,
-                                py: 0.3,
-                                borderRadius: '20px',
-                                backgroundColor: data?.isVerified ? 'rgba(33, 150, 243, 0.1)' : 'rgba(255, 152, 0, 0.1)',
-                                color: data?.isVerified ? '#2196f3' : '#ff9800',
-                                width: 'fit-content'
-                              }}>
-                                <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'currentColor' }} />
-                                <Typography sx={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>
-                                  {data?.isVerified ? "Verified" : "Not Verified"}
+                              <Box
+                                sx={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: 0.5,
+                                  px: 1,
+                                  py: 0.3,
+                                  borderRadius: "20px",
+                                  backgroundColor: data?.isVerified
+                                    ? "rgba(33, 150, 243, 0.1)"
+                                    : "rgba(255, 152, 0, 0.1)",
+                                  color: data?.isVerified
+                                    ? "#2196f3"
+                                    : "#ff9800",
+                                  width: "fit-content",
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: 6,
+                                    height: 6,
+                                    borderRadius: "50%",
+                                    backgroundColor: "currentColor",
+                                  }}
+                                />
+                                <Typography
+                                  sx={{
+                                    fontSize: "10px",
+                                    fontWeight: 600,
+                                    textTransform: "uppercase",
+                                  }}
+                                >
+                                  {data?.isVerified
+                                    ? "Verified"
+                                    : "Not Verified"}
                                 </Typography>
                               </Box>
                             </Box>
                           </TableCell>
-                          {hasPermission(schoolAdminPermission.admin_user.status) && (<TableCell
-                            component="td"
-                            scope="row"
-                            className="table-td"
-                          >
-                            <Box className="admin-table-data-flex">
-                              {data?.isVerified ? (
-                                <Tooltip title={data?.isActive ? "Deactivate" : "Activate"} arrow placement="top">
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <IOSSwitch
-                                      checked={data?.isActive}
-                                      onChange={() => handleStatusChange(data)}
-                                      disabled={data?.isSuperAdmin}
-                                    />
-                                  </Box>
-                                </Tooltip>
-                              ) : (
-                                <Typography sx={{ fontSize: '10px', color: '#ff9800', fontStyle: 'italic' }}>Status locked</Typography>
-                              )}
-                            </Box>
-                          </TableCell>)}
+                          {hasPermission(
+                            schoolAdminPermission.admin_user.status,
+                          ) && (
+                            <TableCell
+                              component="td"
+                              scope="row"
+                              className="table-td"
+                            >
+                              <Box className="admin-table-data-flex">
+                                {data?.isVerified ? (
+                                  <Tooltip
+                                    title={
+                                      data?.isActive ? "Deactivate" : "Activate"
+                                    }
+                                    arrow
+                                    placement="top"
+                                  >
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                      }}
+                                    >
+                                      <IOSSwitch
+                                        checked={data?.isActive}
+                                        onChange={() =>
+                                          handleStatusChange(data)
+                                        }
+                                        disabled={data?.isSuperAdmin}
+                                      />
+                                    </Box>
+                                  </Tooltip>
+                                ) : (
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#ff9800",
+                                      fontStyle: "italic",
+                                    }}
+                                  >
+                                    Status locked
+                                  </Typography>
+                                )}
+                              </Box>
+                            </TableCell>
+                          )}
 
                           {hasAnyPermission([
                             schoolAdminPermission.admin_user.read,
                             schoolAdminPermission.admin_user.delete,
                             schoolAdminPermission.admin_user.update,
                           ]) && (
-                              <TableCell
-                                component="td"
-                                className="table-td"
-                              >
-                                <Box className="admin-table-data-btn-flex">
-                                  {hasPermission(schoolAdminPermission.admin_user.read) && (
-                                    <Tooltip
-                                      title="View"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                            <TableCell component="td" className="table-td">
+                              <Box className="admin-table-data-btn-flex">
+                                {hasPermission(
+                                  schoolAdminPermission.admin_user.read,
+                                ) && (
+                                  <Tooltip
+                                    title="View"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-view-btn"
+                                      onClick={() => {
+                                        navigate("/admin-list/view", {
+                                          state: { id: data?._id },
+                                        });
+                                      }}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-view-btn"
-                                        onClick={() => {
-                                          navigate("/admin-list/view", { state: { id: data?._id } });
-                                        }}
-                                      >
-                                        <img
-                                          src={Svg.yellowEye}
-                                          className="admin-icon"
-                                          alt="View"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
+                                      <img
+                                        src={Svg.yellowEye}
+                                        className="admin-icon"
+                                        alt="View"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
 
-                                  {hasPermission(schoolAdminPermission.admin_user.update) && (
-                                    <Tooltip
-                                      title="Edit"
-                                      arrow
-                                      placement="bottom"
-                                      className="admin-tooltip"
+                                {hasPermission(
+                                  schoolAdminPermission.admin_user.update,
+                                ) && (
+                                  <Tooltip
+                                    title="Edit"
+                                    arrow
+                                    placement="bottom"
+                                    className="admin-tooltip"
+                                  >
+                                    <Button
+                                      className="admin-table-data-btn admin-table-edit-btn"
+                                      onClick={() => {
+                                        navigate("/admin-list/edit", {
+                                          state: { id: data?._id },
+                                        });
+                                      }}
                                     >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-edit-btn"
-                                        onClick={() => {
-                                          navigate("/admin-list/edit", { state: { id: data?._id } });
-                                        }}
-                                      >
-                                        <img
-                                          src={Svg.editIcon}
-                                          className="admin-icon"
-                                          alt="Edit"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
+                                      <img
+                                        src={Svg.editIcon}
+                                        className="admin-icon"
+                                        alt="Edit"
+                                      />
+                                    </Button>
+                                  </Tooltip>
+                                )}
 
-                                  {hasPermission(schoolAdminPermission.admin_user.delete) && !data?.isSuperAdmin && (
+                                {hasPermission(
+                                  schoolAdminPermission.admin_user.delete,
+                                ) &&
+                                  !data?.isSuperAdmin && (
                                     <Tooltip
                                       title="Delete"
                                       arrow
@@ -507,9 +574,9 @@ export default function AdminUser() {
                                       </Button>
                                     </Tooltip>
                                   )}
-                                </Box>
-                              </TableCell>
-                            )}
+                              </Box>
+                            </TableCell>
+                          )}
                         </TableRow>
                       );
                     })
@@ -569,7 +636,6 @@ export default function AdminUser() {
         handleFunction={handleConfirmStatusChange}
         buttonStatusSpinner={buttonStatusSpinner}
       />
-
     </Box>
   );
 }

@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { Box, Autocomplete, TextField, Typography, FormHelperText } from "@mui/material";
+import {
+  Box,
+  Autocomplete,
+  TextField,
+  Typography,
+  FormHelperText,
+} from "@mui/material";
 import { debounce } from "@mui/material/utils";
 import parse from "autosuggest-highlight/parse";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -25,39 +31,57 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
   disabled = false,
   focusedColor = "var(--primary-color, #ff8c00)",
 }) => {
-  const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
+  const autocompleteService =
+    useRef<google.maps.places.AutocompleteService | null>(null);
   const placeService = useRef<google.maps.places.PlacesService | null>(null);
   const [placeInputValue, setPlaceInputValue] = useState("");
   const [placeOptions, setPlaceOptions] = useState<readonly any[]>([]);
 
   const fetch = useMemo(
     () =>
-      debounce((request: { input: string }, callback: (results?: readonly any[]) => void) => {
-        if (autocompleteService.current) {
-          autocompleteService.current.getPlacePredictions(
-            request,
-            (predictions, status) => {
-              if (status !== google.maps.places.PlacesServiceStatus.OK) {
-                console.error("Error fetching place predictions:", status);
-                callback([]);
-                return;
-              }
-              callback(predictions || []);
-            }
-          );
-        }
-      }, 400),
-    []
+      debounce(
+        (
+          request: { input: string },
+          callback: (results?: readonly any[]) => void,
+        ) => {
+          if (autocompleteService.current) {
+            autocompleteService.current.getPlacePredictions(
+              request,
+              (predictions, status) => {
+                if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                  console.error("Error fetching place predictions:", status);
+                  callback([]);
+                  return;
+                }
+                callback(predictions || []);
+              },
+            );
+          }
+        },
+        400,
+      ),
+    [],
   );
 
   useEffect(() => {
-    if (!autocompleteService.current && typeof window !== "undefined" && window.google) {
-      autocompleteService.current = new window.google.maps.places.AutocompleteService();
+    if (
+      !autocompleteService.current &&
+      typeof window !== "undefined" &&
+      window.google
+    ) {
+      autocompleteService.current =
+        new window.google.maps.places.AutocompleteService();
     }
-    if (!placeService.current && typeof window !== "undefined" && window.google) {
+    if (
+      !placeService.current &&
+      typeof window !== "undefined" &&
+      window.google
+    ) {
       // Need a dummy div for PlacesService
       const dummyDiv = document.createElement("div");
-      placeService.current = new window.google.maps.places.PlacesService(dummyDiv);
+      placeService.current = new window.google.maps.places.PlacesService(
+        dummyDiv,
+      );
     }
   }, []);
 
@@ -79,33 +103,33 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
   }, [placeInputValue, fetch, values, name]);
 
   const inputSx = {
-    height: '40px',
-    backgroundColor: 'white !important',
-    borderRadius: '6px !important',
-    '&.MuiOutlinedInput-root, & .MuiOutlinedInput-root': {
-      height: '40px',
-      backgroundColor: 'white !important',
-      borderRadius: '6px !important',
-      '& fieldset': {
-        borderColor: 'var(--input-border, #ced4da) !important',
-        transition: 'all 0.3s ease !important',
+    height: "40px",
+    backgroundColor: "white !important",
+    borderRadius: "6px !important",
+    "&.MuiOutlinedInput-root, & .MuiOutlinedInput-root": {
+      height: "40px",
+      backgroundColor: "white !important",
+      borderRadius: "6px !important",
+      "& fieldset": {
+        borderColor: "var(--input-border, #ced4da) !important",
+        transition: "all 0.3s ease !important",
       },
-      '&:hover fieldset': {
-        borderColor: 'var(--primary-color, #ced4da) !important',
+      "&:hover fieldset": {
+        borderColor: "var(--primary-color, #ced4da) !important",
       },
-      '&.Mui-focused fieldset': {
+      "&.Mui-focused fieldset": {
         borderColor: `${focusedColor} !important`,
-        borderWidth: '1px !important',
+        borderWidth: "1px !important",
       },
     },
-    '& .MuiOutlinedInput-input, & input': {
-      padding: '0 10px !important',
+    "& .MuiOutlinedInput-input, & input": {
+      padding: "0 10px !important",
       fontFamily: "'Poppins', sans-serif !important",
-      fontSize: '14px !important',
-      height: '40px',
-      display: 'flex',
-      alignItems: 'center',
-      boxSizing: 'border-box',
+      fontSize: "14px !important",
+      height: "40px",
+      display: "flex",
+      alignItems: "center",
+      boxSizing: "border-box",
     },
   };
 
@@ -140,23 +164,33 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
               };
 
               placeService.current.getDetails(request, (place, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+                if (
+                  status === google.maps.places.PlacesServiceStatus.OK &&
+                  place
+                ) {
                   const components = place.address_components || [];
-                  const locality = components.find((ele) => ele.types.includes("locality"));
-                  const sublocality = components.find((ele) =>
-                    ele.types.includes("sublocality_level_1") || ele.types.includes("sublocality")
+                  const locality = components.find((ele) =>
+                    ele.types.includes("locality"),
+                  );
+                  const sublocality = components.find(
+                    (ele) =>
+                      ele.types.includes("sublocality_level_1") ||
+                      ele.types.includes("sublocality"),
                   );
                   const state = components.find((ele) =>
-                    ele.types.includes("administrative_area_level_1")
+                    ele.types.includes("administrative_area_level_1"),
                   );
                   const country = components.find((ele) =>
-                    ele.types.includes("country")
+                    ele.types.includes("country"),
                   );
                   const zipCode = components.find((ele) =>
-                    ele.types.includes("postal_code")
+                    ele.types.includes("postal_code"),
                   );
 
-                  setFieldValue("city", locality?.long_name || sublocality?.long_name || "");
+                  setFieldValue(
+                    "city",
+                    locality?.long_name || sublocality?.long_name || "",
+                  );
                   setFieldValue("state", state?.long_name || "");
                   setFieldValue("country", country?.long_name || "India");
                   setFieldValue("pincode", zipCode?.long_name || "");
@@ -200,12 +234,17 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
 
           const parts = parse(
             option.structured_formatting?.main_text || "",
-            matches.map((match: any) => [match.offset, match.offset + match.length])
+            matches.map((match: any) => [
+              match.offset,
+              match.offset + match.length,
+            ]),
           );
 
           return (
             <li key={key} {...optionProps}>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", width: "100%" }}
+              >
                 <Box sx={{ display: "flex", width: 44, flexShrink: 0 }}>
                   <LocationOnIcon sx={{ color: "text.secondary" }} />
                 </Box>
@@ -236,18 +275,19 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
           );
         }}
         sx={{
-          '& .MuiAutocomplete-inputRoot': {
-            padding: '0 !important',
-            height: '40px',
-          }
+          "& .MuiAutocomplete-inputRoot": {
+            padding: "0 !important",
+            height: "40px",
+          },
         }}
       />
       {touched[name] && errors[name] && (
-        <FormHelperText className="error-text">{(touched[name] && errors[name]) ? (errors[name] as string) : ""}</FormHelperText>
+        <FormHelperText className="error-text">
+          {touched[name] && errors[name] ? (errors[name] as string) : ""}
+        </FormHelperText>
       )}
     </Box>
   );
 };
 
 export default AutoCompleteLocation;
-

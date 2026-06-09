@@ -5,7 +5,6 @@ interface DecodedToken {
 }
 
 const useIsValidToken = (accessToken: string | null): boolean => {
-
   let valid = false;
   if (accessToken) {
     try {
@@ -20,9 +19,9 @@ const useIsValidToken = (accessToken: string | null): boolean => {
   }
 
   // Removed the useEffect that triggers logoutAdmin() because a short-lived access token
-  // expiration does not mean the user's entire session is invalid. 
+  // expiration does not mean the user's entire session is invalid.
   // The refreshToken logic in apiClient.ts handles the actual session persistence.
-  
+
   return valid;
 };
 

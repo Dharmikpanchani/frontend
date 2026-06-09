@@ -46,7 +46,12 @@ import {
   InsertDriveFile as FileIcon,
 } from "@mui/icons-material";
 import moment from "moment";
-import { getTeachers, changeTeacherStatus, deleteTeacher, getPendingTeachers } from "@/redux/slices/teacherSlice";
+import {
+  getTeachers,
+  changeTeacherStatus,
+  deleteTeacher,
+  getPendingTeachers,
+} from "@/redux/slices/teacherSlice";
 import { getDepartments } from "@/redux/slices/departmentSlice";
 import { getSubjects } from "@/redux/slices/subjectSlice";
 import { getClasses } from "@/redux/slices/classSlice";
@@ -71,7 +76,8 @@ export default function Teacher() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { hasPermission, hasAnyPermission } = usePermissions();
-  const { teachers, total, loading, pendingTeachers, pendingLoading } = useSelector((state: RootState) => state.TeacherReducer);
+  const { teachers, total, loading, pendingTeachers, pendingLoading } =
+    useSelector((state: RootState) => state.TeacherReducer);
 
   // Tabs for managing Teachers and Approve Documents
   const [tabValue, setTabValue] = useState(0);
@@ -91,28 +97,9 @@ export default function Teacher() {
   const [verifying, setVerifying] = useState(false);
 
   // Bulk AI Verification states
-  const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([]);
-  const [bulkVerifying, setBulkVerifying] = useState(false);
 
   const fetchPendingTeachers = async () => {
     dispatch(getPendingTeachers() as any);
-  };
-
-  const handleBulkVerify = async () => {
-    if (selectedTeacherIds.length === 0) return;
-    setBulkVerifying(true);
-    try {
-      const res = await masterService.bulkAiVerifyTeacherDocuments({ teacherIds: selectedTeacherIds });
-      if (res.status === 200) {
-        toast.success(res.data.message || `${selectedTeacherIds.length} Teacher(s) documents successfully verified by Universal AI Engine!`);
-        setSelectedTeacherIds([]);
-        fetchPendingTeachers();
-      }
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to perform bulk AI verification");
-    } finally {
-      setBulkVerifying(false);
-    }
   };
 
   const fetchTeacherDocsForAdmin = async (id: string) => {
@@ -130,13 +117,17 @@ export default function Teacher() {
     }
   };
 
-  const handleVerifyDocument = async (docId: string, status: 'APPROVED' | 'REJECTED', reason?: string) => {
+  const handleVerifyDocument = async (
+    docId: string,
+    status: "APPROVED" | "REJECTED",
+    reason?: string,
+  ) => {
     setVerifying(true);
     try {
       const res = await masterService.verifyTeacherDocument({
         documentId: docId,
         status,
-        rejectReason: reason
+        rejectReason: reason,
       });
       if (res.status === 200) {
         toast.success(`Document ${status.toLowerCase()} successfully!`);
@@ -154,7 +145,10 @@ export default function Teacher() {
   };
 
   useEffect(() => {
-    if (!viewingTeacherId && hasPermission(schoolAdminPermission.teacher.read)) {
+    if (
+      !viewingTeacherId &&
+      hasPermission(schoolAdminPermission.teacher.read)
+    ) {
       fetchPendingTeachers();
     }
   }, [tabValue, viewingTeacherId, hasPermission]);
@@ -199,18 +193,26 @@ export default function Teacher() {
   };
 
   const handleGetData = (searchQuery?: string, filters?: any) => {
-    dispatch(getTeachers({
-      page: currentPage + 1,
-      perPage: rowsPerPage > 0 ? rowsPerPage : 10,
-      search: searchQuery?.trim() ?? searchNameValue.trim(),
-      ...(filters || filterValues),
-    }) as any);
+    dispatch(
+      getTeachers({
+        page: currentPage + 1,
+        perPage: rowsPerPage > 0 ? rowsPerPage : 10,
+        search: searchQuery?.trim() ?? searchNameValue.trim(),
+        ...(filters || filterValues),
+      }) as any,
+    );
   };
 
-  const { allDepartments } = useSelector((state: RootState) => state.DepartmentReducer);
-  const { allSubjects } = useSelector((state: RootState) => state.SubjectReducer);
+  const { allDepartments } = useSelector(
+    (state: RootState) => state.DepartmentReducer,
+  );
+  const { allSubjects } = useSelector(
+    (state: RootState) => state.SubjectReducer,
+  );
   const { allClasses } = useSelector((state: RootState) => state.ClassReducer);
-  const { allSections } = useSelector((state: RootState) => state.SectionReducer);
+  const { allSections } = useSelector(
+    (state: RootState) => state.SectionReducer,
+  );
 
   useEffect(() => {
     handleGetData(searchNameValue);
@@ -249,7 +251,7 @@ export default function Teacher() {
       handleGetData(query);
       setCurrentPage(0);
     }, 1000),
-    []
+    [],
   );
 
   const filterFields: any[] = [
@@ -450,24 +452,24 @@ export default function Teacher() {
           }}
           className="admin-tabs-main"
           sx={{
-            '& .MuiTabs-indicator': {
-              backgroundColor: 'var(--primary-color)',
-              height: '2.4px',
-              borderRadius: '3px 3px 0 0'
+            "& .MuiTabs-indicator": {
+              backgroundColor: "var(--primary-color)",
+              height: "2.4px",
+              borderRadius: "3px 3px 0 0",
             },
-            '& .MuiTab-root': {
-              textTransform: 'none',
-              fontSize: '13px',
+            "& .MuiTab-root": {
+              textTransform: "none",
+              fontSize: "13px",
               fontWeight: 600,
-              minHeight: '44px',
-              color: '#667085',
+              minHeight: "44px",
+              color: "#667085",
               mr: 4,
               px: 0,
-              '&.Mui-selected': {
-                color: 'var(--primary-color)',
+              "&.Mui-selected": {
+                color: "var(--primary-color)",
                 fontWeight: 700,
               },
-            }
+            },
           }}
         >
           <Tab label="Teachers List" />
@@ -481,7 +483,11 @@ export default function Teacher() {
       {tabValue === 0 && (
         <>
           <Box className="admin-user-list-flex admin-page-title-main">
-            <Typography className="admin-page-title" component="h2" variant="h2">
+            <Typography
+              className="admin-page-title"
+              component="h2"
+              variant="h2"
+            >
               Teachers
             </Typography>
             <Box className="admin-flex-end">
@@ -499,10 +505,10 @@ export default function Teacher() {
                         setSearchNameValue(value);
                         debouncedCallGetApi(value);
                       }}
-                      inputProps={{ maxLength: 80 }}
+                      slotProps={{ htmlInput: { maxLength: 100 } }}
                     />
                     <SearchIcon
-                      sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                      sx={{ color: "var(--primary-color)", fontSize: "20px" }}
                       className="school-admin-search-grey-img admin-icon"
                     />
                   </Box>
@@ -514,15 +520,15 @@ export default function Teacher() {
                   onClick={() => setOpenFilter(true)}
                   sx={{
                     ml: 1,
-                    minWidth: '45px',
-                    p: '0 12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
+                    minWidth: "45px",
+                    p: "0 12px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
                   }}
                 >
                   <FilterIcon
-                    sx={{ color: 'var(--button-text, #fff)', fontSize: '18px' }}
+                    sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
                   />
                 </Button>
               </Box>
@@ -533,7 +539,11 @@ export default function Teacher() {
                     onClick={() => navigate("/teacher/add")}
                   >
                     <AddIcon
-                      sx={{ color: 'var(--button-text, #fff)', fontSize: '18px', mr: 1 }}
+                      sx={{
+                        color: "var(--button-text, #fff)",
+                        fontSize: "18px",
+                        mr: 1,
+                      }}
                     />
                     Add Teacher
                   </Button>
@@ -548,17 +558,54 @@ export default function Teacher() {
                 <Table aria-label="simple table" className="table">
                   <TableHead className="table-head">
                     <TableRow className="table-row">
-                      <TableCell component="th" className="table-th" width="22%">TEACHER INFO</TableCell>
-                      <TableCell component="th" className="table-th" width="13%">PERSONAL</TableCell>
-                      <TableCell component="th" className="table-th" width="18%">PROFESSIONAL</TableCell>
-                      <TableCell component="th" className="table-th" width="20%">ASSIGNMENTS</TableCell>
-                      <TableCell component="th" className="table-th" width="17%">STATUS / LOGIN</TableCell>
+                      <TableCell
+                        component="th"
+                        className="table-th"
+                        width="22%"
+                      >
+                        TEACHER INFO
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        className="table-th"
+                        width="13%"
+                      >
+                        PERSONAL
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        className="table-th"
+                        width="18%"
+                      >
+                        PROFESSIONAL
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        className="table-th"
+                        width="20%"
+                      >
+                        ASSIGNMENTS
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        className="table-th"
+                        width="17%"
+                      >
+                        STATUS / LOGIN
+                      </TableCell>
                       {hasAnyPermission([
                         schoolAdminPermission.teacher.read,
                         schoolAdminPermission.teacher.update,
                         schoolAdminPermission.teacher.delete,
                       ]) && (
-                        <TableCell component="th" className="table-th" width="10%" align="center">ACTIONS</TableCell>
+                        <TableCell
+                          component="th"
+                          className="table-th"
+                          width="10%"
+                          align="center"
+                        >
+                          ACTIONS
+                        </TableCell>
                       )}
                     </TableRow>
                   </TableHead>
@@ -566,32 +613,95 @@ export default function Teacher() {
                     {!loading ? (
                       teachers?.length ? (
                         teachers?.map((data: any) => (
-                          <TableRow key={data._id} sx={{
-                            "&:last-child td, &:last-child th": { border: 0 },
-                            '&:hover': { backgroundColor: 'rgba(0,0,0,0.02)' }
-                          }}>
+                          <TableRow
+                            key={data._id}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                              "&:hover": {
+                                backgroundColor: "rgba(0,0,0,0.02)",
+                              },
+                            }}
+                          >
                             {/* TEACHER INFO: Img, Name, Email, Phone, Address */}
                             <TableCell component="td" className="table-td">
-                              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "flex-start",
+                                  gap: 1.5,
+                                }}
+                              >
                                 <ProfileAvatar
                                   name={data?.fullName}
                                   imageUrl={data?.profileImage}
                                   size={45}
                                 />
                                 <Box sx={{ flex: 1 }}>
-                                  <Typography sx={{ fontSize: '14px', fontWeight: 600, color: '#111827', mb: 0.2 }}>
+                                  <Typography
+                                    sx={{
+                                      fontSize: "14px",
+                                      fontWeight: 600,
+                                      color: "#111827",
+                                      mb: 0.2,
+                                    }}
+                                  >
                                     {data?.fullName || "N/A"}
                                   </Typography>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 0.2 }}>
-                                    <EmailIcon sx={{ fontSize: 13, color: 'var(--primary-color)' }} />
-                                    <Typography sx={{ fontSize: '11px', color: '#6b7280' }}>{data?.email || "N/A"}</Typography>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 0.8,
+                                      mb: 0.2,
+                                    }}
+                                  >
+                                    <EmailIcon
+                                      sx={{
+                                        fontSize: 13,
+                                        color: "var(--primary-color)",
+                                      }}
+                                    />
+                                    <Typography
+                                      sx={{
+                                        fontSize: "11px",
+                                        color: "#6b7280",
+                                      }}
+                                    >
+                                      {data?.email || "N/A"}
+                                    </Typography>
                                   </Box>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 0.4 }}>
-                                    <PhoneIcon sx={{ fontSize: 13, color: 'var(--primary-color)' }} />
-                                    <Typography sx={{ fontSize: '11px', color: '#6b7280' }}>{data?.phoneNumber || "N/A"}</Typography>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 0.8,
+                                      mb: 0.4,
+                                    }}
+                                  >
+                                    <PhoneIcon
+                                      sx={{
+                                        fontSize: 13,
+                                        color: "var(--primary-color)",
+                                      }}
+                                    />
+                                    <Typography
+                                      sx={{
+                                        fontSize: "11px",
+                                        color: "#6b7280",
+                                      }}
+                                    >
+                                      {data?.phoneNumber || "N/A"}
+                                    </Typography>
                                   </Box>
                                   {data?.address && (
-                                    <Typography sx={{ fontSize: '10px', color: '#9ca3af', lineHeight: 1.2, mt: 0.5 }}>
+                                    <Typography
+                                      sx={{
+                                        fontSize: "10px",
+                                        color: "#9ca3af",
+                                        lineHeight: 1.2,
+                                        mt: 0.5,
+                                      }}
+                                    >
                                       {data?.address}
                                     </Typography>
                                   )}
@@ -601,32 +711,94 @@ export default function Teacher() {
 
                             {/* PERSONAL: Gender, DOB, Blood Group */}
                             <TableCell component="td" className="table-td">
-                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <GenderIcon sx={{ fontSize: 13, color: '#9ca3af' }} />
-                                  <Typography sx={{ fontSize: '10px', color: '#9ca3af', fontWeight: 600 }}>SEX:</Typography>
-                                  <Typography sx={{ fontSize: '12px', color: '#111827' }}>{data?.gender || 'N/A'}</Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: 0.5,
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  <GenderIcon
+                                    sx={{ fontSize: 13, color: "#9ca3af" }}
+                                  />
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#9ca3af",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    SEX:
+                                  </Typography>
+                                  <Typography
+                                    sx={{ fontSize: "12px", color: "#111827" }}
+                                  >
+                                    {data?.gender || "N/A"}
+                                  </Typography>
                                 </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <CalendarIcon sx={{ fontSize: 13, color: '#9ca3af' }} />
-                                  <Typography sx={{ fontSize: '10px', color: '#9ca3af', fontWeight: 600 }}>DOB:</Typography>
-                                  <Typography sx={{ fontSize: '11px', color: '#111827' }}>
-                                    {data?.dateOfBirth ? moment(data.dateOfBirth).format('DD MMM YY') : 'N/A'}
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  <CalendarIcon
+                                    sx={{ fontSize: 13, color: "#9ca3af" }}
+                                  />
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#9ca3af",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    DOB:
+                                  </Typography>
+                                  <Typography
+                                    sx={{ fontSize: "11px", color: "#111827" }}
+                                  >
+                                    {data?.dateOfBirth
+                                      ? moment(data.dateOfBirth).format(
+                                          "DD MMM YY",
+                                        )
+                                      : "N/A"}
                                   </Typography>
                                 </Box>
                                 {data?.bloodGroup && (
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <Typography sx={{ fontSize: '10px', color: '#9ca3af', fontWeight: 600 }}>BLOOD:</Typography>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    <Typography
+                                      sx={{
+                                        fontSize: "10px",
+                                        color: "#9ca3af",
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      BLOOD:
+                                    </Typography>
                                     <Chip
                                       label={data.bloodGroup}
                                       size="small"
                                       sx={{
-                                        height: '16px',
-                                        fontSize: '9px',
-                                        backgroundColor: '#fff1f0',
-                                        color: '#f5222d',
-                                        border: '1px solid #ffccc7',
-                                        fontWeight: 700
+                                        height: "16px",
+                                        fontSize: "9px",
+                                        backgroundColor: "#fff1f0",
+                                        color: "#f5222d",
+                                        border: "1px solid #ffccc7",
+                                        fontWeight: 700,
                                       }}
                                     />
                                   </Box>
@@ -636,28 +808,97 @@ export default function Teacher() {
 
                             {/* PROFESSIONAL: Dept, Designation, Experience, Joining */}
                             <TableCell component="td" className="table-td">
-                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                <Typography sx={{ fontSize: '12px', fontWeight: 600, color: 'var(--primary-color)' }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: 0.5,
+                                }}
+                              >
+                                <Typography
+                                  sx={{
+                                    fontSize: "12px",
+                                    fontWeight: 600,
+                                    color: "var(--primary-color)",
+                                  }}
+                                >
                                   {data?.departmentId?.name || "N/A"}
                                 </Typography>
-                                <Typography sx={{ fontSize: '11px', color: '#111827', fontStyle: 'italic' }}>
+                                <Typography
+                                  sx={{
+                                    fontSize: "11px",
+                                    color: "#111827",
+                                    fontStyle: "italic",
+                                  }}
+                                >
                                   {data?.designation || "N/A"}
                                 </Typography>
                                 {data?.userId?.role?.role && (
-                                  <Typography sx={{ fontSize: '10px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', mt: 0.2 }}>
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#6b7280",
+                                      fontWeight: 600,
+                                      textTransform: "uppercase",
+                                      mt: 0.2,
+                                    }}
+                                  >
                                     Role: {data?.userId?.role?.role}
                                   </Typography>
                                 )}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
-                                  <BadgeIcon sx={{ fontSize: 13, color: '#9ca3af' }} />
-                                  <Typography sx={{ fontSize: '10px', color: '#9ca3af', fontWeight: 600 }}>EXP:</Typography>
-                                  <Typography sx={{ fontSize: '11px', color: '#111827' }}>{data?.experienceYears || 0} Yrs</Typography>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                    mt: 0.3,
+                                  }}
+                                >
+                                  <BadgeIcon
+                                    sx={{ fontSize: 13, color: "#9ca3af" }}
+                                  />
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#9ca3af",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    EXP:
+                                  </Typography>
+                                  <Typography
+                                    sx={{ fontSize: "11px", color: "#111827" }}
+                                  >
+                                    {data?.experienceYears || 0} Yrs
+                                  </Typography>
                                 </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <CalendarIcon sx={{ fontSize: 13, color: '#9ca3af' }} />
-                                  <Typography sx={{ fontSize: '10px', color: '#9ca3af', fontWeight: 600 }}>JOINED:</Typography>
-                                  <Typography sx={{ fontSize: '11px', color: '#111827' }}>
-                                    {data?.joiningDate ? moment(data.joiningDate).format('DD MMM YY') : 'N/A'}
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  <CalendarIcon
+                                    sx={{ fontSize: 13, color: "#9ca3af" }}
+                                  />
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#9ca3af",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    JOINED:
+                                  </Typography>
+                                  <Typography
+                                    sx={{ fontSize: "11px", color: "#111827" }}
+                                  >
+                                    {data?.joiningDate
+                                      ? moment(data.joiningDate).format(
+                                          "DD MMM YY",
+                                        )
+                                      : "N/A"}
                                   </Typography>
                                 </Box>
                               </Box>
@@ -665,36 +906,110 @@ export default function Teacher() {
 
                             {/* ASSIGNMENTS: Classes, Sections, Subjects */}
                             <TableCell component="td" className="table-td">
-                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: 0.8,
+                                }}
+                              >
                                 <Box>
-                                  <Typography sx={{ fontSize: '9px', color: '#9ca3af', fontWeight: 700, mb: 0.2, textTransform: 'uppercase' }}>Classes & Sections</Typography>
-                                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4 }}>
-                                    {data?.classesAssigned?.slice(0, 3).map((cls: any, i: number) => (
-                                      <Box key={cls._id || i} sx={{
-                                        px: 0.8, py: 0.2, borderRadius: '4px', bgcolor: '#f0f7ff', border: '1px solid #bae7ff',
-                                        fontSize: '10px', fontWeight: 500, color: '#0050b3'
-                                      }}>
-                                        {cls.name}
-                                      </Box>
-                                    ))}
+                                  <Typography
+                                    sx={{
+                                      fontSize: "9px",
+                                      color: "#9ca3af",
+                                      fontWeight: 700,
+                                      mb: 0.2,
+                                      textTransform: "uppercase",
+                                    }}
+                                  >
+                                    Classes & Sections
+                                  </Typography>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      flexWrap: "wrap",
+                                      gap: 0.4,
+                                    }}
+                                  >
+                                    {data?.classesAssigned
+                                      ?.slice(0, 3)
+                                      .map((cls: any, i: number) => (
+                                        <Box
+                                          key={cls._id || i}
+                                          sx={{
+                                            px: 0.8,
+                                            py: 0.2,
+                                            borderRadius: "4px",
+                                            bgcolor: "#f0f7ff",
+                                            border: "1px solid #bae7ff",
+                                            fontSize: "10px",
+                                            fontWeight: 500,
+                                            color: "#0050b3",
+                                          }}
+                                        >
+                                          {cls.name}
+                                        </Box>
+                                      ))}
                                     {data?.classesAssigned?.length > 3 && (
-                                      <Typography sx={{ fontSize: '10px', color: '#9ca3af' }}>+{data.classesAssigned.length - 3}</Typography>
+                                      <Typography
+                                        sx={{
+                                          fontSize: "10px",
+                                          color: "#9ca3af",
+                                        }}
+                                      >
+                                        +{data.classesAssigned.length - 3}
+                                      </Typography>
                                     )}
                                   </Box>
                                 </Box>
                                 <Box>
-                                  <Typography sx={{ fontSize: '9px', color: '#9ca3af', fontWeight: 700, mb: 0.2, textTransform: 'uppercase' }}>Subjects Specialty</Typography>
-                                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.4 }}>
-                                    {data?.subjects?.slice(0, 3).map((sub: any, i: number) => (
-                                      <Box key={sub._id || i} sx={{
-                                        px: 0.8, py: 0.2, borderRadius: '4px', bgcolor: '#fff7e6', border: '1px solid #ffd591',
-                                        fontSize: '10px', fontWeight: 500, color: '#ad4e00'
-                                      }}>
-                                        {sub.name}
-                                      </Box>
-                                    ))}
+                                  <Typography
+                                    sx={{
+                                      fontSize: "9px",
+                                      color: "#9ca3af",
+                                      fontWeight: 700,
+                                      mb: 0.2,
+                                      textTransform: "uppercase",
+                                    }}
+                                  >
+                                    Subjects Specialty
+                                  </Typography>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      flexWrap: "wrap",
+                                      gap: 0.4,
+                                    }}
+                                  >
+                                    {data?.subjects
+                                      ?.slice(0, 3)
+                                      .map((sub: any, i: number) => (
+                                        <Box
+                                          key={sub._id || i}
+                                          sx={{
+                                            px: 0.8,
+                                            py: 0.2,
+                                            borderRadius: "4px",
+                                            bgcolor: "#fff7e6",
+                                            border: "1px solid #ffd591",
+                                            fontSize: "10px",
+                                            fontWeight: 500,
+                                            color: "#ad4e00",
+                                          }}
+                                        >
+                                          {sub.name}
+                                        </Box>
+                                      ))}
                                     {data?.subjects?.length > 3 && (
-                                      <Typography sx={{ fontSize: '10px', color: '#9ca3af' }}>+{data.subjects.length - 3}</Typography>
+                                      <Typography
+                                        sx={{
+                                          fontSize: "10px",
+                                          color: "#9ca3af",
+                                        }}
+                                      >
+                                        +{data.subjects.length - 3}
+                                      </Typography>
                                     )}
                                   </Box>
                                 </Box>
@@ -703,56 +1018,158 @@ export default function Teacher() {
 
                             {/* STATUS / LOGIN: EmployType, Verification, Login, Active */}
                             <TableCell component="td" className="table-td">
-                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography sx={{ fontSize: '11px', fontWeight: 600, color: '#111827' }}>
-                                    {data?.employmentType || 'NA'}
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: 0.8,
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <Typography
+                                    sx={{
+                                      fontSize: "11px",
+                                      fontWeight: 600,
+                                      color: "#111827",
+                                    }}
+                                  >
+                                    {data?.employmentType || "NA"}
                                   </Typography>
                                   {data?.isVerified ? (
-                                    <Tooltip title={data?.isActive ? "Active" : "Inactive"} arrow>
-                                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Tooltip
+                                      title={
+                                        data?.isActive ? "Active" : "Inactive"
+                                      }
+                                      arrow
+                                    >
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                        }}
+                                      >
                                         <IOSSwitch
                                           checked={data?.isActive}
-                                          onChange={() => setOpenStatusChange(data)}
+                                          onChange={() =>
+                                            setOpenStatusChange(data)
+                                          }
                                           size="small"
                                         />
                                       </Box>
                                     </Tooltip>
                                   ) : (
-                                    <Typography sx={{ fontSize: '10px', color: '#ff9800', fontStyle: 'italic' }}>Status locked</Typography>
+                                    <Typography
+                                      sx={{
+                                        fontSize: "10px",
+                                        color: "#ff9800",
+                                        fontStyle: "italic",
+                                      }}
+                                    >
+                                      Status locked
+                                    </Typography>
                                   )}
                                 </Box>
 
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                  }}
+                                >
                                   <Chip
                                     label={data?.isLogin ? "Online" : "Offline"}
                                     size="small"
                                     sx={{
-                                      backgroundColor: data?.isLogin ? "#e8f5e9" : "#f5f5f5",
-                                      color: data?.isLogin ? "#2e7d32" : "#9e9e9e",
+                                      backgroundColor: data?.isLogin
+                                        ? "#e8f5e9"
+                                        : "#f5f5f5",
+                                      color: data?.isLogin
+                                        ? "#2e7d32"
+                                        : "#9e9e9e",
                                       fontWeight: 700,
                                       fontSize: "9px",
                                       height: "18px",
                                     }}
                                   />
-                                  <Box sx={{
-                                    display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 0.8, py: 0.2, borderRadius: '10px',
-                                    backgroundColor: data?.isVerified ? 'rgba(33, 150, 243, 0.1)' : 'rgba(255, 152, 0, 0.1)',
-                                    color: data?.isVerified ? '#2196f3' : '#ff9800', border: '1px solid currentColor'
-                                  }}>
-                                    <Box sx={{ width: 4, height: 4, borderRadius: '50%', backgroundColor: 'currentColor' }} />
-                                    <Typography sx={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase' }}>
-                                      {data?.isVerified ? "Verified" : "Unverified"}
+                                  <Box
+                                    sx={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: 0.4,
+                                      px: 0.8,
+                                      py: 0.2,
+                                      borderRadius: "10px",
+                                      backgroundColor: data?.isVerified
+                                        ? "rgba(33, 150, 243, 0.1)"
+                                        : "rgba(255, 152, 0, 0.1)",
+                                      color: data?.isVerified
+                                        ? "#2196f3"
+                                        : "#ff9800",
+                                      border: "1px solid currentColor",
+                                    }}
+                                  >
+                                    <Box
+                                      sx={{
+                                        width: 4,
+                                        height: 4,
+                                        borderRadius: "50%",
+                                        backgroundColor: "currentColor",
+                                      }}
+                                    />
+                                    <Typography
+                                      sx={{
+                                        fontSize: "9px",
+                                        fontWeight: 700,
+                                        textTransform: "uppercase",
+                                      }}
+                                    >
+                                      {data?.isVerified
+                                        ? "Verified"
+                                        : "Unverified"}
                                     </Typography>
                                   </Box>
                                 </Box>
 
                                 <Box sx={{ mt: 0.3 }}>
-                                  <Typography sx={{ fontSize: '11px', fontWeight: 600, color: '#111827', fontFamily: "'Poppins', sans-serif" }}>
-                                    {data?.lastLogin ? moment(data?.lastLogin).format("DD MMM YY") : (data?.updatedAt ? moment(data?.updatedAt).format("DD MMM YY") : "---")}
+                                  <Typography
+                                    sx={{
+                                      fontSize: "11px",
+                                      fontWeight: 600,
+                                      color: "#111827",
+                                      fontFamily: "'Poppins', sans-serif",
+                                    }}
+                                  >
+                                    {data?.lastLogin
+                                      ? moment(data?.lastLogin).format(
+                                          "DD MMM YY",
+                                        )
+                                      : data?.updatedAt
+                                        ? moment(data?.updatedAt).format(
+                                            "DD MMM YY",
+                                          )
+                                        : "---"}
                                   </Typography>
-                                  <Typography sx={{ fontSize: '10px', color: '#6B7280', fontWeight: 400, fontFamily: "'Poppins', sans-serif", lineHeight: 1 }}>
-                                    {data?.lastLogin ? moment(data?.lastLogin).fromNow() : (data?.updatedAt ? moment(data?.updatedAt).fromNow() : "---")}
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#6B7280",
+                                      fontWeight: 400,
+                                      fontFamily: "'Poppins', sans-serif",
+                                      lineHeight: 1,
+                                    }}
+                                  >
+                                    {data?.lastLogin
+                                      ? moment(data?.lastLogin).fromNow()
+                                      : data?.updatedAt
+                                        ? moment(data?.updatedAt).fromNow()
+                                        : "---"}
                                   </Typography>
                                 </Box>
                               </Box>
@@ -763,35 +1180,80 @@ export default function Teacher() {
                               schoolAdminPermission.teacher.update,
                               schoolAdminPermission.teacher.delete,
                             ]) && (
-                              <TableCell component="td" className="table-td" align="center">
-                                <Box className="admin-table-data-btn-flex" sx={{ justifyContent: "center" }}>
-                                  {hasPermission(schoolAdminPermission.teacher.read) && (
-                                    <Tooltip title="View" arrow placement="bottom">
+                              <TableCell
+                                component="td"
+                                className="table-td"
+                                align="center"
+                              >
+                                <Box
+                                  className="admin-table-data-btn-flex"
+                                  sx={{ justifyContent: "center" }}
+                                >
+                                  {hasPermission(
+                                    schoolAdminPermission.teacher.read,
+                                  ) && (
+                                    <Tooltip
+                                      title="View"
+                                      arrow
+                                      placement="bottom"
+                                    >
                                       <Button
                                         className="admin-table-data-btn admin-table-view-btn"
-                                        onClick={() => navigate("/teacher/view", { state: { id: data?._id } })}
+                                        onClick={() =>
+                                          navigate("/teacher/view", {
+                                            state: { id: data?._id },
+                                          })
+                                        }
                                       >
-                                        <img src={Svg.yellowEye} className="admin-icon" alt="View" />
+                                        <img
+                                          src={Svg.yellowEye}
+                                          className="admin-icon"
+                                          alt="View"
+                                        />
                                       </Button>
                                     </Tooltip>
                                   )}
-                                  {hasPermission(schoolAdminPermission.teacher.update) && (
-                                    <Tooltip title="Edit" arrow placement="bottom">
+                                  {hasPermission(
+                                    schoolAdminPermission.teacher.update,
+                                  ) && (
+                                    <Tooltip
+                                      title="Edit"
+                                      arrow
+                                      placement="bottom"
+                                    >
                                       <Button
                                         className="admin-table-data-btn admin-table-edit-btn"
-                                        onClick={() => navigate("/teacher/edit", { state: { id: data?._id } })}
+                                        onClick={() =>
+                                          navigate("/teacher/edit", {
+                                            state: { id: data?._id },
+                                          })
+                                        }
                                       >
-                                        <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
+                                        <img
+                                          src={Svg.editIcon}
+                                          className="admin-icon"
+                                          alt="Edit"
+                                        />
                                       </Button>
                                     </Tooltip>
                                   )}
-                                  {hasPermission(schoolAdminPermission.teacher.delete) && (
-                                    <Tooltip title="Delete" arrow placement="bottom">
+                                  {hasPermission(
+                                    schoolAdminPermission.teacher.delete,
+                                  ) && (
+                                    <Tooltip
+                                      title="Delete"
+                                      arrow
+                                      placement="bottom"
+                                    >
                                       <Button
                                         className="admin-table-data-btn admin-table-delete-btn"
                                         onClick={() => handleOpenDelete(data)}
                                       >
-                                        <img src={Svg.trash} className="admin-icon" alt="Delete" />
+                                        <img
+                                          src={Svg.trash}
+                                          className="admin-icon"
+                                          alt="Delete"
+                                        />
                                       </Button>
                                     </Tooltip>
                                   )}
@@ -831,9 +1293,14 @@ export default function Teacher() {
           {/* Case A: Show list of pending teachers */}
           {!viewingTeacherId ? (
             (() => {
-              const filteredPending = pendingTeachers.filter((item) =>
-                item.fullName?.toLowerCase().includes(pendingSearchQuery.toLowerCase()) ||
-                item.email?.toLowerCase().includes(pendingSearchQuery.toLowerCase())
+              const filteredPending = pendingTeachers.filter(
+                (item) =>
+                  item.fullName
+                    ?.toLowerCase()
+                    .includes(pendingSearchQuery.toLowerCase()) ||
+                  item.email
+                    ?.toLowerCase()
+                    .includes(pendingSearchQuery.toLowerCase()),
               );
 
               return (
@@ -848,31 +1315,25 @@ export default function Teacher() {
                       gap: 2,
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
-                      <Typography variant="h5" sx={{ fontSize: "16px", fontWeight: 700, color: "#344054", fontFamily: "'PlusJakartaSans-Bold', sans-serif" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontSize: "16px",
+                          fontWeight: 700,
+                          color: "#344054",
+                          fontFamily: "'PlusJakartaSans-Bold', sans-serif",
+                        }}
+                      >
                         Document Verification Requests
                       </Typography>
-                      {selectedTeacherIds.length > 0 && (
-                        <Button
-                          variant="contained"
-                          disabled={bulkVerifying}
-                          onClick={handleBulkVerify}
-                          sx={{
-                            backgroundColor: "var(--primary-color)",
-                            color: "#fff",
-                            textTransform: "none",
-                            fontSize: "12px",
-                            fontWeight: 700,
-                            borderRadius: "8px",
-                            px: 2,
-                            py: 0.8,
-                            boxShadow: "none",
-                            "&:hover": { backgroundColor: "var(--primary-color)", opacity: 0.9 },
-                          }}
-                        >
-                          {bulkVerifying ? "Processing AI Engine..." : `Bulk AI Verify Selected (${selectedTeacherIds.length})`}
-                        </Button>
-                      )}
                     </Box>
 
                     <Box sx={{ width: { xs: "100%", sm: "300px" } }}>
@@ -888,10 +1349,13 @@ export default function Teacher() {
                               setPendingSearchQuery(e.target.value);
                               setPendingPage(0);
                             }}
-                            inputProps={{ maxLength: 80 }}
+                            slotProps={{ htmlInput: { maxLength: 100 } }}
                           />
                           <SearchIcon
-                            sx={{ color: 'var(--primary-color)', fontSize: '20px' }}
+                            sx={{
+                              color: "var(--primary-color)",
+                              fontSize: "20px",
+                            }}
                             className="school-admin-search-grey-img admin-icon"
                           />
                         </Box>
@@ -901,65 +1365,73 @@ export default function Teacher() {
 
                   <Box className="card-border common-card">
                     <Box className="brand-table-main page-table-main">
-                      <TableContainer component={Paper} className="table-container">
+                      <TableContainer
+                        component={Paper}
+                        className="table-container"
+                      >
                         <Table className="table">
                           <TableHead className="table-head">
                             <TableRow className="table-row">
-                              <TableCell className="table-th" width="5%" align="center">
-                                <Checkbox
-                                  size="small"
-                                  checked={filteredPending.length > 0 && selectedTeacherIds.length === filteredPending.length}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setSelectedTeacherIds(filteredPending.map((item) => item.teacherId));
-                                    } else {
-                                      setSelectedTeacherIds([]);
-                                    }
-                                  }}
-                                  sx={{
-                                    color: "var(--primary-color)",
-                                    "&.Mui-checked": { color: "var(--primary-color)" },
-                                  }}
-                                />
+                              <TableCell className="table-th">
+                                TEACHER NAME
                               </TableCell>
-                              <TableCell className="table-th">TEACHER NAME</TableCell>
-                              <TableCell className="table-th">PENDING REQUESTS</TableCell>
-                              <TableCell className="table-th">SUBMITTED DATE</TableCell>
-                              <TableCell className="table-th" align="center">ACTION</TableCell>
+                              <TableCell className="table-th">
+                                PENDING REQUESTS
+                              </TableCell>
+                              <TableCell className="table-th">
+                                SUBMITTED DATE
+                              </TableCell>
+                              <TableCell className="table-th" align="center">
+                                ACTION
+                              </TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody className="table-body">
                             {!pendingLoading ? (
                               filteredPending.length ? (
                                 filteredPending
-                                  .slice(pendingPage * pendingRowsPerPage, (pendingPage + 1) * pendingRowsPerPage)
+                                  .slice(
+                                    pendingPage * pendingRowsPerPage,
+                                    (pendingPage + 1) * pendingRowsPerPage,
+                                  )
                                   .map((row) => (
-                                    <TableRow key={row.teacherId} sx={{ '&:hover': { backgroundColor: 'rgba(0,0,0,0.02)' } }}>
-                                      <TableCell className="table-td" align="center">
-                                        <Checkbox
-                                          size="small"
-                                          checked={selectedTeacherIds.includes(row.teacherId)}
-                                          onChange={(e) => {
-                                            if (e.target.checked) {
-                                              setSelectedTeacherIds((prev) => [...prev, row.teacherId]);
-                                            } else {
-                                              setSelectedTeacherIds((prev) => prev.filter((id) => id !== row.teacherId));
-                                            }
-                                          }}
-                                          sx={{
-                                            color: "var(--primary-color)",
-                                            "&.Mui-checked": { color: "var(--primary-color)" },
-                                          }}
-                                        />
-                                      </TableCell>
+                                    <TableRow
+                                      key={row.teacherId}
+                                      sx={{
+                                        "&:hover": {
+                                          backgroundColor: "rgba(0,0,0,0.02)",
+                                        },
+                                      }}
+                                    >
                                       <TableCell className="table-td">
-                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                                          <ProfileAvatar name={row.fullName} imageUrl={row.profileImage} size={40} />
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 1.5,
+                                          }}
+                                        >
+                                          <ProfileAvatar
+                                            name={row.fullName}
+                                            imageUrl={row.profileImage}
+                                            size={40}
+                                          />
                                           <Box>
-                                            <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#111827" }}>
+                                            <Typography
+                                              sx={{
+                                                fontSize: "14px",
+                                                fontWeight: 600,
+                                                color: "#111827",
+                                              }}
+                                            >
                                               {row.fullName}
                                             </Typography>
-                                            <Typography sx={{ fontSize: "11px", color: "#6b7280" }}>
+                                            <Typography
+                                              sx={{
+                                                fontSize: "11px",
+                                                color: "#6b7280",
+                                              }}
+                                            >
                                               {row.email}
                                             </Typography>
                                           </Box>
@@ -970,17 +1442,36 @@ export default function Teacher() {
                                           label={`${row.pendingCount} Pending Doc(s)`}
                                           color="warning"
                                           size="small"
-                                          sx={{ fontWeight: 700, fontSize: "11px", borderRadius: "6px" }}
+                                          sx={{
+                                            fontWeight: 700,
+                                            fontSize: "11px",
+                                            borderRadius: "6px",
+                                          }}
                                         />
                                       </TableCell>
-                                      <TableCell className="table-td" sx={{ fontSize: "13px", color: "#475467" }}>
-                                        {moment(row.latestUploadDate).format("DD MMM YYYY, hh:mm A")}
+                                      <TableCell
+                                        className="table-td"
+                                        sx={{
+                                          fontSize: "13px",
+                                          color: "#475467",
+                                        }}
+                                      >
+                                        {moment(row.latestUploadDate).format(
+                                          "DD MMM YYYY, hh:mm A",
+                                        )}
                                       </TableCell>
-                                      <TableCell className="table-td" align="center">
+                                      <TableCell
+                                        className="table-td"
+                                        align="center"
+                                      >
                                         <Button
                                           variant="outlined"
-                                          onClick={() => setViewingTeacherId(row.teacherId)}
-                                          startIcon={<ViewIcon sx={{ fontSize: 16 }} />}
+                                          onClick={() =>
+                                            setViewingTeacherId(row.teacherId)
+                                          }
+                                          startIcon={
+                                            <ViewIcon sx={{ fontSize: 16 }} />
+                                          }
                                           sx={{
                                             textTransform: "none",
                                             borderColor: "var(--primary-color)",
@@ -989,9 +1480,11 @@ export default function Teacher() {
                                             fontWeight: 700,
                                             borderRadius: "8px",
                                             "&:hover": {
-                                              backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.04)",
-                                              borderColor: "var(--primary-color)"
-                                            }
+                                              backgroundColor:
+                                                "rgba(var(--primary-color-rgb, 92, 26, 26), 0.04)",
+                                              borderColor:
+                                                "var(--primary-color)",
+                                            },
                                           }}
                                         >
                                           Verify Documents
@@ -1031,7 +1524,9 @@ export default function Teacher() {
           ) : (
             /* Case B: Show Verification details for selected teacher */
             <Box>
-              <Box sx={{ mb: 4, display: "flex", alignItems: "center", gap: 2 }}>
+              <Box
+                sx={{ mb: 4, display: "flex", alignItems: "center", gap: 2 }}
+              >
                 <IconButton
                   onClick={() => setViewingTeacherId(null)}
                   sx={{
@@ -1039,13 +1534,21 @@ export default function Teacher() {
                     borderRadius: "8px",
                     backgroundColor: "#FFF",
                     p: 1,
-                    "&:hover": { backgroundColor: "#F9FAFB" }
+                    "&:hover": { backgroundColor: "#F9FAFB" },
                   }}
                 >
                   <BackIcon sx={{ fontSize: 18, color: "#344054" }} />
                 </IconButton>
                 <Box>
-                  <Typography variant="h5" sx={{ fontSize: "16px", fontWeight: 700, color: "#344054", fontFamily: "'PlusJakartaSans-Bold', sans-serif" }}>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontSize: "16px",
+                      fontWeight: 700,
+                      color: "#344054",
+                      fontFamily: "'PlusJakartaSans-Bold', sans-serif",
+                    }}
+                  >
                     Verify Documents — {teacherDetails?.fullName || "Teacher"}
                   </Typography>
                   <Typography sx={{ fontSize: "12px", color: "#667085" }}>
@@ -1059,7 +1562,10 @@ export default function Teacher() {
               ) : (
                 <Grid container spacing={3}>
                   {teacherDocs.map((doc, idx) => {
-                    const statusCfg = getStatusConfig(doc.status, doc.isNotUploaded);
+                    const statusCfg = getStatusConfig(
+                      doc.status,
+                      doc.isNotUploaded,
+                    );
 
                     return (
                       <Grid size={{ xs: 12, md: 6 }} key={idx}>
@@ -1071,13 +1577,32 @@ export default function Teacher() {
                           }}
                         >
                           <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                mb: 2,
+                              }}
+                            >
                               <Box>
-                                <Typography sx={{ fontSize: "15px", fontWeight: 700, color: "#1D2939", fontFamily: "'PlusJakartaSans-Bold', sans-serif", mb: 0.5 }}>
+                                <Typography
+                                  sx={{
+                                    fontSize: "15px",
+                                    fontWeight: 700,
+                                    color: "#1D2939",
+                                    fontFamily:
+                                      "'PlusJakartaSans-Bold', sans-serif",
+                                    mb: 0.5,
+                                  }}
+                                >
                                   {doc.documentType}
                                 </Typography>
-                                <Typography sx={{ fontSize: "11px", color: "#667085" }}>
-                                  Version {doc.version || 0} {doc.isVirtual && "(Imported Profile Field)"}
+                                <Typography
+                                  sx={{ fontSize: "11px", color: "#667085" }}
+                                >
+                                  Version {doc.version || 0}{" "}
+                                  {doc.isVirtual && "(Imported Profile Field)"}
                                 </Typography>
                               </Box>
 
@@ -1091,7 +1616,9 @@ export default function Teacher() {
                                   fontWeight: 700,
                                   fontSize: "11px",
                                   borderRadius: "6px",
-                                  "& .MuiChip-icon": { color: statusCfg.textColor },
+                                  "& .MuiChip-icon": {
+                                    color: statusCfg.textColor,
+                                  },
                                 }}
                               />
                             </Box>
@@ -1105,22 +1632,58 @@ export default function Teacher() {
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "space-between",
-                                mb: doc.status === "REJECTED" && doc.rejectReason ? 2 : 3,
+                                mb:
+                                  doc.status === "REJECTED" && doc.rejectReason
+                                    ? 2
+                                    : 3,
                               }}
                             >
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, overflow: "hidden" }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1.5,
+                                  overflow: "hidden",
+                                }}
+                              >
                                 {doc.documentUrl?.endsWith(".pdf") ? (
-                                  <PdfIcon sx={{ color: "#F04438", fontSize: 28 }} />
+                                  <PdfIcon
+                                    sx={{ color: "#F04438", fontSize: 28 }}
+                                  />
                                 ) : (
-                                  <FileIcon sx={{ color: "var(--primary-color, #5c1a1a)", fontSize: 28 }} />
+                                  <FileIcon
+                                    sx={{
+                                      color: "var(--primary-color, #5c1a1a)",
+                                      fontSize: 28,
+                                    }}
+                                  />
                                 )}
                                 <Box sx={{ overflow: "hidden" }}>
-                                  <Typography noWrap sx={{ fontSize: "12px", fontWeight: 600, color: "#344054", fontFamily: "'PlusJakartaSans-Bold', sans-serif" }}>
-                                    {doc.documentUrl ? doc.documentUrl.split("/").pop() : "No document uploaded"}
+                                  <Typography
+                                    noWrap
+                                    sx={{
+                                      fontSize: "12px",
+                                      fontWeight: 600,
+                                      color: "#344054",
+                                      fontFamily:
+                                        "'PlusJakartaSans-Bold', sans-serif",
+                                    }}
+                                  >
+                                    {doc.documentUrl
+                                      ? doc.documentUrl.split("/").pop()
+                                      : "No document uploaded"}
                                   </Typography>
                                   {doc.uploadedAt && (
-                                    <Typography sx={{ fontSize: "10px", color: "#667085" }}>
-                                      Uploaded on {moment(doc.uploadedAt).format("DD MMM YYYY")}
+                                    <Typography
+                                      sx={{
+                                        fontSize: "10px",
+                                        color: "#667085",
+                                      }}
+                                    >
+                                      Uploaded on{" "}
+                                      {moment(doc.uploadedAt).format(
+                                        "DD MMM YYYY",
+                                      )}
                                     </Typography>
                                   )}
                                 </Box>
@@ -1129,28 +1692,56 @@ export default function Teacher() {
                               {doc.documentUrl && (
                                 <Tooltip title="View Document File" arrow>
                                   <IconButton
-                                    onClick={() => handleViewFile(doc.documentUrl)}
+                                    onClick={() =>
+                                      handleViewFile(doc.documentUrl)
+                                    }
                                     size="small"
                                     sx={{
                                       border: "1px solid #D0D5DD",
                                       borderRadius: "8px",
                                       backgroundColor: "#FFF",
-                                      "&:hover": { backgroundColor: "#F9FAFB", borderColor: "var(--primary-color)" }
+                                      "&:hover": {
+                                        backgroundColor: "#F9FAFB",
+                                        borderColor: "var(--primary-color)",
+                                      },
                                     }}
                                   >
-                                    <ViewIcon sx={{ fontSize: 18, color: "#475467" }} />
+                                    <ViewIcon
+                                      sx={{ fontSize: 18, color: "#475467" }}
+                                    />
                                   </IconButton>
                                 </Tooltip>
                               )}
                             </Box>
 
                             {doc.status === "REJECTED" && doc.rejectReason && (
-                              <Box sx={{ mb: 3, p: 1.5, borderRadius: "8px", backgroundColor: "#FEF3F2", borderLeft: "4px solid #F04438" }}>
-                                <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#B42318", fontFamily: "'PlusJakartaSans-Bold', sans-serif", mb: 0.5 }}>
+                              <Box
+                                sx={{
+                                  mb: 3,
+                                  p: 1.5,
+                                  borderRadius: "8px",
+                                  backgroundColor: "#FEF3F2",
+                                  borderLeft: "4px solid #F04438",
+                                }}
+                              >
+                                <Typography
+                                  sx={{
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    color: "#B42318",
+                                    fontFamily:
+                                      "'PlusJakartaSans-Bold', sans-serif",
+                                    mb: 0.5,
+                                  }}
+                                >
                                   Rejection Reason:
                                 </Typography>
                                 {doc.rejectReason.length > 35 ? (
-                                  <Tooltip title={doc.rejectReason} arrow placement="top">
+                                  <Tooltip
+                                    title={doc.rejectReason}
+                                    arrow
+                                    placement="top"
+                                  >
                                     <Typography
                                       sx={{
                                         fontSize: "11px",
@@ -1159,14 +1750,20 @@ export default function Teacher() {
                                         cursor: "pointer",
                                         display: "inline-block",
                                         borderBottom: "1px dashed #FDA29B",
-                                        pb: "1px"
+                                        pb: "1px",
                                       }}
                                     >
                                       {doc.rejectReason.slice(0, 35)}...
                                     </Typography>
                                   </Tooltip>
                                 ) : (
-                                  <Typography sx={{ fontSize: "11px", color: "#B42318", lineHeight: 1.4 }}>
+                                  <Typography
+                                    sx={{
+                                      fontSize: "11px",
+                                      color: "#B42318",
+                                      lineHeight: 1.4,
+                                    }}
+                                  >
                                     {doc.rejectReason}
                                   </Typography>
                                 )}
@@ -1174,51 +1771,58 @@ export default function Teacher() {
                             )}
 
                             {/* Verification Actions (Only for pending documents) */}
-                            {doc.status === "PENDING" && !doc.isNotUploaded && !doc.isVirtual && hasPermission(schoolAdminPermission.teacher.update) && (
-                              <Box sx={{ display: "flex", gap: 1.5, mt: 1 }}>
-                                <Button
-                                  variant="contained"
-                                  color="success"
-                                  size="small"
-                                  fullWidth
-                                  onClick={() => handleVerifyDocument(doc._id, 'APPROVED')}
-                                  disabled={verifying}
-                                  sx={{
-                                    textTransform: "none",
-                                    fontSize: "12px",
-                                    fontWeight: 700,
-                                    borderRadius: "8px",
-                                    boxShadow: "none",
-                                    backgroundColor: "#12B76A",
-                                    "&:hover": { backgroundColor: "#027A48" }
-                                  }}
-                                >
-                                  Approve
-                                </Button>
-                                <Button
-                                  variant="contained"
-                                  color="error"
-                                  size="small"
-                                  fullWidth
-                                  onClick={() => {
-                                    setSelectedDocId(doc._id);
-                                    setRejectModalOpen(true);
-                                  }}
-                                  disabled={verifying}
-                                  sx={{
-                                    textTransform: "none",
-                                    fontSize: "12px",
-                                    fontWeight: 700,
-                                    borderRadius: "8px",
-                                    boxShadow: "none",
-                                    backgroundColor: "#F04438",
-                                    "&:hover": { backgroundColor: "#B42318" }
-                                  }}
-                                >
-                                  Reject
-                                </Button>
-                              </Box>
-                            )}
+                            {doc.status === "PENDING" &&
+                              !doc.isNotUploaded &&
+                              !doc.isVirtual &&
+                              hasPermission(
+                                schoolAdminPermission.teacher.update,
+                              ) && (
+                                <Box sx={{ display: "flex", gap: 1.5, mt: 1 }}>
+                                  <Button
+                                    variant="contained"
+                                    color="success"
+                                    size="small"
+                                    fullWidth
+                                    onClick={() =>
+                                      handleVerifyDocument(doc._id, "APPROVED")
+                                    }
+                                    disabled={verifying}
+                                    sx={{
+                                      textTransform: "none",
+                                      fontSize: "12px",
+                                      fontWeight: 700,
+                                      borderRadius: "8px",
+                                      boxShadow: "none",
+                                      backgroundColor: "#12B76A",
+                                      "&:hover": { backgroundColor: "#027A48" },
+                                    }}
+                                  >
+                                    Approve
+                                  </Button>
+                                  <Button
+                                    variant="contained"
+                                    color="error"
+                                    size="small"
+                                    fullWidth
+                                    onClick={() => {
+                                      setSelectedDocId(doc._id);
+                                      setRejectModalOpen(true);
+                                    }}
+                                    disabled={verifying}
+                                    sx={{
+                                      textTransform: "none",
+                                      fontSize: "12px",
+                                      fontWeight: 700,
+                                      borderRadius: "8px",
+                                      boxShadow: "none",
+                                      backgroundColor: "#F04438",
+                                      "&:hover": { backgroundColor: "#B42318" },
+                                    }}
+                                  >
+                                    Reject
+                                  </Button>
+                                </Box>
+                              )}
                           </CardContent>
                         </Card>
                       </Grid>
@@ -1238,7 +1842,7 @@ export default function Teacher() {
         maxWidth="xs"
         fullWidth
         slotProps={{
-          paper: { sx: { borderRadius: "12px", p: 1 } }
+          paper: { sx: { borderRadius: "12px", p: 1 } },
         }}
       >
         <Formik
@@ -1246,19 +1850,37 @@ export default function Teacher() {
           validationSchema={documentRejectionValidationSchema}
           onSubmit={(values, { resetForm }) => {
             if (selectedDocId) {
-              handleVerifyDocument(selectedDocId, "REJECTED", values.rejectReason);
+              handleVerifyDocument(
+                selectedDocId,
+                "REJECTED",
+                values.rejectReason,
+              );
               resetForm();
             }
           }}
         >
-          {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleBlur,
+            handleSubmit,
+          }) => (
             <Form onSubmit={handleSubmit}>
-              <DialogTitle sx={{ fontWeight: 700, pb: 1, fontFamily: "'PlusJakartaSans-Bold', sans-serif" }}>
+              <DialogTitle
+                sx={{
+                  fontWeight: 700,
+                  pb: 1,
+                  fontFamily: "'PlusJakartaSans-Bold', sans-serif",
+                }}
+              >
                 Rejection Reason
               </DialogTitle>
               <DialogContent sx={{ pb: 1.5 }}>
                 <Typography sx={{ fontSize: "12px", color: "#667085", mb: 2 }}>
-                  Please specify why this document is being rejected. The teacher will see this feedback in their profile.
+                  Please specify why this document is being rejected. The
+                  teacher will see this feedback in their profile.
                 </Typography>
                 <TextField
                   autoFocus
@@ -1279,17 +1901,27 @@ export default function Teacher() {
                       borderRadius: "8px",
                       fontSize: "13px",
                       "& fieldset": {
-                        borderColor: touched.rejectReason && errors.rejectReason ? "#d32f2f" : "#D0D5DD",
+                        borderColor:
+                          touched.rejectReason && errors.rejectReason
+                            ? "#d32f2f"
+                            : "#D0D5DD",
                       },
                       "&:hover fieldset": {
-                        borderColor: touched.rejectReason && errors.rejectReason ? "#d32f2f" : "var(--primary-color) !important",
+                        borderColor:
+                          touched.rejectReason && errors.rejectReason
+                            ? "#d32f2f"
+                            : "var(--primary-color) !important",
                       },
                       "&.Mui-focused fieldset": {
-                        borderColor: touched.rejectReason && errors.rejectReason ? "#d32f2f" : "var(--primary-color) !important",
+                        borderColor:
+                          touched.rejectReason && errors.rejectReason
+                            ? "#d32f2f"
+                            : "var(--primary-color) !important",
                         borderWidth: "1.5px !important",
-                      }
-                    }
+                      },
+                    },
                   }}
+                  slotProps={{ htmlInput: { maxLength: 100 } }}
                 />
               </DialogContent>
               <DialogActions sx={{ p: 2, borderTop: "1px solid #EAECF0" }}>
@@ -1303,7 +1935,7 @@ export default function Teacher() {
                     borderRadius: "8px",
                     fontSize: "13px",
                     px: 2,
-                    "&:hover": { backgroundColor: "#F2F4F7" }
+                    "&:hover": { backgroundColor: "#F2F4F7" },
                   }}
                 >
                   Cancel
@@ -1321,7 +1953,7 @@ export default function Teacher() {
                     fontSize: "13px",
                     px: 2,
                     py: 0.75,
-                    "&:hover": { backgroundColor: "#B42318" }
+                    "&:hover": { backgroundColor: "#B42318" },
                   }}
                 >
                   {verifying ? "Rejecting..." : "Reject Document"}

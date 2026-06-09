@@ -1,6 +1,3 @@
-
-const Jpg = {
-
-}
+const Jpg = {};
 
 export default Jpg;

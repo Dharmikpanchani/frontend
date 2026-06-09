@@ -36,11 +36,12 @@ export const loginAdmin = createAsyncThunk(
         return rejectWithValue(res.message);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Login failed";
+      const errorMessage =
+        error.response?.data?.message || error?.message || "Login failed";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const forgotPasswordAdmin = createAsyncThunk(
@@ -56,11 +57,14 @@ export const forgotPasswordAdmin = createAsyncThunk(
         return rejectWithValue(res.message);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Forgot password error";
+      const errorMessage =
+        error.response?.data?.message ||
+        error?.message ||
+        "Forgot password error";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const verifyOtpAdmin = createAsyncThunk(
@@ -76,11 +80,14 @@ export const verifyOtpAdmin = createAsyncThunk(
         return rejectWithValue(res.message);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "OTP verification error";
+      const errorMessage =
+        error.response?.data?.message ||
+        error?.message ||
+        "OTP verification error";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const resendOtpAdmin = createAsyncThunk(
@@ -96,11 +103,12 @@ export const resendOtpAdmin = createAsyncThunk(
         return rejectWithValue(res.message);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Resend OTP error";
+      const errorMessage =
+        error.response?.data?.message || error?.message || "Resend OTP error";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const resetPasswordAdmin = createAsyncThunk(
@@ -116,11 +124,14 @@ export const resetPasswordAdmin = createAsyncThunk(
         return rejectWithValue(res.message);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Reset password error";
+      const errorMessage =
+        error.response?.data?.message ||
+        error?.message ||
+        "Reset password error";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const changeEmailRequestAdmin = createAsyncThunk(
@@ -136,11 +147,14 @@ export const changeEmailRequestAdmin = createAsyncThunk(
         return rejectWithValue(res.message);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Email change request error";
+      const errorMessage =
+        error.response?.data?.message ||
+        error?.message ||
+        "Email change request error";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const verifyEmailChangeAdmin = createAsyncThunk(
@@ -156,11 +170,14 @@ export const verifyEmailChangeAdmin = createAsyncThunk(
         return rejectWithValue(res.message);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Email verification error";
+      const errorMessage =
+        error.response?.data?.message ||
+        error?.message ||
+        "Email verification error";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const getProfileAdmin = createAsyncThunk(
@@ -175,11 +192,14 @@ export const getProfileAdmin = createAsyncThunk(
         return rejectWithValue(res.message);
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error?.message || "Failed to fetch profile";
+      const errorMessage =
+        error.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch profile";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 const authSlice = createSlice({
@@ -201,9 +221,19 @@ const authSlice = createSlice({
     setAdminLogin: (state, action: PayloadAction<any>) => {
       state.adminDetails = { ...action.payload, isLogin: true };
       state.isAdminLogin = true;
-      const token = action.payload?.accessToken || action.payload?.token || state.token || Cookies.get("auth_token") || "";
+      const token =
+        action.payload?.accessToken ||
+        action.payload?.token ||
+        state.token ||
+        Cookies.get("auth_token") ||
+        "";
       state.token = token;
-      if (token) Cookies.set("auth_token", token, { expires: 7, domain: getCookieDomain(), path: "/" });
+      if (token)
+        Cookies.set("auth_token", token, {
+          expires: 7,
+          domain: getCookieDomain(),
+          path: "/",
+        });
     },
   },
   extraReducers: (builder) => {
@@ -217,14 +247,21 @@ const authSlice = createSlice({
           state.isAdminLogin = false;
           state.isOtpPending = true;
           state.adminDetails = action.payload; // Storing temporarily
-          state.token = action.payload?.accessToken || action.payload?.token || "";
+          state.token =
+            action.payload?.accessToken || action.payload?.token || "";
         } else {
           state.isAdminLogin = true;
           state.isOtpPending = false;
           state.adminDetails = { ...action.payload, isLogin: true };
-          const token = action.payload?.accessToken || action.payload?.token || "";
+          const token =
+            action.payload?.accessToken || action.payload?.token || "";
           state.token = token;
-          if (token) Cookies.set("auth_token", token, { expires: 7, domain: getCookieDomain(), path: "/" });
+          if (token)
+            Cookies.set("auth_token", token, {
+              expires: 7,
+              domain: getCookieDomain(),
+              path: "/",
+            });
         }
       })
       .addCase(loginAdmin.rejected, (state) => {
@@ -248,16 +285,27 @@ const authSlice = createSlice({
       .addCase(verifyOtpAdmin.fulfilled, (state, action) => {
         state.loading = false;
         const type = action.meta.arg.get("type");
-        const isRegistration = type === "registration" || type === "schoolRegistration";
+        const isRegistration =
+          type === "registration" || type === "schoolRegistration";
 
         if (!isRegistration) {
           state.isAdminLogin = true;
           state.isOtpPending = false;
           if (action.payload) {
             state.adminDetails = { ...action.payload, isLogin: true };
-            const token = action.payload?.accessToken || action.payload?.token || state.token || Cookies.get("auth_token") || "";
+            const token =
+              action.payload?.accessToken ||
+              action.payload?.token ||
+              state.token ||
+              Cookies.get("auth_token") ||
+              "";
             state.token = token;
-            if (token) Cookies.set("auth_token", token, { expires: 7, domain: getCookieDomain(), path: "/" });
+            if (token)
+              Cookies.set("auth_token", token, {
+                expires: 7,
+                domain: getCookieDomain(),
+                path: "/",
+              });
           }
         }
       })
@@ -304,5 +352,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logoutAdmin, setEmailForReset, setAdminLogin } = authSlice.actions;
+export const { logoutAdmin, setEmailForReset, setAdminLogin } =
+  authSlice.actions;
 export default authSlice.reducer;

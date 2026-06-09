@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import type { SetPasswordInterface } from "@/types/interfaces/LoginInterface";
 import { Form, Formik, type FormikProps } from "formik";
-import { Box, Button, FormHelperText, IconButton, InputAdornment, OutlinedInput, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormHelperText,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -17,10 +25,14 @@ import { useThemeManager } from "../hooks/useThemeManager";
 export default function SetPassWord() {
   const isSubdomain = getSubdomain();
   useThemeManager();
-  const { schoolLogo, schoolBanner } = useSelector((state: RootState) => state.SchoolReducer);
+  const { schoolLogo, schoolBanner } = useSelector(
+    (state: RootState) => state.SchoolReducer,
+  );
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const emailForReset = useSelector((state: RootState) => state.AdminReducer.emailForReset);
+  const emailForReset = useSelector(
+    (state: RootState) => state.AdminReducer.emailForReset,
+  );
 
   const [showPassword, setShowPassword] = useState(true);
   const [showCofPassword, setShowCofPassword] = useState(true);
@@ -30,7 +42,7 @@ export default function SetPassWord() {
   const handleClickCofShowPassword = () => setShowCofPassword((show) => !show);
 
   const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
   };
@@ -55,7 +67,9 @@ export default function SetPassWord() {
 
     setButtonSpinner(true);
     try {
-      const resultAction = await dispatch(resetPasswordAdmin(urlencoded) as any);
+      const resultAction = await dispatch(
+        resetPasswordAdmin(urlencoded) as any,
+      );
       setButtonSpinner(false);
 
       if (resetPasswordAdmin.fulfilled.match(resultAction)) {
@@ -75,35 +89,40 @@ export default function SetPassWord() {
       validationSchema={setPasswordValidationSchema}
     >
       {(formikProps: FormikProps<SetPasswordInterface>) => {
-        const {
-          values,
-          errors,
-          touched,
-          handleChange,
-          handleSubmit,
-        } = formikProps;
+        const { values, errors, touched, handleChange, handleSubmit } =
+          formikProps;
         return (
           <Form onSubmit={handleSubmit}>
-            <Box 
+            <Box
               className="login-page-container set-password-page"
               sx={{
-                backgroundImage: isSubdomain?.isSubdomain && schoolBanner 
-                  ? `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolBanner}')`
-                  : undefined
+                backgroundImage:
+                  isSubdomain?.isSubdomain && schoolBanner
+                    ? `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolBanner}')`
+                    : undefined,
               }}
             >
               <Box className="login-card">
-                <Box component="img" src={isSubdomain?.isSubdomain && schoolLogo ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo : Png?.logoImg} alt="Logo" className="login-logo" />
+                <Box
+                  component="img"
+                  src={
+                    isSubdomain?.isSubdomain && schoolLogo
+                      ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + schoolLogo
+                      : Png?.logoImg
+                  }
+                  alt="Logo"
+                  className="login-logo"
+                />
 
-                <Typography className="login-title">
-                  Reset Password
-                </Typography>
+                <Typography className="login-title">Reset Password</Typography>
                 <Typography className="login-subtitle">
                   Create a new password for your account.
                 </Typography>
 
                 <Box className="login-form-group">
-                  <label htmlFor="password">Password<span className="required-asterisk">*</span></label>
+                  <label htmlFor="password">
+                    Password<span className="required-asterisk">*</span>
+                  </label>
                   <Box className="password-input-box">
                     <OutlinedInput
                       fullWidth
@@ -124,10 +143,15 @@ export default function SetPassWord() {
                             edge="end"
                             className="password-eye-icon"
                           >
-                            {showPassword ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
+                            {showPassword ? (
+                              <VisibilityOff sx={{ fontSize: 18 }} />
+                            ) : (
+                              <Visibility sx={{ fontSize: 18 }} />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       }
+                      inputProps={{ maxLength: 16 }}
                     />
                     {touched.password && errors.password && (
                       <FormHelperText className="error-text">
@@ -138,7 +162,9 @@ export default function SetPassWord() {
                 </Box>
 
                 <Box className="login-form-group">
-                  <label htmlFor="confirmPassword">Confirm Password<span className="required-asterisk">*</span></label>
+                  <label htmlFor="confirmPassword">
+                    Confirm Password<span className="required-asterisk">*</span>
+                  </label>
                   <Box className="password-input-box">
                     <OutlinedInput
                       fullWidth
@@ -149,7 +175,10 @@ export default function SetPassWord() {
                       className="login-input"
                       value={values.confirmPassword}
                       onChange={handleChange}
-                      error={touched.confirmPassword && Boolean(errors.confirmPassword)}
+                      error={
+                        touched.confirmPassword &&
+                        Boolean(errors.confirmPassword)
+                      }
                       onPaste={(e) => e.preventDefault()}
                       onCopy={(e) => e.preventDefault()}
                       onContextMenu={(e) => e.preventDefault()}
@@ -162,10 +191,15 @@ export default function SetPassWord() {
                             edge="end"
                             className="password-eye-icon"
                           >
-                            {showCofPassword ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
+                            {showCofPassword ? (
+                              <VisibilityOff sx={{ fontSize: 18 }} />
+                            ) : (
+                              <Visibility sx={{ fontSize: 18 }} />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       }
+                      inputProps={{ maxLength: 16 }}
                     />
                     {touched.confirmPassword && errors.confirmPassword && (
                       <FormHelperText className="error-text">
@@ -182,7 +216,11 @@ export default function SetPassWord() {
                   disabled={buttonSpinner}
                   sx={{ mt: 2 }}
                 >
-                  {buttonSpinner ? <Spinner size={20} color="white" /> : "Save Password"}
+                  {buttonSpinner ? (
+                    <Spinner size={20} color="white" />
+                  ) : (
+                    "Save Password"
+                  )}
                 </Button>
               </Box>
             </Box>

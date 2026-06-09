@@ -1,4 +1,11 @@
-import { Table, TableHead, TableRow, TableBody, TableCell, Box } from "@mui/material";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableBody,
+  TableCell,
+  Box,
+} from "@mui/material";
 
 export default function NotAllowPermission() {
   const pathName = window.location.pathname

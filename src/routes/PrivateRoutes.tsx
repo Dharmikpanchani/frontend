@@ -7,7 +7,7 @@ import useIsValidToken from "./isValidToken";
 const PrivateRoutes: React.FC = () => {
   const location = useLocation();
   const { isAdminLogin, adminDetails, token } = useSelector(
-    (state: any) => state.AdminReducer
+    (state: any) => state.AdminReducer,
   );
 
   const cookieToken = Cookies.get("auth_token");
@@ -15,7 +15,9 @@ const PrivateRoutes: React.FC = () => {
   const isValid = useIsValidToken(token || cookieToken || null);
 
   // If Redux says logged in AND it's valid, OR a valid cookie exists
-  const canAccess = (isAdminLogin && adminDetails?.isLogin && isValid) || (!!cookieToken && isValid);
+  const canAccess =
+    (isAdminLogin && adminDetails?.isLogin && isValid) ||
+    (!!cookieToken && isValid);
 
   const isSchoolAdmin = adminDetails?.type === "school_admin";
   const isActivePlan = adminDetails?.schoolData?.isActivePlan;
@@ -29,8 +31,7 @@ const PrivateRoutes: React.FC = () => {
 
   // If they should be on the plan page but aren't
   const isPlanPage =
-    location.pathname === "/user-plan" ||
-    location.pathname === "/login/otp";
+    location.pathname === "/user-plan" || location.pathname === "/login/otp";
 
   if (canAccess && isPlanInactive && !isPlanPage) {
     return <Navigate to="/user-plan" replace={true} />;

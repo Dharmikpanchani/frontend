@@ -32,11 +32,12 @@ export const getAllSchools = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch schools";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to fetch schools";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const addEditSchool = createAsyncThunk(
@@ -47,12 +48,16 @@ export const addEditSchool = createAsyncThunk(
       const res: any = await schoolService.addEditSchool(payload);
       if (res.status === 201 || res.status === 200) {
         toast.success(
-          res?.message || 
-          (isUpdate ? "School updated successfully" : "School registered successfully")
+          res?.message ||
+            (isUpdate
+              ? "School updated successfully"
+              : "School registered successfully"),
         );
         return res.data;
       }
-      toast.error(res?.message || (isUpdate ? "Update failed" : "Registration failed"));
+      toast.error(
+        res?.message || (isUpdate ? "Update failed" : "Registration failed"),
+      );
       return rejectWithValue(res?.message);
     } catch (err: any) {
       const isUpdate = !!payload.get("id");
@@ -63,7 +68,7 @@ export const addEditSchool = createAsyncThunk(
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const deleteSchool = createAsyncThunk(
@@ -78,11 +83,12 @@ export const deleteSchool = createAsyncThunk(
       toast.error(res.message || "Failed to delete school");
       return rejectWithValue(res.message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to delete school";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to delete school";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const changeSchoolStatus = createAsyncThunk(
@@ -97,11 +103,12 @@ export const changeSchoolStatus = createAsyncThunk(
       toast.error(res.message || "Failed to update status");
       return rejectWithValue(res.message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to update status";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to update status";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const getSchoolById = createAsyncThunk(
@@ -114,11 +121,12 @@ export const getSchoolById = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch school";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to fetch school";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 export const getSchoolLogo = createAsyncThunk(
@@ -131,11 +139,14 @@ export const getSchoolLogo = createAsyncThunk(
       toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch school logo";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to fetch school logo";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
-  }
+  },
 );
 
 const schoolSlice = createSlice({

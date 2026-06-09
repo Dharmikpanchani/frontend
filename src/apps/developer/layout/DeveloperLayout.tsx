@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react'
-import { Outlet } from 'react-router-dom';
-import { Box } from '@mui/material';
-import Header from '../component/defaulLayout/Header';
-import Sidebar from '../component/defaulLayout/Sidebar';
-import Png from '@/assets/Png';
-
+import { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
+import { Box } from "@mui/material";
+import Header from "../component/defaulLayout/Header";
+import Sidebar from "../component/defaulLayout/Sidebar";
+import Png from "@/assets/Png";
 
 export default function DeveloperLayout() {
-
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
@@ -23,7 +21,7 @@ export default function DeveloperLayout() {
         if (ctx) {
           ctx.clearRect(0, 0, size, size); // Clear for transparency
           ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
+          ctx.imageSmoothingQuality = "high";
 
           const radius = 32; // Increased to 25% rounding for visibility
           ctx.beginPath();
@@ -68,7 +66,9 @@ export default function DeveloperLayout() {
   return (
     <div>
       <Box className="admin-dashboard-main">
-        <Box className={`admin-dashboard-left-main ${open ? "active" : "admin-sidebar-deactive"}`}>
+        <Box
+          className={`admin-dashboard-left-main ${open ? "active" : "admin-sidebar-deactive"}`}
+        >
           <Sidebar open={open} setOpen={setOpen} />
         </Box>
         <Box className="admin-dashboard-right-main">
@@ -79,5 +79,5 @@ export default function DeveloperLayout() {
         </Box>
       </Box>
     </div>
-  )
+  );
 }

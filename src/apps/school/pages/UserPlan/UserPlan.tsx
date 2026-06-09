@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Grid,
-  Card,
-  Container,
-} from "@mui/material";
+import { Box, Typography, Button, Grid, Card, Container } from "@mui/material";
 import {
   CheckCircle as CheckIcon,
   NorthEast as ExternalIcon,
@@ -22,13 +15,11 @@ interface PlanCardProps {
 }
 
 const PlanCard = styled(Card, {
-  shouldForwardProp: (prop) => prop !== 'isPopular',
+  shouldForwardProp: (prop) => prop !== "isPopular",
 })<PlanCardProps>(({ isPopular }) => ({
   borderRadius: "32px",
   padding: "40px",
-  background: isPopular
-    ? "#ffffff"
-    : "rgba(255, 255, 255, 0.8)",
+  background: isPopular ? "#ffffff" : "rgba(255, 255, 255, 0.8)",
   backdropFilter: "blur(20px)",
   border: isPopular
     ? "2px solid var(--primary-color)"
@@ -103,15 +94,19 @@ const PriceTag = styled(Typography)(() => ({
     fontSize: "20px",
     fontWeight: 600,
     color: "var(--text-muted)",
-  }
+  },
 }));
 
 export default function UserPlan() {
-  const [billingCycle, setBillingCycle] = useState<"6month" | "yearly">("yearly");
+  const [billingCycle, setBillingCycle] = useState<"6month" | "yearly">(
+    "yearly",
+  );
   const [apiPlans, setApiPlans] = useState<any[]>([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
-  const { adminDetails } = useSelector((state: RootState) => state.AdminReducer);
+  const { adminDetails } = useSelector(
+    (state: RootState) => state.AdminReducer,
+  );
 
   const schoolId = adminDetails?.schoolId || adminDetails?.schoolData?._id;
 
@@ -122,14 +117,15 @@ export default function UserPlan() {
       const schoolCode = adminDetails?.schoolData?.schoolCode;
 
       if (!schoolCode) {
-        toast.error("School code not found");
+        toast.error("School Url name not found");
         return;
       }
 
       // Build central payment URL
       const protocol = window.location.protocol;
       const port = window.location.port ? `:${window.location.port}` : "";
-      const baseDomain = import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
+      const baseDomain =
+        import.meta.env.VITE_END_WITH_DOMAIN || ".yoursaas.com";
 
       let checkoutBase: string;
       if (window.location.hostname.includes("lvh.me")) {
@@ -144,7 +140,6 @@ export default function UserPlan() {
       const checkoutUrl = `${checkoutBase}/checkout/school-plan?schoolCode=${schoolCode}&planId=${plan._id}&billingCycle=${billingCycle}`;
 
       window.location.href = checkoutUrl;
-
     } catch (error: any) {
       console.error("Redirect Error:", error);
       toast.error("Failed to initiate payment");
@@ -169,7 +164,7 @@ export default function UserPlan() {
     if (schoolId) {
       fetchPlanData();
     } else {
-      // If no schoolId yet, we still set loading to false after a timeout 
+      // If no schoolId yet, we still set loading to false after a timeout
       // or just wait for the profile fetch in Header to finish and trigger this again
       const timer = setTimeout(() => setDataLoading(false), 2000);
       return () => clearTimeout(timer);
@@ -178,7 +173,15 @@ export default function UserPlan() {
 
   if (dataLoading && apiPlans.length === 0) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', width: '100%' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          width: "100%",
+        }}
+      >
         <Box className="loader-main">
           <Box className="loader">
             <span></span>
@@ -206,7 +209,7 @@ export default function UserPlan() {
                      #fcfcfd`,
         width: "100%",
         py: 4,
-        minHeight: "100vh"
+        minHeight: "100vh",
       }}
     >
       <Container maxWidth="lg">
@@ -224,7 +227,7 @@ export default function UserPlan() {
               py: 0.5,
               borderRadius: "100px",
               fontSize: "10px",
-              border: "1px solid rgba(0, 80, 157, 0.1)"
+              border: "1px solid rgba(0, 80, 157, 0.1)",
             }}
           >
             Flexible Pricing
@@ -236,7 +239,7 @@ export default function UserPlan() {
               mb: 3,
               fontSize: { xs: "32px", md: "56px" },
               color: "var(--text-primary)",
-              letterSpacing: "-1.5px"
+              letterSpacing: "-1.5px",
             }}
           >
             Upgrade Your School Experience
@@ -248,7 +251,7 @@ export default function UserPlan() {
               mx: "auto",
               fontSize: "18px",
               lineHeight: 1.6,
-              opacity: 0.8
+              opacity: 0.8,
             }}
           >
             Select the perfect plan to streamline your school operations.
@@ -257,7 +260,7 @@ export default function UserPlan() {
         </Box>
 
         <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
-          <Box sx={{ position: 'relative' }}>
+          <Box sx={{ position: "relative" }}>
             <CustomSwitch>
               <Box
                 className={`toggle-tab ${billingCycle === "yearly" ? "active" : ""}`}
@@ -275,10 +278,19 @@ export default function UserPlan() {
           </Box>
         </Box>
 
-        <Grid container spacing={4} justifyContent="center" alignItems="stretch">
+        <Grid
+          container
+          spacing={4}
+          justifyContent="center"
+          alignItems="stretch"
+        >
           {filteredPlans.map((plan: any, index: number) => {
-            const price = billingCycle === "6month" ? plan.monPrice : plan.yerPrice;
-            const offerPrice = billingCycle === "6month" ? plan.monOfferPrice : plan.yerOfferPrice;
+            const price =
+              billingCycle === "6month" ? plan.monPrice : plan.yerPrice;
+            const offerPrice =
+              billingCycle === "6month"
+                ? plan.monOfferPrice
+                : plan.yerOfferPrice;
             const isPopular = index === 1; // Highlight the middle plan for better UX
 
             return (
@@ -287,15 +299,21 @@ export default function UserPlan() {
                   {isPopular && <PopularBadge>Recommended</PopularBadge>}
 
                   <Box sx={{ mb: 4 }}>
-                    <Typography variant="h5" sx={{
-                      fontWeight: 800,
-                      color: "var(--text-primary)",
-                      mb: 1,
-                      textTransform: 'capitalize'
-                    }}>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: 800,
+                        color: "var(--text-primary)",
+                        mb: 1,
+                        textTransform: "capitalize",
+                      }}
+                    >
                       {plan.planName}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "var(--text-muted)" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "var(--text-muted)" }}
+                    >
                       Best for growing institutions
                     </Typography>
                   </Box>
@@ -303,7 +321,7 @@ export default function UserPlan() {
                   <Box sx={{ mb: 4 }}>
                     <PriceTag>
                       ₹{price}
-                      <span>/{billingCycle === '6month' ? '6 mo' : 'yr'}</span>
+                      <span>/{billingCycle === "6month" ? "6 mo" : "yr"}</span>
                     </PriceTag>
                     {offerPrice > 0 && (
                       <Typography
@@ -312,7 +330,7 @@ export default function UserPlan() {
                           fontWeight: 600,
                           color: "var(--text-muted)",
                           textDecoration: "line-through",
-                          mt: 1
+                          mt: 1,
                         }}
                       >
                         Was ₹{offerPrice}
@@ -331,34 +349,81 @@ export default function UserPlan() {
                       textTransform: "none",
                       fontWeight: 700,
                       fontSize: "15px",
-                      background: isPopular ? "var(--theme-gradient)" : "rgba(0, 80, 157, 0.08)",
+                      background: isPopular
+                        ? "var(--theme-gradient)"
+                        : "rgba(0, 80, 157, 0.08)",
                       color: isPopular ? "#fff" : "var(--primary-color)",
                       mb: 4,
-                      boxShadow: isPopular ? "0 8px 20px -4px rgba(0, 33, 71, 0.25)" : "none",
-                      border: isPopular ? "none" : "1px solid rgba(0, 80, 157, 0.1)",
+                      boxShadow: isPopular
+                        ? "0 8px 20px -4px rgba(0, 33, 71, 0.25)"
+                        : "none",
+                      border: isPopular
+                        ? "none"
+                        : "1px solid rgba(0, 80, 157, 0.1)",
                       "&:hover": {
-                        background: isPopular ? "var(--theme-gradient)" : "rgba(0, 80, 157, 0.12)",
+                        background: isPopular
+                          ? "var(--theme-gradient)"
+                          : "rgba(0, 80, 157, 0.12)",
                         transform: "scale(1.01)",
-                        boxShadow: isPopular ? "0 12px 28px -6px rgba(0, 33, 71, 0.35)" : "none",
+                        boxShadow: isPopular
+                          ? "0 12px 28px -6px rgba(0, 33, 71, 0.35)"
+                          : "none",
                       },
                     }}
                   >
-                    {paymentLoading ? "Processing..." : <>Select Plan <ExternalIcon sx={{ ml: 1, fontSize: 18 }} /></>}
+                    {paymentLoading ? (
+                      "Processing..."
+                    ) : (
+                      <>
+                        Select Plan{" "}
+                        <ExternalIcon sx={{ ml: 1, fontSize: 18 }} />
+                      </>
+                    )}
                   </Button>
 
                   <Box sx={{ flex: 1 }}>
-                    <Typography sx={{ fontWeight: 700, mb: 3, fontSize: "14px", color: "var(--text-primary)" }}>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        mb: 3,
+                        fontSize: "14px",
+                        color: "var(--text-primary)",
+                      }}
+                    >
                       WHAT'S INCLUDED:
                     </Typography>
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                      {plan.moduleDescription?.map((module: string, i: number) => (
-                        <Box key={i} sx={{ display: "flex", alignItems: "flex-start", gap: 1.5 }}>
-                          <CheckIcon sx={{ fontSize: 20, color: "var(--secondary-color)", mt: "2px" }} />
-                          <Typography sx={{ fontSize: "14px", color: "var(--text-secondary)", fontWeight: 500 }}>
-                            {module}
-                          </Typography>
-                        </Box>
-                      ))}
+                    <Box
+                      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                    >
+                      {plan.moduleDescription?.map(
+                        (module: string, i: number) => (
+                          <Box
+                            key={i}
+                            sx={{
+                              display: "flex",
+                              alignItems: "flex-start",
+                              gap: 1.5,
+                            }}
+                          >
+                            <CheckIcon
+                              sx={{
+                                fontSize: 20,
+                                color: "var(--secondary-color)",
+                                mt: "2px",
+                              }}
+                            />
+                            <Typography
+                              sx={{
+                                fontSize: "14px",
+                                color: "var(--text-secondary)",
+                                fontWeight: 500,
+                              }}
+                            >
+                              {module}
+                            </Typography>
+                          </Box>
+                        ),
+                      )}
                     </Box>
                   </Box>
                 </PlanCard>
@@ -369,7 +434,17 @@ export default function UserPlan() {
 
         <Box sx={{ mt: 10, textAlign: "center" }}>
           <Typography variant="body2" sx={{ color: "var(--text-muted)" }}>
-            Need a custom enterprise solution? <Box component="span" sx={{ color: 'var(--secondary-color)', fontWeight: 700, cursor: 'pointer' }}>Contact our team</Box>
+            Need a custom enterprise solution?{" "}
+            <Box
+              component="span"
+              sx={{
+                color: "var(--secondary-color)",
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              Contact our team
+            </Box>
           </Typography>
         </Box>
       </Container>

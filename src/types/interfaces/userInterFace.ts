@@ -1,4 +1,3 @@
-
 export interface GetUserInterface {
   _id: string;
   fullName: string;
@@ -8,7 +7,7 @@ export interface GetUserInterface {
   isActive: boolean;
   isDeleted: boolean;
   isVerify: boolean;
-  createdAt: string; 
-  updatedAt: string; 
-  image: string; 
+  createdAt: string;
+  updatedAt: string;
+  image: string;
 }

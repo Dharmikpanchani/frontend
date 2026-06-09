@@ -7,20 +7,29 @@ interface DataNotFoundProps {
   colSpan?: number;
 }
 
-function DataNotFound({ image, text = "No Data Found", colSpan = 12 }: DataNotFoundProps) {
-  const defaultImage = "https://img.freepik.com/free-vector/school-building-concept-illustration_114360-15509.jpg";
+function DataNotFound({
+  image,
+  text = "No Data Found",
+  colSpan = 12,
+}: DataNotFoundProps) {
+  const defaultImage =
+    "https://img.freepik.com/free-vector/school-building-concept-illustration_114360-15509.jpg";
 
   return (
     <TableRow>
-      <TableCell className="table-not-found-td" colSpan={colSpan} sx={{ borderBottom: 'none !important' }}>
+      <TableCell
+        className="table-not-found-td"
+        colSpan={colSpan}
+        sx={{ borderBottom: "none !important" }}
+      >
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
             py: 8,
-            width: '100%'
+            width: "100%",
           }}
         >
           <Box
@@ -28,19 +37,19 @@ function DataNotFound({ image, text = "No Data Found", colSpan = 12 }: DataNotFo
             src={image || defaultImage}
             alt="Not Found"
             sx={{
-              width: '100%',
-              maxWidth: '350px',
-              height: 'auto',
+              width: "100%",
+              maxWidth: "350px",
+              height: "auto",
               mb: 2,
-              opacity: 0.8
+              opacity: 0.8,
             }}
           />
           <Typography
             sx={{
-              fontSize: '18px',
+              fontSize: "18px",
               fontWeight: 600,
-              color: '#9ca3af',
-              fontFamily: "'Poppins', sans-serif"
+              color: "#9ca3af",
+              fontFamily: "'Poppins', sans-serif",
             }}
           >
             {text}

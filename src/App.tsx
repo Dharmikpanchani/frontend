@@ -45,30 +45,33 @@ const theme = createTheme({
     MuiAutocomplete: {
       styleOverrides: {
         popper: {
-          zIndex: 'auto !important'
-        }
-      }
-    }
+          zIndex: "auto !important",
+        },
+      },
+    },
   },
 });
 
 function App() {
   const isSubdomain = getSubdomain();
   const dispatch = useDispatch();
-  const { loading: schoolLoading } = useSelector((state: RootState) => state.SchoolReducer);
+  const { loading: schoolLoading } = useSelector(
+    (state: RootState) => state.SchoolReducer,
+  );
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
 
   useEffect(() => {
     if (isSubdomain?.isSubdomain) {
       const urlencoded = new URLSearchParams();
       urlencoded.append("schoolCode", isSubdomain.name);
-      
+
       const adminUrl = import.meta.env.VITE_MAIN_URL || "http://localhost:5173";
 
       dispatch(getSchoolLogo(urlencoded) as any).then((actionResult: any) => {
         if (getSchoolLogo.rejected.match(actionResult)) {
           setIsRedirecting(true);
-          const errorMsg = (actionResult.payload as any) || "School domain not found!";
+          const errorMsg =
+            (actionResult.payload as any) || "School domain not found!";
           toasterError(errorMsg);
           setTimeout(() => {
             window.location.href = adminUrl;

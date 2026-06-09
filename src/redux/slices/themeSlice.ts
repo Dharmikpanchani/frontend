@@ -1,4 +1,8 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import { schoolService } from "@/api/services/school.service";
 import { getProfileAdmin, loginAdmin, verifyOtpAdmin } from "./authSlice";
 import { getSchoolLogo } from "./schoolSlice";
@@ -114,7 +118,7 @@ export const persistTheme = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 const themeSlice = createSlice({
@@ -158,10 +162,13 @@ const themeSlice = createSlice({
             const backendTheme = themeToApply;
             // Map backend theme to frontend state if names differ, here they match mostly
             const newTheme = { ...state, ...backendTheme };
-            localStorage.setItem("school-theme-settings", JSON.stringify(newTheme));
+            localStorage.setItem(
+              "school-theme-settings",
+              JSON.stringify(newTheme),
+            );
             return newTheme;
           }
-        }
+        },
       );
   },
 });
