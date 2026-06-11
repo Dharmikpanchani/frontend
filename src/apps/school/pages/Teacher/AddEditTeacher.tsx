@@ -12,6 +12,7 @@ import {
   Link,
   Autocomplete,
   Tooltip,
+  Chip,
 } from "@mui/material";
 import ProfileAvatar from "@/apps/common/ProfileAvatar";
 import {
@@ -849,6 +850,26 @@ export default function AddEditTeacher() {
                           <FormHelperText className="error-text">
                             {errors.email as string}
                           </FormHelperText>
+                        )}
+                        {id && teacherData?.teacherCode && (
+                          <Box sx={{ mt: 0.8, display: "flex", alignItems: "center", gap: 1 }}>
+                            <Typography sx={{ fontSize: "11px", color: "#667085" }}>
+                              Teacher Code:
+                            </Typography>
+                            <Chip
+                              label={teacherData.teacherCode}
+                              size="small"
+                              sx={{
+                                height: "20px",
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                backgroundColor: "rgba(var(--primary-color-rgb, 92,26,26), 0.1)",
+                                color: "var(--primary-color)",
+                                borderRadius: "4px",
+                                "& .MuiChip-label": { px: "8px" },
+                              }}
+                            />
+                          </Box>
                         )}
                       </Box>
                       <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>

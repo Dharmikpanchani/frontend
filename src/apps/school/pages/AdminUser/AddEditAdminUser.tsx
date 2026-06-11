@@ -24,6 +24,7 @@ import {
   Avatar,
   Tooltip,
   debounce,
+  Chip,
 } from "@mui/material";
 import {
   Visibility,
@@ -416,6 +417,26 @@ export default function AddEditAdminUser() {
                             ? (errors.email as string)
                             : ""}
                         </FormHelperText>
+                        {(isEdit || isView) && selectedAdminUser?.adminCode && (
+                          <Box sx={{ mt: 0.8, display: "flex", alignItems: "center", gap: 1 }}>
+                            <Typography sx={{ fontSize: "11px", color: "#667085" }}>
+                              Admin Code:
+                            </Typography>
+                            <Chip
+                              label={selectedAdminUser.adminCode}
+                              size="small"
+                              sx={{
+                                height: "20px",
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                backgroundColor: "rgba(var(--primary-color-rgb, 92,26,26), 0.1)",
+                                color: "var(--primary-color)",
+                                borderRadius: "4px",
+                                "& .MuiChip-label": { px: "8px" },
+                              }}
+                            />
+                          </Box>
+                        )}
                       </Box>
 
                       <Box gridColumn="span 12" className="admin-input-box">

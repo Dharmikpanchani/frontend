@@ -670,6 +670,21 @@ export default function Teacher() {
                                       {data?.email || "N/A"}
                                     </Typography>
                                   </Box>
+                                  {data?.teacherCode && (
+                                    <Chip
+                                      label={data.teacherCode}
+                                      size="small"
+                                      sx={{
+                                        height: "18px",
+                                        fontSize: "10px",
+                                        fontWeight: 700,
+                                        backgroundColor: "rgba(var(--primary-color-rgb, 92,26,26), 0.1)",
+                                        color: "var(--primary-color)",
+                                        borderRadius: "4px",
+                                        "& .MuiChip-label": { px: "6px" },
+                                      }}
+                                    />
+                                  )}
                                   <Box
                                     sx={{
                                       display: "flex",

@@ -357,6 +357,22 @@ export default function AdminUser() {
                                   {data?.email || "N/A"}
                                 </Typography>
                               </Tooltip>
+                              {data?.adminCode && (
+                                <Chip
+                                  label={data.adminCode}
+                                  size="small"
+                                  sx={{
+                                    mt: 0.5,
+                                    height: "18px",
+                                    fontSize: "10px",
+                                    fontWeight: 700,
+                                    backgroundColor: "rgba(var(--primary-color-rgb, 92,26,26), 0.1)",
+                                    color: "var(--primary-color)",
+                                    borderRadius: "4px",
+                                    "& .MuiChip-label": { px: "6px" },
+                                  }}
+                                />
+                              )}
                             </Box>
                           </TableCell>
                           <TableCell
