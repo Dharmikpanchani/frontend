@@ -33,6 +33,7 @@ export const getAllAdminUsers = createAsyncThunk(
       isActive,
       isLogin,
       isVerified,
+      adminCode,
     }: {
       page: number;
       perPage: number;
@@ -41,6 +42,7 @@ export const getAllAdminUsers = createAsyncThunk(
       isActive?: string;
       isLogin?: string;
       isVerified?: string;
+      adminCode?: string;
     },
     { rejectWithValue },
   ) => {
@@ -53,6 +55,7 @@ export const getAllAdminUsers = createAsyncThunk(
         isActive,
         isLogin,
         isVerified,
+        adminCode,
       );
       if (res.status === 200) return res;
       const message = res?.message || "Failed to fetch admin users";

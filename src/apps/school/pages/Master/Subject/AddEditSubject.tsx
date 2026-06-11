@@ -48,6 +48,9 @@ export default function AddEditSubject() {
   const { actionLoading, loading, selectedSubject } = useSelector(
     (state: RootState) => state.SubjectReducer,
   );
+  const { startYear, endYear } = useSelector(
+    (state: RootState) => state.AcademicYearReducer,
+  );
 
   const [initialValues, setInitialValues] = useState({
     id: "",
@@ -80,7 +83,12 @@ export default function AddEditSubject() {
 
   const handleSubmit = async (values: any) => {
     try {
-      const resultAction = await dispatch(addEditSubjectAction(values) as any);
+      const payload = {
+        ...values,
+        startYear,
+        endYear,
+      };
+      const resultAction = await dispatch(addEditSubjectAction(payload) as any);
       if (addEditSubjectAction.fulfilled.match(resultAction)) {
         navigate("/master/subject");
       }

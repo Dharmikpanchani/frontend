@@ -17,12 +17,13 @@ import { Formik, Form } from "formik";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
-import { labelSx, inputSx } from "@/utils/styles/commonSx";
+import { labelSx, inputSx, multiInputSx } from "@/utils/styles/commonSx";
 
 export interface FilterField {
   type:
     | "select"
     | "searchbaseSelect"
+    | "multiSearchSelect"
     | "date"
     | "inputSelect"
     | "dateRange"
@@ -391,6 +392,54 @@ const Filter: React.FC<FilterProps> = ({
                 }}
               />
             </Box>
+          </Box>
+        );
+      case "multiSearchSelect":
+        return (
+          <Box key={field.name}>
+            <Typography sx={labelSx}>{field.label}</Typography>
+            <Autocomplete
+              multiple
+              options={field.options || []}
+              getOptionLabel={
+                field.getOptionLabel ||
+                ((option: any) => option.label || option)
+              }
+              value={
+                field.options?.filter((opt: any) => {
+                  const val = field.getOptionValue
+                    ? field.getOptionValue(opt)
+                    : typeof opt === "object" && opt !== null
+                      ? opt._id || opt.value
+                      : opt;
+                  return Array.isArray(values[field.name]) && values[field.name].includes(val);
+                }) || []
+              }
+              onChange={(_, newValue) => {
+                const vals = (newValue || []).map((item: any) => {
+                  return field.getOptionValue
+                    ? field.getOptionValue(item)
+                    : typeof item === "object" && item !== null
+                      ? item._id !== undefined
+                        ? item._id
+                        : item.value
+                      : item;
+                });
+                setFieldValue(field.name, vals);
+              }}
+              slotProps={{
+                popper: {
+                  sx: { zIndex: "999999 !important" },
+                },
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder={field.placeholder || "Select"}
+                  sx={multiInputSx}
+                />
+              )}
+            />
           </Box>
         );
       default:

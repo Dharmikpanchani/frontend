@@ -14,7 +14,6 @@ import Svg from "@/assets/Svg";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import type { RootState } from "@/redux/Store";
-import AcademicYearSelector from "./AcademicYearSelector";
 
 // const imageBaseUrl = import.meta.env.VITE_BASE_URL_IMAGE;
 
@@ -85,7 +84,6 @@ export default function Header(props: any) {
           )}
         </Box>
         <Box className="admin-header-right">
-          <AcademicYearSelector />
           <Box className="admin-header-drop-main">
             <Button
               className="admin-drop-header-btn"

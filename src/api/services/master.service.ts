@@ -37,6 +37,13 @@ export const masterService = {
     if (params.isActive !== undefined && params.isActive !== "")
       queryParams.append("isActive", params.isActive);
     if (params.type) queryParams.append("type", params.type);
+    if (params.startYear) {
+      if (Array.isArray(params.startYear)) {
+        params.startYear.forEach((y: any) => queryParams.append("startYear", String(y)));
+      } else {
+        queryParams.append("startYear", String(params.startYear));
+      }
+    }
 
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;
@@ -59,6 +66,15 @@ export const masterService = {
     if (params.perPage) queryParams.append("perPageData", params.perPage);
     if (params.search) queryParams.append("searchRequest", params.search);
     if (params.type) queryParams.append("type", params.type);
+    if (params.isActive !== undefined && params.isActive !== "")
+      queryParams.append("isActive", params.isActive);
+    if (params.startYear) {
+      if (Array.isArray(params.startYear)) {
+        params.startYear.forEach((y: any) => queryParams.append("startYear", String(y)));
+      } else {
+        queryParams.append("startYear", String(params.startYear));
+      }
+    }
 
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;
@@ -85,6 +101,13 @@ export const masterService = {
     if (params.isActive !== undefined && params.isActive !== "")
       queryParams.append("isActive", params.isActive);
     if (params.type) queryParams.append("type", params.type);
+    if (params.startYear) {
+      if (Array.isArray(params.startYear)) {
+        params.startYear.forEach((y: any) => queryParams.append("startYear", String(y)));
+      } else {
+        queryParams.append("startYear", String(params.startYear));
+      }
+    }
 
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;
@@ -123,7 +146,16 @@ export const masterService = {
       queryParams.append("isActive", params.isActive);
     if (params.isVerified !== undefined && params.isVerified !== "")
       queryParams.append("isVerified", params.isVerified);
+    if (params.teacherCode)
+      queryParams.append("teacherCode", params.teacherCode);
     if (params.type) queryParams.append("type", params.type);
+    if (params.startYear) {
+      if (Array.isArray(params.startYear)) {
+        params.startYear.forEach((y: any) => queryParams.append("startYear", String(y)));
+      } else {
+        queryParams.append("startYear", String(params.startYear));
+      }
+    }
 
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;

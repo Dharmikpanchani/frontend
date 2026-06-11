@@ -41,6 +41,9 @@ export default function AddEditClass() {
   const { selectedClass, loading, actionLoading } = useSelector(
     (state: RootState) => state.ClassReducer,
   );
+  const { startYear, endYear } = useSelector(
+    (state: RootState) => state.AcademicYearReducer,
+  );
 
   useEffect(() => {
     if (id) {
@@ -65,6 +68,12 @@ export default function AddEditClass() {
     const urlencoded = new URLSearchParams();
     urlencoded.append("name", values.name);
     urlencoded.append("code", values.code);
+    if (startYear) {
+      urlencoded.append("startYear", String(startYear));
+    }
+    if (endYear) {
+      urlencoded.append("endYear", String(endYear));
+    }
 
     if (id) {
       urlencoded.append("id", id);

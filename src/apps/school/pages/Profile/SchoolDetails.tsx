@@ -732,7 +732,7 @@ export default function SchoolDetails() {
                     onBlur={handleBlur}
                     error={touched.state && Boolean(errors.state)}
                     sx={inputSx}
-                    slotProps={{ htmlInput: { maxLength: 50 } }}
+                    inputProps={{ maxLength: 50 }}
                   />
                   <FormHelperText error>
                     {touched.state && (errors.state as string)}

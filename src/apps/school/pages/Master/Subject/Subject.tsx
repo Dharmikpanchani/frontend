@@ -38,6 +38,17 @@ import DataNotFound from "@/apps/school/component/schoolCommon/dataNotFound/Data
 import PopupModal from "@/apps/school/component/schoolCommon/popUpModal/PopupModal";
 import { IOSSwitch } from "@/apps/school/component/schoolCommon/commonCssFunction/cssFunction";
 
+const getAvailableYears = (): number[] => {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const currentYear = month >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  const years: number[] = [];
+  for (let y = 2020; y <= currentYear; y++) {
+    years.push(y);
+  }
+  return years.reverse();
+};
+
 export default function Subject() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -57,6 +68,7 @@ export default function Subject() {
   const [filterValues, setFilterValues] = useState({
     departmentId: "",
     isActive: "",
+    startYears: [] as number[],
   });
 
   const [openDelete, setOpenDelete] = useState(false);
@@ -85,6 +97,10 @@ export default function Subject() {
   };
 
   const handleGetData = (searchQuery?: string, filters?: any) => {
+    const selectedYears = filters?.startYears !== undefined
+      ? filters.startYears
+      : filterValues.startYears;
+
     dispatch(
       getSubjects({
         page: currentPage + 1,
@@ -98,6 +114,7 @@ export default function Subject() {
           filters?.isActive !== undefined
             ? filters.isActive
             : filterValues.isActive,
+        startYear: selectedYears.length > 0 ? selectedYears : undefined,
       }) as any,
     );
   };
@@ -117,7 +134,7 @@ export default function Subject() {
   };
 
   const handleResetFilter = () => {
-    const resetValues = { departmentId: "", isActive: "" };
+    const resetValues = { departmentId: "", isActive: "", startYears: [] };
     setFilterValues(resetValues);
     handleGetData(searchNameValue, resetValues);
     setOpenFilter(false);
@@ -496,6 +513,18 @@ export default function Subject() {
               { label: "Active", value: true },
               { label: "Deactive", value: false },
             ],
+          },
+          {
+            type: "multiSearchSelect",
+            name: "startYears",
+            label: "Academic Year",
+            placeholder: "Select Academic Years",
+            options: getAvailableYears().map((y) => ({
+              label: `${y}-${y + 1}`,
+              value: y,
+            })),
+            getOptionLabel: (option: any) => option.label || "",
+            getOptionValue: (option: any) => option.value,
           },
         ]}
         handleApply={handleApplyFilter}

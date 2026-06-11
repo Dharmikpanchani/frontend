@@ -43,6 +43,9 @@ export default function AddEditSection() {
   const { actionLoading, loading, selectedSection } = useSelector(
     (state: RootState) => state.SectionReducer,
   );
+  const { startYear, endYear } = useSelector(
+    (state: RootState) => state.AcademicYearReducer,
+  );
 
   const [initialValues, setInitialValues] = useState({
     id: "",
@@ -70,7 +73,12 @@ export default function AddEditSection() {
 
   const handleSubmit = async (values: any) => {
     try {
-      const resultAction = await dispatch(addEditSection(values) as any);
+      const payload = {
+        ...values,
+        startYear,
+        endYear,
+      };
+      const resultAction = await dispatch(addEditSection(payload) as any);
 
       if (addEditSection.fulfilled.match(resultAction)) {
         navigate("/master/section");

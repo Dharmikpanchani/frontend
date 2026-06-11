@@ -25,16 +25,6 @@ DataService.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    const yearFilter = localStorage.getItem("academic-year-filter");
-    if (yearFilter) {
-      try {
-        const { startYear, endYear } = JSON.parse(yearFilter);
-        config.headers["x-academic-year-start"] = String(startYear);
-        config.headers["x-academic-year-end"] = String(endYear);
-      } catch {
-        // ignore malformed value
-      }
-    }
     return config;
   },
   (error) => {
@@ -50,18 +40,6 @@ DataService.interceptors.response.use(
     const originalRequest = error.config;
 
     const handleLogout = async () => {
-      try {
-        await axios.post(
-          `${getBaseURL()}/${Api.LOGOUT}`,
-          {},
-          { withCredentials: true },
-        );
-      } catch (logoutError) {
-        console.error(
-          "Logout API call failed during authentication error:",
-          logoutError,
-        );
-      }
       Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
       Cookies.remove("auth_token", { path: "/" });
       if (typeof window !== "undefined") {

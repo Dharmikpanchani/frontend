@@ -26,7 +26,6 @@ import {
   Card,
   CardContent,
   IconButton,
-  Checkbox,
 } from "@mui/material";
 import {
   Email as EmailIcon,
@@ -71,6 +70,17 @@ import { masterService } from "@/api/services/master.service";
 import toast from "react-hot-toast";
 import { Formik, Form } from "formik";
 import { documentRejectionValidationSchema } from "@/utils/validation/FormikValidation";
+
+const getAvailableYears = (): number[] => {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const currentYear = month >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  const years: number[] = [];
+  for (let y = 2020; y <= currentYear; y++) {
+    years.push(y);
+  }
+  return years.reverse();
+};
 
 export default function Teacher() {
   const dispatch = useDispatch();
@@ -180,6 +190,8 @@ export default function Teacher() {
     attendanceId: "",
     isActive: "",
     isVerified: "",
+    teacherCode: "",
+    startYears: [] as number[],
   });
 
   const handleOpenDelete = (data: any) => {
@@ -193,12 +205,16 @@ export default function Teacher() {
   };
 
   const handleGetData = (searchQuery?: string, filters?: any) => {
+    const activeFilters = filters || filterValues;
+    const { startYears, ...restFilters } = activeFilters;
+
     dispatch(
       getTeachers({
         page: currentPage + 1,
         perPage: rowsPerPage > 0 ? rowsPerPage : 10,
         search: searchQuery?.trim() ?? searchNameValue.trim(),
-        ...(filters || filterValues),
+        ...restFilters,
+        startYear: startYears && startYears.length > 0 ? startYears : undefined,
       }) as any,
     );
   };
@@ -240,6 +256,8 @@ export default function Teacher() {
       attendanceId: "",
       isActive: "",
       isVerified: "",
+      teacherCode: "",
+      startYears: [],
     };
     setFilterValues(resetValues);
     handleGetData(searchNameValue, resetValues);
@@ -272,6 +290,12 @@ export default function Teacher() {
       name: "email",
       label: "Email",
       placeholder: "Enter Email",
+    },
+    {
+      type: "inputSelect",
+      name: "teacherCode",
+      label: "Teacher Code",
+      placeholder: "Enter Teacher Code",
     },
     {
       type: "date",
@@ -357,6 +381,18 @@ export default function Teacher() {
         { label: "Verified", value: "true" },
         { label: "Unverified", value: "false" },
       ],
+    },
+    {
+      type: "multiSearchSelect",
+      name: "startYears",
+      label: "Academic Year",
+      placeholder: "Select Academic Years",
+      options: getAvailableYears().map((y) => ({
+        label: `${y}-${y + 1}`,
+        value: y,
+      })),
+      getOptionLabel: (option: any) => option.label || "",
+      getOptionValue: (option: any) => option.value,
     },
   ];
 

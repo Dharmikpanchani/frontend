@@ -597,7 +597,7 @@ export default function AddEditAdminUser() {
                                   </IconButton>
                                 </InputAdornment>
                               }
-                              slotProps={{ htmlInput: { maxLength: 16 } }}
+                              inputProps={{ maxLength: 16 }}
                             />
                             <FormHelperText className="error-text">
                               {touched.password && errors.password

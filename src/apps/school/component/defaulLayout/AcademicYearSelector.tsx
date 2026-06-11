@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import { CalendarMonth, ExpandMore } from "@mui/icons-material";
@@ -62,7 +62,7 @@ export default function AcademicYearSelector() {
             display: { xs: "none", sm: "block" },
           }}
         >
-          {startYear}-{String(startYear + 1).slice(2)}
+          {startYear}-{startYear + 1}
         </Typography>
         <ExpandMore sx={{ fontSize: "15px", color: "inherit", display: { xs: "none", sm: "block" } }} />
       </Button>
@@ -77,13 +77,27 @@ export default function AcademicYearSelector() {
         PaperProps={{
           sx: {
             mt: 1,
-            minWidth: 130,
+            minWidth: 115,
             maxHeight: 260,
-            overflow: "auto",
+            overflowY: "auto",
+            overflowX: "hidden",
             borderRadius: "var(--border-radius, 10px)",
             boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
             border: "1px solid var(--card-border, rgba(0,0,0,0.07))",
             backgroundColor: "var(--card-bg, #fff)",
+            "&::-webkit-scrollbar": {
+              width: "4.8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "transparent",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "var(--primary-color, #002147)",
+              borderRadius: "10px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "rgba(var(--primary-color-rgb, 0, 33, 71), 0.8)",
+            },
             "& .MuiMenuItem-root": {
               fontSize: "13px",
               fontFamily: "var(--font-family)",
@@ -91,15 +105,19 @@ export default function AcademicYearSelector() {
               px: 2,
               py: 1,
               color: "var(--text-primary)",
+              transition: "all 0.2s ease",
               "&:hover": {
-                backgroundColor: "var(--primary-color)",
-                color: "#fff",
+                backgroundColor: "rgba(var(--primary-color-rgb, 0, 33, 71), 0.08)",
+                color: "var(--primary-color, #002147)",
               },
               "&.Mui-selected": {
-                backgroundColor: "var(--primary-color)",
-                color: "#fff",
+                backgroundColor: "rgba(var(--primary-color-rgb, 0, 33, 71), 0.15)",
+                color: "var(--primary-color, #002147)",
                 fontWeight: "700",
-                "&:hover": { backgroundColor: "var(--primary-color)" },
+                "&:hover": {
+                  backgroundColor: "rgba(var(--primary-color-rgb, 0, 33, 71), 0.2)",
+                  color: "var(--primary-color, #002147)",
+                },
               },
             },
           },
@@ -111,7 +129,7 @@ export default function AcademicYearSelector() {
             selected={year === startYear}
             onClick={() => handleSelect(year)}
           >
-            {year}-{String(year + 1).slice(2)}
+            {year}-{year + 1}
           </MenuItem>
         ))}
       </Menu>

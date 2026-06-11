@@ -61,6 +61,7 @@ export default function AdminUser() {
     isActive: "",
     isLogin: "",
     isVerified: "",
+    adminCode: "",
   });
 
   const [openDelete, setOpenDelete] = useState(false);
@@ -93,6 +94,10 @@ export default function AdminUser() {
           filters?.isVerified !== undefined
             ? filters.isVerified
             : filterValues.isVerified,
+        adminCode:
+          filters?.adminCode !== undefined
+            ? filters.adminCode
+            : filterValues.adminCode,
       }) as any,
     );
   };
@@ -112,7 +117,7 @@ export default function AdminUser() {
   };
 
   const handleResetFilter = () => {
-    const resetValues = { role: "", isActive: "", isLogin: "", isVerified: "" };
+    const resetValues = { role: "", isActive: "", isLogin: "", isVerified: "", adminCode: "" };
     setFilterValues(resetValues);
     handleGetData(searchNameValue, resetValues);
     setOpenFilter(false);
@@ -188,6 +193,12 @@ export default function AdminUser() {
         { label: "Verified", value: true },
         { label: "Unverified", value: false },
       ],
+    },
+    {
+      type: "inputSelect",
+      name: "adminCode",
+      label: "Admin Code",
+      placeholder: "Enter Admin Code",
     },
   ];
 
@@ -327,7 +338,7 @@ export default function AdminUser() {
                                 imageUrl={data?.profileImage}
                                 size={40}
                               />
-                              <Box className="admin-table-data-flex">
+                              <Box className="admin-table-data-flex" sx={{ flexWrap: "wrap", gap: 1 }}>
                                 <Tooltip
                                   title={data?.name || "N/A"}
                                   arrow
@@ -338,6 +349,21 @@ export default function AdminUser() {
                                     {data?.name || "N/A"}
                                   </Typography>
                                 </Tooltip>
+                                {data?.adminCode && (
+                                  <Chip
+                                    label={data.adminCode}
+                                    size="small"
+                                    sx={{
+                                      height: "18px",
+                                      fontSize: "10px",
+                                      fontWeight: 700,
+                                      backgroundColor: "rgba(var(--primary-color-rgb, 92,26,26), 0.1)",
+                                      color: "var(--primary-color)",
+                                      borderRadius: "4px",
+                                      "& .MuiChip-label": { px: "6px" },
+                                    }}
+                                  />
+                                )}
                               </Box>
                             </Box>
                           </TableCell>
@@ -357,22 +383,6 @@ export default function AdminUser() {
                                   {data?.email || "N/A"}
                                 </Typography>
                               </Tooltip>
-                              {data?.adminCode && (
-                                <Chip
-                                  label={data.adminCode}
-                                  size="small"
-                                  sx={{
-                                    mt: 0.5,
-                                    height: "18px",
-                                    fontSize: "10px",
-                                    fontWeight: 700,
-                                    backgroundColor: "rgba(var(--primary-color-rgb, 92,26,26), 0.1)",
-                                    color: "var(--primary-color)",
-                                    borderRadius: "4px",
-                                    "& .MuiChip-label": { px: "6px" },
-                                  }}
-                                />
-                              )}
                             </Box>
                           </TableCell>
                           <TableCell

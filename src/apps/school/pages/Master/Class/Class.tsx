@@ -16,7 +16,8 @@ import {
   Tooltip,
   debounce,
 } from "@mui/material";
-import { Search as SearchIcon, Add as AddIcon } from "@mui/icons-material";
+import { Search as SearchIcon, Add as AddIcon, FilterList as FilterIcon } from "@mui/icons-material";
+import Filter from "@/apps/common/filter/Filter";
 import {
   getClasses,
   deleteClass,
@@ -32,6 +33,17 @@ import DataNotFound from "@/apps/school/component/schoolCommon/dataNotFound/Data
 import PopupModal from "@/apps/school/component/schoolCommon/popUpModal/PopupModal";
 import { IOSSwitch } from "@/apps/school/component/schoolCommon/commonCssFunction/cssFunction";
 
+const getAvailableYears = (): number[] => {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const currentYear = month >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  const years: number[] = [];
+  for (let y = 2020; y <= currentYear; y++) {
+    years.push(y);
+  }
+  return years.reverse();
+};
+
 export default function Class() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -43,6 +55,12 @@ export default function Class() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchNameValue, setSearchNameValue] = useState<string>("");
   const [selectedData, setSelectedData] = useState<any>(null);
+
+  const [openFilter, setOpenFilter] = useState(false);
+  const [filterValues, setFilterValues] = useState({
+    isActive: "",
+    startYears: [] as number[],
+  });
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openStatusModal, setOpenStatusModal] = useState(false);
@@ -69,12 +87,21 @@ export default function Class() {
     setSelectedData(null);
   };
 
-  const handleGetData = (searchQuery?: string) => {
+  const handleGetData = (searchQuery?: string, filters?: any) => {
+    const selectedYears = filters?.startYears !== undefined
+      ? filters.startYears
+      : filterValues.startYears;
+
     dispatch(
       getClasses({
         page: currentPage + 1,
         perPage: rowsPerPage > 0 ? rowsPerPage : 10,
         search: searchQuery?.trim() ?? searchNameValue.trim(),
+        isActive:
+          filters?.isActive !== undefined
+            ? filters.isActive
+            : filterValues.isActive,
+        startYear: selectedYears.length > 0 ? selectedYears : undefined,
       }) as any,
     );
   };
@@ -82,6 +109,19 @@ export default function Class() {
   useEffect(() => {
     handleGetData(searchNameValue);
   }, [currentPage, rowsPerPage]);
+
+  const handleApplyFilter = (values: any) => {
+    setFilterValues(values);
+    handleGetData(searchNameValue, values);
+    setOpenFilter(false);
+  };
+
+  const handleResetFilter = () => {
+    const resetValues = { isActive: "", startYears: [] };
+    setFilterValues(resetValues);
+    handleGetData(searchNameValue, resetValues);
+    setOpenFilter(false);
+  };
 
   const handleDelete = async () => {
     if (!selectedData) return;
@@ -126,6 +166,24 @@ export default function Class() {
                 />
               </Box>
             </Box>
+          </Box>
+          <Box className="admin-filter-btn-main">
+            <Button
+              className="admin-btn-theme"
+              onClick={() => setOpenFilter(true)}
+              sx={{
+                ml: 1,
+                minWidth: "45px",
+                p: "0 12px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <FilterIcon
+                sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
+              />
+            </Button>
           </Box>
           {hasPermission(schoolAdminPermission.class.create) && (
             <Box className="admin-add-user-btn-main">
@@ -383,6 +441,39 @@ export default function Class() {
           ) : null}
         </Box>
       </Box>
+
+      <Filter
+        open={openFilter}
+        onClose={() => setOpenFilter(false)}
+        title="Class Filter"
+        fields={[
+          {
+            type: "searchbaseSelect",
+            name: "isActive",
+            label: "Status",
+            placeholder: "Select Status",
+            options: [
+              { label: "Active", value: true },
+              { label: "Deactive", value: false },
+            ],
+          },
+          {
+            type: "multiSearchSelect",
+            name: "startYears",
+            label: "Academic Year",
+            placeholder: "Select Academic Years",
+            options: getAvailableYears().map((y) => ({
+              label: `${y}-${y + 1}`,
+              value: y,
+            })),
+            getOptionLabel: (option: any) => option.label || "",
+            getOptionValue: (option: any) => option.value,
+          },
+        ]}
+        handleApply={handleApplyFilter}
+        handleReset={handleResetFilter}
+        initialValues={filterValues}
+      />
 
       <PopupModal
         type="delete"

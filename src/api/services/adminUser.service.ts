@@ -10,6 +10,7 @@ export const adminUserService = {
     isActive?: string,
     isLogin?: string,
     isVerified?: string,
+    adminCode?: string,
   ) => {
     let url = `${Api.GET_ALL_ADMIN}?pageNumber=${page}&perPageData=${perPage}&searchRequest=${encodeURIComponent(search)}`;
     if (role) url += `&role=${role}`;
@@ -18,6 +19,8 @@ export const adminUserService = {
     if (isLogin !== undefined && isLogin !== "") url += `&isLogin=${isLogin}`;
     if (isVerified !== undefined && isVerified !== "")
       url += `&isVerified=${isVerified}`;
+    if (adminCode !== undefined && adminCode !== "")
+      url += `&adminCode=${encodeURIComponent(adminCode)}`;
     return adminApiService.get<any>(url);
   },
   getAllSimple: (search: string) =>
