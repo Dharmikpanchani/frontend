@@ -25,6 +25,16 @@ DataService.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    const yearFilter = localStorage.getItem("academic-year-filter");
+    if (yearFilter) {
+      try {
+        const { startYear, endYear } = JSON.parse(yearFilter);
+        config.headers["x-academic-year-start"] = String(startYear);
+        config.headers["x-academic-year-end"] = String(endYear);
+      } catch {
+        // ignore malformed value
+      }
+    }
     return config;
   },
   (error) => {

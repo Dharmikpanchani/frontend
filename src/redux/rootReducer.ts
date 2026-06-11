@@ -13,10 +13,13 @@ import classReducer from "./slices/classSlice";
 import sectionReducer from "./slices/sectionSlice";
 import teacherReducer from "./slices/teacherSlice";
 import planReducer from "./slices/planSlice";
+import academicYearReducer from "./slices/academicYearSlice";
 import type { AuthState } from "./slices/authSlice";
+import type { AcademicYearState } from "./slices/academicYearSlice";
 
 export interface RootState {
   AdminReducer: AuthState;
+  AcademicYearReducer: AcademicYearState;
   UserReducer: ReturnType<typeof userReducer>;
   RoleReducer: ReturnType<typeof roleReducer>;
   AdminUserReducer: ReturnType<typeof adminUserReducer>;
@@ -33,6 +36,7 @@ export interface RootState {
 }
 
 const rootReducer = combineReducers({
+  AcademicYearReducer: academicYearReducer,
   AdminReducer: authReducer,
   UserReducer: userReducer,
   RoleReducer: roleReducer,
