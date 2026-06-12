@@ -41,7 +41,6 @@ export const adminUserService = {
     if (params.schoolType) url += `schoolType=${params.schoolType}&`;
     if (params.schoolCode) url += `schoolCode=${params.schoolCode}&`;
     if (params.panNumber) url += `panNumber=${params.panNumber}&`;
-    if (params.gstNumber) url += `gstNumber=${params.gstNumber}&`;
     if (params.registrationNumber)
       url += `registrationNumber=${params.registrationNumber}&`;
     if (params.establishedYear)

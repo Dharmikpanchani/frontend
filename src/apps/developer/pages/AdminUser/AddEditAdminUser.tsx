@@ -87,7 +87,6 @@ export default function AddEditAdminUser() {
     isVerified: "",
     schoolCode: "",
     panNumber: "",
-    gstNumber: "",
     registrationNumber: "",
     establishedYear: "",
   });
@@ -141,7 +140,6 @@ export default function AddEditAdminUser() {
           isVerified: filters?.isVerified ?? filterValues.isVerified,
           schoolCode: filters?.schoolCode ?? filterValues.schoolCode,
           panNumber: filters?.panNumber ?? filterValues.panNumber,
-          gstNumber: filters?.gstNumber ?? filterValues.gstNumber,
           registrationNumber:
             filters?.registrationNumber ?? filterValues.registrationNumber,
           establishedYear:
@@ -182,7 +180,6 @@ export default function AddEditAdminUser() {
       isVerified: "",
       schoolCode: "",
       panNumber: "",
-      gstNumber: "",
       registrationNumber: "",
       establishedYear: "",
     };
@@ -239,12 +236,6 @@ export default function AddEditAdminUser() {
       name: "panNumber",
       label: "PAN Number",
       placeholder: "Enter PAN Number",
-    },
-    {
-      type: "inputSelect",
-      name: "gstNumber",
-      label: "GST Number",
-      placeholder: "Enter GST Number",
     },
     {
       type: "inputSelect",
@@ -1138,13 +1129,6 @@ export default function AddEditAdminUser() {
                                 sx={{ fontSize: "11px", color: "#9ca3af" }}
                               >
                                 PAN: {data?.panNumber || "NA"}
-                              </Typography>
-                            )}
-                            {data?.gstNumber && (
-                              <Typography
-                                sx={{ fontSize: "11px", color: "#9ca3af" }}
-                              >
-                                GST: {data?.gstNumber || "NA"}
                               </Typography>
                             )}
                             {data?.registrationNumber && (

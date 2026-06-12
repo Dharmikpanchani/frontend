@@ -552,7 +552,6 @@ export const schoolValidationSchema = Yup.object({
   country: countryValidation(true),
   // Legal
   registrationNumber: registrationNumberValidation(true),
-  gstNumber: gstValidation(false),
   panNumber: panValidation(false),
   affiliationCertificate: fileValidation("Affiliation certificate", false),
   affiliationCertificateUrl: Yup.string().optional(),
@@ -583,7 +582,6 @@ export const schoolProfileUpdateValidationSchema = Yup.object({
   zipCode: zipCodeValidation(true),
   country: countryValidation(true),
   registrationNumber: registrationNumberValidation(true),
-  gstNumber: gstValidation(false),
   panNumber: panValidation(false),
   logo: imageValidation("School logo", false, 200, 200).nullable(),
   banner: imageValidation("School banner", false, 1200, 400).nullable(),
@@ -842,23 +840,8 @@ export const teacherValidationSchema = Yup.object().shape(
       }),
     // Documents
     profileImage: imageValidation("Profile Image", false).nullable(),
-    resume: fileValidation("Resume", false, [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/svg+xml",
-    ]).nullable(),
     idProof: imageValidation("ID Proof", false).nullable(),
     aadharCard: fileValidation("Aadhar Card", false, [
-      "application/pdf",
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-    ]).nullable(),
-    panCard: fileValidation("PAN Card", false, [
       "application/pdf",
       "image/jpeg",
       "image/jpg",

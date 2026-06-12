@@ -71,7 +71,6 @@ interface SchoolProfileValues {
   medium: string;
   establishedYear: any; // Moment object
   registrationNumber: string;
-  gstNumber: string;
   panNumber: string;
   latitude?: string;
   longitude?: string;
@@ -159,7 +158,6 @@ export default function SchoolDetails() {
             ? moment(data.establishedYear)
             : null,
           registrationNumber: data.registrationNumber || "",
-          gstNumber: data.gstNumber || "",
           panNumber: data.panNumber || "",
           latitude: data.latitude || "",
           longitude: data.longitude || "",
@@ -205,7 +203,6 @@ export default function SchoolDetails() {
         moment(values.establishedYear).format("YYYY-MM-DD"),
       );
     formData.append("registrationNumber", values.registrationNumber);
-    formData.append("gstNumber", values.gstNumber);
     formData.append("panNumber", values.panNumber);
     if (values.latitude) formData.append("latitude", values.latitude);
     if (values.longitude) formData.append("longitude", values.longitude);
@@ -776,7 +773,7 @@ export default function SchoolDetails() {
                 </Grid>
 
                 {/* Legal & Branding */}
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                   <Typography sx={labelSx}>
                     <RegIcon
                       sx={{ fontSize: 16, color: "var(--primary-color)" }}
@@ -802,29 +799,7 @@ export default function SchoolDetails() {
                   </FormHelperText>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Typography sx={labelSx}>
-                    <RegIcon
-                      sx={{ fontSize: 16, color: "var(--primary-color)" }}
-                    />{" "}
-                    GST Number
-                  </Typography>
-                  <OutlinedInput
-                    fullWidth
-                    name="gstNumber"
-                    value={values.gstNumber}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.gstNumber && Boolean(errors.gstNumber)}
-                    sx={inputSx}
-                    inputProps={{ maxLength: 15 }}
-                  />
-                  <FormHelperText error>
-                    {touched.gstNumber && (errors.gstNumber as string)}
-                  </FormHelperText>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                   <Typography sx={labelSx}>
                     <RegIcon
                       sx={{ fontSize: 16, color: "var(--primary-color)" }}
@@ -846,7 +821,7 @@ export default function SchoolDetails() {
                   </FormHelperText>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                   <Typography sx={labelSx}>
                     <DateIcon
                       sx={{ fontSize: 16, color: "var(--primary-color)" }}

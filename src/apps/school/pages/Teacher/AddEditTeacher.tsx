@@ -187,14 +187,10 @@ export default function AddEditTeacher() {
       panNumber: teacherData?.panNumber || "",
       aadharNumber: teacherData?.aadharNumber || "",
       // Documents
-      resume: teacherData?.resume || null,
-      resumeName: teacherData?.resume || "",
       idProof: teacherData?.idProof || null,
       idProofName: teacherData?.idProof || "",
       aadharCard: teacherData?.aadharCard || null,
       aadharCardName: teacherData?.aadharCard || "",
-      panCard: teacherData?.panCard || null,
-      panCardName: teacherData?.panCard || "",
       educationCertificates: teacherData?.educationCertificates || [],
       experienceCertificates: teacherData?.experienceCertificates || [],
       // Attendance
@@ -283,10 +279,8 @@ export default function AddEditTeacher() {
       // Documents
       if (values.profileImage)
         formData.append("profileImage", values.profileImage);
-      if (values.resume) formData.append("resume", values.resume);
       if (values.idProof) formData.append("idProof", values.idProof);
       if (values.aadharCard) formData.append("aadharCard", values.aadharCard);
-      if (values.panCard) formData.append("panCard", values.panCard);
 
       // Certificates
       if (values.educationCertificates?.length > 0) {
@@ -1745,105 +1739,6 @@ export default function AddEditTeacher() {
                       gap={{ xs: 2, sm: 3 }}
                       sx={{ mb: 2 }}
                     >
-                      {/* Resume */}
-                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
-                        <Typography sx={labelSx}>Resume (PDF/DOC)</Typography>
-                        <Box
-                          sx={{
-                            border: "1px dashed #E4E7EC",
-                            p: 1,
-                            borderRadius: "8px",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            minHeight: "44px",
-                            backgroundColor: "#fff",
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color: "#667085",
-                              fontSize: "13px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              pr: 1,
-                            }}
-                          >
-                            {values.resume instanceof File
-                              ? values.resume.name
-                              : values.resumeName
-                                ? "Resume Uploaded"
-                                : "No file selected"}
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                              pointerEvents: "auto",
-                            }}
-                          >
-                            {(values.resume || values.resumeName) && (
-                              <Link
-                                onClick={() => {
-                                  const url =
-                                    values.resume instanceof File
-                                      ? URL.createObjectURL(values.resume)
-                                      : `${import.meta.env.VITE_BASE_URL_IMAGE}/${values.resumeName}`;
-                                  window.open(url, "_blank");
-                                }}
-                                sx={{
-                                  color: "#f59e0b",
-                                  fontSize: "13px",
-                                  fontWeight: 600,
-                                  cursor: "pointer",
-                                  textDecoration: "underline",
-                                  "&:hover": { color: "#d97706" },
-                                }}
-                              >
-                                View
-                              </Link>
-                            )}
-                            {!isView && (
-                              <Button
-                                variant="outlined"
-                                component="label"
-                                size="small"
-                                sx={{
-                                  textTransform: "none",
-                                  height: "32px",
-                                  fontSize: "12px",
-                                  fontWeight: 600,
-                                  color: "var(--primary-color)",
-                                  borderColor:
-                                    "rgba(var(--primary-color-rgb, 92, 26, 26), 0.3)",
-                                  "&:hover": {
-                                    borderColor: "var(--primary-color)",
-                                    backgroundColor: "transparent",
-                                    opacity: 0.8,
-                                  },
-                                }}
-                              >
-                                Choose File
-                                <input
-                                  hidden
-                                  type="file"
-                                  onChange={(e) =>
-                                    setFieldValue("resume", e.target.files?.[0])
-                                  }
-                                />
-                              </Button>
-                            )}
-                          </Box>
-                        </Box>
-                        {touched.resume && errors.resume && (
-                          <FormHelperText className="error-text">
-                            {errors.resume as string}
-                          </FormHelperText>
-                        )}
-                      </Box>
 
                       {/* ID Proof */}
                       <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
@@ -2055,110 +1950,6 @@ export default function AddEditTeacher() {
                         )}
                       </Box>
 
-                      {/* PAN Card */}
-                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
-                        <Typography sx={labelSx}>
-                          PAN Card (PDF/Image)
-                        </Typography>
-                        <Box
-                          sx={{
-                            border: "1px dashed #E4E7EC",
-                            p: 1,
-                            borderRadius: "8px",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            minHeight: "44px",
-                            backgroundColor: "#fff",
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color: "#667085",
-                              fontSize: "13px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              pr: 1,
-                            }}
-                          >
-                            {values.panCard instanceof File
-                              ? values.panCard.name
-                              : values.panCardName
-                                ? "PAN Card Uploaded"
-                                : "No file selected"}
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                              pointerEvents: "auto",
-                            }}
-                          >
-                            {(values.panCard || values.panCardName) && (
-                              <Link
-                                onClick={() => {
-                                  const url =
-                                    values.panCard instanceof File
-                                      ? URL.createObjectURL(values.panCard)
-                                      : `${import.meta.env.VITE_BASE_URL_IMAGE}/${values.panCardName}`;
-                                  window.open(url, "_blank");
-                                }}
-                                sx={{
-                                  color: "#f59e0b",
-                                  fontSize: "13px",
-                                  fontWeight: 600,
-                                  cursor: "pointer",
-                                  textDecoration: "underline",
-                                  "&:hover": { color: "#d97706" },
-                                }}
-                              >
-                                View
-                              </Link>
-                            )}
-                            {!isView && (
-                              <Button
-                                variant="outlined"
-                                component="label"
-                                size="small"
-                                sx={{
-                                  textTransform: "none",
-                                  height: "32px",
-                                  fontSize: "12px",
-                                  fontWeight: 600,
-                                  color: "var(--primary-color)",
-                                  borderColor:
-                                    "rgba(var(--primary-color-rgb, 92, 26, 26), 0.3)",
-                                  "&:hover": {
-                                    borderColor: "var(--primary-color)",
-                                    backgroundColor: "transparent",
-                                    opacity: 0.8,
-                                  },
-                                }}
-                              >
-                                Choose File
-                                <input
-                                  hidden
-                                  type="file"
-                                  onChange={(e) =>
-                                    setFieldValue(
-                                      "panCard",
-                                      e.target.files?.[0],
-                                    )
-                                  }
-                                />
-                              </Button>
-                            )}
-                          </Box>
-                        </Box>
-                        {touched.panCard && errors.panCard && (
-                          <FormHelperText className="error-text">
-                            {errors.panCard as string}
-                          </FormHelperText>
-                        )}
-                      </Box>
 
                       {/* Education Certificates */}
                       <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>

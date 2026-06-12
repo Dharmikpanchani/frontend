@@ -140,9 +140,11 @@ export const getSchoolLogo = createAsyncThunk(
       return rejectWithValue(message);
     } catch (err: any) {
       const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to fetch school logo";
+        err.response?.status === 404
+          ? "School not found"
+          : err.response?.data?.message ||
+            err.message ||
+            "Failed to fetch school logo";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }

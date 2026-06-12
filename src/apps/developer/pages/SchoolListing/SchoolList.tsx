@@ -64,7 +64,6 @@ export default function SchoolList() {
     isVerified: "",
     schoolCode: "",
     panNumber: "",
-    gstNumber: "",
     registrationNumber: "",
     establishedYear: "",
     isActivePlan: "",
@@ -153,7 +152,6 @@ export default function SchoolList() {
         isVerified: filters?.isVerified ?? filterValues.isVerified,
         schoolCode: filters?.schoolCode ?? filterValues.schoolCode,
         panNumber: filters?.panNumber ?? filterValues.panNumber,
-        gstNumber: filters?.gstNumber ?? filterValues.gstNumber,
         registrationNumber:
           filters?.registrationNumber ?? filterValues.registrationNumber,
         establishedYear:
@@ -187,7 +185,6 @@ export default function SchoolList() {
       isVerified: "",
       schoolCode: "",
       panNumber: "",
-      gstNumber: "",
       registrationNumber: "",
       establishedYear: "",
       isActivePlan: "",
@@ -253,12 +250,6 @@ export default function SchoolList() {
       name: "panNumber",
       label: "PAN Number",
       placeholder: "Enter PAN Number",
-    },
-    {
-      type: "inputSelect",
-      name: "gstNumber",
-      label: "GST Number",
-      placeholder: "Enter GST Number",
     },
     {
       type: "inputSelect",
@@ -801,30 +792,6 @@ export default function SchoolList() {
                                   sx={{ fontSize: "12px", color: "#111827" }}
                                 >
                                   {data?.panNumber || "NA"}
-                                </Typography>
-                              </Box>
-                            )}
-                            {data?.gstNumber && (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 0.5,
-                                }}
-                              >
-                                <Typography
-                                  sx={{
-                                    fontSize: "11px",
-                                    color: "#9ca3af",
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  GST:
-                                </Typography>
-                                <Typography
-                                  sx={{ fontSize: "12px", color: "#111827" }}
-                                >
-                                  {data?.gstNumber || "NA"}
                                 </Typography>
                               </Box>
                             )}

@@ -100,7 +100,6 @@ export default function RegisterSchool() {
       // Legal Details
       registrationNumber:
         isEdit || isView ? selectedSchool?.registrationNumber || "" : "",
-      gstNumber: isEdit || isView ? selectedSchool?.gstNumber || "" : "",
       panNumber: isEdit || isView ? selectedSchool?.panNumber || "" : "",
       affiliationCertificate: null,
       affiliationCertificateUrl:
@@ -147,7 +146,6 @@ export default function RegisterSchool() {
 
     // Legal Details
     formData.append("registrationNumber", values.registrationNumber);
-    formData.append("gstNumber", values.gstNumber);
     formData.append("panNumber", values.panNumber);
     if (values.affiliationCertificate) {
       formData.append("affiliationCertificate", values.affiliationCertificate);
@@ -807,7 +805,7 @@ export default function RegisterSchool() {
                       gap={{ xs: 2, sm: 3 }}
                       sx={{ mb: 6 }}
                     >
-                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                         <Typography sx={labelSx}>
                           Registration Number
                           <span style={{ color: "#ef4444", marginLeft: "2px" }}>
@@ -838,34 +836,7 @@ export default function RegisterSchool() {
                         </FormHelperText>
                       </Box>
 
-                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
-                        <Typography sx={labelSx}>GST Number</Typography>
-                        <TextField
-                          fullWidth
-                          name="gstNumber"
-                          placeholder="GSTIN"
-                          variant="outlined"
-                          sx={inputSx}
-                          value={values.gstNumber}
-                          onChange={(e) =>
-                            setFieldValue(
-                              "gstNumber",
-                              e.target.value.toUpperCase(),
-                            )
-                          }
-                          onBlur={handleBlur}
-                          error={touched.gstNumber && Boolean(errors.gstNumber)}
-                          disabled={isView}
-                          slotProps={{ htmlInput: { maxLength: 15 } }}
-                        />
-                        <FormHelperText className="error-text">
-                          {touched.gstNumber && errors.gstNumber
-                            ? (errors.gstNumber as string)
-                            : ""}
-                        </FormHelperText>
-                      </Box>
-
-                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                         <Typography sx={labelSx}>PAN Number</Typography>
                         <TextField
                           fullWidth
