@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Router from "./routes";
+import { Box, Button, Typography } from "@mui/material";
 import { getSubdomain } from "./apps/common/commonJsFunction";
 import { getSchoolLogo } from "./redux/slices/schoolSlice";
 import { toasterError } from "./utils/toaster/Toaster";
@@ -64,6 +65,7 @@ function App() {
     (state: RootState) => state.AdminReducer,
   );
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
+  const [loadingTimeout, setLoadingTimeout] = useState<boolean>(false);
 
   // Heartbeat ping interval when logged in
   useEffect(() => {
@@ -111,10 +113,68 @@ function App() {
     }
   }, []);
 
+  // Safety timer to prevent infinite loading spinner
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    const isInitialLoading = !!(isSubdomain?.isSubdomain && (schoolLoading || isRedirecting));
+    if (isInitialLoading) {
+      timer = setTimeout(() => {
+        setLoadingTimeout(true);
+      }, 10000); // 10 seconds safety timeout
+    } else {
+      setLoadingTimeout(false);
+    }
+    return () => clearTimeout(timer);
+  }, [isSubdomain?.isSubdomain, schoolLoading, isRedirecting]);
+
   if (isSubdomain?.isSubdomain && (schoolLoading || isRedirecting)) {
     return (
       <ThemeProvider theme={theme}>
-        <PageLoader />
+        {!loadingTimeout ? (
+          <PageLoader />
+        ) : (
+          <Box
+            sx={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 999,
+              backgroundColor: "#fff",
+              gap: 2,
+            }}
+          >
+            <Box sx={{ textAlign: "center", p: 3, maxWidth: "400px" }}>
+              <Typography variant="h6" color="error" sx={{ mb: 2, fontWeight: 600 }}>
+                Connection Timeout
+              </Typography>
+              <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+                The server is taking too long to respond. Please check your internet connection or try again.
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
+                <Button
+                  variant="contained"
+                  onClick={() => window.location.reload()}
+                  sx={{ backgroundColor: "#002147", "&:hover": { backgroundColor: "#002147" } }}
+                >
+                  Retry
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => window.location.href = import.meta.env.VITE_MAIN_URL || "http://localhost:5173"}
+                  sx={{ color: "#002147", borderColor: "#002147", "&:hover": { borderColor: "#002147" } }}
+                >
+                  Go to Home
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        )}
       </ThemeProvider>
     );
   }
