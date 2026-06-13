@@ -118,6 +118,13 @@ export default function AddEditTeacher() {
 
   const [teacherData, setTeacherData] = useState<any>(null);
 
+  const fetchTeacherDetails = async () => {
+    const result = await dispatch(getTeacherById(id as string) as any);
+    if (getTeacherById.fulfilled.match(result)) {
+      setTeacherData(result.payload);
+    }
+  };
+
   useEffect(() => {
     const params = { type: "filter" };
     dispatch(getDepartments(params) as any);
@@ -130,13 +137,6 @@ export default function AddEditTeacher() {
       fetchTeacherDetails();
     }
   }, [id]);
-
-  const fetchTeacherDetails = async () => {
-    const result = await dispatch(getTeacherById(id as string) as any);
-    if (getTeacherById.fulfilled.match(result)) {
-      setTeacherData(result.payload);
-    }
-  };
 
   const initialValues = useMemo(
     () => ({
@@ -204,7 +204,7 @@ export default function AddEditTeacher() {
       shiftTimeTo: teacherData?.shiftTiming?.includes(" - ")
         ? moment(teacherData.shiftTiming.split(" - ")[1], "hh:mm A")
         : null,
-      role: teacherData?.userId?.role?._id || teacherData?.userId?.role || "",
+      roles: teacherData?.userId?.roles?.map((r: { _id?: string } | string) => typeof r === "object" ? r._id || "" : r) || (teacherData?.userId?.role ? [teacherData.userId.role._id || teacherData.userId.role] : []),
       isActive: teacherData?.isActive ?? true,
     }),
     [id, teacherData],
@@ -307,7 +307,11 @@ export default function AddEditTeacher() {
       } else if (values.shiftTiming) {
         formData.append("shiftTiming", values.shiftTiming);
       }
-      if (values.role) formData.append("role", values.role);
+      if (values.roles && values.roles.length > 0) {
+        values.roles.forEach((rId: string) => {
+          formData.append("roles[]", rId);
+        });
+      }
       if (values.isActive !== undefined)
         formData.append("isActive", values.isActive.toString());
 
@@ -950,30 +954,34 @@ export default function AddEditTeacher() {
                           </Tooltip>
                         </Box>
                         <Autocomplete
+                          multiple
                           options={allRoles || []}
-                          getOptionLabel={(option: any) => option.role || ""}
+                          getOptionLabel={(option: { role?: string; _id?: string }) => option.role || ""}
                           value={
-                            allRoles?.find(
-                              (role: any) => role._id === values.role,
-                            ) || null
+                            allRoles?.filter((role: { _id?: string; role?: string }) =>
+                              values.roles?.includes(role._id),
+                            ) || []
                           }
                           onChange={(_, newValue) => {
-                            setFieldValue("role", newValue ? newValue._id : "");
+                            setFieldValue(
+                              "roles",
+                              newValue ? newValue.map((item: { _id?: string; role?: string }) => item._id) : [],
+                            );
                           }}
                           disabled={isView}
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Role"
+                              placeholder="Select Roles"
                               variant="outlined"
                               sx={inputSx}
-                              error={touched.role && Boolean(errors.role)}
+                              error={touched.roles && Boolean(errors.roles)}
                             />
                           )}
                         />
                         <FormHelperText className="error-text">
-                          {touched.role && errors.role
-                            ? (errors.role as string)
+                          {touched.roles && errors.roles
+                            ? (errors.roles as string)
                             : ""}
                         </FormHelperText>
                       </Box>

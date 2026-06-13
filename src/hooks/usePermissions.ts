@@ -12,8 +12,18 @@ export const usePermissions = () => {
   const isSuperAdmin = adminDetails?.isSuperAdmin;
 
   const rolePermissions = useMemo((): string[] => {
+    const roles = adminDetails?.roles;
+    if (roles && Array.isArray(roles)) {
+      const allPerms = new Set<string>();
+      roles.forEach((r: any) => {
+        if (r && r.isActive !== false && Array.isArray(r.permissions)) {
+          r.permissions.forEach((p: string) => allPerms.add(p));
+        }
+      });
+      return Array.from(allPerms);
+    }
     return adminDetails?.role?.permissions ?? [];
-  }, [adminDetails?.role?.permissions]);
+  }, [adminDetails?.roles, adminDetails?.role?.permissions]);
 
   const planPermissions = useMemo((): string[] => {
     return adminDetails?.schoolData?.plan?.permissions ?? [];

@@ -463,7 +463,9 @@ export const adminUserValidationSchema = Yup.object({
         .required("Please confirm your password"),
     otherwise: () => Yup.string().optional(),
   }),
-  role: Yup.string().required("Please select role"),
+  roles: Yup.array()
+    .min(1, "Please select at least one role")
+    .required("Please select at least one role"),
   id: Yup.string().optional(),
 });
 
@@ -849,7 +851,9 @@ export const teacherValidationSchema = Yup.object().shape(
     ]).nullable(),
     educationCertificates: Yup.array().of(Yup.mixed()).optional(),
     experienceCertificates: Yup.array().of(Yup.mixed()).optional(),
-    role: Yup.string().required("Please select role"),
+    roles: Yup.array()
+      .min(1, "Please select at least one role")
+      .required("Please select at least one role"),
   },
   [["shiftTimeFrom", "shiftTimeTo"]],
 );

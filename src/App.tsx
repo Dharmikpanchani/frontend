@@ -11,6 +11,8 @@ import { getSchoolLogo } from "./redux/slices/schoolSlice";
 import { toasterError } from "./utils/toaster/Toaster";
 import PageLoader from "./apps/common/loader/PageLoader";
 import type { RootState } from "./redux/Store";
+import { adminApiService } from "./api/client/apiClient";
+import { Api } from "./api/EndPoint";
 
 const theme = createTheme({
   typography: {
@@ -58,7 +60,26 @@ function App() {
   const { loading: schoolLoading } = useSelector(
     (state: RootState) => state.SchoolReducer,
   );
+  const { isAdminLogin, token } = useSelector(
+    (state: RootState) => state.AdminReducer,
+  );
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
+
+  // Heartbeat ping interval when logged in
+  useEffect(() => {
+    if (!isAdminLogin || !token) return;
+
+    const sendPing = () => {
+      adminApiService.get(Api.PING).catch((err) => {
+        console.error("Heartbeat error:", err);
+      });
+    };
+
+    sendPing();
+    const interval = setInterval(sendPing, 2 * 60 * 1000); // every 2 minutes
+
+    return () => clearInterval(interval);
+  }, [isAdminLogin, token]);
 
   useEffect(() => {
     if (isSubdomain?.isSubdomain) {

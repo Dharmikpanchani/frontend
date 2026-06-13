@@ -353,13 +353,19 @@ export default function AdminUser() {
                           >
                             <Box className="admin-table-data-flex">
                               <Tooltip
-                                title={data?.role?.role || "N/A"}
+                                title={
+                                  data?.roles?.length
+                                    ? data.roles.map((r: { role?: string } | string) => typeof r === "object" ? r.role || "" : r).join(", ")
+                                    : data?.role?.role || "N/A"
+                                }
                                 arrow
                                 placement="bottom"
                                 className="admin-tooltip"
                               >
                                 <Typography className="admin-table-data-text">
-                                  {data?.role?.role || "N/A"}
+                                  {data?.roles?.length
+                                    ? data.roles.map((r: { role?: string } | string) => typeof r === "object" ? r.role || "" : r).join(", ")
+                                    : data?.role?.role || "N/A"}
                                 </Typography>
                               </Tooltip>
                             </Box>

@@ -884,7 +884,7 @@ export default function Teacher() {
                                 >
                                   {data?.designation || "N/A"}
                                 </Typography>
-                                {data?.userId?.role?.role && (
+                                {(data?.userId?.roles?.length || data?.userId?.role?.role) && (
                                   <Typography
                                     sx={{
                                       fontSize: "10px",
@@ -894,7 +894,10 @@ export default function Teacher() {
                                       mt: 0.2,
                                     }}
                                   >
-                                    Role: {data?.userId?.role?.role}
+                                    Role:{" "}
+                                    {data?.userId?.roles?.length
+                                      ? data.userId.roles.map((r: { role?: string } | string) => typeof r === "object" ? r.role || "" : r).join(", ")
+                                      : data?.userId?.role?.role}
                                   </Typography>
                                 )}
                                 <Box

@@ -241,7 +241,7 @@ export default function AddEditAdminUser() {
       phoneNumber: isEdit || isView ? selectedAdminUser?.phoneNumber || "" : "",
       password: "",
       confirmPassword: "",
-      role: isEdit || isView ? selectedAdminUser?.role?._id || "" : "",
+      roles: isEdit || isView ? selectedAdminUser?.roles?.map((r: { _id?: string } | string) => typeof r === "object" ? r._id || "" : r) || (selectedAdminUser?.role ? [selectedAdminUser.role._id || selectedAdminUser.role] : []) : [],
       id: id || "",
     }),
     [isEdit, isView, selectedAdminUser, id],
@@ -255,7 +255,11 @@ export default function AddEditAdminUser() {
     urlencoded.append("name", values.name);
     urlencoded.append("email", values.email);
     urlencoded.append("phoneNumber", values.phoneNumber);
-    urlencoded.append("role", values.role);
+    if (values.roles && values.roles.length > 0) {
+      values.roles.forEach((rId: string) => {
+        urlencoded.append("roles[]", rId);
+      });
+    }
 
     if (id) {
       urlencoded.append("id", id);
@@ -466,15 +470,19 @@ export default function AddEditAdminUser() {
                           </Tooltip>
                         </Box>
                         <Autocomplete
+                          multiple
                           options={allRoles || []}
-                          getOptionLabel={(option: any) => option.role || ""}
+                          getOptionLabel={(option: { role?: string; _id?: string }) => option.role || ""}
                           value={
-                            allRoles?.find(
-                              (role: any) => role._id === values.role,
-                            ) || null
+                            allRoles?.filter((role: { _id?: string; role?: string }) =>
+                              values.roles?.includes(role._id),
+                            ) || []
                           }
                           onChange={(_, newValue) => {
-                            setFieldValue("role", newValue ? newValue._id : "");
+                            setFieldValue(
+                              "roles",
+                              newValue ? newValue.map((item: { _id?: string; role?: string }) => item._id) : [],
+                            );
                           }}
                           disabled={isView}
                           popupIcon={
@@ -488,10 +496,10 @@ export default function AddEditAdminUser() {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder="Select Role"
+                              placeholder="Select Roles"
                               variant="outlined"
                               sx={inputSx}
-                              error={touched.role && Boolean(errors.role)}
+                              error={touched.roles && Boolean(errors.roles)}
                             />
                           )}
                           sx={{
@@ -500,7 +508,8 @@ export default function AddEditAdminUser() {
                               paddingBottom: "0 !important",
                               paddingLeft: "0 !important",
                               paddingRight: "30px !important",
-                              height: "40px",
+                              height: "auto",
+                              minHeight: "40px",
                               "& .MuiAutocomplete-input": {
                                 padding: "0 10px !important",
                                 height: "40px",
@@ -511,8 +520,8 @@ export default function AddEditAdminUser() {
                           }}
                         />
                         <FormHelperText className="error-text">
-                          {touched.role && errors.role
-                            ? (errors.role as string)
+                          {touched.roles && errors.roles
+                            ? (errors.roles as string)
                             : ""}
                         </FormHelperText>
                       </Box>

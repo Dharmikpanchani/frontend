@@ -14,6 +14,7 @@ if (window.location.pathname.startsWith("/checkout")) {
 }
 
 export const Api = {
+  PING: `${route}/ping`,
   LOGIN: `${route}/login`,
   LOGOUT: `${route}/logout`,
   REFRESH_TOKEN: `${route}/refresh-token`,
