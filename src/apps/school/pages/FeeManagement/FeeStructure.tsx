@@ -1,0 +1,261 @@
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  Box, Typography, Button, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow, Paper, Tooltip,
+} from "@mui/material";
+import { Add as AddIcon } from "@mui/icons-material";
+import {
+  fetchFeeStructures, removeFeeStructure, fetchFeeCategories,
+} from "@/redux/slices/feeSlice";
+import { getClasses } from "@/redux/slices/classSlice";
+import type { RootState, AppDispatch } from "@/redux/Store";
+import toast from "react-hot-toast";
+import { usePermissions } from "@/hooks/usePermissions";
+import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
+import Pagination from "@/apps/common/pagination/Pagination";
+import Loader from "@/apps/common/loader/Loader";
+import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
+import { IOSSwitch } from "../../component/schoolCommon/commonCssFunction/cssFunction";
+import Svg from "@/assets/Svg";
+
+const FeeStructure = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { hasPermission, hasAnyPermission } = usePermissions();
+  const { structures, loading } = useSelector((state: RootState) => state.FeeReducer);
+
+  const canView = hasPermission(schoolAdminPermission.fee_structure.read);
+  const canAdd = hasPermission(schoolAdminPermission.fee_structure.create);
+  const canEdit = hasPermission(schoolAdminPermission.fee_structure.update);
+  const canDelete = hasPermission(schoolAdminPermission.fee_structure.delete);
+  const canStatus = hasPermission(schoolAdminPermission.fee_structure.status);
+
+  const navigate = useNavigate();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalDocs, setTotalDocs] = useState(0);
+
+  useEffect(() => {
+    loadStructures();
+    dispatch(fetchFeeCategories({ page: 1, limit: 100 }) as any);
+    dispatch(getClasses({ type: "filter" }) as any);
+  }, [page, rowsPerPage]);
+
+  const loadStructures = async () => {
+    try {
+      const res: any = await dispatch(fetchFeeStructures({ page: page + 1, limit: rowsPerPage })).unwrap();
+      if (res?.data) setTotalDocs(res.data.totalDocs || res.data.length || 0);
+    } catch (err) { console.error(err); }
+  };
+
+
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this structure?")) {
+      try {
+        await dispatch(removeFeeStructure(id)).unwrap();
+        toast.success("Structure deleted successfully"); loadStructures();
+      } catch (err: any) { toast.error(err || "Failed to delete structure"); }
+    }
+  };
+
+  const handleStatusChange = async (id: string, currentStatus: boolean) => {
+    try {
+      const { changeFeeStructureStatus } = await import("@/api/services/fee.service");
+      await changeFeeStructureStatus(id, { isActive: !currentStatus });
+      toast.success("Status updated successfully"); loadStructures();
+    } catch (err: any) { toast.error(err?.response?.data?.message || "Failed to update status"); }
+  };
+
+  const getTotalAmount = (structure: any) =>
+    structure.installments?.reduce((acc: number, curr: any) => acc + curr.amount, 0) || 0;
+  return (
+    <Box className="admin-dashboard-content">
+      <Box className="admin-user-list-flex admin-page-title-main">
+        <Typography className="admin-page-title" component="h2" variant="h2">
+          Fee Structures
+        </Typography>
+        {canAdd && (
+          <Box className="admin-add-user-btn-main">
+            <Button
+              className="admin-btn-theme"
+              onClick={() => navigate("/fee/structures/add")}
+              startIcon={<AddIcon />}
+            >
+              Create Structure
+            </Button>
+          </Box>
+        )}
+      </Box>
+
+      <Box className="card-border common-card">
+        <Box className="brand-table-main page-table-main">
+          <TableContainer component={Paper} className="table-container">
+            <Table aria-label="fee structures table" className="table">
+              <TableHead className="table-head">
+                <TableRow className="table-row">
+                  <TableCell className="table-th">Class</TableCell>
+                  <TableCell className="table-th">Fee Category</TableCell>
+                  <TableCell className="table-th">Total Amount</TableCell>
+                  <TableCell className="table-th">Installments</TableCell>
+                  {canStatus && <TableCell className="table-th">Status</TableCell>}
+                  {hasAnyPermission([
+                    schoolAdminPermission.fee_structure.read,
+                    schoolAdminPermission.fee_structure.update,
+                    schoolAdminPermission.fee_structure.delete,
+                  ]) && (
+                    <TableCell align="right" className="table-th">
+                      Actions
+                    </TableCell>
+                  )}
+                </TableRow>
+              </TableHead>
+              <TableBody className="table-body">
+                {loading && structures.length === 0 ? (
+                  <Loader colSpan={canStatus ? 5 : 4} />
+                ) : structures.length === 0 ? (
+                  <DataNotFound text="No fee structures found." colSpan={canStatus ? 5 : 4} />
+                ) : (
+                  structures.map((row: any) => (
+                    <TableRow
+                      key={row._id}
+                      sx={{
+                        "&:last-child td, &:last-child th": { border: 0 },
+                        "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" },
+                      }}
+                    >
+                      <TableCell className="table-td" sx={{ color: "#101828", fontWeight: 500 }}>
+                        <Tooltip title={row.classId?.name || "N/A"} arrow placement="top">
+                          <Typography className="admin-table-data-text" sx={{ color: "#101828", fontWeight: 500, cursor: "pointer" }}>
+                            {row.classId?.name || "N/A"}
+                          </Typography>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell className="table-td" sx={{ color: "#475467" }}>
+                        <Tooltip title={row.feeCategoryId?.name || "N/A"} arrow placement="top">
+                          <Typography className="admin-table-data-text" sx={{ color: "#475467", cursor: "pointer" }}>
+                            {row.feeCategoryId?.name || "N/A"}
+                          </Typography>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell className="table-td" sx={{ color: "#027A48", fontWeight: 600 }}>
+                        ₹{getTotalAmount(row).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="table-td">
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                          {row.installments?.slice(0, 2).map((inst: any, idx: number) => (
+                            <Box
+                              key={idx}
+                              sx={{
+                                fontSize: "11px",
+                                p: 0.5,
+                                border: "1px solid #eaecf0",
+                                borderRadius: "4px",
+                                backgroundColor: "#F9FAFB",
+                              }}
+                            >
+                              {inst.label}: ₹{inst.amount}
+                            </Box>
+                          ))}
+                          {row.installments && row.installments.length > 2 && (
+                            <Tooltip
+                              title={row.installments
+                                .slice(2)
+                                .map((inst: any) => `${inst.label}: ₹${inst.amount}`)
+                                .join(", ")}
+                              arrow
+                              placement="top"
+                            >
+                              <Box
+                                sx={{
+                                  fontSize: "11px",
+                                  p: 0.5,
+                                  border: "1px solid #eaecf0",
+                                  borderRadius: "4px",
+                                  backgroundColor: "#F9FAFB",
+                                  color: "#6b7280",
+                                  fontWeight: 500,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                +{row.installments.length - 2} more
+                              </Box>
+                            </Tooltip>
+                          )}
+                        </Box>
+                      </TableCell>
+                      {canStatus && (
+                        <TableCell className="table-td">
+                          <IOSSwitch
+                            checked={row.isActive}
+                            onChange={() => handleStatusChange(row._id, row.isActive)}
+                          />
+                        </TableCell>
+                      )}
+                      {hasAnyPermission([
+                        schoolAdminPermission.fee_structure.read,
+                        schoolAdminPermission.fee_structure.update,
+                        schoolAdminPermission.fee_structure.delete,
+                      ]) && (
+                        <TableCell className="table-td" align="right">
+                          <Box className="admin-table-data-btn-flex" sx={{ justifyContent: "flex-end", gap: 0.5 }}>
+                            {canView && (
+                              <Tooltip title="View" arrow placement="bottom" className="admin-tooltip">
+                                <Button
+                                  className="admin-table-data-btn admin-table-view-btn"
+                                  onClick={() => navigate("/fee/structures/view", { state: { id: row._id } })}
+                                >
+                                  <img src={Svg.yellowEye} className="admin-icon" alt="View" />
+                                </Button>
+                              </Tooltip>
+                            )}
+                            {canEdit && (
+                              <Tooltip title="Edit" arrow placement="bottom">
+                                <Button
+                                  className="admin-table-data-btn admin-table-edit-btn"
+                                  onClick={() => navigate("/fee/structures/edit", { state: { id: row._id } })}
+                                >
+                                  <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
+                                </Button>
+                              </Tooltip>
+                            )}
+                            {canDelete && (
+                              <Tooltip title="Delete" arrow placement="bottom">
+                                <Button
+                                  className="admin-table-data-btn admin-table-delete-btn"
+                                  onClick={() => handleDelete(row._id)}
+                                >
+                                  <img src={Svg.trash} className="admin-icon" alt="Trash" />
+                                </Button>
+                              </Tooltip>
+                            )}
+                          </Box>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+        <Box className="admin-pagination-main">
+          {totalDocs ? (
+            <Pagination
+              count={totalDocs}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              setPage={setPage}
+              setRowsPerPage={setRowsPerPage}
+            />
+          ) : null}
+        </Box>
+      </Box>
+
+
+    </Box>
+  );
+};
+
+export default FeeStructure;

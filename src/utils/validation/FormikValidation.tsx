@@ -924,8 +924,58 @@ export const planValidationSchema = Yup.object().shape({
     .optional()
     .nullable(),
   billingCycle: Yup.string().required("Billing cycle is required"),
+  studentLimit: Yup.number()
+    .typeError("Student Limit must be a number")
+    .integer("Student Limit must be an integer")
+    .test(
+      "valid-student-limit",
+      "Student Limit must be -1 (unlimited) or a positive number (minimum 1)",
+      (value) => value === -1 || (value !== undefined && value >= 1),
+    )
+    .required("Student Limit is required"),
+  storageLimit: Yup.number()
+    .typeError("Storage Limit must be a number")
+    .integer("Storage Limit must be an integer")
+    .test(
+      "valid-storage-limit",
+      "Storage Limit must be -1 (unlimited) or a positive number (minimum 1)",
+      (value) => value === -1 || (value !== undefined && value >= 1),
+    )
+    .required("Storage Limit is required"),
 });
 
 export const documentRejectionValidationSchema = Yup.object().shape({
   rejectReason: genericStringValidation("Rejection reason", 3, 250, true),
 });
+
+export const feeCategoryValidationSchema = Yup.object().shape({
+  name: genericStringValidation("Category name", 3, 100, true),
+  description: Yup.string()
+    .max(500, "Description must be at most 500 characters")
+    .optional(),
+  isMandatory: Yup.boolean().optional(),
+});
+
+export const feeStructureValidationSchema = Yup.object().shape({
+  classId: Yup.string().required("Class is required"),
+  feeCategoryId: Yup.string().required("Fee Category is required"),
+  installments: Yup.array()
+    .of(
+      Yup.object().shape({
+        label: genericStringValidation("Label", 2, 50, true),
+        amount: Yup.number()
+          .typeError("Amount must be a number")
+          .positive("Amount must be positive")
+          .min(1, "Amount must be at least ₹1")
+          .required("Amount is required"),
+        dueDate: Yup.string()
+          .required("Due date is required")
+          .test("is-valid-date", "Please select a valid due date", (value) => {
+            if (!value) return false;
+            return moment(value).isValid();
+          }),
+      })
+    )
+    .min(1, "At least one installment is required"),
+});
+

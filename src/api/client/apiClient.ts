@@ -25,6 +25,21 @@ DataService.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Attach academic year start to request header from localStorage
+    if (typeof window !== "undefined" && config.headers) {
+      const savedYear = localStorage.getItem("academic-year-filter");
+      if (savedYear) {
+        try {
+          const parsed = JSON.parse(savedYear);
+          if (parsed && parsed.startYear) {
+            config.headers["x-academic-year-start"] = parsed.startYear.toString();
+          }
+        } catch (e) {
+          // Ignore
+        }
+      }
+    }
     return config;
   },
   (error) => {

@@ -54,6 +54,15 @@ const AddEditSection = lazy(
 const TeacherList = lazy(() => import("./pages/Teacher/Teacher"));
 const AddEditTeacher = lazy(() => import("./pages/Teacher/AddEditTeacher"));
 
+// Fee Management
+const SchoolSettingsPage = lazy(() => import("./pages/FeeManagement/Settings"));
+const FeeCategoryPage = lazy(() => import("./pages/FeeManagement/FeeCategory"));
+const AddEditFeeCategory = lazy(() => import("./pages/FeeManagement/AddEditFeeCategory"));
+const FeeStructurePage = lazy(() => import("./pages/FeeManagement/FeeStructure"));
+const AddEditFeeStructure = lazy(() => import("./pages/FeeManagement/AddEditFeeStructure"));
+const FeeCollectionPage = lazy(() => import("./pages/FeeManagement/FeeCollection"));
+const FeeDuesPage = lazy(() => import("./pages/FeeManagement/FeeDues"));
+
 /**
  * Wrapper component that reads permissions from the store (inside a component body,
  * satisfying the Rules of Hooks) and conditionally renders the guarded page.
@@ -405,6 +414,111 @@ export const schoolRoutes: RouteConfig[] = [
                 permission={schoolAdminPermission?.teacher?.read}
               >
                 <AddEditTeacher />
+              </PermissionRoute>
+            ),
+          },
+          // Fee Category
+          {
+            path: "/fee/categories",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_category?.read}
+              >
+                <FeeCategoryPage />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/fee/categories/add",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_category?.create}
+              >
+                <AddEditFeeCategory />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/fee/categories/edit",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_category?.update}
+              >
+                <AddEditFeeCategory />
+              </PermissionRoute>
+            ),
+          },
+          // Fee Structure
+          {
+            path: "/fee/structures",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_structure?.read}
+              >
+                <FeeStructurePage />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/fee/structures/add",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_structure?.create}
+              >
+                <AddEditFeeStructure />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/fee/structures/edit",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_structure?.update}
+              >
+                <AddEditFeeStructure />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/fee/structures/view",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_structure?.read}
+              >
+                <AddEditFeeStructure />
+              </PermissionRoute>
+            ),
+          },
+          // Fee Collection
+          {
+            path: "/fee/collections",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_collection?.read}
+              >
+                <FeeCollectionPage />
+              </PermissionRoute>
+            ),
+          },
+          // Fee Dues
+          {
+            path: "/fee/dues",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_collection?.read}
+              >
+                <FeeDuesPage />
+              </PermissionRoute>
+            ),
+          },
+          // School Settings
+          {
+            path: "/settings",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.school_settings?.read}
+              >
+                <SchoolSettingsPage />
               </PermissionRoute>
             ),
           },

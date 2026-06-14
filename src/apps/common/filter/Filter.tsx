@@ -36,6 +36,9 @@ export interface FilterField {
   getOptionValue?: (option: any) => any;
   minLimit?: number;
   maxLimit?: number;
+  minDate?: moment.Moment;
+  maxDate?: moment.Moment;
+  disableFuture?: boolean;
 }
 
 interface FilterProps {
@@ -157,6 +160,11 @@ const Filter: React.FC<FilterProps> = ({
                 onChange={(date) =>
                   setFieldValue(field.name, date ? date.toISOString() : "")
                 }
+                format="DD-MM-YYYY"
+                maxDate={
+                  field.maxDate || (field.disableFuture ? moment() : undefined)
+                }
+                minDate={field.minDate}
                 open={!!openSelectors[field.name]}
                 onOpen={() => toggleSelector(field.name, true)}
                 onClose={() => toggleSelector(field.name, false)}
@@ -213,6 +221,12 @@ const Filter: React.FC<FilterProps> = ({
                       date ? date.toISOString() : "",
                     )
                   }
+                  format="DD-MM-YYYY"
+                  maxDate={
+                    field.maxDate ||
+                    (field.disableFuture ? moment() : undefined)
+                  }
+                  minDate={field.minDate}
                   open={!!openSelectors[`${field.name}Start`]}
                   onOpen={() => toggleSelector(`${field.name}Start`, true)}
                   onClose={() => toggleSelector(`${field.name}Start`, false)}
@@ -250,6 +264,16 @@ const Filter: React.FC<FilterProps> = ({
                       `${field.name}End`,
                       date ? date.toISOString() : "",
                     )
+                  }
+                  format="DD-MM-YYYY"
+                  maxDate={
+                    field.maxDate ||
+                    (field.disableFuture ? moment() : undefined)
+                  }
+                  minDate={
+                    values[`${field.name}Start`]
+                      ? moment(values[`${field.name}Start`])
+                      : field.minDate
                   }
                   open={!!openSelectors[`${field.name}End`]}
                   onOpen={() => toggleSelector(`${field.name}End`, true)}

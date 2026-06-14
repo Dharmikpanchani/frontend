@@ -553,6 +553,13 @@ export default function PlanView() {
                 >
                   Status
                 </TableCell>
+                <TableCell
+                  className="table-th"
+                  align="center"
+                  sx={{ fontWeight: 700 }}
+                >
+                  Export
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody className="table-body">
@@ -566,7 +573,7 @@ export default function PlanView() {
                 <TableCell className="table-td" align="center">
                   -
                 </TableCell>
-                {["view", "add", "edit", "delete", "status"].map((typeId) => (
+                {["view", "add", "edit", "delete", "status", "export"].map((typeId) => (
                   <TableCell key={typeId} className="table-td" align="center">
                     <BpCheckbox checked={isTypeAllChecked(typeId)} disabled />
                   </TableCell>
@@ -597,7 +604,7 @@ export default function PlanView() {
                           disabled
                         />
                       </TableCell>
-                      <TableCell colSpan={5} />
+                      <TableCell colSpan={6} />
                     </TableRow>,
                   );
                 if (module.mainTitleId === "teacher")
@@ -619,7 +626,7 @@ export default function PlanView() {
                           disabled
                         />
                       </TableCell>
-                      <TableCell colSpan={5} />
+                      <TableCell colSpan={6} />
                     </TableRow>,
                   );
 
@@ -646,7 +653,7 @@ export default function PlanView() {
                         disabled
                       />
                     </TableCell>
-                    {["view", "add", "edit", "delete", "status"].map(
+                    {["view", "add", "edit", "delete", "status", "export"].map(
                       (typeId) => {
                         let actualTypeId = typeId;
                         if (

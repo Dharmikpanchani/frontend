@@ -6,13 +6,10 @@ import {
   ExpandMore,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
-  Palette as PaletteIcon,
 } from "@mui/icons-material";
 import { authService } from "@/api/services/auth.service";
 import { logoutAdmin } from "@/redux/slices/authSlice";
 import Svg from "@/assets/Svg";
-import { usePermissions } from "@/hooks/usePermissions";
-import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import type { RootState } from "@/redux/Store";
 
 // const imageBaseUrl = import.meta.env.VITE_BASE_URL_IMAGE;
@@ -21,7 +18,6 @@ export default function Header(props: any) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { hasPermission } = usePermissions();
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
   );
@@ -236,20 +232,7 @@ export default function Header(props: any) {
               </MenuItem>
             )}
 
-            {!isUserPlanPage &&
-              hasPermission(schoolAdminPermission.theme.read) && (
-                <MenuItem
-                  onClick={() => {
-                    navigate("/theme-settings");
-                    handleClose();
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                    <PaletteIcon sx={{ fontSize: "18px" }} />
-                    Theme Settings
-                  </Box>
-                </MenuItem>
-              )}
+
 
             <MenuItem
               onClick={() => {

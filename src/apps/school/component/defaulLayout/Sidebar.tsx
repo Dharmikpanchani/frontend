@@ -27,6 +27,7 @@ export default function Sidebar(props: any) {
       dispatch(getPendingTeachers());
     }
   }, [location.pathname, dispatch, hasPermission]);
+
   // Handle responsive menu open/close
   useEffect(() => {
     const handleResize = () => {
@@ -36,10 +37,7 @@ export default function Sidebar(props: any) {
         props?.setOpen?.(true);
       }
     };
-
-    // Initial check
     handleResize();
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -55,20 +53,21 @@ export default function Sidebar(props: any) {
   }, [props?.open]);
 
   const [openRoleManagement, setOpenRoleManagement] = useState(false);
-  const handleClickRoleManagement = () => {
-    setOpenRoleManagement(!openRoleManagement);
-  };
+  const handleClickRoleManagement = () => setOpenRoleManagement(!openRoleManagement);
 
   const [openCmsManagement, setOpenCmsManagement] = useState(false);
-  const handleClickCmsManagement = () => {
-    setOpenCmsManagement(!openCmsManagement);
-  };
+  const handleClickCmsManagement = () => setOpenCmsManagement(!openCmsManagement);
 
   const [openMasterManagement, setOpenMasterManagement] = useState(false);
-  const handleClickMasterManagement = () => {
-    setOpenMasterManagement(!openMasterManagement);
-  };
+  const handleClickMasterManagement = () => setOpenMasterManagement(!openMasterManagement);
 
+  const [openFeeManagement, setOpenFeeManagement] = useState(false);
+  const handleClickFeeManagement = () => setOpenFeeManagement(!openFeeManagement);
+
+  const [openSettingsManagement, setOpenSettingsManagement] = useState(false);
+  const handleClickSettingsManagement = () => setOpenSettingsManagement(!openSettingsManagement);
+
+  // ─── Menu Data ──────────────────────────────────────────────────────────────
   const roleManagement = [
     {
       title: "Roles",
@@ -124,6 +123,55 @@ export default function Sidebar(props: any) {
     },
   ];
 
+  const feeManagement = [
+    {
+      title: "Fee Category",
+      pathName: "/fee/categories",
+      icon: Svg.brand,
+      show: hasPermission(schoolAdminPermission.fee_category?.read),
+      menuHighlight: ["fee", "categories"],
+    },
+    {
+      title: "Fee Structure",
+      pathName: "/fee/structures",
+      icon: Svg.dashboard,
+      show: hasPermission(schoolAdminPermission.fee_structure?.read),
+      menuHighlight: ["fee", "structures"],
+    },
+    {
+      title: "Collect Fees",
+      pathName: "/fee/collections",
+      icon: Svg.filter,
+      show: hasPermission(schoolAdminPermission.fee_collection?.read),
+      menuHighlight: ["fee", "collections"],
+    },
+    {
+      title: "Dues & Defaulters",
+      pathName: "/fee/dues",
+      icon: Svg.latestUpdate,
+      show: hasPermission(schoolAdminPermission.fee_collection?.read),
+      menuHighlight: ["fee", "dues"],
+    },
+  ];
+
+  // ✅ New Settings dropdown (School Theme + Settings)
+  const settingsManagement = [
+    {
+      title: "School Theme",
+      pathName: "/theme-settings",
+      icon: Svg.settings,
+      show: hasPermission(schoolAdminPermission.theme?.read),
+      menuHighlight: ["theme-settings"],
+    },
+    {
+      title: "Settings",
+      pathName: "/settings",
+      icon: Svg.settings,
+      show: hasPermission(schoolAdminPermission.school_settings?.read),
+      menuHighlight: ["settings"],
+    },
+  ];
+
   const cms: any = [];
 
   const checkActive = (menuItems: any[]) => {
@@ -133,15 +181,11 @@ export default function Sidebar(props: any) {
   };
 
   useEffect(() => {
-    if (checkActive(roleManagement)) {
-      setOpenRoleManagement(true);
-    }
-    if (checkActive(cms)) {
-      setOpenCmsManagement(true);
-    }
-    if (checkActive(masterManagement)) {
-      setOpenMasterManagement(true);
-    }
+    if (checkActive(roleManagement)) setOpenRoleManagement(true);
+    if (checkActive(cms)) setOpenCmsManagement(true);
+    if (checkActive(masterManagement)) setOpenMasterManagement(true);
+    if (checkActive(feeManagement)) setOpenFeeManagement(true);
+    if (checkActive(settingsManagement)) setOpenSettingsManagement(true);
   }, [location.pathname]);
 
   // show menu with permissions
@@ -170,6 +214,18 @@ export default function Sidebar(props: any) {
     schoolAdminPermission.teacher.read,
   ]);
 
+  const feePermission = hasAnyPermission([
+    schoolAdminPermission.fee_category?.read,
+    schoolAdminPermission.fee_structure?.read,
+    schoolAdminPermission.fee_collection?.read,
+  ]);
+
+  const settingsPermission = hasAnyPermission([
+    schoolAdminPermission.theme?.read,
+    schoolAdminPermission.school_settings?.read,
+  ]);
+
+  // ─── Render ─────────────────────────────────────────────────────────────────
   return (
     <Box className="admin-sidebar-main">
       <Box className="admin-sidebar-inner-main">
@@ -177,19 +233,12 @@ export default function Sidebar(props: any) {
         <Box className="admin-sidebar-logo-main">
           <Link
             to={"/dashboard"}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              textDecoration: "none",
-            }}
+            style={{ display: "flex", justifyContent: "center", alignItems: "center", textDecoration: "none" }}
           >
             <img
               src={
                 adminDetails?.schoolData?.logo
-                  ? import.meta.env.VITE_BASE_URL_IMAGE +
-                    "/" +
-                    adminDetails?.schoolData?.logo
+                  ? import.meta.env.VITE_BASE_URL_IMAGE + "/" + adminDetails?.schoolData?.logo
                   : Png.logoImg
               }
               className="admin-sidebar-logo"
@@ -203,126 +252,92 @@ export default function Sidebar(props: any) {
               document.body.classList.remove("admin-body-overflow");
             }}
             className="admin-sidebar-close-btn"
-            sx={{
-              minWidth: "auto",
-              p: 0.5,
-              display: { xs: "block", lg: "none" },
-              position: "absolute",
-              right: "15px",
-            }}
+            sx={{ minWidth: "auto", p: 0.5, display: { xs: "block", lg: "none" }, position: "absolute", right: "15px" }}
           >
-            <img
-              src={Svg.close}
-              className="admin-close-icon"
-              alt="close"
-              style={{
-                width: "24px",
-                height: "24px",
-                filter: "brightness(0) invert(1)",
-              }}
-            />
+            <img src={Svg.close} className="admin-close-icon" alt="close" style={{ width: "24px", height: "24px", filter: "brightness(0) invert(1)" }} />
           </Button>
         </Box>
 
         {/* Menu List */}
         <Box className="admin-sidebar-list-main scrollbar">
           <List className="admin-sidebar-list">
+
+            {/* Dashboard */}
             {data.map((ele, index) =>
               ele?.show ? (
                 <ListItem className="admin-sidebar-listitem" key={index}>
                   <Link
                     to={ele?.pathName}
-                    onClick={() => {
-                      if (window.innerWidth < 786) {
-                        props?.setOpen?.(false);
-                      }
-                    }}
-                    className={
-                      ele?.menuHighlight?.includes(
-                        location?.pathname?.split("/")[1],
-                      )
-                        ? "admin-sidebar-link active"
-                        : "admin-sidebar-link"
-                    }
+                    onClick={() => { if (window.innerWidth < 786) props?.setOpen?.(false); }}
+                    className={ele?.menuHighlight?.includes(location?.pathname?.split("/")[1]) ? "admin-sidebar-link active" : "admin-sidebar-link"}
                   >
-                    <img
-                      src={ele?.icon}
-                      alt={ele?.title}
-                      className="admin-sidebar-icons"
-                    />
-                    <span className="admin-sidebar-link-text">
-                      {ele?.title}
-                    </span>
+                    <img src={ele?.icon} alt={ele?.title} className="admin-sidebar-icons" />
+                    <span className="admin-sidebar-link-text">{ele?.title}</span>
                   </Link>
                 </ListItem>
               ) : null,
             )}
 
-            {/* Role Management */}
-            {rolePermission && (
-              <ListItem
-                component="div"
-                className="admin-sidebar-listitem flex-column align-items-start"
-              >
+            {/* Fee Management */}
+            {feePermission && (
+              <ListItem component="div" className="admin-sidebar-listitem flex-column align-items-start">
                 <Box className="admin-submenu-link-box w-100">
-                  <Box
-                    className="admin-sidebar-link"
-                    onClick={handleClickRoleManagement}
-                  >
-                    <img
-                      src={Svg.roleIcon}
-                      alt="Admin"
-                      className="admin-sidebar-icons"
-                    />
-                    <span className="admin-sidebar-link-text">Admin</span>
-                    {openRoleManagement ? (
-                      <ExpandLess className="expandless-icon" />
-                    ) : (
-                      <ExpandMore className="expandmore-icon" />
-                    )}
+                  <Box className="admin-sidebar-link" onClick={handleClickFeeManagement}>
+                    <img src={Svg.roleIcon} alt="Fee Management" className="admin-sidebar-icons" />
+                    <span className="admin-sidebar-link-text">Fee Management</span>
+                    {openFeeManagement ? <ExpandLess className="expandless-icon" /> : <ExpandMore className="expandmore-icon" />}
                   </Box>
-
                   <Box className="admin-submenu-main">
-                    <Collapse
-                      in={openRoleManagement}
-                      timeout="auto"
-                      unmountOnExit
-                      className="admin-submenu-collapse"
-                    >
-                      <List
-                        component="div"
-                        disablePadding
-                        className="admin-sidebar-submenulist"
-                      >
-                        {roleManagement.map((data) =>
-                          data.show ? (
-                            <ListItem
-                              className="admin-sidebar-listitem"
-                              key={data.pathName}
-                            >
+                    <Collapse in={openFeeManagement} timeout="auto" unmountOnExit className="admin-submenu-collapse">
+                      <List component="div" disablePadding className="admin-sidebar-submenulist">
+                        {feeManagement.map((dt) =>
+                          dt.show ? (
+                            <ListItem className="admin-sidebar-listitem" key={dt.pathName}>
                               <Link
-                                to={data?.pathName}
-                                onClick={() => {
-                                  if (window.innerWidth < 786) {
-                                    props?.setOpen?.(false);
-                                  }
-                                }}
+                                to={dt?.pathName}
+                                onClick={() => { if (window.innerWidth < 786) props?.setOpen?.(false); }}
                                 className={
-                                  data?.menuHighlight?.includes(
-                                    location?.pathname?.split("/")[1],
-                                  )
+                                  dt?.menuHighlight?.includes(location?.pathname?.split("/")[1]) &&
+                                    dt?.menuHighlight?.includes(location?.pathname?.split("/")[2] || "")
                                     ? "admin-sidebar-link active"
                                     : "admin-sidebar-link"
                                 }
                               >
-                                <img
-                                  src={data?.icon}
-                                  alt={data?.title}
-                                  className="admin-sidebar-icons"
-                                />
-                                <span className="admin-sidebar-link-text">
-                                  {data?.title}
-                                </span>
+                                <img src={dt?.icon} alt={dt?.title} className="admin-sidebar-icons" />
+                                <span className="admin-sidebar-link-text">{dt?.title}</span>
+                              </Link>
+                            </ListItem>
+                          ) : null,
+                        )}
+                      </List>
+                    </Collapse>
+                  </Box>
+                </Box>
+              </ListItem>
+            )}
+
+            {/* Role Management (Admin) */}
+            {rolePermission && (
+              <ListItem component="div" className="admin-sidebar-listitem flex-column align-items-start">
+                <Box className="admin-submenu-link-box w-100">
+                  <Box className="admin-sidebar-link" onClick={handleClickRoleManagement}>
+                    <img src={Svg.roleIcon} alt="Admin" className="admin-sidebar-icons" />
+                    <span className="admin-sidebar-link-text">Admin</span>
+                    {openRoleManagement ? <ExpandLess className="expandless-icon" /> : <ExpandMore className="expandmore-icon" />}
+                  </Box>
+                  <Box className="admin-submenu-main">
+                    <Collapse in={openRoleManagement} timeout="auto" unmountOnExit className="admin-submenu-collapse">
+                      <List component="div" disablePadding className="admin-sidebar-submenulist">
+                        {roleManagement.map((data) =>
+                          data.show ? (
+                            <ListItem className="admin-sidebar-listitem" key={data.pathName}>
+                              <Link
+                                to={data?.pathName}
+                                onClick={() => { if (window.innerWidth < 786) props?.setOpen?.(false); }}
+                                className={data?.menuHighlight?.includes(location?.pathname?.split("/")[1]) ? "admin-sidebar-link active" : "admin-sidebar-link"}
+                              >
+                                <img src={data?.icon} alt={data?.title} className="admin-sidebar-icons" />
+                                <span className="admin-sidebar-link-text">{data?.title}</span>
                               </Link>
                             </ListItem>
                           ) : null,
@@ -336,98 +351,45 @@ export default function Sidebar(props: any) {
 
             {/* Master Management */}
             {masterPermission && (
-              <ListItem
-                component="div"
-                className="admin-sidebar-listitem flex-column align-items-start"
-              >
+              <ListItem component="div" className="admin-sidebar-listitem flex-column align-items-start">
                 <Box className="admin-submenu-link-box w-100">
-                  <Box
-                    className="admin-sidebar-link"
-                    onClick={handleClickMasterManagement}
-                  >
-                    <img
-                      src={Svg.brand}
-                      alt="Master"
-                      className="admin-sidebar-icons"
-                    />
-                    <span className="admin-sidebar-link-text">
-                      Student Master
-                    </span>
-                    {openMasterManagement ? (
-                      <ExpandLess className="expandless-icon" />
-                    ) : (
-                      <ExpandMore className="expandmore-icon" />
-                    )}
+                  <Box className="admin-sidebar-link" onClick={handleClickMasterManagement}>
+                    <img src={Svg.brand} alt="Master" className="admin-sidebar-icons" />
+                    <span className="admin-sidebar-link-text">Student Master</span>
+                    {openMasterManagement ? <ExpandLess className="expandless-icon" /> : <ExpandMore className="expandmore-icon" />}
                   </Box>
-
                   <Box className="admin-submenu-main">
-                    <Collapse
-                      in={openMasterManagement}
-                      timeout="auto"
-                      unmountOnExit
-                      className="admin-submenu-collapse"
-                    >
-                      <List
-                        component="div"
-                        disablePadding
-                        className="admin-sidebar-submenulist"
-                      >
+                    <Collapse in={openMasterManagement} timeout="auto" unmountOnExit className="admin-submenu-collapse">
+                      <List component="div" disablePadding className="admin-sidebar-submenulist">
                         {masterManagement.map((dt) =>
                           dt.show ? (
-                            <ListItem
-                              className="admin-sidebar-listitem"
-                              key={dt.pathName}
-                            >
+                            <ListItem className="admin-sidebar-listitem" key={dt.pathName}>
                               <Link
                                 to={dt?.pathName}
-                                onClick={() => {
-                                  if (window.innerWidth < 786) {
-                                    props?.setOpen?.(false);
-                                  }
-                                }}
+                                onClick={() => { if (window.innerWidth < 786) props?.setOpen?.(false); }}
                                 className={
-                                  dt?.menuHighlight?.includes(
-                                    location?.pathname?.split("/")[1],
-                                  ) ||
-                                  (location?.pathname?.split("/")[1] ===
-                                    "master" &&
-                                    dt?.menuHighlight?.includes(
-                                      location?.pathname?.split("/")[2],
-                                    ))
+                                  dt?.menuHighlight?.includes(location?.pathname?.split("/")[1]) ||
+                                    (location?.pathname?.split("/")[1] === "master" &&
+                                      dt?.menuHighlight?.includes(location?.pathname?.split("/")[2]))
                                     ? "admin-sidebar-link active"
                                     : "admin-sidebar-link"
                                 }
                               >
-                                <img
-                                  src={dt?.icon}
-                                  alt={dt?.title}
-                                  className="admin-sidebar-icons"
-                                />
-                                <span className="admin-sidebar-link-text">
-                                  {dt?.title}
-                                </span>
-                                {dt?.title === "Teachers" &&
-                                  pendingDocCount > 0 && (
-                                    <span
-                                      style={{
-                                        position: "absolute",
-                                        right: "15px",
-                                        top: "50%",
-                                        transform: "translateY(-50%)",
-                                        backgroundColor: "#d92d20",
-                                        color: "#fff",
-                                        fontSize: "10px",
-                                        fontWeight: 700,
-                                        borderRadius: "10px",
-                                        padding: "2px 8px",
-                                        lineHeight: 1,
-                                        display: "inline-block",
-                                        zIndex: 10,
-                                      }}
-                                    >
-                                      {pendingDocCount}
-                                    </span>
-                                  )}
+                                <img src={dt?.icon} alt={dt?.title} className="admin-sidebar-icons" />
+                                <span className="admin-sidebar-link-text">{dt?.title}</span>
+                                {dt?.title === "Teachers" && pendingDocCount > 0 && (
+                                  <span
+                                    style={{
+                                      position: "absolute", right: "15px", top: "50%",
+                                      transform: "translateY(-50%)", backgroundColor: "#d92d20",
+                                      color: "#fff", fontSize: "10px", fontWeight: 700,
+                                      borderRadius: "10px", padding: "2px 8px",
+                                      lineHeight: 1, display: "inline-block", zIndex: 10,
+                                    }}
+                                  >
+                                    {pendingDocCount}
+                                  </span>
+                                )}
                               </Link>
                             </ListItem>
                           ) : null,
@@ -441,73 +403,28 @@ export default function Sidebar(props: any) {
 
             {/* CMS Management */}
             {cmsPermission && (
-              <ListItem
-                component="div"
-                className="admin-sidebar-listitem flex-column align-items-start"
-              >
+              <ListItem component="div" className="admin-sidebar-listitem flex-column align-items-start">
                 <Box className="admin-submenu-link-box w-100">
-                  <Box
-                    className="admin-sidebar-link"
-                    onClick={handleClickCmsManagement}
-                  >
-                    <img
-                      src={Svg.cms}
-                      alt="CMS"
-                      className="admin-sidebar-icons"
-                    />
+                  <Box className="admin-sidebar-link" onClick={handleClickCmsManagement}>
+                    <img src={Svg.cms} alt="CMS" className="admin-sidebar-icons" />
                     <span className="admin-sidebar-link-text">CMS</span>
-                    {openCmsManagement ? (
-                      <ExpandLess className="expandless-icon" />
-                    ) : (
-                      <ExpandMore className="expandmore-icon" />
-                    )}
+                    {openCmsManagement ? <ExpandLess className="expandless-icon" /> : <ExpandMore className="expandmore-icon" />}
                   </Box>
-
                   <Box className="admin-submenu-main">
-                    <Collapse
-                      in={openCmsManagement}
-                      timeout="auto"
-                      unmountOnExit
-                      className="admin-submenu-collapse"
-                    >
-                      <List
-                        component="div"
-                        disablePadding
-                        className="admin-sidebar-submenulist"
-                      >
+                    <Collapse in={openCmsManagement} timeout="auto" unmountOnExit className="admin-submenu-collapse">
+                      <List component="div" disablePadding className="admin-sidebar-submenulist">
                         {cms?.map((data: any) => {
-                          const pathSegments =
-                            location?.pathname?.split("/") || [];
-                          const isActive = pathSegments.some(
-                            (segment: string) =>
-                              data?.menuHighlight?.includes(segment),
-                          );
+                          const pathSegments = location?.pathname?.split("/") || [];
+                          const isActive = pathSegments.some((segment: string) => data?.menuHighlight?.includes(segment));
                           return data.show ? (
-                            <ListItem
-                              className="admin-sidebar-listitem"
-                              key={data.pathName}
-                            >
+                            <ListItem className="admin-sidebar-listitem" key={data.pathName}>
                               <Link
                                 to={data?.pathName}
-                                onClick={() => {
-                                  if (window.innerWidth < 786) {
-                                    props?.setOpen?.(false);
-                                  }
-                                }}
-                                className={
-                                  isActive
-                                    ? "admin-sidebar-link active"
-                                    : "admin-sidebar-link"
-                                }
+                                onClick={() => { if (window.innerWidth < 786) props?.setOpen?.(false); }}
+                                className={isActive ? "admin-sidebar-link active" : "admin-sidebar-link"}
                               >
-                                <img
-                                  src={data?.icon}
-                                  alt={data?.title}
-                                  className="admin-sidebar-icons"
-                                />
-                                <span className="admin-sidebar-link-text">
-                                  {data?.title}
-                                </span>
+                                <img src={data?.icon} alt={data?.title} className="admin-sidebar-icons" />
+                                <span className="admin-sidebar-link-text">{data?.title}</span>
                               </Link>
                             </ListItem>
                           ) : null;
@@ -518,6 +435,44 @@ export default function Sidebar(props: any) {
                 </Box>
               </ListItem>
             )}
+
+            {/* ✅ Settings Management (School Theme + Settings) */}
+            {settingsPermission && (
+              <ListItem component="div" className="admin-sidebar-listitem flex-column align-items-start">
+                <Box className="admin-submenu-link-box w-100">
+                  <Box className="admin-sidebar-link" onClick={handleClickSettingsManagement}>
+                    <img src={Svg.settings} alt="Settings" className="admin-sidebar-icons" />
+                    <span className="admin-sidebar-link-text">Settings</span>
+                    {openSettingsManagement ? <ExpandLess className="expandless-icon" /> : <ExpandMore className="expandmore-icon" />}
+                  </Box>
+                  <Box className="admin-submenu-main">
+                    <Collapse in={openSettingsManagement} timeout="auto" unmountOnExit className="admin-submenu-collapse">
+                      <List component="div" disablePadding className="admin-sidebar-submenulist">
+                        {settingsManagement.map((dt) =>
+                          dt.show ? (
+                            <ListItem className="admin-sidebar-listitem" key={dt.pathName}>
+                              <Link
+                                to={dt?.pathName}
+                                onClick={() => { if (window.innerWidth < 786) props?.setOpen?.(false); }}
+                                className={
+                                  dt?.menuHighlight?.includes(location?.pathname?.split("/")[1])
+                                    ? "admin-sidebar-link active"
+                                    : "admin-sidebar-link"
+                                }
+                              >
+                                <img src={dt?.icon} alt={dt?.title} className="admin-sidebar-icons" />
+                                <span className="admin-sidebar-link-text">{dt?.title}</span>
+                              </Link>
+                            </ListItem>
+                          ) : null,
+                        )}
+                      </List>
+                    </Collapse>
+                  </Box>
+                </Box>
+              </ListItem>
+            )}
+
           </List>
         </Box>
       </Box>

@@ -129,4 +129,42 @@ export const Api = {
   UPGRADE_PLAN: `subscription/upgrade`,
   INSTANT_UPGRADE: `subscription/instant-upgrade`,
   CANCEL_FUTURE_PLAN: `subscription/cancel-future-plan`,
+
+  // Settings
+  GET_SCHOOL_SETTINGS: `${route}/school-settings`,
+  UPDATE_SCHOOL_SETTINGS: `${route}/school-settings`,
+
+  // Fee Management
+  GET_ALL_FEE_CATEGORIES: `${route}/fee-categories`,
+  GET_FEE_CATEGORY: `${route}/fee-categories`,
+  ADD_FEE_CATEGORY: `${route}/fee-categories`,
+  UPDATE_FEE_CATEGORY: `${route}/fee-categories`,
+  DELETE_FEE_CATEGORY: `${route}/fee-categories`,
+  CHANGE_FEE_CATEGORY_STATUS: `${route}/fee-category-action-status`, // /:id
+
+  GET_ALL_FEE_STRUCTURES: `${route}/fee-structures`,
+  GET_FEE_STRUCTURE: `${route}/fee-structures`,
+  ADD_FEE_STRUCTURE: `${route}/fee-structures`,
+  UPDATE_FEE_STRUCTURE: `${route}/fee-structures`,
+  DELETE_FEE_STRUCTURE: `${route}/fee-structures`,
+  CHANGE_FEE_STRUCTURE_STATUS: `${route}/fee-structure-action-status`, // /:id
+
+  GET_ALL_FEE_COLLECTIONS: `${route}/fee-collections`,
+  GET_FEE_COLLECTION: `${route}/fee-collections`,
+  ADD_FEE_COLLECTION: `${route}/fee-collections/collect`,
+  EXPORT_FEE_RECEIPT: `${route}/fee-collections/receipt`, // /:id/export
+
+  GET_FEE_DUES: `${route}/fee-collections/dues`,
+  SEND_DUE_REMINDER: `${route}/fee-collections/dues`,
+
+  GET_DASHBOARD_FEE_STATS: `${route}/fee-collections`,
+
+  // User Portal - Fees
+  USER_GET_FEE_LEDGER: `user/fees/ledger`,
+  USER_EXPORT_FEE_RECEIPT: `user/fees/receipt`, // id/export
+
+  // Clearances & Developer Transactions (Phase 1.5)
+  CLEAR_FEE_COLLECTION: `${route}/fee-collections`, // /:id/payment-status
+  GET_DEVELOPER_TRANSACTIONS: `developer/transactions`,
+  EXPORT_DEVELOPER_TRANSACTIONS: `developer/transactions/export`,
 };

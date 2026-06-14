@@ -115,7 +115,7 @@ function App() {
 
   // Safety timer to prevent infinite loading spinner
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: any;
     const isInitialLoading = !!(isSubdomain?.isSubdomain && (schoolLoading || isRedirecting));
     if (isInitialLoading) {
       timer = setTimeout(() => {

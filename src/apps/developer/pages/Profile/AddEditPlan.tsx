@@ -17,6 +17,9 @@ import {
   Link,
   InputAdornment,
   Autocomplete,
+  Select,
+  MenuItem,
+  FormControl,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -97,6 +100,8 @@ export default function AddEditPlan() {
         yerPrice: selectedPlan.yerPrice || "",
         yerOfferPrice: selectedPlan.yerOfferPrice || "",
         permissions: selectedPlan.permissions || [],
+        studentLimit: selectedPlan.studentLimit !== undefined ? selectedPlan.studentLimit : -1,
+        storageLimit: selectedPlan.storageLimit !== undefined ? selectedPlan.storageLimit : -1,
       };
     }
     return {
@@ -108,6 +113,8 @@ export default function AddEditPlan() {
       yerOfferPrice: "",
       billingCycle: "6month",
       permissions: [],
+      studentLimit: -1,
+      storageLimit: -1,
     };
   }, [selectedPlan, id]);
 
@@ -393,7 +400,7 @@ export default function AddEditPlan() {
                             display="grid"
                             gridTemplateColumns="repeat(12, 1fr)"
                             gap={{ xs: 2, sm: 3 }}
-                            sx={{ mb: isFreePlan ? 6 : 0 }}
+                            sx={{ mb: 3 }}
                           >
                             <Box gridColumn={{ xs: "span 12", sm: "span 12" }}>
                               <Typography sx={labelSx}>
@@ -425,6 +432,113 @@ export default function AddEditPlan() {
                               <FormHelperText className="error-text">
                                 {touched.planName && errors.planName
                                   ? (errors.planName as string)
+                                  : ""}
+                              </FormHelperText>
+                            </Box>
+                          </Box>
+
+                          <Box
+                            display="grid"
+                            gridTemplateColumns="repeat(12, 1fr)"
+                            gap={{ xs: 2, sm: 3 }}
+                            sx={{ mb: isFreePlan ? 6 : 3 }}
+                          >
+                            {/* Student Limit */}
+                            <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                              <Typography sx={labelSx}>
+                                Student Limit
+                                <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
+                              </Typography>
+                              <FormControl fullWidth>
+                                <Select
+                                  value={values.studentLimit === -1 ? "unlimited" : "limited"}
+                                  onChange={(e) => {
+                                    if (e.target.value === "unlimited") {
+                                      setFieldValue("studentLimit", -1);
+                                    } else {
+                                      setFieldValue("studentLimit", "");
+                                    }
+                                  }}
+                                  disabled={isView}
+                                  sx={inputSx}
+                                  displayEmpty
+                                >
+                                  <MenuItem value="unlimited">Unlimited</MenuItem>
+                                  <MenuItem value="limited">Limited</MenuItem>
+                                </Select>
+                              </FormControl>
+                              {values.studentLimit !== -1 && (
+                                <TextField
+                                  fullWidth
+                                  type="number"
+                                  name="studentLimit"
+                                  placeholder="Enter student limit (e.g. 500)"
+                                  variant="outlined"
+                                  sx={{ ...inputSx, mt: 1.5 }}
+                                  value={values.studentLimit === "" ? "" : values.studentLimit}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setFieldValue("studentLimit", val === "" ? "" : Number(val));
+                                  }}
+                                  onBlur={handleBlur}
+                                  error={touched.studentLimit && Boolean(errors.studentLimit)}
+                                  disabled={isView}
+                                  slotProps={{ htmlInput: { min: 1 } }}
+                                />
+                              )}
+                              <FormHelperText className="error-text">
+                                {touched.studentLimit && errors.studentLimit
+                                  ? (errors.studentLimit as string)
+                                  : ""}
+                              </FormHelperText>
+                            </Box>
+
+                            {/* Storage Limit */}
+                            <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                              <Typography sx={labelSx}>
+                                Storage Limit (GB)
+                                <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
+                              </Typography>
+                              <FormControl fullWidth>
+                                <Select
+                                  value={values.storageLimit === -1 ? "unlimited" : "limited"}
+                                  onChange={(e) => {
+                                    if (e.target.value === "unlimited") {
+                                      setFieldValue("storageLimit", -1);
+                                    } else {
+                                      setFieldValue("storageLimit", "");
+                                    }
+                                  }}
+                                  disabled={isView}
+                                  sx={inputSx}
+                                  displayEmpty
+                                >
+                                  <MenuItem value="unlimited">Unlimited</MenuItem>
+                                  <MenuItem value="limited">Limited</MenuItem>
+                                </Select>
+                              </FormControl>
+                              {values.storageLimit !== -1 && (
+                                <TextField
+                                  fullWidth
+                                  type="number"
+                                  name="storageLimit"
+                                  placeholder="Enter storage limit in GB (e.g. 50)"
+                                  variant="outlined"
+                                  sx={{ ...inputSx, mt: 1.5 }}
+                                  value={values.storageLimit === "" ? "" : values.storageLimit}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setFieldValue("storageLimit", val === "" ? "" : Number(val));
+                                  }}
+                                  onBlur={handleBlur}
+                                  error={touched.storageLimit && Boolean(errors.storageLimit)}
+                                  disabled={isView}
+                                  slotProps={{ htmlInput: { min: 1 } }}
+                                />
+                              )}
+                              <FormHelperText className="error-text">
+                                {touched.storageLimit && errors.storageLimit
+                                  ? (errors.storageLimit as string)
                                   : ""}
                               </FormHelperText>
                             </Box>
@@ -747,6 +861,13 @@ export default function AddEditPlan() {
                             >
                               Status
                             </TableCell>
+                            <TableCell
+                              className="table-th"
+                              align="center"
+                              sx={{ fontWeight: 700 }}
+                            >
+                              Export
+                            </TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody className="table-body">
@@ -763,7 +884,7 @@ export default function AddEditPlan() {
                             <TableCell className="table-td" align="center">
                               -
                             </TableCell>
-                            {["view", "add", "edit", "delete", "status"].map(
+                            {["view", "add", "edit", "delete", "status", "export"].map(
                               (typeId) => (
                                 <TableCell
                                   key={typeId}
@@ -825,7 +946,7 @@ export default function AddEditPlan() {
                                       disabled={isView}
                                     />
                                   </TableCell>
-                                  <TableCell colSpan={5} />
+                                  <TableCell colSpan={6} />
                                 </TableRow>,
                               );
                             if (module.mainTitleId === "student")
@@ -859,7 +980,7 @@ export default function AddEditPlan() {
                                       disabled={isView}
                                     />
                                   </TableCell>
-                                  <TableCell colSpan={5} />
+                                  <TableCell colSpan={6} />
                                 </TableRow>,
                               );
 
@@ -942,6 +1063,7 @@ export default function AddEditPlan() {
                                   "edit",
                                   "delete",
                                   "status",
+                                  "export",
                                 ].map((typeId) => {
                                   // Handle legacy titleIds for specific modules
                                   let actualTypeId = typeId;

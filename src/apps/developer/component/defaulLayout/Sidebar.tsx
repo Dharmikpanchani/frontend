@@ -95,6 +95,13 @@ export default function Sidebar(props: any) {
       show: hasPermission(developerPermission.plan.read),
       menuHighlight: ["plan-list"],
     },
+    {
+      title: "Transactions",
+      pathName: "/transactions",
+      icon: Png.cmsIcon,
+      show: hasPermission(developerPermission.transaction?.read || "transaction_view"),
+      menuHighlight: ["transactions"],
+    },
   ];
 
   const rolePermission = hasAnyPermission([
