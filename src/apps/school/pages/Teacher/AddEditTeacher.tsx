@@ -63,6 +63,42 @@ import {
   salaryTypeOptions,
 } from "@/apps/common/StaticArrayData";
 
+const maritalStatusOptions = [
+  { label: "Single", value: "Single" },
+  { label: "Married", value: "Married" },
+  { label: "Divorced", value: "Divorced" },
+  { label: "Widowed", value: "Widowed" },
+];
+
+const socialCategoryOptions = [
+  { label: "General", value: "General" },
+  { label: "OBC", value: "OBC" },
+  { label: "SC", value: "SC" },
+  { label: "ST", value: "ST" },
+  { label: "Other", value: "Other" },
+];
+
+const FormikSyncAddress = ({ values, setFieldValue, sameAsCurrentAddress }: any) => {
+  useEffect(() => {
+    if (sameAsCurrentAddress) {
+      setFieldValue("permanentAddress", values.address || "");
+      setFieldValue("permanentCity", values.city || "");
+      setFieldValue("permanentState", values.state || "");
+      setFieldValue("permanentCountry", values.country || "");
+      setFieldValue("permanentPincode", values.pincode || "");
+    }
+  }, [
+    sameAsCurrentAddress,
+    values.address,
+    values.city,
+    values.state,
+    values.country,
+    values.pincode,
+    setFieldValue
+  ]);
+  return null;
+};
+
 export default function AddEditTeacher() {
   const location = useLocation();
   const id = location.state?.id;
@@ -113,10 +149,27 @@ export default function AddEditTeacher() {
   const [openJoiningDate, setOpenJoiningDate] = useState(false);
   const [openShiftTimeFrom, setOpenShiftTimeFrom] = useState(false);
   const [openShiftTimeTo, setOpenShiftTimeTo] = useState(false);
+  const [openConfirmationDate, setOpenConfirmationDate] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [teacherData, setTeacherData] = useState<any>(null);
+  const [sameAsCurrentAddress, setSameAsCurrentAddress] = useState(false);
+
+  useEffect(() => {
+    if (teacherData) {
+      if (
+        teacherData.address &&
+        teacherData.address === teacherData.permanentAddress &&
+        teacherData.city === teacherData.permanentCity &&
+        teacherData.state === teacherData.permanentState &&
+        teacherData.country === teacherData.permanentCountry &&
+        teacherData.pincode === teacherData.permanentPincode
+      ) {
+        setSameAsCurrentAddress(true);
+      }
+    }
+  }, [teacherData]);
 
   const fetchTeacherDetails = async () => {
     const result = await dispatch(getTeacherById(id as string) as any);
@@ -158,6 +211,21 @@ export default function AddEditTeacher() {
       state: teacherData?.state || "",
       country: teacherData?.country || "India",
       pincode: teacherData?.pincode || "",
+      // New fields in Contact/Personal
+      fatherSpouseName: teacherData?.fatherSpouseName || "",
+      motherName: teacherData?.motherName || "",
+      maritalStatus: teacherData?.maritalStatus || "",
+      socialCategory: teacherData?.socialCategory || "",
+      religion: teacherData?.religion || "",
+      nationality: teacherData?.nationality || "Indian",
+      permanentAddress: teacherData?.permanentAddress || "",
+      permanentCity: teacherData?.permanentCity || "",
+      permanentState: teacherData?.permanentState || "",
+      permanentCountry: teacherData?.permanentCountry || "India",
+      permanentPincode: teacherData?.permanentPincode || "",
+      emergencyContactName: teacherData?.emergencyContactName || "",
+      emergencyContactRelation: teacherData?.emergencyContactRelation || "",
+      emergencyContactPhone: teacherData?.emergencyContactPhone || "",
       // Auth
       password: "",
       confirmPassword: "",
@@ -176,6 +244,14 @@ export default function AddEditTeacher() {
         teacherData?.classesAssigned?.map((c: any) => c._id || c) || [],
       sectionsAssigned:
         teacherData?.sectionsAssigned?.map((s: any) => s._id || s) || [],
+      probationPeriod: teacherData?.probationPeriod !== undefined && teacherData?.probationPeriod !== null ? teacherData.probationPeriod : "",
+      confirmationDate: teacherData?.confirmationDate
+        ? moment(teacherData.confirmationDate)
+        : null,
+      previousSchoolName: teacherData?.previousSchoolName || "",
+      previousDesignation: teacherData?.previousDesignation || "",
+      previousDuration: teacherData?.previousDuration || "",
+      previousLeavingReason: teacherData?.previousLeavingReason || "",
       // Salary
       employmentType: teacherData?.employmentType || "",
       salary: teacherData?.salary || "",
@@ -186,11 +262,18 @@ export default function AddEditTeacher() {
       ifscCode: teacherData?.ifscCode || "",
       panNumber: teacherData?.panNumber || "",
       aadharNumber: teacherData?.aadharNumber || "",
+      accountHolderName: teacherData?.accountHolderName || "",
+      branchName: teacherData?.branchName || "",
+      pfNumber: teacherData?.pfNumber || "",
+      uanNumber: teacherData?.uanNumber || "",
+      esicNumber: teacherData?.esicNumber || "",
       // Documents
       idProof: teacherData?.idProof || null,
       idProofName: teacherData?.idProof || "",
       aadharCard: teacherData?.aadharCard || null,
       aadharCardName: teacherData?.aadharCard || "",
+      appointmentLetter: teacherData?.appointmentLetter || null,
+      appointmentLetterName: teacherData?.appointmentLetter || "",
       educationCertificates: teacherData?.educationCertificates || [],
       experienceCertificates: teacherData?.experienceCertificates || [],
       // Attendance
@@ -228,6 +311,12 @@ export default function AddEditTeacher() {
           moment(values.dateOfBirth).toISOString(),
         );
       }
+      formData.append("fatherSpouseName", values.fatherSpouseName);
+      formData.append("motherName", values.motherName);
+      formData.append("maritalStatus", values.maritalStatus);
+      formData.append("socialCategory", values.socialCategory);
+      formData.append("religion", values.religion);
+      formData.append("nationality", values.nationality);
 
       // Address
       formData.append("address", values.address);
@@ -235,6 +324,16 @@ export default function AddEditTeacher() {
       if (values.state) formData.append("state", values.state);
       if (values.country) formData.append("country", values.country);
       if (values.pincode) formData.append("pincode", values.pincode);
+
+      formData.append("permanentAddress", values.permanentAddress);
+      formData.append("permanentCity", values.permanentCity);
+      formData.append("permanentState", values.permanentState);
+      formData.append("permanentCountry", values.permanentCountry);
+      formData.append("permanentPincode", values.permanentPincode);
+
+      formData.append("emergencyContactName", values.emergencyContactName);
+      formData.append("emergencyContactRelation", values.emergencyContactRelation);
+      formData.append("emergencyContactPhone", values.emergencyContactPhone);
 
       // Professional
       if (values.joiningDate) {
@@ -249,6 +348,17 @@ export default function AddEditTeacher() {
       formData.append("specialization", values.specialization);
       formData.append("designation", values.designation);
       formData.append("departmentId", values.departmentId);
+
+      if (values.probationPeriod !== undefined && values.probationPeriod !== null && values.probationPeriod !== "") {
+        formData.append("probationPeriod", values.probationPeriod.toString());
+      }
+      if (values.confirmationDate) {
+        formData.append("confirmationDate", moment(values.confirmationDate).toISOString());
+      }
+      formData.append("previousSchoolName", values.previousSchoolName);
+      formData.append("previousDesignation", values.previousDesignation);
+      formData.append("previousDuration", values.previousDuration);
+      formData.append("previousLeavingReason", values.previousLeavingReason);
 
       // Arrays
       values.subjects.forEach((id: string) =>
@@ -273,6 +383,12 @@ export default function AddEditTeacher() {
       if (values.aadharNumber)
         formData.append("aadharNumber", values.aadharNumber);
 
+      if (values.accountHolderName) formData.append("accountHolderName", values.accountHolderName);
+      if (values.branchName) formData.append("branchName", values.branchName);
+      if (values.pfNumber) formData.append("pfNumber", values.pfNumber);
+      if (values.uanNumber) formData.append("uanNumber", values.uanNumber);
+      if (values.esicNumber) formData.append("esicNumber", values.esicNumber);
+
       // Auth (Only for Add)
       if (!id && values.password) formData.append("password", values.password);
 
@@ -281,6 +397,8 @@ export default function AddEditTeacher() {
         formData.append("profileImage", values.profileImage);
       if (values.idProof) formData.append("idProof", values.idProof);
       if (values.aadharCard) formData.append("aadharCard", values.aadharCard);
+      if (values.appointmentLetter)
+        formData.append("appointmentLetter", values.appointmentLetter);
 
       // Certificates
       if (values.educationCertificates?.length > 0) {
@@ -449,6 +567,7 @@ export default function AddEditTeacher() {
                   onSubmit={handleSubmit}
                   style={{ pointerEvents: isView ? "none" : "auto" }}
                 >
+                  <FormikSyncAddress values={values} setFieldValue={setFieldValue} sameAsCurrentAddress={sameAsCurrentAddress} />
                   <Box sx={{ maxWidth: 1100 }}>
                     {/* 1. Basic Information */}
                     <SectionTitle
@@ -820,6 +939,180 @@ export default function AddEditTeacher() {
                           </FormHelperText>
                         )}
                       </Box>
+
+                      {/* Father / Spouse Name */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>
+                          Father's / Spouse's Name<span style={{ color: "#ef4444" }}>*</span>
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          name="fatherSpouseName"
+                          placeholder="Enter Father's or Spouse's Name"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.fatherSpouseName}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "fatherSpouseName",
+                              e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                            )
+                          }
+                          error={touched.fatherSpouseName && Boolean(errors.fatherSpouseName)}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        {touched.fatherSpouseName && errors.fatherSpouseName && (
+                          <FormHelperText className="error-text">
+                            {errors.fatherSpouseName as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Mother's Name */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Mother's Name</Typography>
+                        <TextField
+                          fullWidth
+                          name="motherName"
+                          placeholder="Enter Mother's Name"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.motherName}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "motherName",
+                              e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                            )
+                          }
+                          error={touched.motherName && Boolean(errors.motherName)}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        {touched.motherName && errors.motherName && (
+                          <FormHelperText className="error-text">
+                            {errors.motherName as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Marital Status */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>
+                          Marital Status<span style={{ color: "#ef4444" }}>*</span>
+                        </Typography>
+                        <Autocomplete
+                          options={maritalStatusOptions}
+                          getOptionLabel={(o) => o.label}
+                          value={
+                            maritalStatusOptions.find(
+                              (o) => o.value === values.maritalStatus,
+                            ) || null
+                          }
+                          onChange={(_, v) =>
+                            setFieldValue("maritalStatus", v?.value || "")
+                          }
+                          renderInput={(p) => (
+                            <TextField
+                              {...p}
+                              placeholder="Select"
+                              variant="outlined"
+                              sx={inputSx}
+                              error={touched.maritalStatus && Boolean(errors.maritalStatus)}
+                            />
+                          )}
+                        />
+                        {touched.maritalStatus && errors.maritalStatus && (
+                          <FormHelperText className="error-text">
+                            {errors.maritalStatus as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Social Category */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>
+                          Social Category<span style={{ color: "#ef4444" }}>*</span>
+                        </Typography>
+                        <Autocomplete
+                          options={socialCategoryOptions}
+                          getOptionLabel={(o) => o.label}
+                          value={
+                            socialCategoryOptions.find(
+                              (o) => o.value === values.socialCategory,
+                            ) || null
+                          }
+                          onChange={(_, v) =>
+                            setFieldValue("socialCategory", v?.value || "")
+                          }
+                          renderInput={(p) => (
+                            <TextField
+                              {...p}
+                              placeholder="Select"
+                              variant="outlined"
+                              sx={inputSx}
+                              error={touched.socialCategory && Boolean(errors.socialCategory)}
+                            />
+                          )}
+                        />
+                        {touched.socialCategory && errors.socialCategory && (
+                          <FormHelperText className="error-text">
+                            {errors.socialCategory as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Religion */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>Religion</Typography>
+                        <TextField
+                          fullWidth
+                          name="religion"
+                          placeholder="e.g. Hindu, Christian, Muslim"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.religion}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "religion",
+                              e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                            )
+                          }
+                          error={touched.religion && Boolean(errors.religion)}
+                          slotProps={{ htmlInput: { maxLength: 30 } }}
+                        />
+                        {touched.religion && errors.religion && (
+                          <FormHelperText className="error-text">
+                            {errors.religion as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Nationality */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>
+                          Nationality<span style={{ color: "#ef4444" }}>*</span>
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          name="nationality"
+                          placeholder="e.g. Indian"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.nationality}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "nationality",
+                              e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                            )
+                          }
+                          error={touched.nationality && Boolean(errors.nationality)}
+                          slotProps={{ htmlInput: { maxLength: 30 } }}
+                        />
+                        {touched.nationality && errors.nationality && (
+                          <FormHelperText className="error-text">
+                            {errors.nationality as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
                     </Box>
 
                     {/* 2. Contact Details */}
@@ -1049,6 +1342,224 @@ export default function AddEditTeacher() {
                           slotProps={{ htmlInput: { maxLength: 50 } }}
                         />
                       </Box>
+
+                      {/* Checkbox for same address */}
+                      <Box gridColumn="span 12" sx={{ mt: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                        <input
+                          type="checkbox"
+                          id="sameAsCurrentAddressCheckbox"
+                          checked={sameAsCurrentAddress}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setSameAsCurrentAddress(checked);
+                            if (checked) {
+                              setFieldValue("permanentAddress", values.address);
+                              setFieldValue("permanentCity", values.city);
+                              setFieldValue("permanentState", values.state);
+                              setFieldValue("permanentCountry", values.country);
+                              setFieldValue("permanentPincode", values.pincode);
+                            }
+                          }}
+                          disabled={isView}
+                          style={{ width: "16px", height: "16px", cursor: isView ? "default" : "pointer" }}
+                        />
+                        <label
+                          htmlFor="sameAsCurrentAddressCheckbox"
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: 500,
+                            color: "#475467",
+                            cursor: isView ? "default" : "pointer"
+                          }}
+                        >
+                          Permanent address same as current address
+                        </label>
+                      </Box>
+
+                      {/* Permanent Address fields */}
+                      <Box gridColumn="span 12" sx={{ mt: 2 }}>
+                        <Typography sx={labelSx}>
+                          Permanent Address (Search Location)<span style={{ color: "#ef4444" }}>*</span>
+                        </Typography>
+                        <AutoCompleteLocation
+                          name="permanentAddress"
+                          placeholder="Search permanent address..."
+                          values={values}
+                          setFieldValue={setFieldValue}
+                          touched={touched}
+                          errors={errors}
+                          disabled={isView || sameAsCurrentAddress}
+                        />
+                      </Box>
+                      <Box gridColumn={{ xs: "span 12", sm: "span 3" }}>
+                        <Typography sx={labelSx}>Permanent City<span style={{ color: "#ef4444" }}>*</span></Typography>
+                        <TextField
+                          fullWidth
+                          name="permanentCity"
+                          placeholder="City"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={sameAsCurrentAddress ? values.city : values.permanentCity}
+                          onChange={handleChange}
+                          error={touched.permanentCity && Boolean(errors.permanentCity)}
+                          disabled={isView || sameAsCurrentAddress}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        {touched.permanentCity && errors.permanentCity && (
+                          <FormHelperText className="error-text">
+                            {errors.permanentCity as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+                      <Box gridColumn={{ xs: "span 12", sm: "span 3" }}>
+                        <Typography sx={labelSx}>Permanent State<span style={{ color: "#ef4444" }}>*</span></Typography>
+                        <TextField
+                          fullWidth
+                          name="permanentState"
+                          placeholder="State"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={sameAsCurrentAddress ? values.state : values.permanentState}
+                          onChange={handleChange}
+                          error={touched.permanentState && Boolean(errors.permanentState)}
+                          disabled={isView || sameAsCurrentAddress}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        {touched.permanentState && errors.permanentState && (
+                          <FormHelperText className="error-text">
+                            {errors.permanentState as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+                      <Box gridColumn={{ xs: "span 12", sm: "span 3" }}>
+                        <Typography sx={labelSx}>Permanent Pincode<span style={{ color: "#ef4444" }}>*</span></Typography>
+                        <TextField
+                          fullWidth
+                          name="permanentPincode"
+                          placeholder="Pincode"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={sameAsCurrentAddress ? values.pincode : values.permanentPincode}
+                          onChange={handleChange}
+                          error={touched.permanentPincode && Boolean(errors.permanentPincode)}
+                          disabled={isView || sameAsCurrentAddress}
+                          slotProps={{ htmlInput: { maxLength: 6 } }}
+                        />
+                        {touched.permanentPincode && errors.permanentPincode && (
+                          <FormHelperText className="error-text">
+                            {errors.permanentPincode as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+                      <Box gridColumn={{ xs: "span 12", sm: "span 3" }}>
+                        <Typography sx={labelSx}>Permanent Country<span style={{ color: "#ef4444" }}>*</span></Typography>
+                        <TextField
+                          fullWidth
+                          name="permanentCountry"
+                          placeholder="Country"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={sameAsCurrentAddress ? values.country : values.permanentCountry}
+                          onChange={handleChange}
+                          error={touched.permanentCountry && Boolean(errors.permanentCountry)}
+                          disabled={isView || sameAsCurrentAddress}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        {touched.permanentCountry && errors.permanentCountry && (
+                          <FormHelperText className="error-text">
+                            {errors.permanentCountry as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+                    </Box>
+
+                    {/* Emergency Contact details */}
+                    <SectionTitle icon={PersonIcon} title="Emergency Contact Details" />
+                    <Box
+                      display="grid"
+                      gridTemplateColumns="repeat(12, 1fr)"
+                      gap={{ xs: 2, sm: 3 }}
+                    >
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>
+                          Emergency Contact Name<span style={{ color: "#ef4444" }}>*</span>
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          name="emergencyContactName"
+                          placeholder="Contact Name"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.emergencyContactName}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "emergencyContactName",
+                              e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                            )
+                          }
+                          error={touched.emergencyContactName && Boolean(errors.emergencyContactName)}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        {touched.emergencyContactName && errors.emergencyContactName && (
+                          <FormHelperText className="error-text">
+                            {errors.emergencyContactName as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>
+                          Relation<span style={{ color: "#ef4444" }}>*</span>
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          name="emergencyContactRelation"
+                          placeholder="e.g. Father, Spouse, Friend"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.emergencyContactRelation}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "emergencyContactRelation",
+                              e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                            )
+                          }
+                          error={touched.emergencyContactRelation && Boolean(errors.emergencyContactRelation)}
+                          slotProps={{ htmlInput: { maxLength: 30 } }}
+                        />
+                        {touched.emergencyContactRelation && errors.emergencyContactRelation && (
+                          <FormHelperText className="error-text">
+                            {errors.emergencyContactRelation as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>
+                          Phone Number<span style={{ color: "#ef4444" }}>*</span>
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          name="emergencyContactPhone"
+                          placeholder="10-digit Phone"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.emergencyContactPhone}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "emergencyContactPhone",
+                              e.target.value.replace(/\D/g, "").slice(0, 10),
+                            )
+                          }
+                          error={touched.emergencyContactPhone && Boolean(errors.emergencyContactPhone)}
+                          slotProps={{ htmlInput: { maxLength: 10 } }}
+                        />
+                        {touched.emergencyContactPhone && errors.emergencyContactPhone && (
+                          <FormHelperText className="error-text">
+                            {errors.emergencyContactPhone as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
                     </Box>
 
                     {/* 3. Professional Details */}
@@ -1074,7 +1585,7 @@ export default function AddEditTeacher() {
                             onOpen={() => setOpenJoiningDate(true)}
                             onClose={() => setOpenJoiningDate(false)}
                             onChange={(v) => setFieldValue("joiningDate", v)}
-                            disablePast
+                            disablePast={!id}
                             maxDate={moment().add(12, "months")}
                             slotProps={{
                               textField: {
@@ -1499,6 +2010,200 @@ export default function AddEditTeacher() {
                           </FormHelperText>
                         )}
                       </Box>
+
+                      {/* Probation Period */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Probation Period (Months)</Typography>
+                        <TextField
+                          fullWidth
+                          name="probationPeriod"
+                          placeholder="e.g. 6"
+                          type="number"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.probationPeriod}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, "").slice(0, 2);
+                            setFieldValue("probationPeriod", val === "" ? "" : Number(val));
+                          }}
+                          error={touched.probationPeriod && Boolean(errors.probationPeriod)}
+                          slotProps={{ htmlInput: { min: 0, max: 99 } }}
+                        />
+                        {touched.probationPeriod && errors.probationPeriod && (
+                          <FormHelperText className="error-text">
+                            {errors.probationPeriod as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Confirmation Date */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Confirmation Date</Typography>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                          <DatePicker
+                            format="DD/MM/YYYY"
+                            value={values.confirmationDate}
+                            open={openConfirmationDate}
+                            onOpen={() => setOpenConfirmationDate(true)}
+                            onClose={() => setOpenConfirmationDate(false)}
+                            onChange={(v) => setFieldValue("confirmationDate", v)}
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                placeholder: "Select Date",
+                                variant: "outlined",
+                                onClick: () => setOpenConfirmationDate(true),
+                                error:
+                                  touched.confirmationDate &&
+                                  Boolean(errors.confirmationDate),
+                                sx: {
+                                  "& .MuiPickersOutlinedInput-root": {
+                                    height: "40px",
+                                    backgroundColor: "#fff !important",
+                                    borderRadius:
+                                      "var(--button-radius, 6px) !important",
+                                    "& fieldset": {
+                                      borderColor:
+                                        "var(--input-border, #ced4da) !important",
+                                    },
+                                    "&:hover:not(.Mui-focused) fieldset": {
+                                      borderColor:
+                                        "var(--input-border, #ced4da) !important",
+                                    },
+                                    "&.Mui-focused:not(.Mui-error) fieldset": {
+                                      borderColor:
+                                        "var(--primary-color) !important",
+                                      borderWidth: "1px !important",
+                                    },
+                                  },
+                                  "& .MuiOutlinedInput-input": {
+                                    padding: "0 14px !important",
+                                    fontSize: "14px !important",
+                                    fontFamily:
+                                      "var(--font-family, 'Poppins', sans-serif) !important",
+                                    height: "40px",
+                                    cursor: "pointer",
+                                  },
+                                },
+                              },
+                              popper: {
+                                sx: {
+                                  "& .MuiPickersDay-root.Mui-selected": {
+                                    backgroundColor:
+                                      "var(--primary-color, #5c1a1a) !important",
+                                    color: "#ffffff !important",
+                                  },
+                                  "& .MuiPickersDay-root:hover": {
+                                    backgroundColor:
+                                      "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1) !important",
+                                  },
+                                  "& .MuiPickersYear-yearButton.Mui-selected": {
+                                    backgroundColor:
+                                      "var(--primary-color, #5c1a1a) !important",
+                                    color: "#ffffff !important",
+                                  },
+                                  "& .MuiPickersMonth-monthButton.Mui-selected":
+                                    {
+                                      backgroundColor:
+                                        "var(--primary-color, #5c1a1a) !important",
+                                      color: "#ffffff !important",
+                                    },
+                                },
+                              },
+                              field: { readOnly: true } as any,
+                            }}
+                          />
+                        </LocalizationProvider>
+                        {touched.confirmationDate && errors.confirmationDate && (
+                          <FormHelperText className="error-text">
+                            {errors.confirmationDate as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Previous School Name */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Previous School Name</Typography>
+                        <TextField
+                          fullWidth
+                          name="previousSchoolName"
+                          placeholder="e.g. ABC Public School"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.previousSchoolName}
+                          onChange={handleChange}
+                          error={touched.previousSchoolName && Boolean(errors.previousSchoolName)}
+                          slotProps={{ htmlInput: { maxLength: 100 } }}
+                        />
+                        {touched.previousSchoolName && errors.previousSchoolName && (
+                          <FormHelperText className="error-text">
+                            {errors.previousSchoolName as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Previous Designation */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Previous Designation</Typography>
+                        <TextField
+                          fullWidth
+                          name="previousDesignation"
+                          placeholder="e.g. Primary Teacher"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.previousDesignation}
+                          onChange={handleChange}
+                          error={touched.previousDesignation && Boolean(errors.previousDesignation)}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        {touched.previousDesignation && errors.previousDesignation && (
+                          <FormHelperText className="error-text">
+                            {errors.previousDesignation as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Previous Duration */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Previous Experience Duration</Typography>
+                        <TextField
+                          fullWidth
+                          name="previousDuration"
+                          placeholder="e.g. 2 Years"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.previousDuration}
+                          onChange={handleChange}
+                          error={touched.previousDuration && Boolean(errors.previousDuration)}
+                          slotProps={{ htmlInput: { maxLength: 30 } }}
+                        />
+                        {touched.previousDuration && errors.previousDuration && (
+                          <FormHelperText className="error-text">
+                            {errors.previousDuration as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Previous Leaving Reason */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Leaving Reason</Typography>
+                        <TextField
+                          fullWidth
+                          name="previousLeavingReason"
+                          placeholder="Reason for leaving"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.previousLeavingReason}
+                          onChange={handleChange}
+                          error={touched.previousLeavingReason && Boolean(errors.previousLeavingReason)}
+                          slotProps={{ htmlInput: { maxLength: 150 } }}
+                        />
+                        {touched.previousLeavingReason && errors.previousLeavingReason && (
+                          <FormHelperText className="error-text">
+                            {errors.previousLeavingReason as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
                     </Box>
 
                     {/* 4. Salary & Employment */}
@@ -1734,6 +2439,131 @@ export default function AddEditTeacher() {
                           slotProps={{ htmlInput: { maxLength: 12 } }}
                         />
                       </Box>
+
+                      {/* Account Holder Name */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Account Holder Name</Typography>
+                        <TextField
+                          fullWidth
+                          name="accountHolderName"
+                          placeholder="Name as in bank record"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.accountHolderName}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "accountHolderName",
+                              e.target.value.replace(/[^A-Za-z\s]/g, ""),
+                            )
+                          }
+                          error={touched.accountHolderName && Boolean(errors.accountHolderName)}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        {touched.accountHolderName && errors.accountHolderName && (
+                          <FormHelperText className="error-text">
+                            {errors.accountHolderName as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Bank Branch Name */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Bank Branch Name</Typography>
+                        <TextField
+                          fullWidth
+                          name="branchName"
+                          placeholder="Branch Name"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.branchName}
+                          onChange={handleChange}
+                          error={touched.branchName && Boolean(errors.branchName)}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        {touched.branchName && errors.branchName && (
+                          <FormHelperText className="error-text">
+                            {errors.branchName as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* PF Number */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>PF Number</Typography>
+                        <TextField
+                          fullWidth
+                          name="pfNumber"
+                          placeholder="PF Number"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.pfNumber}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "pfNumber",
+                              e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""),
+                            )
+                          }
+                          error={touched.pfNumber && Boolean(errors.pfNumber)}
+                          slotProps={{ htmlInput: { maxLength: 22 } }}
+                        />
+                        {touched.pfNumber && errors.pfNumber && (
+                          <FormHelperText className="error-text">
+                            {errors.pfNumber as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* UAN Number */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>UAN Number</Typography>
+                        <TextField
+                          fullWidth
+                          name="uanNumber"
+                          placeholder="12-digit UAN"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.uanNumber}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "uanNumber",
+                              e.target.value.replace(/\D/g, "").slice(0, 12),
+                            )
+                          }
+                          error={touched.uanNumber && Boolean(errors.uanNumber)}
+                          slotProps={{ htmlInput: { maxLength: 12 } }}
+                        />
+                        {touched.uanNumber && errors.uanNumber && (
+                          <FormHelperText className="error-text">
+                            {errors.uanNumber as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* ESIC Number */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>ESIC Number</Typography>
+                        <TextField
+                          fullWidth
+                          name="esicNumber"
+                          placeholder="17-digit ESIC"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.esicNumber}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "esicNumber",
+                              e.target.value.replace(/\D/g, "").slice(0, 17),
+                            )
+                          }
+                          error={touched.esicNumber && Boolean(errors.esicNumber)}
+                          slotProps={{ htmlInput: { maxLength: 17 } }}
+                        />
+                        {touched.esicNumber && errors.esicNumber && (
+                          <FormHelperText className="error-text">
+                            {errors.esicNumber as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
                     </Box>
 
                     {/* 5. Documents */}
@@ -1954,6 +2784,111 @@ export default function AddEditTeacher() {
                         {touched.aadharCard && errors.aadharCard && (
                           <FormHelperText className="error-text">
                             {errors.aadharCard as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Appointment Letter */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>
+                          Appointment Letter (PDF/Image)
+                        </Typography>
+                        <Box
+                          sx={{
+                            border: "1px dashed #E4E7EC",
+                            p: 1,
+                            borderRadius: "8px",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            minHeight: "44px",
+                            backgroundColor: "#fff",
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#667085",
+                              fontSize: "13px",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              pr: 1,
+                            }}
+                          >
+                            {values.appointmentLetter instanceof File
+                              ? values.appointmentLetter.name
+                              : values.appointmentLetterName
+                                ? "Appointment Letter Uploaded"
+                                : "No file selected"}
+                          </Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                              pointerEvents: "auto",
+                            }}
+                          >
+                            {(values.appointmentLetter || values.appointmentLetterName) && (
+                              <Link
+                                onClick={() => {
+                                  const url =
+                                    values.appointmentLetter instanceof File
+                                      ? URL.createObjectURL(values.appointmentLetter)
+                                      : `${import.meta.env.VITE_BASE_URL_IMAGE}/${values.appointmentLetterName}`;
+                                  window.open(url, "_blank");
+                                }}
+                                sx={{
+                                  color: "#f59e0b",
+                                  fontSize: "13px",
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                  textDecoration: "underline",
+                                  "&:hover": { color: "#d97706" },
+                                }}
+                              >
+                                View
+                              </Link>
+                            )}
+                            {!isView && (
+                              <Button
+                                variant="outlined"
+                                component="label"
+                                size="small"
+                                sx={{
+                                  textTransform: "none",
+                                  height: "32px",
+                                  fontSize: "12px",
+                                  fontWeight: 600,
+                                  color: "var(--primary-color)",
+                                  borderColor:
+                                    "rgba(var(--primary-color-rgb, 92, 26, 26), 0.3)",
+                                  "&:hover": {
+                                    borderColor: "var(--primary-color)",
+                                    backgroundColor: "transparent",
+                                    opacity: 0.8,
+                                  },
+                                }}
+                              >
+                                Choose File
+                                <input
+                                  hidden
+                                  type="file"
+                                  onChange={(e) =>
+                                    setFieldValue(
+                                      "appointmentLetter",
+                                      e.target.files?.[0],
+                                    )
+                                  }
+                                />
+                              </Button>
+                            )}
+                          </Box>
+                        </Box>
+                        {touched.appointmentLetter && errors.appointmentLetter && (
+                          <FormHelperText className="error-text">
+                            {errors.appointmentLetter as string}
                           </FormHelperText>
                         )}
                       </Box>

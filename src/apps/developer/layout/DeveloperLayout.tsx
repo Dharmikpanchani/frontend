@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import Header from "../component/defaulLayout/Header";
 import Sidebar from "../component/defaulLayout/Sidebar";
@@ -7,6 +7,16 @@ import Png from "@/assets/Png";
 
 export default function DeveloperLayout() {
   const [open, setOpen] = useState(true);
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    const mainContain = document.querySelector(".admin-dashboard-containt-main") || document.querySelector(".admin-dashboard-right-main");
+    if (mainContain) {
+      mainContain.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [location.pathname]);
+
 
   useEffect(() => {
     const setRoundedFavicon = (url: string) => {

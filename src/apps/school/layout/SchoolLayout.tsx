@@ -20,6 +20,15 @@ export default function SchoolLayout() {
     dispatch(getProfileAdmin() as any);
   }, [dispatch]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    const mainContain = document.querySelector(".admin-dashboard-containt-main") || document.querySelector(".admin-dashboard-right-main");
+    if (mainContain) {
+      mainContain.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [location.pathname]);
+
+
   if (loading) {
     return <PageLoader />;
   }

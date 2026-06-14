@@ -46,6 +46,12 @@ import {
   mediumOptions,
 } from "@/apps/common/StaticArrayData";
 
+const schoolGenderTypeOptions = [
+  { label: "Co-educational", value: "Co-ed" },
+  { label: "Boys Only", value: "Boys Only" },
+  { label: "Girls Only", value: "Girls Only" },
+];
+
 export default function RegisterSchool() {
   const location = useLocation();
   const id = location.state?.id;
@@ -109,6 +115,15 @@ export default function RegisterSchool() {
       logoUrl: isEdit || isView ? selectedSchool?.logo || "" : "",
       banner: null,
       bannerUrl: isEdit || isView ? selectedSchool?.banner || "" : "",
+      trustName: isEdit || isView ? selectedSchool?.trustName || "" : "",
+      schoolGenderType: isEdit || isView ? selectedSchool?.schoolGenderType || "Co-ed" : "Co-ed",
+      landlineNumber: isEdit || isView ? selectedSchool?.landlineNumber || "" : "",
+      alternateEmail: isEdit || isView ? selectedSchool?.alternateEmail || "" : "",
+      websiteUrl: isEdit || isView ? selectedSchool?.websiteUrl || "" : "",
+      tanNumber: isEdit || isView ? selectedSchool?.tanNumber || "" : "",
+      gstNumber: isEdit || isView ? selectedSchool?.gstNumber || "" : "",
+      authorizedSignature: null,
+      authorizedSignatureUrl: isEdit || isView ? selectedSchool?.authorizedSignature || "" : "",
     }),
     [id, isEdit, isView, selectedSchool],
   );
@@ -157,6 +172,17 @@ export default function RegisterSchool() {
     }
     if (values.banner) {
       formData.append("banner", values.banner);
+    }
+
+    formData.append("trustName", values.trustName);
+    formData.append("schoolGenderType", values.schoolGenderType);
+    formData.append("landlineNumber", values.landlineNumber);
+    formData.append("alternateEmail", values.alternateEmail);
+    formData.append("websiteUrl", values.websiteUrl);
+    formData.append("tanNumber", values.tanNumber);
+    formData.append("gstNumber", values.gstNumber);
+    if (values.authorizedSignature) {
+      formData.append("authorizedSignature", values.authorizedSignature);
     }
 
     try {
@@ -379,6 +405,79 @@ export default function RegisterSchool() {
                         <FormHelperText className="error-text">
                           {touched.ownerName && errors.ownerName
                             ? (errors.ownerName as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+                      {/* Trust Name */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>
+                          Trust / Society Name
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          name="trustName"
+                          placeholder="Enter Trust / Society Name"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.trustName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.trustName && Boolean(errors.trustName)}
+                          disabled={isView}
+                          slotProps={{ htmlInput: { maxLength: 120 } }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.trustName && errors.trustName
+                            ? (errors.trustName as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+                      {/* School Gender Type */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>
+                          School Gender Type
+                          <span style={{ color: "#ef4444", marginLeft: "2px" }}>
+                            *
+                          </span>
+                        </Typography>
+                        <Autocomplete
+                          options={schoolGenderTypeOptions}
+                          getOptionLabel={(option: any) => option.label}
+                          value={
+                            schoolGenderTypeOptions.find(
+                              (opt: any) => opt.value === values.schoolGenderType,
+                            ) || null
+                          }
+                          onChange={(_, newValue) =>
+                            setFieldValue(
+                              "schoolGenderType",
+                              newValue ? newValue.value : "Co-ed",
+                            )
+                          }
+                          disabled={isView}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Gender Type"
+                              variant="outlined"
+                              sx={inputSx}
+                              error={
+                                touched.schoolGenderType && Boolean(errors.schoolGenderType)
+                              }
+                            />
+                          )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              padding: "0 !important",
+                              height: "40px",
+                            },
+                          }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.schoolGenderType && errors.schoolGenderType
+                            ? (errors.schoolGenderType as string)
                             : ""}
                         </FormHelperText>
                       </Box>
@@ -657,6 +756,76 @@ export default function RegisterSchool() {
                             : ""}
                         </FormHelperText>
                       </Box>
+
+                      {/* Landline Number */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>Landline Number</Typography>
+                        <TextField
+                          fullWidth
+                          name="landlineNumber"
+                          placeholder="Enter Landline Number"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.landlineNumber}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, "").slice(0, 12);
+                            setFieldValue("landlineNumber", val);
+                          }}
+                          onBlur={handleBlur}
+                          error={touched.landlineNumber && Boolean(errors.landlineNumber)}
+                          disabled={isView}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.landlineNumber && errors.landlineNumber
+                            ? (errors.landlineNumber as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+                      {/* Alternate Email */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>Alternate / Backup Email</Typography>
+                        <TextField
+                          fullWidth
+                          name="alternateEmail"
+                          placeholder="Enter Backup Email"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.alternateEmail}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.alternateEmail && Boolean(errors.alternateEmail)}
+                          disabled={isView}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.alternateEmail && errors.alternateEmail
+                            ? (errors.alternateEmail as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+                      {/* Website URL */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
+                        <Typography sx={labelSx}>Official Website URL</Typography>
+                        <TextField
+                          fullWidth
+                          name="websiteUrl"
+                          placeholder="e.g. www.school.com"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.websiteUrl}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.websiteUrl && Boolean(errors.websiteUrl)}
+                          disabled={isView}
+                          slotProps={{ htmlInput: { maxLength: 100 } }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.websiteUrl && errors.websiteUrl
+                            ? (errors.websiteUrl as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
                     </Box>
 
                     {/* 2. Address Details */}
@@ -859,6 +1028,56 @@ export default function RegisterSchool() {
                         <FormHelperText className="error-text">
                           {touched.panNumber && errors.panNumber
                             ? (errors.panNumber as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>TAN Number</Typography>
+                        <TextField
+                          fullWidth
+                          name="tanNumber"
+                          placeholder="TAN"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.tanNumber}
+                          onChange={(e) => {
+                            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                            setFieldValue("tanNumber", value);
+                          }}
+                          onBlur={handleBlur}
+                          error={touched.tanNumber && Boolean(errors.tanNumber)}
+                          disabled={isView}
+                          slotProps={{ htmlInput: { maxLength: 10 } }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.tanNumber && errors.tanNumber
+                            ? (errors.tanNumber as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>GST Number</Typography>
+                        <TextField
+                          fullWidth
+                          name="gstNumber"
+                          placeholder="GST"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.gstNumber}
+                          onChange={(e) => {
+                            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                            setFieldValue("gstNumber", value);
+                          }}
+                          onBlur={handleBlur}
+                          error={touched.gstNumber && Boolean(errors.gstNumber)}
+                          disabled={isView}
+                          slotProps={{ htmlInput: { maxLength: 15 } }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.gstNumber && errors.gstNumber
+                            ? (errors.gstNumber as string)
                             : ""}
                         </FormHelperText>
                       </Box>
@@ -1193,6 +1412,99 @@ export default function RegisterSchool() {
                         <FormHelperText className="error-text">
                           {touched.banner && errors.banner
                             ? (errors.banner as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+                      {/* Authorized Signature Upload */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Authorized Signature</Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 2,
+                          }}
+                        >
+                          <Box sx={{ position: "relative" }}>
+                            <Button
+                              variant="outlined"
+                              component="label"
+                              disabled={isView}
+                              sx={{
+                                minWidth: "100px",
+                                width: "100px",
+                                height: "100px",
+                                borderRadius: "12px",
+                                border: "1px dashed #ced4da",
+                                bgcolor: "transparent",
+                                p: 0,
+                                overflow: "hidden",
+                                flexShrink: 0,
+                                "&:hover": { bgcolor: "transparent" },
+                                cursor: isView ? "default" : "pointer",
+                              }}
+                            >
+                              {renderSingleImage({
+                                profile: values.authorizedSignature,
+                                imageUrl: values.authorizedSignatureUrl,
+                              })}
+                              <input
+                                hidden
+                                accept="image/*"
+                                type="file"
+                                disabled={isView}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>,
+                                ) => {
+                                  const files = e.target.files;
+                                  if (files && files.length > 0) {
+                                    setFieldValue("authorizedSignature", files[0]);
+                                  }
+                                }}
+                              />
+                            </Button>
+                            {(values.authorizedSignature || values.authorizedSignatureUrl) &&
+                              !isView &&
+                              !isEdit && (
+                                <IconButton
+                                  size="small"
+                                  onClick={() => {
+                                    setFieldValue("authorizedSignature", null);
+                                    setFieldValue("authorizedSignatureUrl", "");
+                                  }}
+                                  sx={{
+                                    position: "absolute",
+                                    top: -8,
+                                    right: -8,
+                                    p: "2px",
+                                    bgcolor: "#ef4444",
+                                    color: "white",
+                                    boxShadow: 2,
+                                    zIndex: 10,
+                                    "&:hover": { bgcolor: "#dc2626" },
+                                  }}
+                                >
+                                  <CloseIcon sx={{ fontSize: 14 }} />
+                                </IconButton>
+                              )}
+                          </Box>
+                          <Typography
+                            sx={{
+                              fontSize: "11px",
+                              color: "#667085",
+                              pt: 1,
+                              maxWidth: "200px",
+                            }}
+                          >
+                            <strong>Recommended:</strong> 200x200px (1:1 Ratio).
+                            <br />
+                            Max 20MB. JPG, PNG, SVG.
+                          </Typography>
+                        </Box>
+                        <FormHelperText className="error-text">
+                          {touched.authorizedSignature && errors.authorizedSignature
+                            ? (errors.authorizedSignature as string)
                             : ""}
                         </FormHelperText>
                       </Box>

@@ -546,15 +546,23 @@ export const schoolValidationSchema = Yup.object({
   board: Yup.string().required("Board is required"),
   medium: Yup.string().required("Medium is required"),
   establishedYear: dateValidation(true),
+  trustName: Yup.string().max(120, "Trust name must be at most 120 characters").optional(),
+  schoolGenderType: Yup.string().required("School gender type is required"),
   // Address
   address: addressValidation(true),
   city: cityValidation(true),
   state: stateValidation(true),
   zipCode: zipCodeValidation(true),
   country: countryValidation(true),
+  // Contact info
+  landlineNumber: Yup.string().matches(/^[0-9]{10,12}$/, "Landline must be between 10 and 12 digits").optional().nullable(),
+  alternateEmail: emailValidation(false),
+  websiteUrl: Yup.string().max(100, "Website URL must be at most 100 characters").optional(),
   // Legal
   registrationNumber: registrationNumberValidation(true),
   panNumber: panValidation(false),
+  tanNumber: Yup.string().matches(/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/, "Please enter a valid 10-character TAN (e.g. ABCD12345E)").optional().nullable(),
+  gstNumber: gstValidation(false),
   affiliationCertificate: fileValidation("Affiliation certificate", false),
   affiliationCertificateUrl: Yup.string().optional(),
   // Branding
@@ -568,6 +576,8 @@ export const schoolValidationSchema = Yup.object({
   logoUrl: Yup.string().optional(),
   banner: imageValidation("School banner", false, 1200, 400).nullable(),
   bannerUrl: Yup.string().optional(),
+  authorizedSignature: imageValidation("Authorized signature", false).nullable(),
+  authorizedSignatureUrl: Yup.string().optional(),
 });
 
 export const schoolProfileUpdateValidationSchema = Yup.object({
@@ -578,16 +588,24 @@ export const schoolProfileUpdateValidationSchema = Yup.object({
   board: Yup.string().required("Board is required"),
   medium: Yup.string().required("Medium is required"),
   establishedYear: dateValidation(true),
+  trustName: Yup.string().max(120, "Trust name must be at most 120 characters").optional(),
+  schoolGenderType: Yup.string().required("School gender type is required"),
   address: addressValidation(true),
   city: cityValidation(true),
   state: stateValidation(true),
   zipCode: zipCodeValidation(true),
   country: countryValidation(true),
+  landlineNumber: Yup.string().matches(/^[0-9]{10,12}$/, "Landline must be between 10 and 12 digits").optional().nullable(),
+  alternateEmail: emailValidation(false),
+  websiteUrl: Yup.string().max(100, "Website URL must be at most 100 characters").optional(),
   registrationNumber: registrationNumberValidation(true),
   panNumber: panValidation(false),
+  tanNumber: Yup.string().matches(/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/, "Please enter a valid 10-character TAN (e.g. ABCD12345E)").optional().nullable(),
+  gstNumber: gstValidation(false),
   logo: imageValidation("School logo", false, 200, 200).nullable(),
   banner: imageValidation("School banner", false, 1200, 400).nullable(),
   affiliationCertificate: fileValidation("Affiliation certificate", false),
+  authorizedSignature: imageValidation("Authorized signature", false).nullable(),
 });
 
 export const departmentValidationSchema = Yup.object().shape({
@@ -715,12 +733,26 @@ export const teacherValidationSchema = Yup.object().shape(
     gender: Yup.string().optional(),
     dateOfBirth: dobValidation(true),
     bloodGroup: Yup.string().optional(),
+    fatherSpouseName: fullNameValidation("Father's/Spouse's name", true),
+    motherName: fullNameValidation("Mother's name", false),
+    maritalStatus: Yup.string().required("Marital status is required"),
+    socialCategory: Yup.string().required("Social category is required"),
+    religion: Yup.string().max(30, "Religion must be at most 30 characters").optional(),
+    nationality: Yup.string().max(30, "Nationality must be at most 30 characters").required("Nationality is required"),
     // Address
     address: genericStringValidation("Address", 5, 200, false),
     city: cityValidation(false),
     state: stateValidation(false),
     country: countryValidation(false),
     pincode: zipCodeValidation(false),
+    permanentAddress: genericStringValidation("Permanent address", 5, 200, true),
+    permanentCity: cityValidation(true),
+    permanentState: stateValidation(true),
+    permanentCountry: countryValidation(true),
+    permanentPincode: zipCodeValidation(true),
+    emergencyContactName: fullNameValidation("Emergency contact name", true),
+    emergencyContactRelation: Yup.string().max(30, "Relation must be at most 30 characters").required("Relation is required"),
+    emergencyContactPhone: phoneNumberValidation(true),
     // Professional
     joiningDate: Yup.mixed().when("id", {
       is: (id: string) => !!id,
@@ -753,6 +785,18 @@ export const teacherValidationSchema = Yup.object().shape(
     sectionsAssigned: Yup.array()
       .min(1, "At least one section is required")
       .required("Sections are required"),
+    probationPeriod: Yup.number()
+      .typeError("Probation period must be a number")
+      .integer("Probation period must be an integer")
+      .min(0, "Cannot be negative")
+      .max(99, "Must be under 99 months")
+      .optional()
+      .nullable(),
+    confirmationDate: dateValidation(false),
+    previousSchoolName: Yup.string().max(100, "Previous school name must be at most 100 characters").optional(),
+    previousDesignation: Yup.string().max(50, "Previous designation must be at most 50 characters").optional(),
+    previousDuration: Yup.string().max(30, "Previous duration must be at most 30 characters").optional(),
+    previousLeavingReason: Yup.string().max(150, "Leaving reason must be at most 150 characters").optional(),
     // Salary
     employmentType: Yup.string().required("Employment type is required"),
     salary: Yup.number()
@@ -778,7 +822,8 @@ export const teacherValidationSchema = Yup.object().shape(
       .min(10, "Account number is too short")
       .max(18, "Account number is too long")
       .optional(),
-
+    accountHolderName: Yup.string().max(50, "Account holder name must be at most 50 characters").optional(),
+    branchName: Yup.string().max(50, "Branch name must be at most 50 characters").optional(),
     confirmAccountNumber: Yup.string()
       .oneOf([Yup.ref("accountNumber")], "Account numbers must match")
       .when("accountNumber", {
@@ -796,6 +841,9 @@ export const teacherValidationSchema = Yup.object().shape(
       .min(12, "Aadhar number must be at least 12 digits")
       .max(12, "Aadhar number must be at most 12 digits")
       .optional(),
+    pfNumber: Yup.string().max(22, "PF number must be at most 22 characters").optional(),
+    uanNumber: Yup.string().matches(/^\d{12}$/, "UAN number must be exactly 12 digits").optional(),
+    esicNumber: Yup.string().matches(/^\d{17}$/, "ESIC number must be exactly 17 digits").optional(),
 
     // Auth
     id: Yup.string().optional(),
@@ -849,6 +897,7 @@ export const teacherValidationSchema = Yup.object().shape(
       "image/jpg",
       "image/png",
     ]).nullable(),
+    appointmentLetter: fileValidation("Appointment letter", false).nullable(),
     educationCertificates: Yup.array().of(Yup.mixed()).optional(),
     experienceCertificates: Yup.array().of(Yup.mixed()).optional(),
     roles: Yup.array()
