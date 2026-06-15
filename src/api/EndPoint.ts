@@ -104,6 +104,7 @@ export const Api = {
   GET_STUDENT: `${route}/get-student`,
   ADD_EDIT_STUDENT: `${route}/add-edit-student`,
   DELETE_STUDENT: `${route}/delete-student`,
+  CHANGE_STUDENT_STATUS: `${route}/student-action-status`,
   // Plan management
   GET_ALL_PLANS: `${route}/get-all-plans`,
   GET_PLAN: `${route}/get-plan`,

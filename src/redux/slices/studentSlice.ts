@@ -24,7 +24,7 @@ export const getstudents = createAsyncThunk(
   "student/getAll",
   async (params: any, { rejectWithValue }) => {
     try {
-      const res: any = await masterService.getstudents(params);
+      const res: any = await masterService.getStudents(params);
       if (res.status === 200) return res;
       return rejectWithValue(res.message);
     } catch (err: any) {

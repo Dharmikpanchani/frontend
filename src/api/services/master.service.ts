@@ -209,5 +209,5 @@ export const masterService = {
   deleteStudent: (id: string) =>
     adminApiService.delete<any>(`${Api.DELETE_STUDENT}/${id}`),
   changeStudentStatus: (id: string) =>
-    adminApiService.post<any>(`${Api.DELETE_STUDENT}/${id}`, {}),
+    adminApiService.post<any>(`${Api.CHANGE_STUDENT_STATUS}/${id}`, {}),
 };
