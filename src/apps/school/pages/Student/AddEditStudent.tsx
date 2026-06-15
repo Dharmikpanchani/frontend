@@ -359,7 +359,7 @@ export default function AddEditStudent() {
                   />
                 </Box>
               </Box>
-              {touched.profileImage && errors.profileImage && (
+              {touched.profileImage && (errors.profileImage as string) && (
                 <FormHelperText
                   error
                   sx={{ textAlign: "center", mt: -1, mb: 1 }}
@@ -393,7 +393,7 @@ export default function AddEditStudent() {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.fullName && Boolean(errors.fullName)}
-                    helperText={touched.fullName && errors.fullName}
+                    helperText={touched.fullName && (errors.fullName as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -425,7 +425,7 @@ export default function AddEditStudent() {
                         {...params}
                         placeholder="Select gender"
                         error={touched.gender && Boolean(errors.gender)}
-                        helperText={touched.gender && errors.gender}
+                        helperText={touched.gender && (errors.gender as string)}
                         slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
                       />
                     )}
@@ -486,7 +486,7 @@ export default function AddEditStudent() {
                         error={
                           touched.bloodGroup && Boolean(errors.bloodGroup)
                         }
-                        helperText={touched.bloodGroup && errors.bloodGroup}
+                        helperText={touched.bloodGroup && (errors.bloodGroup as string)}
                         slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
                       />
                     )}
@@ -552,7 +552,7 @@ export default function AddEditStudent() {
                       Boolean(errors.admissionNumber)
                     }
                     helperText={
-                      touched.admissionNumber && errors.admissionNumber
+                      touched.admissionNumber && (errors.admissionNumber as string)
                     }
                     disabled={isReadOnly}
                     slotProps={{
@@ -611,7 +611,7 @@ export default function AddEditStudent() {
                     error={
                       touched.rollNumber && Boolean(errors.rollNumber)
                     }
-                    helperText={touched.rollNumber && errors.rollNumber}
+                    helperText={touched.rollNumber && (errors.rollNumber as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -642,7 +642,7 @@ export default function AddEditStudent() {
                         {...params}
                         placeholder="Select class"
                         error={touched.classId && Boolean(errors.classId)}
-                        helperText={touched.classId && errors.classId}
+                        helperText={touched.classId && (errors.classId as string)}
                         slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
                       />
                     )}
@@ -676,7 +676,7 @@ export default function AddEditStudent() {
                         error={
                           touched.sectionId && Boolean(errors.sectionId)
                         }
-                        helperText={touched.sectionId && errors.sectionId}
+                        helperText={touched.sectionId && (errors.sectionId as string)}
                         slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
                       />
                     )}
@@ -737,7 +737,7 @@ export default function AddEditStudent() {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.email && Boolean(errors.email)}
-                    helperText={touched.email && errors.email}
+                    helperText={touched.email && (errors.email as string)}
                     disabled={isReadOnly || Boolean(id)}
                     slotProps={{
                       input: { sx: inputSx },
@@ -762,7 +762,7 @@ export default function AddEditStudent() {
                     error={
                       touched.phoneNumber && Boolean(errors.phoneNumber)
                     }
-                    helperText={touched.phoneNumber && errors.phoneNumber}
+                    helperText={touched.phoneNumber && (errors.phoneNumber as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -797,7 +797,7 @@ export default function AddEditStudent() {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.city && Boolean(errors.city)}
-                    helperText={touched.city && errors.city}
+                    helperText={touched.city && (errors.city as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -818,7 +818,7 @@ export default function AddEditStudent() {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.state && Boolean(errors.state)}
-                    helperText={touched.state && errors.state}
+                    helperText={touched.state && (errors.state as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -839,7 +839,7 @@ export default function AddEditStudent() {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.country && Boolean(errors.country)}
-                    helperText={touched.country && errors.country}
+                    helperText={touched.country && (errors.country as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -860,7 +860,7 @@ export default function AddEditStudent() {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.pincode && Boolean(errors.pincode)}
-                    helperText={touched.pincode && errors.pincode}
+                    helperText={touched.pincode && (errors.pincode as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -923,7 +923,7 @@ export default function AddEditStudent() {
                     error={
                       touched.fatherName && Boolean(errors.fatherName)
                     }
-                    helperText={touched.fatherName && errors.fatherName}
+                    helperText={touched.fatherName && (errors.fatherName as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -946,7 +946,7 @@ export default function AddEditStudent() {
                     error={
                       touched.fatherPhone && Boolean(errors.fatherPhone)
                     }
-                    helperText={touched.fatherPhone && errors.fatherPhone}
+                    helperText={touched.fatherPhone && (errors.fatherPhone as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -969,7 +969,7 @@ export default function AddEditStudent() {
                     error={
                       touched.motherName && Boolean(errors.motherName)
                     }
-                    helperText={touched.motherName && errors.motherName}
+                    helperText={touched.motherName && (errors.motherName as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -992,7 +992,7 @@ export default function AddEditStudent() {
                     error={
                       touched.motherPhone && Boolean(errors.motherPhone)
                     }
-                    helperText={touched.motherPhone && errors.motherPhone}
+                    helperText={touched.motherPhone && (errors.motherPhone as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -1015,7 +1015,7 @@ export default function AddEditStudent() {
                     error={
                       touched.guardianName && Boolean(errors.guardianName)
                     }
-                    helperText={touched.guardianName && errors.guardianName}
+                    helperText={touched.guardianName && (errors.guardianName as string)}
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -1039,7 +1039,7 @@ export default function AddEditStudent() {
                       touched.guardianPhone && Boolean(errors.guardianPhone)
                     }
                     helperText={
-                      touched.guardianPhone && errors.guardianPhone
+                      touched.guardianPhone && (errors.guardianPhone as string)
                     }
                     disabled={isReadOnly}
                     slotProps={{
@@ -1101,7 +1101,7 @@ export default function AddEditStudent() {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       error={touched.password && Boolean(errors.password)}
-                      helperText={touched.password && errors.password}
+                      helperText={touched.password && (errors.password as string)}
                       slotProps={{
                         input: {
                           sx: inputSx,
@@ -1148,7 +1148,7 @@ export default function AddEditStudent() {
                         Boolean(errors.confirmPassword)
                       }
                       helperText={
-                        touched.confirmPassword && errors.confirmPassword
+                        touched.confirmPassword && (errors.confirmPassword as string)
                       }
                       slotProps={{
                         input: {
