@@ -58,14 +58,14 @@ export default function SchoolLayout() {
             sx={
               isUserPlanPage
                 ? {
-                    backgroundColor: "var(--body-color)",
-                    minHeight: "100vh",
-                    padding: "85px 24px 24px 15px !important",
-                    transition: "0.3s all cubic-bezier(0.4, 0, 0.2, 1)",
-                    WebkitTransition: "0.3s all cubic-bezier(0.4, 0, 0.2, 1)",
-                    display: "flex",
-                    flexDirection: "column",
-                  }
+                  backgroundColor: "var(--body-color)",
+                  minHeight: "100vh",
+                  padding: "85px 24px 24px 15px !important",
+                  transition: "0.3s all cubic-bezier(0.4, 0, 0.2, 1)",
+                  WebkitTransition: "0.3s all cubic-bezier(0.4, 0, 0.2, 1)",
+                  display: "flex",
+                  flexDirection: "column",
+                }
                 : {}
             }
           >

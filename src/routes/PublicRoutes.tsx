@@ -9,6 +9,7 @@ import { getSubdomain } from "../apps/common/commonJsFunction";
 import { logoutAdmin } from "../redux/slices/authSlice";
 import { authService } from "../api/services/auth.service";
 import Cookies from "js-cookie";
+import ScrollToTop from "../apps/common/ScrollToTop";
 
 const PublicRoutes: React.FC = () => {
   const { isSubdomain } = getSubdomain();
@@ -47,7 +48,12 @@ const PublicRoutes: React.FC = () => {
   ) {
     return <Navigate to="/dashboard" replace={true} />;
   }
-  return <Outlet />;
+  return (
+    <>
+      <ScrollToTop />
+      <Outlet />
+    </>
+  );
 };
 
 export default PublicRoutes;

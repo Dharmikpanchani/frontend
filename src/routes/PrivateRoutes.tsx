@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import useIsValidToken from "./isValidToken";
+import ScrollToTop from "../apps/common/ScrollToTop";
 
 const PrivateRoutes: React.FC = () => {
   const location = useLocation();
@@ -37,7 +38,14 @@ const PrivateRoutes: React.FC = () => {
     return <Navigate to="/user-plan" replace={true} />;
   }
 
-  return canAccess ? <Outlet /> : <Navigate to="/" replace={true} />;
+  return canAccess ? (
+    <>
+      <ScrollToTop />
+      <Outlet />
+    </>
+  ) : (
+    <Navigate to="/" replace={true} />
+  );
 };
 
 export default PrivateRoutes;
