@@ -195,7 +195,7 @@ export const masterService = {
     if (params.isActive !== undefined && params.isActive !== "")
       queryParams.append("isActive", params.isActive);
     if (params.type) queryParams.append("type", params.type);
-    
+
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;
     return adminApiService.get<any>(url);

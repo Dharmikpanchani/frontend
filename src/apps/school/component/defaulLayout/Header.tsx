@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Button, Typography, Menu, MenuItem } from "@mui/material";
@@ -23,12 +23,26 @@ export default function Header(props: any) {
   );
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [imageError, setImageError] = useState(false);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  useEffect(() => {
+    setImageError(false);
+  }, [adminDetails?.image]);
+
+  const getInitials = (name?: string) => {
+    if (!name) return "A";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+    }
+    return parts[0].substring(0, 2).toUpperCase();
   };
 
   const handleLogOut = async () => {
@@ -117,7 +131,7 @@ export default function Header(props: any) {
                     fontFamily: "var(--font-family)",
                   }}
                 >
-                  {adminDetails?.image ? (
+                  {adminDetails?.image && !imageError && adminDetails.image !== "null" && adminDetails.image !== "undefined" && adminDetails.image.trim() !== "" ? (
                     <img
                       src={
                         import.meta.env.VITE_BASE_URL_IMAGE +
@@ -125,6 +139,7 @@ export default function Header(props: any) {
                         adminDetails.image
                       }
                       alt="avatar"
+                      onError={() => setImageError(true)}
                       style={{
                         width: "100%",
                         height: "100%",
@@ -132,7 +147,7 @@ export default function Header(props: any) {
                       }}
                     />
                   ) : (
-                    adminDetails?.name?.charAt(0)?.toUpperCase() || "A"
+                    getInitials(adminDetails?.name)
                   )}
                 </Box>
                 <Box

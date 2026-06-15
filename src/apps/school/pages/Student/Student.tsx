@@ -333,15 +333,15 @@ export default function Student() {
                     schoolAdminPermission.student.update,
                     schoolAdminPermission.student.delete,
                   ]) && (
-                    <TableCell
-                      component="th"
-                      className="table-th"
-                      width="10%"
-                      align="center"
-                    >
-                      ACTIONS
-                    </TableCell>
-                  )}
+                      <TableCell
+                        component="th"
+                        className="table-th"
+                        width="10%"
+                        align="center"
+                      >
+                        ACTIONS
+                      </TableCell>
+                    )}
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
@@ -722,86 +722,86 @@ export default function Student() {
                           schoolAdminPermission.student.update,
                           schoolAdminPermission.student.delete,
                         ]) && (
-                          <TableCell
-                            component="td"
-                            className="table-td"
-                            align="center"
-                          >
-                            <Box
-                              className="admin-table-data-btn-flex"
-                              sx={{ justifyContent: "center" }}
+                            <TableCell
+                              component="td"
+                              className="table-td"
+                              align="center"
                             >
-                              {hasPermission(
-                                schoolAdminPermission.student.read,
-                              ) && (
-                                <Tooltip
-                                  title="View"
-                                  arrow
-                                  placement="bottom"
-                                >
-                                  <Button
-                                    className="admin-table-data-btn admin-table-view-btn"
-                                    onClick={() =>
-                                      navigate("/student/view", {
-                                        state: { id: data?._id },
-                                      })
-                                    }
-                                  >
-                                    <img
-                                      src={Svg.yellowEye}
-                                      className="admin-icon"
-                                      alt="View"
-                                    />
-                                  </Button>
-                                </Tooltip>
-                              )}
-                              {hasPermission(
-                                schoolAdminPermission.student.update,
-                              ) && (
-                                <Tooltip
-                                  title="Edit"
-                                  arrow
-                                  placement="bottom"
-                                >
-                                  <Button
-                                    className="admin-table-data-btn admin-table-edit-btn"
-                                    onClick={() =>
-                                      navigate("/student/edit", {
-                                        state: { id: data?._id },
-                                      })
-                                    }
-                                  >
-                                    <img
-                                      src={Svg.editIcon}
-                                      className="admin-icon"
-                                      alt="Edit"
-                                    />
-                                  </Button>
-                                </Tooltip>
-                              )}
-                              {hasPermission(
-                                schoolAdminPermission.student.delete,
-                              ) && (
-                                <Tooltip
-                                  title="Delete"
-                                  arrow
-                                  placement="bottom"
-                                >
-                                  <Button
-                                    className="admin-table-data-btn admin-table-delete-btn"
-                                    onClick={() => handleOpenDelete(data)}
-                                  >
-                                    <img
-                                      src={Svg.trash}
-                                      className="admin-icon"
-                                      alt="Delete"
-                                    />
-                                  </Button>
-                                </Tooltip>
-                              )}
-                            </Box>
-                          </TableCell>
-                        )}
+                              <Box
+                                className="admin-table-data-btn-flex"
+                                sx={{ justifyContent: "center" }}
+                              >
+                                {hasPermission(
+                                  schoolAdminPermission.student.read,
+                                ) && (
+                                    <Tooltip
+                                      title="View"
+                                      arrow
+                                      placement="bottom"
+                                    >
+                                      <Button
+                                        className="admin-table-data-btn admin-table-view-btn"
+                                        onClick={() =>
+                                          navigate("/student/view", {
+                                            state: { id: data?._id },
+                                          })
+                                        }
+                                      >
+                                        <img
+                                          src={Svg.yellowEye}
+                                          className="admin-icon"
+                                          alt="View"
+                                        />
+                                      </Button>
+                                    </Tooltip>
+                                  )}
+                                {hasPermission(
+                                  schoolAdminPermission.student.update,
+                                ) && (
+                                    <Tooltip
+                                      title="Edit"
+                                      arrow
+                                      placement="bottom"
+                                    >
+                                      <Button
+                                        className="admin-table-data-btn admin-table-edit-btn"
+                                        onClick={() =>
+                                          navigate("/student/edit", {
+                                            state: { id: data?._id },
+                                          })
+                                        }
+                                      >
+                                        <img
+                                          src={Svg.editIcon}
+                                          className="admin-icon"
+                                          alt="Edit"
+                                        />
+                                      </Button>
+                                    </Tooltip>
+                                  )}
+                                {hasPermission(
+                                  schoolAdminPermission.student.delete,
+                                ) && (
+                                    <Tooltip
+                                      title="Delete"
+                                      arrow
+                                      placement="bottom"
+                                    >
+                                      <Button
+                                        className="admin-table-data-btn admin-table-delete-btn"
+                                        onClick={() => handleOpenDelete(data)}
+                                      >
+                                        <img
+                                          src={Svg.trash}
+                                          className="admin-icon"
+                                          alt="Delete"
+                                        />
+                                      </Button>
+                                    </Tooltip>
+                                  )}
+                              </Box>
+                            </TableCell>
+                          )}
                       </TableRow>
                     ))
                   ) : (
