@@ -94,6 +94,13 @@ export default function Sidebar(props: any) {
       menuHighlight: ["teacher"],
     },
     {
+      title: "Students",
+      pathName: "/student",
+      icon: Svg.userList,
+      show: hasPermission(schoolAdminPermission.student?.read),
+      menuHighlight: ["student"],
+    },
+    {
       title: "Department",
       pathName: "/master/department",
       icon: Svg.roleIcon,
@@ -212,6 +219,7 @@ export default function Sidebar(props: any) {
     schoolAdminPermission.class.read,
     schoolAdminPermission.section.read,
     schoolAdminPermission.teacher.read,
+    schoolAdminPermission.student?.read,
   ]);
 
   const feePermission = hasAnyPermission([

@@ -54,6 +54,9 @@ const AddEditSection = lazy(
 const TeacherList = lazy(() => import("./pages/Teacher/Teacher"));
 const AddEditTeacher = lazy(() => import("./pages/Teacher/AddEditTeacher"));
 
+const StudentList = lazy(() => import("./pages/Student/Student"));
+const AddEditStudent = lazy(() => import("./pages/Student/AddEditStudent"));
+
 // Fee Management
 const SchoolSettingsPage = lazy(() => import("./pages/FeeManagement/Settings"));
 const FeeCategoryPage = lazy(() => import("./pages/FeeManagement/FeeCategory"));
@@ -414,6 +417,47 @@ export const schoolRoutes: RouteConfig[] = [
                 permission={schoolAdminPermission?.teacher?.read}
               >
                 <AddEditTeacher />
+              </PermissionRoute>
+            ),
+          },
+          // Student
+          {
+            path: "/student",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.student?.read}
+              >
+                <StudentList />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/student/add",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.student?.create}
+              >
+                <AddEditStudent />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/student/edit",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.student?.update}
+              >
+                <AddEditStudent />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/student/view",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.student?.read}
+              >
+                <AddEditStudent />
               </PermissionRoute>
             ),
           },

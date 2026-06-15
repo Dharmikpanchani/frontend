@@ -81,15 +81,15 @@ export default function PlanView() {
   }, []);
 
   const selectedPlan = profileData?.planData;
-  const planExpiryDate = profileData?.PlanExptyDate;
+  const planExpiryDate = profileData?.planExpiryDate;
 
   const initialValues = useMemo(() => {
     if (selectedPlan) {
       return {
         planName: selectedPlan.planName || "",
-        monPrice: selectedPlan.monPrice || "0",
+        monthlyPrice: selectedPlan.monthlyPrice || "0",
         monOfferPrice: selectedPlan.monOfferPrice || "0",
-        yerPrice: selectedPlan.yerPrice || "0",
+        yearlyPrice: selectedPlan.yearlyPrice || "0",
         yerOfferPrice: selectedPlan.yerOfferPrice || "0",
         billingCycle: selectedPlan.billingCycle || "6month",
         maxStudents: selectedPlan.maxStudents || "",
@@ -435,8 +435,8 @@ export default function PlanView() {
                   sx={inputSx}
                   value={
                     initialValues.billingCycle === "6month"
-                      ? initialValues.monPrice
-                      : initialValues.yerPrice
+                      ? initialValues.monthlyPrice
+                      : initialValues.yearlyPrice
                   }
                   disabled
                   InputProps={{

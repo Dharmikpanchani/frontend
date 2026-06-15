@@ -267,7 +267,7 @@ export default function Checkout() {
   }
 
   const price =
-    billingCycle === "6month" ? planData.monPrice : planData.yerPrice;
+    billingCycle === "6month" ? planData.monthlyPrice : planData.yearlyPrice;
   const gstAmount = Math.round(price * 0.18);
   const totalPrice = price + gstAmount;
 

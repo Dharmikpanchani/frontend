@@ -1126,7 +1126,7 @@ export default function AddEditAdminUser() {
                                 }}
                               >
                                 {getRelativePlanExpiry(
-                                  data?.PlanExptyDate,
+                                  data?.planExpiryDate,
                                   data?.isActivePlan,
                                 )}
                               </Typography>

@@ -12,6 +12,7 @@ import subjectReducer from "./slices/subjectSlice";
 import classReducer from "./slices/classSlice";
 import sectionReducer from "./slices/sectionSlice";
 import teacherReducer from "./slices/teacherSlice";
+import studentReducer from "./slices/studentSlice";
 import planReducer from "./slices/planSlice";
 import academicYearReducer from "./slices/academicYearSlice";
 import feeReducer from "./slices/feeSlice";
@@ -34,6 +35,7 @@ export interface RootState {
   ClassReducer: ReturnType<typeof classReducer>;
   SectionReducer: ReturnType<typeof sectionReducer>;
   TeacherReducer: ReturnType<typeof teacherReducer>;
+  StudentReducer: ReturnType<typeof studentReducer>;
   PlanReducer: ReturnType<typeof planReducer>;
   FeeReducer: ReturnType<typeof feeReducer>;
   DeveloperTransactionReducer: ReturnType<typeof developerTransactionReducer>;
@@ -54,6 +56,7 @@ const rootReducer = combineReducers({
   ClassReducer: classReducer,
   SectionReducer: sectionReducer,
   TeacherReducer: teacherReducer,
+  StudentReducer: studentReducer,
   PlanReducer: planReducer,
   FeeReducer: feeReducer,
   DeveloperTransactionReducer: developerTransactionReducer,

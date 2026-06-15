@@ -100,6 +100,10 @@ export const Api = {
   ADD_EDIT_TEACHER: `${route}/add-edit-teacher`,
   DELETE_TEACHER: `${route}/delete-teacher`,
   CHANGE_TEACHER_STATUS: `${route}/teacher-action-status`,
+  GET_ALL_STUDENTS: `${route}/get-all-students`,
+  GET_STUDENT: `${route}/get-student`,
+  ADD_EDIT_STUDENT: `${route}/add-edit-student`,
+  DELETE_STUDENT: `${route}/delete-student`,
   // Plan management
   GET_ALL_PLANS: `${route}/get-all-plans`,
   GET_PLAN: `${route}/get-plan`,

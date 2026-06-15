@@ -757,7 +757,7 @@ export default function SchoolList() {
                               }}
                             >
                               {getRelativePlanExpiry(
-                                data?.PlanExptyDate,
+                                data?.planExpiryDate,
                                 data?.isActivePlan,
                               )}
                             </Typography>

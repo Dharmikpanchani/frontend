@@ -724,6 +724,62 @@ export const sectionValidationSchema = Yup.object().shape({
   classId: Yup.string().required("Class is required"),
 });
 
+export const studentValidationSchema = Yup.object().shape({
+  id: Yup.string().optional(),
+  // Basic Info
+  fullName: fullNameValidation("Full name", true),
+  gender: Yup.string().optional(),
+  dateOfBirth: dobValidation(false),
+  bloodGroup: Yup.string().optional(),
+  profileImage: imageValidation("Profile Image", false).nullable(),
+  // Academic
+  admissionNumber: Yup.string()
+    .test(
+      "no-whitespace",
+      "Please enter a valid admission number",
+      (_value, context) =>
+        typeof context.originalValue !== "string" ||
+        context.originalValue.trim() === context.originalValue,
+    )
+    .transform((value) => value?.trim())
+    .min(2, "Admission number must be at least 2 characters")
+    .max(30, "Admission number must be at most 30 characters")
+    .required("Admission number is required"),
+  admissionDate: dateValidation(true, "Admission date is required"),
+  rollNumber: Yup.string().optional(),
+  classId: Yup.string().required("Class is required"),
+  sectionId: Yup.string().required("Section is required"),
+  // Contact
+  email: emailValidation(true),
+  phoneNumber: phoneNumberValidation(true),
+  address: genericStringValidation("Address", 5, 200, false),
+  city: cityValidation(false),
+  state: stateValidation(false),
+  country: countryValidation(false),
+  pincode: zipCodeValidation(false),
+  // Guardian
+  fatherName: fullNameValidation("Father's name", false),
+  fatherPhone: phoneNumberValidation(false),
+  motherName: fullNameValidation("Mother's name", false),
+  motherPhone: phoneNumberValidation(false),
+  guardianName: fullNameValidation("Guardian's name", false),
+  guardianPhone: phoneNumberValidation(false),
+  // Auth (Add only)
+  password: Yup.string().when("id", {
+    is: (id: string) => !id,
+    then: () => passwordValidation("Password", true),
+    otherwise: () => Yup.string().optional(),
+  }),
+  confirmPassword: Yup.string().when("id", {
+    is: (id: string) => !id,
+    then: () =>
+      Yup.string()
+        .oneOf([Yup.ref("password")], "Passwords must match")
+        .required("Please confirm your password"),
+    otherwise: () => Yup.string().optional(),
+  }),
+});
+
 export const teacherValidationSchema = Yup.object().shape(
   {
     fullName: fullNameValidation("Fullname", true),
@@ -913,7 +969,7 @@ export const planValidationSchema = Yup.object().shape({
   id: Yup.string().optional(),
   planName: genericStringValidation("Plan name", 3, 50, true),
   permissions: Yup.array().of(Yup.string()).optional(),
-  monPrice: Yup.number()
+  monthlyPrice: Yup.number()
     .typeError("6 Months Price must be a number")
     .min(0, "Price cannot be negative")
     .test("min-6month-price", "Minimum price not met", function (value) {
@@ -940,7 +996,7 @@ export const planValidationSchema = Yup.object().shape({
     .min(0, "Offer price cannot be negative")
     .optional()
     .nullable(),
-  yerPrice: Yup.number()
+  yearlyPrice: Yup.number()
     .typeError("Yearly Price must be a number")
     .min(0, "Price cannot be negative")
     .test("min-yearly-price", "Minimum price not met", function (value) {

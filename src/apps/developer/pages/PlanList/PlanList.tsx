@@ -421,7 +421,7 @@ export default function PlanList() {
                           >
                             {data.planName?.toLowerCase() === "free"
                               ? "-"
-                              : `₹${data.billingCycle === "6month" ? data.monPrice : data.yerPrice}`}
+                              : `₹${data.billingCycle === "6month" ? data.monthlyPrice : data.yearlyPrice}`}
                           </Typography>
                         </TableCell>
                         <TableCell align="center" className="table-td">

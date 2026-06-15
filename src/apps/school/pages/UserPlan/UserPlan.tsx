@@ -286,7 +286,7 @@ export default function UserPlan() {
         >
           {filteredPlans.map((plan: any, index: number) => {
             const price =
-              billingCycle === "6month" ? plan.monPrice : plan.yerPrice;
+              billingCycle === "6month" ? plan.monthlyPrice : plan.yearlyPrice;
             const offerPrice =
               billingCycle === "6month"
                 ? plan.monOfferPrice

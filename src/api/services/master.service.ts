@@ -182,4 +182,32 @@ export const masterService = {
     status: "APPROVED" | "REJECTED";
     rejectReason?: string;
   }) => adminApiService.post<any>(Api.ADMIN_VERIFY_TEACHER_DOCUMENT, payload),
+
+  // Students
+  getStudents: (params: any) => {
+    let url = `${Api.GET_ALL_STUDENTS}`;
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append("pageNumber", params.page);
+    if (params.perPage) queryParams.append("perPageData", params.perPage);
+    if (params.search) queryParams.append("searchRequest", params.search);
+    if (params.classId) queryParams.append("classId", params.classId);
+    if (params.sectionId) queryParams.append("sectionId", params.sectionId);
+    if (params.isActive !== undefined && params.isActive !== "")
+      queryParams.append("isActive", params.isActive);
+    if (params.type) queryParams.append("type", params.type);
+    
+    const queryString = queryParams.toString();
+    if (queryString) url += `?${queryString}`;
+    return adminApiService.get<any>(url);
+  },
+  addEditStudent: (payload: any, id?: string) => {
+    const url = id ? `${Api.ADD_EDIT_STUDENT}/${id}` : Api.ADD_EDIT_STUDENT;
+    return adminApiService.post<any>(url, payload);
+  },
+  getStudentById: (id: string) =>
+    adminApiService.get<any>(`${Api.GET_STUDENT}/${id}`),
+  deleteStudent: (id: string) =>
+    adminApiService.delete<any>(`${Api.DELETE_STUDENT}/${id}`),
+  changeStudentStatus: (id: string) =>
+    adminApiService.post<any>(`${Api.DELETE_STUDENT}/${id}`, {}),
 };

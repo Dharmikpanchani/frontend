@@ -68,6 +68,20 @@ const teacherModule: RoleStaticItem = {
   ],
 };
 
+const studentModule: RoleStaticItem = {
+  mainTitle: "Student",
+  mainTitleId: "student",
+  price: "₹ 12",
+  subRole: [
+    { title: "Add", titleId: "add", is_show: true },
+    { title: "Edit", titleId: "edit", is_show: true },
+    { title: "View", titleId: "view", is_show: true },
+    { title: "Delete", titleId: "delete", is_show: true },
+    { title: "Status", titleId: "status", is_show: true },
+    { title: "Export", titleId: "export", is_show: true },
+  ],
+};
+
 const departmentModule: RoleStaticItem = {
   mainTitle: "Department",
   mainTitleId: "department",
@@ -198,6 +212,7 @@ export const planStaticData: RoleStaticItem[] = [
   rolesModule,
   adminUserModule,
   teacherModule,
+  studentModule,
   departmentModule,
   subjectModule,
   classModule,
@@ -257,6 +272,7 @@ export const schoolRoleStaticData: RoleStaticItem[] = [
   rolesModule,
   adminUserModule,
   teacherModule,
+  studentModule,
   departmentModule,
   subjectModule,
   classModule,
@@ -416,6 +432,14 @@ export const schoolAdminPermission = {
     delete: "teacher_delete",
     status: "teacher_status",
     export: "teacher_export",
+  },
+  student: {
+    create: "student_add",
+    update: "student_edit",
+    read: "student_view",
+    delete: "student_delete",
+    status: "student_status",
+    export: "student_export",
   },
   school_settings: {
     read: "school_settings_view",

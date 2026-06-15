@@ -95,9 +95,9 @@ export default function AddEditPlan() {
         id: id,
         planName: selectedPlan.planName || "",
         billingCycle: selectedPlan.billingCycle || "6month",
-        monPrice: selectedPlan.monPrice || "",
+        monthlyPrice: selectedPlan.monthlyPrice || "",
         monOfferPrice: selectedPlan.monOfferPrice || "",
-        yerPrice: selectedPlan.yerPrice || "",
+        yearlyPrice: selectedPlan.yearlyPrice || "",
         yerOfferPrice: selectedPlan.yerOfferPrice || "",
         permissions: selectedPlan.permissions || [],
         studentLimit: selectedPlan.studentLimit !== undefined ? selectedPlan.studentLimit : -1,
@@ -107,9 +107,9 @@ export default function AddEditPlan() {
     return {
       id: "",
       planName: "",
-      monPrice: "",
+      monthlyPrice: "",
       monOfferPrice: "",
-      yerPrice: "",
+      yearlyPrice: "",
       yerOfferPrice: "",
       billingCycle: "6month",
       permissions: [],
@@ -144,17 +144,17 @@ export default function AddEditPlan() {
 
     if (isFreePlan) {
       payload.billingCycle = "6month";
-      payload.monPrice = 0;
+      payload.monthlyPrice = 0;
       payload.monOfferPrice = 0;
-      delete payload.yerPrice;
+      delete payload.yearlyPrice;
       delete payload.yerOfferPrice;
     } else {
       // Ensure we only send fields relevant to the selected billing cycle
       if (values.billingCycle === "6month") {
-        delete payload.yerPrice;
+        delete payload.yearlyPrice;
         delete payload.yerOfferPrice;
       } else if (values.billingCycle === "yearly") {
-        delete payload.monPrice;
+        delete payload.monthlyPrice;
         delete payload.monOfferPrice;
       }
     }
@@ -576,10 +576,10 @@ export default function AddEditPlan() {
                                     setFieldValue("billingCycle", newCycle);
                                     // Clear non-relevant fields when cycle changes
                                     if (newCycle === "6month") {
-                                      setFieldValue("yerPrice", "");
+                                      setFieldValue("yearlyPrice", "");
                                       setFieldValue("yerOfferPrice", "");
                                     } else if (newCycle === "yearly") {
-                                      setFieldValue("monPrice", "");
+                                      setFieldValue("monthlyPrice", "");
                                       setFieldValue("monOfferPrice", "");
                                     }
                                   }}
@@ -622,14 +622,14 @@ export default function AddEditPlan() {
                                     </Typography>
                                     <TextField
                                       fullWidth
-                                      name="monPrice"
+                                      name="monthlyPrice"
                                       placeholder="Enter 6 Months Price"
                                       variant="outlined"
                                       sx={inputSx}
-                                      value={values.monPrice}
+                                      value={values.monthlyPrice}
                                       onChange={(e) => {
                                         const val = e.target.value;
-                                        setFieldValue("monPrice", val);
+                                        setFieldValue("monthlyPrice", val);
                                         if (!isNaN(Number(val)) && val !== "") {
                                           setFieldValue(
                                             "monOfferPrice",
@@ -639,8 +639,8 @@ export default function AddEditPlan() {
                                       }}
                                       onBlur={handleBlur}
                                       error={
-                                        touched.monPrice &&
-                                        Boolean(errors.monPrice)
+                                        touched.monthlyPrice &&
+                                        Boolean(errors.monthlyPrice)
                                       }
                                       disabled={isView}
                                       InputProps={{
@@ -652,8 +652,8 @@ export default function AddEditPlan() {
                                       }}
                                                                           />
                                     <FormHelperText className="error-text">
-                                      {touched.monPrice && errors.monPrice
-                                        ? (errors.monPrice as string)
+                                      {touched.monthlyPrice && errors.monthlyPrice
+                                        ? (errors.monthlyPrice as string)
                                         : ""}
                                     </FormHelperText>
                                   </Box>
@@ -712,14 +712,14 @@ export default function AddEditPlan() {
                                     </Typography>
                                     <TextField
                                       fullWidth
-                                      name="yerPrice"
+                                      name="yearlyPrice"
                                       placeholder="Enter Yearly Price"
                                       variant="outlined"
                                       sx={inputSx}
-                                      value={values.yerPrice}
+                                      value={values.yearlyPrice}
                                       onChange={(e) => {
                                         const val = e.target.value;
-                                        setFieldValue("yerPrice", val);
+                                        setFieldValue("yearlyPrice", val);
                                         if (!isNaN(Number(val)) && val !== "") {
                                           setFieldValue(
                                             "yerOfferPrice",
@@ -729,8 +729,8 @@ export default function AddEditPlan() {
                                       }}
                                       onBlur={handleBlur}
                                       error={
-                                        touched.yerPrice &&
-                                        Boolean(errors.yerPrice)
+                                        touched.yearlyPrice &&
+                                        Boolean(errors.yearlyPrice)
                                       }
                                       disabled={isView}
                                       InputProps={{
@@ -743,8 +743,8 @@ export default function AddEditPlan() {
                                       slotProps={{ htmlInput: { maxLength: 100 } }}
                                     />
                                     <FormHelperText className="error-text">
-                                      {touched.yerPrice && errors.yerPrice
-                                        ? (errors.yerPrice as string)
+                                      {touched.yearlyPrice && errors.yearlyPrice
+                                        ? (errors.yearlyPrice as string)
                                         : ""}
                                     </FormHelperText>
                                   </Box>
