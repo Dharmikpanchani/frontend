@@ -12,39 +12,73 @@ import {
   TableCell,
   TableBody,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   CircularProgress,
   MenuItem,
-  Select,
-  Tooltip,
+  Menu,
 } from "@mui/material";
-import { Search as SearchIcon, Download as DownloadIcon, Html as HtmlIcon, Print as PrintIcon } from "@mui/icons-material";
+import {
+  Search as SearchIcon,
+  Download as DownloadIcon,
+  Print as PrintIcon,
+  FileDownload as ExcelIcon,
+  PictureAsPdf as PdfIcon,
+  FilterList as FilterIcon,
+} from "@mui/icons-material";
 import { admissionService } from "@/api/services/admission.service";
+import Loader from "@/apps/common/loader/Loader";
+import DataNotFound from "@/apps/school/component/schoolCommon/dataNotFound/DataNotFound";
 import toast from "react-hot-toast";
 import moment from "moment";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
-import { labelSx, inputSx } from "@/utils/styles/commonSx";
+import Filter from "@/apps/common/filter/Filter";
+import Pagination from "@/apps/common/pagination/Pagination";
 
 export default function Inquiries() {
   const { hasPermission } = usePermissions();
-  const canUpdate = hasPermission(schoolAdminPermission.student.update);
 
   const [inquiries, setInquiries] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [rowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
+  const [openFilter, setOpenFilter] = useState(false);
+  const [filterValues, setFilterValues] = useState({
+    studentName: "",
+    date: "",
+  });
 
-  const [statusModalOpen, setStatusModalOpen] = useState(false);
-  const [selectedInquiry, setSelectedInquiry] = useState<any>(null);
-  const [newStatus, setNewStatus] = useState("");
-  const [adminRemark, setAdminRemark] = useState("");
-  const [actionLoading, setActionLoading] = useState(false);
-  const [exportingFormat, setExportingFormat] = useState<"excel" | "html" | "print" | null>(null);
+  const filterFields: any[] = [
+    {
+      type: "inputSelect",
+      name: "studentName",
+      label: "Student Name",
+      placeholder: "Enter Student Name",
+    },
+    {
+      type: "date",
+      name: "date",
+      label: "Date",
+      placeholder: "Select Date",
+    },
+  ];
+
+  const handleApplyFilter = (values: any) => {
+    setFilterValues(values);
+    setPage(0);
+    setOpenFilter(false);
+  };
+
+  const handleResetFilters = () => {
+    setFilterValues({ studentName: "", date: "" });
+    setPage(0);
+    setOpenFilter(false);
+  };
+
+  const [exportingFormat, setExportingFormat] = useState<"excel" | "pdf" | "print" | null>(null);
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+  const exporting = exportingFormat !== null;
 
   const fetchInquiries = async () => {
     setLoading(true);
@@ -53,62 +87,34 @@ export default function Inquiries() {
         pageNumber: page + 1,
         perPageData: rowsPerPage,
         searchRequest: search.trim(),
+        studentName: filterValues.studentName || undefined,
+        date: filterValues.date ? moment(filterValues.date).format("YYYY-MM-DD") : undefined,
       });
-      setInquiries(res?.data?.data || []);
+      setInquiries(res?.data || []);
+      setTotal(res?.pagination?.totalArrayLength || 0);
     } catch {
       setInquiries([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    setLoading(true);
     const timer = setTimeout(() => {
       fetchInquiries();
     }, 500);
     return () => clearTimeout(timer);
-  }, [page, search]);
+  }, [page, search, filterValues, rowsPerPage]);
 
-  const handleOpenStatusModal = (inquiry: any) => {
-    setSelectedInquiry(inquiry);
-    setNewStatus(inquiry.status);
-    setAdminRemark(inquiry.adminRemark || "");
-    setStatusModalOpen(true);
-  };
-
-  const handleUpdateStatus = async () => {
-    if (!selectedInquiry) return;
-    setActionLoading(true);
-    try {
-      await admissionService.updateInquiryStatus(selectedInquiry._id, {
-        status: newStatus,
-        adminRemark: adminRemark.trim(),
-      });
-      toast.success("Inquiry status updated");
-      setStatusModalOpen(false);
-      fetchInquiries();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update status");
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending": return "warning";
-      case "contacted": return "info";
-      case "converted": return "success";
-      case "rejected": return "error";
-      default: return "default";
-    }
-  };
-
-  const handleExport = async (format: "excel" | "html" | "print") => {
+  const handleExport = async (format: "excel" | "pdf" | "print") => {
     try {
       setExportingFormat(format);
       const params = {
-        search,
+        searchRequest: search,
+        studentName: filterValues.studentName || undefined,
+        date: filterValues.date ? moment(filterValues.date).format("YYYY-MM-DD") : undefined,
         format,
       };
 
@@ -131,6 +137,8 @@ export default function Inquiries() {
           type:
             format === "excel"
               ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              : format === "pdf"
+              ? "application/pdf"
               : "text/html; charset=utf-8",
         });
         const url = window.URL.createObjectURL(blob);
@@ -139,7 +147,7 @@ export default function Inquiries() {
         link.setAttribute(
           "download",
           `Inquiries_Report_${moment().format("YYYYMMDD_HHmmss")}.${
-            format === "excel" ? "xlsx" : "html"
+            format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
           }`
         );
         document.body.appendChild(link);
@@ -163,52 +171,60 @@ export default function Inquiries() {
           Admission Inquiries
         </Typography>
         <Box className="admin-flex-end">
-          <TextField
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            placeholder="Search name or phone"
-            size="small"
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ fontSize: 18, color: "var(--primary-color)", mr: 1 }} />,
-            }}
-            sx={{ minWidth: 250, bgcolor: "#fff", borderRadius: 1 }}
-          />
-          <Box className="admin-filter-btn-main">
-            <Tooltip title="Export to Excel">
-              <Button
-                className="admin-btn-theme"
-                onClick={() => handleExport("excel")}
-                disabled={exportingFormat !== null}
-                sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
-              >
-                {exportingFormat === "excel" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <DownloadIcon sx={{ color: "#fff", fontSize: "18px" }} />}
-              </Button>
-            </Tooltip>
+          <Box className="admin-search-main">
+            <Box className="admin-search-box">
+              <Box className="admin-form-group">
+                <TextField
+                  value={search}
+                  fullWidth
+                  id="search"
+                  className="admin-form-control"
+                  placeholder="Search"
+                  onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+                  slotProps={{ htmlInput: { maxLength: 100 } }}
+                />
+                <SearchIcon
+                  sx={{ color: "var(--primary-color)", fontSize: "20px" }}
+                  className="school-admin-search-grey-img admin-icon"
+                />
+              </Box>
+            </Box>
           </Box>
+
           <Box className="admin-filter-btn-main">
-            <Tooltip title="Export to HTML">
-              <Button
-                className="admin-btn-theme"
-                onClick={() => handleExport("html")}
-                disabled={exportingFormat !== null}
-                sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
-              >
-                {exportingFormat === "html" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <HtmlIcon sx={{ color: "#fff", fontSize: "18px" }} />}
-              </Button>
-            </Tooltip>
+            <Button
+              className="admin-btn-theme"
+              onClick={() => setOpenFilter(true)}
+              sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center", gap: "8px" }}
+            >
+              <FilterIcon sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }} />
+            </Button>
           </Box>
-          <Box className="admin-filter-btn-main">
-            <Tooltip title="Export to Print">
+
+          {inquiries.length > 0 && (
+            <>
               <Button
-                className="admin-btn-theme"
-                onClick={() => handleExport("print")}
-                disabled={exportingFormat !== null}
-                sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
+                variant="outlined"
+                startIcon={exporting ? <CircularProgress size={16} /> : <DownloadIcon />}
+                disabled={exporting}
+                onClick={(e) => setExportAnchorEl(e.currentTarget)}
+                sx={{ textTransform: "none", borderRadius: "8px", borderColor: "#eaecf0", color: "#344054", height: "40px", ml: 1 }}
               >
-                {exportingFormat === "print" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <PrintIcon sx={{ color: "#fff", fontSize: "18px" }} />}
+                Export Report
               </Button>
-            </Tooltip>
-          </Box>
+              <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                  <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                </MenuItem>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                  <PdfIcon sx={{ fontSize: "18px", color: "#F04438" }} /> Export PDF
+                </MenuItem>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                  <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Print View
+                </MenuItem>
+              </Menu>
+            </>
+          )}
         </Box>
       </Box>
 
@@ -223,13 +239,11 @@ export default function Inquiries() {
                   <TableCell className="table-th">CLASS</TableCell>
                   <TableCell className="table-th">MESSAGE</TableCell>
                   <TableCell className="table-th">DATE</TableCell>
-                  <TableCell className="table-th">STATUS</TableCell>
-                  {canUpdate && <TableCell className="table-th" align="center">ACTION</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
                 {loading ? (
-                  <TableRow><TableCell colSpan={7} align="center" sx={{ py: 4 }}><CircularProgress size={28} sx={{ color: "var(--primary-color)" }} /></TableCell></TableRow>
+                  <Loader colSpan={5} />
                 ) : inquiries.length ? (
                   inquiries.map((inq: any) => (
                     <TableRow key={inq._id} sx={{ "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" } }}>
@@ -250,61 +264,37 @@ export default function Inquiries() {
                       <TableCell className="table-td">
                         <Typography sx={{ fontSize: 12 }}>{moment(inq.createdAt).format("DD MMM YYYY")}</Typography>
                       </TableCell>
-                      <TableCell className="table-td">
-                        <Chip label={inq.status.toUpperCase()} color={getStatusColor(inq.status)} size="small" sx={{ fontSize: 10, fontWeight: 600, height: 20 }} />
-                        {inq.adminRemark && (
-                          <Typography sx={{ fontSize: 10, color: "text.secondary", mt: 0.5 }}>Remark: {inq.adminRemark}</Typography>
-                        )}
-                      </TableCell>
-                      {canUpdate && (
-                        <TableCell className="table-td" align="center">
-                          <Button size="small" variant="outlined" onClick={() => handleOpenStatusModal(inq)}
-                            sx={{ fontSize: 11, textTransform: "none", borderColor: "var(--primary-color)", color: "var(--primary-color)" }}>
-                            Update
-                          </Button>
-                        </TableCell>
-                      )}
                     </TableRow>
                   ))
                 ) : (
-                  <TableRow><TableCell colSpan={7} align="center" sx={{ py: 6 }}>
-                    <Typography sx={{ fontSize: 14, color: "#9ca3af" }}>No inquiries found</Typography>
-                  </TableCell></TableRow>
+                  <DataNotFound colSpan={5} text="No inquiries found" />
                 )}
               </TableBody>
             </Table>
           </TableContainer>
         </Box>
+        <Box className="admin-pagination-main">
+          {total ? (
+            <Pagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              setPage={setPage}
+              setRowsPerPage={setRowsPerPage}
+            />
+          ) : null}
+        </Box>
       </Box>
 
-      {/* Update Status Modal */}
-      <Dialog open={statusModalOpen} onClose={() => setStatusModalOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ fontWeight: 600, fontSize: "16px" }}>Update Inquiry Status</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-            <Box>
-              <Typography sx={labelSx}>Status</Typography>
-              <Select fullWidth size="small" value={newStatus} onChange={(e) => setNewStatus(e.target.value)} sx={inputSx}>
-                <MenuItem value="pending">Pending</MenuItem>
-                <MenuItem value="contacted">Contacted</MenuItem>
-                <MenuItem value="converted">Converted (Admission Taken)</MenuItem>
-                <MenuItem value="rejected">Rejected (Not Interested)</MenuItem>
-              </Select>
-            </Box>
-            <Box>
-              <Typography sx={labelSx}>Admin Remark (Optional)</Typography>
-              <TextField fullWidth multiline rows={3} value={adminRemark} onChange={(e) => setAdminRemark(e.target.value)} placeholder="Add internal notes..." slotProps={{ input: { sx: inputSx } }} />
-            </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={() => setStatusModalOpen(false)} color="inherit">Cancel</Button>
-          <Button onClick={handleUpdateStatus} variant="contained" disabled={actionLoading}
-            sx={{ backgroundColor: "var(--primary-color) !important", textTransform: "none", boxShadow: "none" }}>
-            {actionLoading ? <CircularProgress size={20} color="inherit" /> : "Save"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Filter
+        open={openFilter}
+        onClose={() => setOpenFilter(false)}
+        title="Inquiries Filter"
+        fields={filterFields}
+        handleApply={handleApplyFilter}
+        handleReset={handleResetFilters}
+        initialValues={filterValues}
+      />
     </Box>
   );
 }

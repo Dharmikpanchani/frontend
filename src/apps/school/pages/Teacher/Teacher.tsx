@@ -27,6 +27,8 @@ import {
   CardContent,
   IconButton,
   CircularProgress,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import {
   Email as EmailIcon,
@@ -47,6 +49,7 @@ import {
   Download as DownloadIcon,
   Html as HtmlIcon,
   Print as PrintIcon,
+  FileDownload as ExcelIcon,
 } from "@mui/icons-material";
 import moment from "moment";
 import {
@@ -115,7 +118,9 @@ export default function Teacher() {
   const [openImportModal, setOpenImportModal] = useState(false);
 
   // Export states
-  const [exportingFormat, setExportingFormat] = useState<"excel" | "html" | "print" | null>(null);
+  const [exportingFormat, setExportingFormat] = useState<"excel" | "pdf" | "print" | null>(null);
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+  const exporting = exportingFormat !== null;
 
   // Bulk AI Verification states
 
@@ -431,7 +436,7 @@ export default function Teacher() {
     }
   };
 
-  const handleExport = async (format: "excel" | "html" | "print") => {
+  const handleExport = async (format: "excel" | "pdf" | "print") => {
     try {
       setExportingFormat(format);
       const params = {
@@ -469,6 +474,8 @@ export default function Teacher() {
           type:
             format === "excel"
               ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              : format === "pdf"
+              ? "application/pdf"
               : "text/html; charset=utf-8",
         });
         const url = window.URL.createObjectURL(blob);
@@ -477,7 +484,7 @@ export default function Teacher() {
         link.setAttribute(
           "download",
           `Teachers_Report_${moment().format("YYYYMMDD_HHmmss")}.${
-            format === "excel" ? "xlsx" : "html"
+            format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
           }`
         );
         document.body.appendChild(link);
@@ -670,10 +677,8 @@ export default function Teacher() {
               {hasPermission(schoolAdminPermission.teacher.create) && (
                 <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1 }}>
                   <Button
-                    variant="outlined"
                     className="admin-btn-theme"
                     onClick={() => setOpenImportModal(true)}
-                    sx={{ backgroundColor: "#fff !important", color: "var(--primary-color) !important", borderColor: "var(--primary-color) !important" }}
                   >
                     Import
                   </Button>
@@ -692,42 +697,30 @@ export default function Teacher() {
                   </Button>
                 </Box>
               )}
-              <Box className="admin-filter-btn-main">
-                <Tooltip title="Export to Excel">
+              {hasPermission(schoolAdminPermission.teacher.read) && teachers?.length > 0 && (
+                <>
                   <Button
-                    className="admin-btn-theme"
-                    onClick={() => handleExport("excel")}
-                    disabled={exportingFormat !== null}
-                    sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
+                    variant="outlined"
+                    startIcon={exporting ? <CircularProgress size={16} /> : <DownloadIcon />}
+                    disabled={exporting}
+                    onClick={(e) => setExportAnchorEl(e.currentTarget)}
+                    sx={{ textTransform: "none", borderRadius: "8px", borderColor: "#eaecf0", color: "#344054", height: "40px", ml: 1 }}
                   >
-                    {exportingFormat === "excel" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <DownloadIcon sx={{ color: "#fff", fontSize: "18px" }} />}
+                    Export Report
                   </Button>
-                </Tooltip>
-              </Box>
-              <Box className="admin-filter-btn-main">
-                <Tooltip title="Export to HTML">
-                  <Button
-                    className="admin-btn-theme"
-                    onClick={() => handleExport("html")}
-                    disabled={exportingFormat !== null}
-                    sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
-                  >
-                    {exportingFormat === "html" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <HtmlIcon sx={{ color: "#fff", fontSize: "18px" }} />}
-                  </Button>
-                </Tooltip>
-              </Box>
-              <Box className="admin-filter-btn-main">
-                <Tooltip title="Export to Print">
-                  <Button
-                    className="admin-btn-theme"
-                    onClick={() => handleExport("print")}
-                    disabled={exportingFormat !== null}
-                    sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
-                  >
-                    {exportingFormat === "print" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <PrintIcon sx={{ color: "#fff", fontSize: "18px" }} />}
-                  </Button>
-                </Tooltip>
-              </Box>
+                  <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+                    <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                      <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                    </MenuItem>
+                    <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                      <PdfIcon sx={{ fontSize: "18px", color: "#F04438" }} /> Export PDF
+                    </MenuItem>
+                    <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                      <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Print View
+                    </MenuItem>
+                  </Menu>
+                </>
+              )}
             </Box>
           </Box>
 
@@ -1460,10 +1453,10 @@ export default function Teacher() {
                           </TableRow>
                         ))
                       ) : (
-                        <DataNotFound text="No Teachers Found" />
+                        <DataNotFound text="No Teachers Found" colSpan={6} />
                       )
                     ) : (
-                      <Loader />
+                      <Loader colSpan={6} />
                     )}
                   </TableBody>
                 </Table>
@@ -1575,7 +1568,7 @@ export default function Teacher() {
                               <TableCell className="table-th">
                                 PENDING REQUESTS
                               </TableCell>
-                              <TableCell className="table-th">
+                              <TableCell className="table-th" align="center">
                                 SUBMITTED DATE
                               </TableCell>
                               <TableCell className="table-th" align="center">
@@ -1648,6 +1641,7 @@ export default function Teacher() {
                                       </TableCell>
                                       <TableCell
                                         className="table-td"
+                                        align="center"
                                         sx={{
                                           fontSize: "13px",
                                           color: "#475467",
@@ -1690,11 +1684,7 @@ export default function Teacher() {
                                     </TableRow>
                                   ))
                               ) : (
-                                <TableRow>
-                                  <TableCell colSpan={4}>
-                                    <DataNotFound text="No Pending Document Requests Found" />
-                                  </TableCell>
-                                </TableRow>
+                                <DataNotFound text="No Pending Document Requests Found" colSpan={4} />
                               )
                             ) : (
                               <Loader colSpan={4} />

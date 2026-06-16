@@ -23,6 +23,8 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import {
   Email as EmailIcon,
@@ -40,6 +42,8 @@ import {
   Download as DownloadIcon,
   Html as HtmlIcon,
   Print as PrintIcon,
+  FileDownload as ExcelIcon,
+  PictureAsPdf as PdfIcon,
 } from "@mui/icons-material";
 import { masterService } from "@/api/services/master.service";
 import { admissionService } from "@/api/services/admission.service";
@@ -49,6 +53,7 @@ import {
   getStudents,
   changeStudentStatus,
   deleteStudent,
+  getPendingAdmissionsCount,
 } from "@/redux/slices/studentSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import { getSections } from "@/redux/slices/sectionSlice";
@@ -80,7 +85,7 @@ export default function Student() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { hasPermission, hasAnyPermission } = usePermissions();
-  const { students, total, loading } = useSelector(
+  const { students, total, loading, pendingAdmissionsCount } = useSelector(
     (state: RootState) => state.StudentReducer,
   );
 
@@ -107,7 +112,9 @@ export default function Student() {
     startYears: [] as number[],
   });
 
-  const [exportingFormat, setExportingFormat] = useState<"excel" | "html" | "print" | null>(null);
+  const [exportingFormat, setExportingFormat] = useState<"excel" | "pdf" | "print" | null>(null);
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+  const exporting = exportingFormat !== null;
 
   // For Admission tabs ──
   const [tabValue, setTabValue] = useState(0);
@@ -132,8 +139,8 @@ export default function Student() {
         perPageData: pendingRowsPerPage,
         searchRequest: pendingSearch.trim(),
       });
-      setPendingAdmissions(res?.data?.data || []);
-      setPendingTotal(res?.data?.pagination?.totalItems || 0);
+      setPendingAdmissions(res?.data || []);
+      setPendingTotal(res?.pagination?.totalArrayLength || 0);
     } catch {
       setPendingAdmissions([]);
     } finally {
@@ -144,6 +151,10 @@ export default function Student() {
   useEffect(() => {
     if (tabValue === 1) fetchPendingAdmissions();
   }, [tabValue, pendingPage, pendingSearch]);
+
+  useEffect(() => {
+    dispatch(getPendingAdmissionsCount() as any);
+  }, [dispatch]);
 
   const handleAdmissionAction = async (action: "approved" | "rejected") => {
     if (!reviewModal) return;
@@ -164,6 +175,7 @@ export default function Student() {
       setRejectReason("");
       setAdmissionNumberOverride("");
       fetchPendingAdmissions();
+      dispatch(getPendingAdmissionsCount() as any);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Action failed");
     } finally {
@@ -321,7 +333,7 @@ export default function Student() {
     }
   };
 
-  const handleExport = async (format: "excel" | "html" | "print") => {
+  const handleExport = async (format: "excel" | "pdf" | "print") => {
     try {
       setExportingFormat(format);
       const params = {
@@ -351,6 +363,8 @@ export default function Student() {
           type:
             format === "excel"
               ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              : format === "pdf"
+              ? "application/pdf"
               : "text/html; charset=utf-8",
         });
         const url = window.URL.createObjectURL(blob);
@@ -359,7 +373,7 @@ export default function Student() {
         link.setAttribute(
           "download",
           `Students_Report_${moment().format("YYYYMMDD_HHmmss")}.${
-            format === "excel" ? "xlsx" : "html"
+            format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
           }`
         );
         document.body.appendChild(link);
@@ -403,175 +417,200 @@ export default function Student() {
 
   return (
     <Box className="admin-dashboard-content">
-      <Box className="admin-user-list-flex admin-page-title-main">
-        <Typography
-          className="admin-page-title"
-          component="h2"
-          variant="h2"
-        >
-          Students
-        </Typography>
-        <Box className="admin-flex-end">
-          <Box className="admin-search-main">
-            <Box className="admin-search-box">
-              <Box className="admin-form-group">
-                <TextField
-                  value={searchNameValue}
-                  fullWidth
-                  id="search"
-                  className="admin-form-control"
-                  placeholder="Search"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    const value = e.target.value;
-                    setSearchNameValue(value);
-                    debouncedCallGetApi(value);
-                  }}
-                  slotProps={{ htmlInput: { maxLength: 100 } }}
-                />
-                <SearchIcon
-                  sx={{ color: "var(--primary-color)", fontSize: "20px" }}
-                  className="school-admin-search-grey-img admin-icon"
-                />
-              </Box>
-            </Box>
-          </Box>
-          <Box className="admin-filter-btn-main">
-            <Button
-              className="admin-btn-theme"
-              onClick={() => setOpenFilter(true)}
-              sx={{
-                ml: 1,
-                minWidth: "45px",
-                p: "0 12px",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <FilterIcon
-                sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
-              />
-            </Button>
-          </Box>
-          {hasPermission(schoolAdminPermission.student.create) && (
-            <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1 }}>
-              <Button
-                variant="outlined"
-                className="admin-btn-theme"
-                onClick={() => setOpenImportModal(true)}
-                sx={{ backgroundColor: "#fff !important", color: "var(--primary-color) !important", borderColor: "var(--primary-color) !important" }}
-              >
-                Import
-              </Button>
-              <Button
-                className="admin-btn-theme"
-                onClick={() => {
-                  navigate("/student-list/add");
-                }}
-              >
-                <AddIcon
-                  sx={{
-                    color: "var(--button-text, #fff)",
-                    fontSize: "18px",
-                    mr: 1,
-                  }}
-                />
-                Add Student
-              </Button>
-            </Box>
-          )}
-          <Box className="admin-filter-btn-main">
-            <Tooltip title="Export to Excel">
-              <Button
-                className="admin-btn-theme"
-                onClick={() => handleExport("excel")}
-                disabled={exportingFormat !== null}
-                sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
-              >
-                {exportingFormat === "excel" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <DownloadIcon sx={{ color: "#fff", fontSize: "18px" }} />}
-              </Button>
-            </Tooltip>
-          </Box>
-          <Box className="admin-filter-btn-main">
-            <Tooltip title="Export to HTML">
-              <Button
-                className="admin-btn-theme"
-                onClick={() => handleExport("html")}
-                disabled={exportingFormat !== null}
-                sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
-              >
-                {exportingFormat === "html" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <HtmlIcon sx={{ color: "#fff", fontSize: "18px" }} />}
-              </Button>
-            </Tooltip>
-          </Box>
-          <Box className="admin-filter-btn-main">
-            <Tooltip title="Export to Print">
-              <Button
-                className="admin-btn-theme"
-                onClick={() => handleExport("print")}
-                disabled={exportingFormat !== null}
-                sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
-              >
-                {exportingFormat === "print" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <PrintIcon sx={{ color: "#fff", fontSize: "18px" }} />}
-              </Button>
-            </Tooltip>
-          </Box>
-        </Box>
-      </Box>
-
       {/* Tabs */}
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ borderBottom: 1, borderColor: "#E9ECEF", mb: 3 }}>
         <Tabs
           value={tabValue}
           onChange={(_, v) => setTabValue(v)}
           sx={{
+            "& .MuiTabs-indicator": {
+              backgroundColor: "var(--primary-color)",
+              height: "2.4px",
+              borderRadius: "3px 3px 0 0",
+            },
             "& .MuiTab-root": {
               textTransform: "none",
+              fontSize: "13px",
               fontWeight: 600,
-              fontSize: 14,
+              minHeight: "44px",
               color: "#667085",
-              minHeight: 40,
-              px: 2,
+              mr: 4,
+              px: 0,
+              "&.Mui-selected": {
+                color: "var(--primary-color) !important",
+                fontWeight: 700,
+              },
             },
-            "& .Mui-selected": { color: "var(--primary-color) !important" },
-            "& .MuiTabs-indicator": { backgroundColor: "var(--primary-color)" },
           }}
         >
           <Tab label="Students" />
-          <Tab
-            label={
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                Pending Admissions
-                {pendingTotal > 0 && (
-                  <Chip
-                    label={pendingTotal}
-                    size="small"
-                    sx={{ background: "#dc2626", color: "#fff", height: 18, fontSize: 10, ml: 0.5 }}
-                  />
-                )}
-              </Box>
-            }
-          />
+          <Tab label={`Pending Admissions (${pendingAdmissionsCount || 0})`} />
         </Tabs>
       </Box>
+
+      {tabValue === 0 && (
+        <Box className="admin-user-list-flex admin-page-title-main">
+          <Typography
+            className="admin-page-title"
+            component="h2"
+            variant="h2"
+          >
+            Students
+          </Typography>
+          <Box className="admin-flex-end">
+            <Box className="admin-search-main">
+              <Box className="admin-search-box">
+                <Box className="admin-form-group">
+                  <TextField
+                    value={searchNameValue}
+                    fullWidth
+                    id="search"
+                    className="admin-form-control"
+                    placeholder="Search"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = e.target.value;
+                      setSearchNameValue(value);
+                      debouncedCallGetApi(value);
+                    }}
+                    slotProps={{ htmlInput: { maxLength: 100 } }}
+                  />
+                  <SearchIcon
+                    sx={{ color: "var(--primary-color)", fontSize: "20px" }}
+                    className="school-admin-search-grey-img admin-icon"
+                  />
+                </Box>
+              </Box>
+            </Box>
+            <Box className="admin-filter-btn-main">
+              <Button
+                className="admin-btn-theme"
+                onClick={() => setOpenFilter(true)}
+                sx={{
+                  ml: 1,
+                  minWidth: "45px",
+                  p: "0 12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FilterIcon
+                  sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
+                />
+              </Button>
+            </Box>
+            {hasPermission(schoolAdminPermission.student.read) && students?.length > 0 && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={exporting ? <CircularProgress size={16} /> : <DownloadIcon />}
+                  disabled={exporting}
+                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
+                  sx={{ textTransform: "none", borderRadius: "8px", borderColor: "#eaecf0", color: "#344054", height: "40px", ml: 1 }}
+                >
+                  Export Report
+                </Button>
+                <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                  </MenuItem>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <PdfIcon sx={{ fontSize: "18px", color: "#F04438" }} /> Export PDF
+                  </MenuItem>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Print View
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+            {hasPermission(schoolAdminPermission.student.create) && (
+              <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  className="admin-btn-theme"
+                  onClick={() => setOpenImportModal(true)}
+                >
+                  Import
+                </Button>
+                <Button
+                  className="admin-btn-theme"
+                  onClick={() => {
+                    navigate("/student/add");
+                  }}
+                >
+                  <AddIcon
+                    sx={{
+                      color: "var(--button-text, #fff)",
+                      fontSize: "18px",
+                      mr: 1,
+                    }}
+                  />
+                  Add Student
+                </Button>
+              </Box>
+            )}
+          </Box>
+        </Box>
+      )}
 
       {tabValue === 1 ? (
         /* ── Pending Admissions Tab ── */
         <Box>
-          <Box sx={{ mb: 2, display: "flex", gap: 1.5, alignItems: "center" }}>
-            <TextField
-              value={pendingSearch}
-              onChange={(e) => { setPendingSearch(e.target.value); setPendingPage(0); }}
-              placeholder="Search by name or phone"
-              size="small"
-              sx={{ flex: 1, maxWidth: 320 }}
-              InputProps={{
-                startAdornment: <SearchIcon sx={{ fontSize: 18, color: "var(--primary-color)", mr: 1 }} />,
+          <Box
+            sx={{
+              mb: 3,
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              justifyContent: "space-between",
+              alignItems: { xs: "stretch", sm: "center" },
+              gap: 2,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                flexWrap: "wrap",
               }}
-            />
-            <Typography sx={{ fontSize: 13, color: "#667085" }}>
-              {pendingTotal} pending application{pendingTotal !== 1 ? "s" : ""}
-            </Typography>
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  color: "#344054",
+                  fontFamily: "'PlusJakartaSans-Bold', sans-serif",
+                }}
+              >
+                Pending Admission Applications
+              </Typography>
+            </Box>
+
+            <Box sx={{ width: { xs: "100%", sm: "300px" } }}>
+              <Box className="admin-search-box">
+                <Box className="admin-form-group" sx={{ m: 0 }}>
+                  <TextField
+                    value={pendingSearch}
+                    fullWidth
+                    id="pendingSearch"
+                    className="admin-form-control"
+                    placeholder="Search name or phone"
+                    onChange={(e) => {
+                      setPendingSearch(e.target.value);
+                      setPendingPage(0);
+                    }}
+                    slotProps={{ htmlInput: { maxLength: 100 } }}
+                  />
+                  <SearchIcon
+                    sx={{
+                      color: "var(--primary-color)",
+                      fontSize: "20px",
+                    }}
+                    className="school-admin-search-grey-img admin-icon"
+                  />
+                </Box>
+              </Box>
+            </Box>
           </Box>
 
           <Box className="card-border common-card">
@@ -584,13 +623,13 @@ export default function Student() {
                       <TableCell className="table-th" width="15%">CLASS APPLIED</TableCell>
                       <TableCell className="table-th" width="15%">PREVIOUS ACADEMIC</TableCell>
                       <TableCell className="table-th" width="15%">GUARDIAN</TableCell>
-                      <TableCell className="table-th" width="15%">APPLIED ON</TableCell>
+                      <TableCell className="table-th" width="15%" align="center">APPLIED ON</TableCell>
                       <TableCell className="table-th" width="15%" align="center">ACTIONS</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody className="table-body">
                     {pendingLoading ? (
-                      <TableRow><TableCell colSpan={6} align="center" sx={{ py: 4 }}><CircularProgress size={28} sx={{ color: "var(--primary-color)" }} /></TableCell></TableRow>
+                      <Loader colSpan={6} />
                     ) : pendingAdmissions.length ? (
                       pendingAdmissions.map((app: any) => (
                         <TableRow key={app._id} sx={{ "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" } }}>
@@ -649,7 +688,7 @@ export default function Student() {
                               {!app.fatherName && !app.motherName && <Typography sx={{ fontSize: 11, color: "#9ca3af" }}>N/A</Typography>}
                             </Box>
                           </TableCell>
-                          <TableCell className="table-td">
+                          <TableCell className="table-td" align="center">
                             <Typography sx={{ fontSize: 12, color: "#374151" }}>
                               {moment(app.createdAt).format("DD MMM YYYY")}
                             </Typography>
@@ -673,10 +712,7 @@ export default function Student() {
                         </TableRow>
                       ))
                     ) : (
-                      <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                        <PendingIcon sx={{ fontSize: 40, color: "#d1d5db", mb: 1 }} />
-                        <Typography sx={{ fontSize: 14, color: "#9ca3af" }}>No pending admission applications</Typography>
-                      </TableCell></TableRow>
+                      <DataNotFound text="No pending admission applications" colSpan={6} />
                     )}
                   </TableBody>
                 </Table>
@@ -1184,10 +1220,10 @@ export default function Student() {
                       </TableRow>
                     ))
                   ) : (
-                    <DataNotFound text="No Students Found" />
+                    <DataNotFound text="No Students Found" colSpan={6} />
                   )
                 ) : (
-                  <Loader />
+                  <Loader colSpan={6} />
                 )}
               </TableBody>
             </Table>

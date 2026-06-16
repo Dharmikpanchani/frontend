@@ -93,7 +93,7 @@ export const getPendingAdmissionsCount = createAsyncThunk(
   async () => {
     try {
       const res: any = await admissionService.getPendingAdmissions({ perPageData: 1 });
-      return res?.data?.pagination?.totalArrayLength || 0;
+      return res?.pagination?.totalArrayLength || 0;
     } catch {
       return 0;
     }

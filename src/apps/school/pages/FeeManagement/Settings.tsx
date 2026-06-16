@@ -22,6 +22,7 @@ import {
   Tabs,
   Tab,
   CircularProgress,
+  Checkbox,
 } from "@mui/material";
 import {
   Settings as SettingsIcon,
@@ -734,14 +735,25 @@ const Settings = () => {
           <SectionHeader icon={SettingsIcon} title="Admission Settings" isFirst />
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 3, mb: 5 }}>
             <Box>
-              <Typography sx={labelSx}>Enable Online Admission (Full Form)</Typography>
+              <Typography sx={labelSx}>Online Admission Settings</Typography>
               <Typography sx={{ fontSize: "13px", color: "text.secondary", mb: 2 }}>
-                If enabled, parents will fill the complete admission form. If disabled, they will only see a short inquiry form.
+                Configure user portal options. Note: The Admission Inquiry form is always available on the user portal.
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <IOSSwitch checked={formData.admission.enableOnlineAdmission} onChange={(e) => handleChange("admission", "enableOnlineAdmission", e.target.checked)} disabled={!canEdit} />
-                <Typography sx={{ ml: 1.5, fontSize: "14px", color: formData.admission.enableOnlineAdmission ? "success.main" : "text.secondary" }}>
-                  {formData.admission.enableOnlineAdmission ? "Active (Direct Admission)" : "Disabled (Inquiry Only)"}
+                <Checkbox
+                  checked={formData.admission.enableOnlineAdmission}
+                  onChange={(e) => handleChange("admission", "enableOnlineAdmission", e.target.checked)}
+                  disabled={!canEdit}
+                  sx={{
+                    color: "var(--primary-color)",
+                    "&.Mui-checked": {
+                      color: "var(--primary-color)",
+                    },
+                    p: 0,
+                  }}
+                />
+                <Typography sx={{ ml: 1.5, fontSize: "14px", fontWeight: 500, color: "#344054" }}>
+                  Show Admission Option (Allow direct admission forms)
                 </Typography>
               </Box>
             </Box>

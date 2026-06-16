@@ -29,7 +29,19 @@ export const useColorExtractor = () => {
         return await new Promise((resolve) => {
           const img = new Image();
           img.crossOrigin = "Anonymous";
-          img.src = imageUrl;
+
+          const getBaseURL = () => {
+            const host = window.location.hostname;
+            const { VITE_BASE_URL, VITE_END_WITH_DOMAIN, VITE_SUB_DOMAIN } = import.meta.env;
+            if (VITE_END_WITH_DOMAIN && host.endsWith(VITE_END_WITH_DOMAIN)) {
+              return VITE_SUB_DOMAIN;
+            }
+            return VITE_BASE_URL || "http://localhost:3032/api";
+          };
+
+          const baseUrl = getBaseURL();
+          const targetUrl = `${baseUrl}/images/proxy?url=${encodeURIComponent(imageUrl)}`;
+          img.src = targetUrl.includes("?") ? `${targetUrl}&_t=${Date.now()}` : `${targetUrl}?_t=${Date.now()}`;
 
           img.onload = () => {
             const canvas = document.createElement("canvas");

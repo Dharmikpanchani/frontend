@@ -39,6 +39,16 @@ export default function Department() {
     (state: RootState) => state.DepartmentReducer,
   );
   const { hasPermission, hasAnyPermission } = usePermissions();
+  const colSpanCount =
+    3 +
+    (hasPermission(schoolAdminPermission.department.status) ? 1 : 0) +
+    (hasAnyPermission([
+      schoolAdminPermission.department.read,
+      schoolAdminPermission.department.update,
+      schoolAdminPermission.department.delete,
+    ])
+      ? 1
+      : 0);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchNameValue, setSearchNameValue] = useState<string>("");
@@ -362,10 +372,10 @@ export default function Department() {
                       );
                     })
                   ) : (
-                    <DataNotFound />
+                    <DataNotFound colSpan={colSpanCount} text="No departments found" />
                   )
                 ) : (
-                  <Loader />
+                  <Loader colSpan={colSpanCount} />
                 )}
               </TableBody>
             </Table>

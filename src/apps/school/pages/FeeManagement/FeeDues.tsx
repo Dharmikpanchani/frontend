@@ -6,7 +6,7 @@ import {
   MenuItem, Tooltip,
   Menu, CircularProgress, TextField
 } from "@mui/material";
-import { Download as DownloadIcon, Notifications as NotificationsIcon, MoneyOff as MoneyOffIcon, Group as GroupIcon, FilterList as FilterIcon, Search as SearchIcon } from "@mui/icons-material";
+import { Download as DownloadIcon, Notifications as NotificationsIcon, MoneyOff as MoneyOffIcon, Group as GroupIcon, FilterList as FilterIcon, Search as SearchIcon, FileDownload as ExcelIcon, PictureAsPdf as PdfIcon, Print as PrintIcon } from "@mui/icons-material";
 import { fetchFeeDues, sendReminder, fetchFeeCategories } from "@/redux/slices/feeSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import type { RootState, AppDispatch } from "@/redux/Store";
@@ -292,7 +292,7 @@ const FeeDues = () => {
             </Button>
           </Box>
 
-          {canExport && (
+          {canExport && dues.length > 0 && (
             <>
               <Button
                 variant="outlined"
@@ -303,8 +303,15 @@ const FeeDues = () => {
                 Export Report
               </Button>
               <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
-                <MenuItem onClick={() => { setExportAnchorEl(null); exportToCSV(); }}>Export CSV / Excel</MenuItem>
-                <MenuItem onClick={() => { setExportAnchorEl(null); handlePrintView(); }}>Print View</MenuItem>
+                <MenuItem onClick={() => { setExportAnchorEl(null); exportToCSV(); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                  <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                </MenuItem>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handlePrintView(); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                  <PdfIcon sx={{ fontSize: "18px", color: "#F04438" }} /> Export PDF
+                </MenuItem>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handlePrintView(); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                  <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Print View
+                </MenuItem>
               </Menu>
             </>
           )}

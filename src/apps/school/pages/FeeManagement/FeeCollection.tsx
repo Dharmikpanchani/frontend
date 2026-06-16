@@ -374,7 +374,7 @@ const FeeCollection = () => {
             </Button>
           </Box>
 
-          {canExport && (
+          {canExport && collections.length > 0 && (
             <>
               <Button
                 variant="outlined"

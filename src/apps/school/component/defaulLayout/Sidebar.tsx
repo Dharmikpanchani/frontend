@@ -391,9 +391,20 @@ export default function Sidebar(props: any) {
                                 to={dt?.pathName}
                                 onClick={() => { if (window.innerWidth < 786) props?.setOpen?.(false); }}
                                 className={
-                                  dt?.menuHighlight?.includes(location?.pathname?.split("/")[1]) ||
-                                    (location?.pathname?.split("/")[1] === "master" &&
-                                      dt?.menuHighlight?.includes(location?.pathname?.split("/")[2]))
+                                  (() => {
+                                    const path1 = location?.pathname?.split("/")[1];
+                                    const path2 = location?.pathname?.split("/")[2] || "";
+                                    if (dt?.title === "Inquiries") {
+                                      return path1 === "student" && path2 === "inquiries";
+                                    }
+                                    if (dt?.title === "Students") {
+                                      return path1 === "student" && path2 !== "inquiries";
+                                    }
+                                    return (
+                                      dt?.menuHighlight?.includes(path1) ||
+                                      (path1 === "master" && dt?.menuHighlight?.includes(path2))
+                                    );
+                                  })()
                                     ? "admin-sidebar-link active"
                                     : "admin-sidebar-link"
                                 }
