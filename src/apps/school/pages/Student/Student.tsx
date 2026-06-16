@@ -16,6 +16,13 @@ import {
   debounce,
   TableBody,
   Tooltip,
+  Tabs,
+  Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
 } from "@mui/material";
 import {
   Email as EmailIcon,
@@ -25,7 +32,14 @@ import {
   Add as AddIcon,
   Wc as GenderIcon,
   CalendarMonth as CalendarIcon,
+  HourglassEmpty as PendingIcon,
+  CheckCircle as ApprovedIcon,
+  Cancel as RejectedIcon,
+  Visibility as ViewIcon,
+  School as SchoolIcon,
 } from "@mui/icons-material";
+import { admissionService } from "@/api/services/admission.service";
+import toast from "react-hot-toast";
 import moment from "moment";
 import {
   getStudents,
@@ -84,6 +98,68 @@ export default function Student() {
     isActive: "",
     startYears: [] as number[],
   });
+
+  // ── Pending Admissions tab ──
+  const [tabValue, setTabValue] = useState(0);
+  const [pendingAdmissions, setPendingAdmissions] = useState<any[]>([]);
+  const [pendingTotal, setPendingTotal] = useState(0);
+  const [pendingLoading, setPendingLoading] = useState(false);
+  const [pendingPage, setPendingPage] = useState(0);
+  const [pendingRowsPerPage] = useState(10);
+  const [pendingSearch, setPendingSearch] = useState("");
+
+  const [reviewModal, setReviewModal] = useState<any>(null);
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [admissionNumberOverride, setAdmissionNumberOverride] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const fetchPendingAdmissions = async () => {
+    setPendingLoading(true);
+    try {
+      const res: any = await admissionService.getPendingAdmissions({
+        pageNumber: pendingPage + 1,
+        perPageData: pendingRowsPerPage,
+        searchRequest: pendingSearch.trim(),
+      });
+      setPendingAdmissions(res?.data?.data || []);
+      setPendingTotal(res?.data?.pagination?.totalItems || 0);
+    } catch {
+      setPendingAdmissions([]);
+    } finally {
+      setPendingLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tabValue === 1) fetchPendingAdmissions();
+  }, [tabValue, pendingPage, pendingSearch]);
+
+  const handleAdmissionAction = async (action: "approved" | "rejected") => {
+    if (!reviewModal) return;
+    if (action === "rejected" && !rejectReason.trim()) {
+      toast.error("Please provide a rejection reason");
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await admissionService.admissionAction(reviewModal._id, {
+        action,
+        rejectReason: action === "rejected" ? rejectReason.trim() : undefined,
+        admissionNumber: admissionNumberOverride.trim() || undefined,
+      });
+      toast.success(action === "approved" ? "Application approved!" : "Application rejected");
+      setReviewModal(null);
+      setRejectModalOpen(false);
+      setRejectReason("");
+      setAdmissionNumberOverride("");
+      fetchPendingAdmissions();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Action failed");
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   const { allClasses } = useSelector((state: RootState) => state.ClassReducer);
   const { allSections } = useSelector(
@@ -306,6 +382,173 @@ export default function Student() {
           )}
         </Box>
       </Box>
+
+      {/* Tabs */}
+      <Box sx={{ mb: 2 }}>
+        <Tabs
+          value={tabValue}
+          onChange={(_, v) => setTabValue(v)}
+          sx={{
+            "& .MuiTab-root": {
+              textTransform: "none",
+              fontWeight: 600,
+              fontSize: 14,
+              color: "#667085",
+              minHeight: 40,
+              px: 2,
+            },
+            "& .Mui-selected": { color: "var(--primary-color) !important" },
+            "& .MuiTabs-indicator": { backgroundColor: "var(--primary-color)" },
+          }}
+        >
+          <Tab label="Students" />
+          <Tab
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                Pending Admissions
+                {pendingTotal > 0 && (
+                  <Chip
+                    label={pendingTotal}
+                    size="small"
+                    sx={{ background: "#dc2626", color: "#fff", height: 18, fontSize: 10, ml: 0.5 }}
+                  />
+                )}
+              </Box>
+            }
+          />
+        </Tabs>
+      </Box>
+
+      {tabValue === 1 ? (
+        /* ── Pending Admissions Tab ── */
+        <Box>
+          <Box sx={{ mb: 2, display: "flex", gap: 1.5, alignItems: "center" }}>
+            <TextField
+              value={pendingSearch}
+              onChange={(e) => { setPendingSearch(e.target.value); setPendingPage(0); }}
+              placeholder="Search by name or phone"
+              size="small"
+              sx={{ flex: 1, maxWidth: 320 }}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ fontSize: 18, color: "var(--primary-color)", mr: 1 }} />,
+              }}
+            />
+            <Typography sx={{ fontSize: 13, color: "#667085" }}>
+              {pendingTotal} pending application{pendingTotal !== 1 ? "s" : ""}
+            </Typography>
+          </Box>
+
+          <Box className="card-border common-card">
+            <Box className="brand-table-main page-table-main">
+              <TableContainer component={Paper} className="table-container">
+                <Table className="table">
+                  <TableHead className="table-head">
+                    <TableRow className="table-row">
+                      <TableCell className="table-th" width="25%">STUDENT INFO</TableCell>
+                      <TableCell className="table-th" width="15%">CLASS APPLIED</TableCell>
+                      <TableCell className="table-th" width="15%">PREVIOUS ACADEMIC</TableCell>
+                      <TableCell className="table-th" width="15%">GUARDIAN</TableCell>
+                      <TableCell className="table-th" width="15%">APPLIED ON</TableCell>
+                      <TableCell className="table-th" width="15%" align="center">ACTIONS</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody className="table-body">
+                    {pendingLoading ? (
+                      <TableRow><TableCell colSpan={6} align="center" sx={{ py: 4 }}><CircularProgress size={28} sx={{ color: "var(--primary-color)" }} /></TableCell></TableRow>
+                    ) : pendingAdmissions.length ? (
+                      pendingAdmissions.map((app: any) => (
+                        <TableRow key={app._id} sx={{ "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" } }}>
+                          <TableCell className="table-td">
+                            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5 }}>
+                              <Box>
+                                <Typography sx={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>
+                                  {app.fullName}
+                                </Typography>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.3 }}>
+                                  <PhoneIcon sx={{ fontSize: 12, color: "var(--primary-color)" }} />
+                                  <Typography sx={{ fontSize: 11, color: "#6b7280" }}>{app.phoneNumber}</Typography>
+                                </Box>
+                                {app.email && (
+                                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                    <EmailIcon sx={{ fontSize: 12, color: "var(--primary-color)" }} />
+                                    <Typography sx={{ fontSize: 11, color: "#6b7280" }}>{app.email}</Typography>
+                                  </Box>
+                                )}
+                                <Chip
+                                  label={`App: ${app.admissionNumber}`}
+                                  size="small"
+                                  sx={{ mt: 0.4, height: 18, fontSize: 10, fontWeight: 700, backgroundColor: "rgba(var(--primary-color-rgb, 92,26,26), 0.08)", color: "var(--primary-color)", borderRadius: "4px" }}
+                                />
+                              </Box>
+                            </Box>
+                          </TableCell>
+                          <TableCell className="table-td">
+                            {app.classId?.name ? (
+                              <Chip icon={<SchoolIcon sx={{ fontSize: 13 }} />} label={app.classId.name} size="small"
+                                sx={{ height: 22, fontSize: 11, fontWeight: 600, backgroundColor: "#f0f7ff", color: "#1565c0", border: "1px solid #bae7ff" }} />
+                            ) : "N/A"}
+                          </TableCell>
+                          <TableCell className="table-td">
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.3 }}>
+                              {app.previousClass && (
+                                <Typography sx={{ fontSize: 11, color: "#374151" }}>Prev Class: <strong>{app.previousClass}</strong></Typography>
+                              )}
+                              {app.previousSchool && (
+                                <Typography sx={{ fontSize: 11, color: "#374151" }}>School: <strong>{app.previousSchool}</strong></Typography>
+                              )}
+                              {app.percentage !== undefined && app.percentage !== null && (
+                                <Chip label={`${app.percentage}%`} size="small"
+                                  sx={{ height: 18, fontSize: 10, fontWeight: 700, backgroundColor: "#f0fdf4", color: "#16a34a", border: "1px solid #86efac", width: "fit-content" }} />
+                              )}
+                              {!app.previousClass && !app.previousSchool && app.percentage == null && (
+                                <Typography sx={{ fontSize: 11, color: "#9ca3af" }}>N/A</Typography>
+                              )}
+                            </Box>
+                          </TableCell>
+                          <TableCell className="table-td">
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.3 }}>
+                              {app.fatherName && <Typography sx={{ fontSize: 11, color: "#111827" }}>{app.fatherName}</Typography>}
+                              {app.fatherPhone && <Typography sx={{ fontSize: 10, color: "#6b7280" }}>{app.fatherPhone}</Typography>}
+                              {app.motherName && <Typography sx={{ fontSize: 11, color: "#111827", mt: 0.3 }}>{app.motherName}</Typography>}
+                              {!app.fatherName && !app.motherName && <Typography sx={{ fontSize: 11, color: "#9ca3af" }}>N/A</Typography>}
+                            </Box>
+                          </TableCell>
+                          <TableCell className="table-td">
+                            <Typography sx={{ fontSize: 12, color: "#374151" }}>
+                              {moment(app.createdAt).format("DD MMM YYYY")}
+                            </Typography>
+                            <Typography sx={{ fontSize: 10, color: "#9ca3af" }}>
+                              {moment(app.createdAt).fromNow()}
+                            </Typography>
+                          </TableCell>
+                          <TableCell className="table-td" align="center">
+                            <Tooltip title="Review Application" arrow>
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() => { setReviewModal(app); setAdmissionNumberOverride(""); setRejectReason(""); }}
+                                sx={{ fontSize: 11, borderColor: "var(--primary-color)", color: "var(--primary-color)", px: 1.5, py: 0.3, minWidth: "auto" }}
+                                startIcon={<ViewIcon sx={{ fontSize: 14 }} />}
+                              >
+                                Review
+                              </Button>
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                        <PendingIcon sx={{ fontSize: 40, color: "#d1d5db", mb: 1 }} />
+                        <Typography sx={{ fontSize: 14, color: "#9ca3af" }}>No pending admission applications</Typography>
+                      </TableCell></TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          </Box>
+        </Box>
+      ) : (
 
       <Box className="card-border common-card">
         <Box className="brand-table-main page-table-main">
@@ -827,6 +1070,8 @@ export default function Student() {
         </Box>
       </Box>
 
+      )} {/* end tabValue === 0 */}
+
       <Filter
         open={openFilter}
         onClose={() => setOpenFilter(false)}
@@ -856,6 +1101,137 @@ export default function Student() {
         handleFunction={handleConfirmStatusChange}
         buttonStatusSpinner={buttonStatusSpinner}
       />
+
+      {/* Review Admission Modal */}
+      <Dialog
+        open={!!reviewModal}
+        onClose={() => !actionLoading && setReviewModal(null)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: "var(--border-radius, 12px)" } }}
+      >
+        <DialogTitle sx={{ pb: 1, fontWeight: 700, fontSize: 16, color: "#101828" }}>
+          Review Admission Application
+        </DialogTitle>
+        <DialogContent dividers>
+          {reviewModal && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {/* Student info */}
+              <Box sx={{ background: "#f9fafb", borderRadius: "8px", p: 2 }}>
+                <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#101828" }}>{reviewModal.fullName}</Typography>
+                <Typography sx={{ fontSize: 13, color: "#667085" }}>{reviewModal.phoneNumber} {reviewModal.email && `· ${reviewModal.email}`}</Typography>
+                {reviewModal.classId?.name && (
+                  <Chip icon={<SchoolIcon sx={{ fontSize: 13 }} />} label={`Class: ${reviewModal.classId.name}`} size="small"
+                    sx={{ mt: 1, height: 22, fontSize: 11, backgroundColor: "#f0f7ff", color: "#1565c0", border: "1px solid #bae7ff" }} />
+                )}
+                {(reviewModal.previousClass || reviewModal.previousSchool) && (
+                  <Typography sx={{ fontSize: 12, color: "#374151", mt: 1 }}>
+                    Previous: {[reviewModal.previousClass, reviewModal.previousSchool].filter(Boolean).join(" · ")}
+                  </Typography>
+                )}
+                {reviewModal.percentage != null && (
+                  <Chip label={`${reviewModal.percentage}%`} size="small"
+                    sx={{ mt: 0.5, height: 18, fontSize: 10, fontWeight: 700, backgroundColor: "#f0fdf4", color: "#16a34a", border: "1px solid #86efac" }} />
+                )}
+                {reviewModal.resultDocument && (
+                  <Box sx={{ mt: 1 }}>
+                    <Typography sx={{ fontSize: 12, color: "#667085" }}>Result Document: </Typography>
+                    <a href={`${import.meta.env.VITE_BASE_URL_IMAGE}/${reviewModal.resultDocument}`} target="_blank" rel="noreferrer"
+                      style={{ fontSize: 12, color: "var(--primary-color)" }}>
+                      View Document
+                    </a>
+                  </Box>
+                )}
+              </Box>
+
+              {/* Guardian */}
+              {(reviewModal.fatherName || reviewModal.motherName) && (
+                <Box>
+                  <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#667085", mb: 0.5 }}>GUARDIAN</Typography>
+                  {reviewModal.fatherName && <Typography sx={{ fontSize: 13, color: "#374151" }}>Father: {reviewModal.fatherName} {reviewModal.fatherPhone && `(${reviewModal.fatherPhone})`}</Typography>}
+                  {reviewModal.motherName && <Typography sx={{ fontSize: 13, color: "#374151" }}>Mother: {reviewModal.motherName} {reviewModal.motherPhone && `(${reviewModal.motherPhone})`}</Typography>}
+                </Box>
+              )}
+
+              {/* Custom admission number */}
+              <Box>
+                <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#667085", mb: 0.5 }}>
+                  ADMISSION NUMBER (optional — auto-generated if blank)
+                </Typography>
+                <TextField
+                  value={admissionNumberOverride}
+                  onChange={(e) => setAdmissionNumberOverride(e.target.value)}
+                  placeholder="e.g. STU-2024-001"
+                  fullWidth size="small"
+                />
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
+          <Button
+            onClick={() => setReviewModal(null)}
+            disabled={actionLoading}
+            sx={{ color: "#667085", textTransform: "none" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => setRejectModalOpen(true)}
+            disabled={actionLoading}
+            variant="outlined"
+            sx={{ borderColor: "#dc2626", color: "#dc2626", textTransform: "none" }}
+            startIcon={<RejectedIcon sx={{ fontSize: 16 }} />}
+          >
+            Reject
+          </Button>
+          <Button
+            onClick={() => handleAdmissionAction("approved")}
+            disabled={actionLoading}
+            variant="contained"
+            sx={{ background: "#16a34a", textTransform: "none", "&:hover": { background: "#15803d" } }}
+            startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <ApprovedIcon sx={{ fontSize: 16 }} />}
+          >
+            {actionLoading ? "Processing..." : "Approve"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reject Reason Modal */}
+      <Dialog
+        open={rejectModalOpen}
+        onClose={() => !actionLoading && setRejectModalOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: "var(--border-radius, 12px)" } }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, fontSize: 15 }}>Rejection Reason</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: 13, color: "#667085", mb: 1.5 }}>
+            Please provide a reason for rejecting this application. The student will be able to see this.
+          </Typography>
+          <TextField
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            multiline rows={3} fullWidth
+            placeholder="Enter rejection reason..."
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setRejectModalOpen(false)} disabled={actionLoading} sx={{ color: "#667085", textTransform: "none" }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => handleAdmissionAction("rejected")}
+            disabled={actionLoading || !rejectReason.trim()}
+            variant="contained"
+            sx={{ background: "#dc2626", textTransform: "none", "&:hover": { background: "#b91c1c" } }}
+            startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <RejectedIcon sx={{ fontSize: 16 }} />}
+          >
+            {actionLoading ? "Rejecting..." : "Confirm Reject"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

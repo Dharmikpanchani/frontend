@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/redux/Store";
 import { getPendingTeachers } from "@/redux/slices/teacherSlice";
+import { getPendingAdmissionsCount } from "@/redux/slices/studentSlice";
 
 export default function Sidebar(props: any) {
   const location = useLocation();
@@ -22,9 +23,16 @@ export default function Sidebar(props: any) {
   );
   const pendingDocCount = pendingTeachers.length;
 
+  const { pendingAdmissionsCount } = useSelector(
+    (state: RootState) => state.StudentReducer,
+  );
+
   useEffect(() => {
     if (hasPermission(schoolAdminPermission.teacher.read)) {
       dispatch(getPendingTeachers());
+    }
+    if (hasPermission(schoolAdminPermission.student?.read)) {
+      dispatch(getPendingAdmissionsCount());
     }
   }, [location.pathname, dispatch, hasPermission]);
 
@@ -396,6 +404,19 @@ export default function Sidebar(props: any) {
                                     }}
                                   >
                                     {pendingDocCount}
+                                  </span>
+                                )}
+                                {dt?.title === "Students" && pendingAdmissionsCount > 0 && (
+                                  <span
+                                    style={{
+                                      position: "absolute", right: "15px", top: "50%",
+                                      transform: "translateY(-50%)", backgroundColor: "#d92d20",
+                                      color: "#fff", fontSize: "10px", fontWeight: 700,
+                                      borderRadius: "10px", padding: "2px 8px",
+                                      lineHeight: 1, display: "inline-block", zIndex: 10,
+                                    }}
+                                  >
+                                    {pendingAdmissionsCount}
                                   </span>
                                 )}
                               </Link>

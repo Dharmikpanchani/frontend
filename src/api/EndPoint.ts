@@ -168,6 +168,15 @@ export const Api = {
   USER_GET_FEE_LEDGER: `user/fees/ledger`,
   USER_EXPORT_FEE_RECEIPT: `user/fees/receipt`, // id/export
 
+  // Admission (Public)
+  ADMISSION_APPLY: `user/admissions/apply`,
+  ADMISSION_STATUS: `user/admissions/status`,
+  PUBLIC_CLASSES: `user/public-classes`,
+
+  // Admission (Admin)
+  ADMIN_GET_PENDING_ADMISSIONS: `${route}/pending-admission-students`,
+  ADMIN_STUDENT_ADMISSION_ACTION: `${route}/student-admission-action`, // /:id
+
   // Clearances & Developer Transactions (Phase 1.5)
   CLEAR_FEE_COLLECTION: `${route}/fee-collections`, // /:id/payment-status
   GET_DEVELOPER_TRANSACTIONS: `developer/transactions`,

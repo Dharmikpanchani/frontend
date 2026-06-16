@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Box, Button, Typography, Menu, MenuItem } from "@mui/material";
+import { Box, Button, Typography, Menu, MenuItem, Badge, Chip } from "@mui/material";
 import {
   ExpandMore,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
+  School as AdmissionIcon,
 } from "@mui/icons-material";
+import { admissionService } from "@/api/services/admission.service";
 import { authService } from "@/api/services/auth.service";
 import { logoutAdmin } from "@/redux/slices/authSlice";
 import Svg from "@/assets/Svg";
@@ -24,6 +26,18 @@ export default function Header(props: any) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [imageError, setImageError] = useState(false);
+  const [admissionAnchorEl, setAdmissionAnchorEl] = useState<null | HTMLElement>(null);
+  const admissionOpen = Boolean(admissionAnchorEl);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    admissionService
+      .getPendingAdmissions({ pageNumber: 1, perPageData: 1 })
+      .then((res: any) => {
+        setPendingCount(res?.data?.pagination?.totalArrayLength || 0);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -93,7 +107,88 @@ export default function Header(props: any) {
             </Box>
           )}
         </Box>
-        <Box className="admin-header-right">
+        <Box className="admin-header-right" sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          {/* Admission Quick Access */}
+          {!isUserPlanPage && (
+            <Box>
+              <Button
+                onClick={(e) => setAdmissionAnchorEl(e.currentTarget)}
+                sx={{
+                  textTransform: "none",
+                  color: "var(--header-text, rgba(255,255,255,0.85))",
+                  borderRadius: "8px",
+                  px: 1.5,
+                  py: 0.5,
+                  gap: 0.75,
+                  display: "flex",
+                  alignItems: "center",
+                  "&:hover": { background: "rgba(255,255,255,0.1)" },
+                }}
+              >
+                <Badge
+                  badgeContent={pendingCount > 0 ? pendingCount : null}
+                  color="error"
+                  sx={{ "& .MuiBadge-badge": { fontSize: 10, minWidth: 16, height: 16, padding: "0 4px" } }}
+                >
+                  <AdmissionIcon sx={{ fontSize: 20 }} />
+                </Badge>
+                <Typography sx={{ fontSize: 13, fontWeight: 600, display: { xs: "none", md: "block" } }}>
+                  Admission
+                </Typography>
+                <ExpandMore sx={{ fontSize: 16 }} />
+              </Button>
+              <Menu
+                anchorEl={admissionAnchorEl}
+                open={admissionOpen}
+                onClose={() => setAdmissionAnchorEl(null)}
+                disableScrollLock
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                PaperProps={{
+                  sx: {
+                    mt: 1.5, minWidth: 200,
+                    borderRadius: "var(--border-radius, 12px)",
+                    boxShadow: "var(--card-shadow, 0 10px 25px rgba(0,0,0,0.15))",
+                    border: "1px solid var(--card-border, rgba(0,0,0,0.05))",
+                    backgroundColor: "var(--card-bg, #fff)",
+                    "& .MuiMenuItem-root": {
+                      px: 2, py: 1.5, fontSize: 14,
+                      fontFamily: "var(--font-family, Poppins, sans-serif)",
+                      color: "var(--text-primary)",
+                      "& .MuiSvgIcon-root": { color: "var(--primary-color)" },
+                      "&:hover": {
+                        backgroundColor: "var(--primary-color)",
+                        color: "#fff !important",
+                        "& .MuiSvgIcon-root": { color: "#fff !important" },
+                      },
+                    },
+                  },
+                }}
+              >
+                <MenuItem
+                  onClick={() => {
+                    navigate("/student");
+                    setAdmissionAnchorEl(null);
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, width: "100%", justifyContent: "space-between" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                      <AdmissionIcon sx={{ fontSize: 18 }} />
+                      Pending Approvals
+                    </Box>
+                    {pendingCount > 0 && (
+                      <Chip
+                        label={pendingCount}
+                        size="small"
+                        sx={{ background: "#dc2626", color: "#fff", height: 20, fontSize: 11, ml: 1 }}
+                      />
+                    )}
+                  </Box>
+                </MenuItem>
+              </Menu>
+            </Box>
+          )}
+
           <Box className="admin-header-drop-main">
             <Button
               className="admin-drop-header-btn"

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { masterService } from "../../api/services/master.service";
+import { admissionService } from "../../api/services/admission.service";
 import toast from "react-hot-toast";
 
 interface studentState {
@@ -9,6 +10,7 @@ interface studentState {
   allstudents: any[];
   total: number;
   selectedStudent: any;
+  pendingAdmissionsCount: number;
 }
 
 const initialState: studentState = {
@@ -18,6 +20,7 @@ const initialState: studentState = {
   allstudents: [],
   total: 0,
   selectedStudent: null,
+  pendingAdmissionsCount: 0,
 };
 
 export const getstudents = createAsyncThunk(
@@ -81,6 +84,18 @@ export const deleteStudent = createAsyncThunk(
       const msg = err.response?.data?.message || err.message;
       toast.error(msg);
       return rejectWithValue(msg);
+    }
+  },
+);
+
+export const getPendingAdmissionsCount = createAsyncThunk(
+  "student/pendingAdmissionsCount",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res: any = await admissionService.getPendingAdmissions({ perPageData: 1 });
+      return res?.data?.pagination?.totalArrayLength || 0;
+    } catch {
+      return 0;
     }
   },
 );
@@ -162,6 +177,10 @@ const studentSlice = createSlice({
       })
       .addCase(deleteStudent.rejected, (state) => {
         state.actionLoading = false;
+      })
+      // getPendingAdmissionsCount
+      .addCase(getPendingAdmissionsCount.fulfilled, (state, action) => {
+        state.pendingAdmissionsCount = action.payload;
       })
       // changeStudentStatus
       .addCase(changeStudentStatus.pending, (state) => {
