@@ -608,6 +608,15 @@ export const schoolProfileUpdateValidationSchema = Yup.object({
   authorizedSignature: imageValidation("Authorized signature", false).nullable(),
 });
 
+export const exportLimitSchema = Yup.object({
+  limit: Yup.number()
+    .typeError("Please enter a valid number")
+    .integer("Must be a whole number")
+    .min(1, "Minimum 1 record")
+    .max(5000, "Maximum 5000 records allowed")
+    .required("Record limit is required"),
+});
+
 export const departmentValidationSchema = Yup.object().shape({
   name: Yup.string()
     .test(

@@ -39,7 +39,6 @@ import {
   DataObject as LimitIcon,
 } from "@mui/icons-material";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { fetchFeeCollections, clearFeePayment } from "@/redux/slices/feeSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import type { RootState, AppDispatch } from "@/redux/Store";
@@ -51,19 +50,10 @@ import Pagination from "@/apps/common/pagination/Pagination";
 import Loader from "@/apps/common/loader/Loader";
 import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
 import Filter from "@/apps/common/filter/Filter";
+import { exportLimitSchema } from "@/utils/validation/FormikValidation";
 
 // ─── Export limit quick-pick presets ─────────────────────────────
 const LIMIT_PRESETS = [100, 500, 1000, 2000, 5000];
-
-// ─── Formik + Yup validation schema for export limit ─────────────
-const exportLimitSchema = Yup.object({
-  limit: Yup.number()
-    .typeError("Please enter a valid number")
-    .integer("Must be a whole number")
-    .min(1, "Minimum 1 record")
-    .max(5000, "Maximum 5000 records allowed")
-    .required("Record limit is required"),
-});
 
 const FeeCollection = () => {
   const dispatch = useDispatch<AppDispatch>();
