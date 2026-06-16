@@ -109,6 +109,13 @@ export default function Sidebar(props: any) {
       menuHighlight: ["student"],
     },
     {
+      title: "Inquiries",
+      pathName: "/student/inquiries",
+      icon: Svg.latestUpdate,
+      show: hasPermission(schoolAdminPermission.student?.read),
+      menuHighlight: ["student", "inquiries"],
+    },
+    {
       title: "Department",
       pathName: "/master/department",
       icon: Svg.roleIcon,

@@ -161,6 +161,20 @@ export const masterService = {
     if (queryString) url += `?${queryString}`;
     return adminApiService.get<any>(url);
   },
+  exportTeachers: (params?: any) => {
+    const format = params?.format || "excel";
+    return adminApiService.get<any>(`${Api.EXPORT_TEACHERS}`, {
+      params,
+      responseType: format === "excel" || format === "pdf" ? "blob" : "text",
+    });
+  },
+  importTeachers: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return adminApiService.post<any>(`${Api.IMPORT_TEACHERS}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
   addEditTeacher: (payload: any, id?: string) => {
     const url = id ? `${Api.ADD_EDIT_TEACHER}/${id}` : Api.ADD_EDIT_TEACHER;
     return adminApiService.post<any>(url, payload);
@@ -200,9 +214,35 @@ export const masterService = {
     if (queryString) url += `?${queryString}`;
     return adminApiService.get<any>(url);
   },
-  addEditStudent: (payload: any, id?: string) => {
+  exportStudents: (params?: any) => {
+    const format = params?.format || "excel";
+    return adminApiService.get<any>(`${Api.EXPORT_STUDENTS}`, {
+      params,
+      responseType: format === "excel" || format === "pdf" ? "blob" : "text",
+    });
+  },
+  importStudents: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return adminApiService.post<any>(`${Api.IMPORT_STUDENTS}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+  addEditStudent: (payload: any) => {
+    let id: string | undefined;
+    let body: any = payload;
+    if (payload instanceof FormData) {
+      id = (payload.get("id") as string) || undefined;
+      if (id) payload.delete("id");
+    } else {
+      id = payload?.id;
+      if (id) {
+        const { id: _id, ...rest } = payload;
+        body = rest;
+      }
+    }
     const url = id ? `${Api.ADD_EDIT_STUDENT}/${id}` : Api.ADD_EDIT_STUDENT;
-    return adminApiService.post<any>(url, payload);
+    return adminApiService.post<any>(url, body);
   },
   getStudentById: (id: string) =>
     adminApiService.get<any>(`${Api.GET_STUDENT}/${id}`),

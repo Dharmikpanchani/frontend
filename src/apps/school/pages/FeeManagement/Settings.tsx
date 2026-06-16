@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -56,6 +56,7 @@ const Settings = () => {
   const [subTabValue, setSubTabValue] = useState(0);
 
   const [formData, setFormData] = useState({
+    admission: { enableOnlineAdmission: true },
     fee: { enableLateFine: false, fineAmountPerDay: 0, gracePeriodDays: 0 },
     export: { pdfFooterText: "Thank you. This is a computer-generated receipt.", pdfWatermark: "" },
     paymentGateway: { isActive: false },
@@ -100,6 +101,9 @@ const Settings = () => {
   useEffect(() => {
     if (settings) {
       setFormData({
+        admission: {
+          enableOnlineAdmission: settings.admission?.enableOnlineAdmission ?? true,
+        },
         fee: {
           enableLateFine: settings.fee?.enableLateFine || false,
           fineAmountPerDay: settings.fee?.fineAmountPerDay || 0,
@@ -378,16 +382,17 @@ const Settings = () => {
         </Breadcrumbs>
       </Box>
 
-      {/* â•â•â• OUTER TABS: Payment | Other â•â•â• */}
+      {/* ——— OUTER TABS: Payment | Student | Other ——— */}
       <Box sx={{ borderBottom: 1, borderColor: "#E9ECEF" }}>
         <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)} className="admin-tabs-main"
           sx={{ "& .MuiTabs-indicator": tabSx.indicator, "& .MuiTab-root": tabSx.tab }}>
           <Tab label="Payment" />
+          <Tab label="Student" />
           <Tab label="Other" />
         </Tabs>
       </Box>
 
-      {/* â•â•â• PAYMENT TAB â•â•â• */}
+      {/* ——— PAYMENT TAB ——— */}
       {tabValue === 0 && (
         <Box className="card-border common-card" sx={{ position: "relative", borderRadius: "12px", backgroundColor: "white", minHeight: "300px", overflow: "hidden" }}>
           {loading && !settings ? (
@@ -409,7 +414,7 @@ const Settings = () => {
               {/* Sub-Tab Content */}
               <Box sx={{ p: { xs: 2.5, sm: 4 } }}>
 
-                {/* â”€â”€ SUB-TAB 0: FEE RULES â”€â”€ */}
+                {/* —— SUB-TAB 0: FEE RULES —— */}
                 {subTabValue === 0 && (
                   <>
                     <SectionHeader icon={SettingsIcon} title="Fee & Late Fine Rules" isFirst />
@@ -429,7 +434,7 @@ const Settings = () => {
                             <Typography sx={labelSx}>Fine Amount (Per Day)</Typography>
                             <TextField fullWidth type="number" disabled={!canEdit} value={formData.fee.fineAmountPerDay}
                               onChange={(e) => handleChange("fee", "fineAmountPerDay", Number(e.target.value))}
-                              slotProps={{ input: { startAdornment: <InputAdornment position="start">â‚¹</InputAdornment>, sx: inputSx } }} />
+                              slotProps={{ input: { startAdornment: <InputAdornment position="start">₹</InputAdornment>, sx: inputSx } }} />
                           </Box>
                           <Box>
                             <Typography sx={labelSx}>Grace Period (Days)</Typography>
@@ -468,7 +473,7 @@ const Settings = () => {
                   </>
                 )}
 
-                {/* â”€â”€ SUB-TAB 1: PAYMENT METHODS â”€â”€ */}
+                {/* —— SUB-TAB 1: PAYMENT METHODS —— */}
                 {subTabValue === 1 && (
                   <>
                     <SectionHeader icon={BankIcon} title="Payment Receiving Methods Configuration" isFirst />
@@ -594,7 +599,7 @@ const Settings = () => {
                   </>
                 )}
 
-                {/* â”€â”€ SUB-TAB 2: PAYMENT GATEWAY â”€â”€ */}
+                {/* —— SUB-TAB 2: PAYMENT GATEWAY —— */}
                 {subTabValue === 2 && (
                   <>
                     <SectionHeader icon={BankIcon} title="Online Payment Gateway (Razorpay Route)" isFirst />
@@ -642,7 +647,7 @@ const Settings = () => {
                                     <TableCell className="table-td">
                                       {account.isRazorpayLinked ? (
                                         <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                                          <Typography sx={{ fontSize: "12px", color: "success.main", fontWeight: 600 }}>Linked âœ“</Typography>
+                                          <Typography sx={{ fontSize: "12px", color: "success.main", fontWeight: 600 }}>Linked ✓</Typography>
                                           <Typography sx={{ fontSize: "11px", color: "text.secondary", fontFamily: "monospace" }}>{account.razorpayAccountId}</Typography>
                                         </Box>
                                       ) : account._id ? (
@@ -680,7 +685,7 @@ const Settings = () => {
             </>
           )}
 
-          {/* Dialogs â€” always mounted inside Payment card */}
+          {/* Dialogs — always mounted inside Payment card */}
           <Dialog open={bankDialogOpen} onClose={() => setBankDialogOpen(false)} maxWidth="xs" fullWidth>
             <DialogTitle sx={{ fontWeight: 700, fontSize: "16px" }}>Add School Bank Account</DialogTitle>
             <DialogContent>
@@ -723,8 +728,38 @@ const Settings = () => {
         </Box>
       )}
 
-      {/* â•â•â• OTHER TAB â•â•â• */}
+      {/* ——— STUDENT TAB ——— */}
       {tabValue === 1 && (
+        <Box className="card-border common-card" sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: "12px", backgroundColor: "white", minHeight: "300px" }}>
+          <SectionHeader icon={SettingsIcon} title="Admission Settings" isFirst />
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 3, mb: 5 }}>
+            <Box>
+              <Typography sx={labelSx}>Enable Online Admission (Full Form)</Typography>
+              <Typography sx={{ fontSize: "13px", color: "text.secondary", mb: 2 }}>
+                If enabled, parents will fill the complete admission form. If disabled, they will only see a short inquiry form.
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <IOSSwitch checked={formData.admission.enableOnlineAdmission} onChange={(e) => handleChange("admission", "enableOnlineAdmission", e.target.checked)} disabled={!canEdit} />
+                <Typography sx={{ ml: 1.5, fontSize: "14px", color: formData.admission.enableOnlineAdmission ? "success.main" : "text.secondary" }}>
+                  {formData.admission.enableOnlineAdmission ? "Active (Direct Admission)" : "Disabled (Inquiry Only)"}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          {canEdit && (
+            <Box sx={{ pt: 4, borderTop: "1px solid #F0F0F0", display: "flex", justifyContent: "flex-end" }}>
+              <Button variant="contained" className="admin-btn-theme" onClick={handleSave} disabled={saving}
+                sx={{ minWidth: { xs: "100%", sm: "150px" }, height: "40px", borderRadius: "8px", background: "var(--theme-gradient, var(--primary-color)) !important", textTransform: "none", fontWeight: 600, boxShadow: "none" }}>
+                {saving ? <CircularProgress size={20} color="inherit" /> : <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}><SaveIcon sx={{ fontSize: 18 }} />Save Changes</Box>}
+              </Button>
+            </Box>
+          )}
+        </Box>
+      )}
+
+      {/* ——— OTHER TAB ——— */}
+      {tabValue === 2 && (
         <Box className="card-border common-card" sx={{ borderRadius: "12px", backgroundColor: "white", minHeight: "400px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2.5 }}>
           <Box sx={{ width: 72, height: 72, borderRadius: "16px", backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <SettingsIcon sx={{ fontSize: 36, color: "var(--primary-color, #5c1a1a)", opacity: 0.5 }} />

@@ -37,7 +37,11 @@ import {
   Cancel as RejectedIcon,
   Visibility as ViewIcon,
   School as SchoolIcon,
+  Download as DownloadIcon,
+  Html as HtmlIcon,
+  Print as PrintIcon,
 } from "@mui/icons-material";
+import { masterService } from "@/api/services/master.service";
 import { admissionService } from "@/api/services/admission.service";
 import toast from "react-hot-toast";
 import moment from "moment";
@@ -55,6 +59,7 @@ import Loader from "@/apps/common/loader/Loader";
 import Pagination from "@/apps/common/pagination/Pagination";
 import { IOSSwitch } from "../../component/schoolCommon/commonCssFunction/cssFunction";
 import PopupModal from "../../component/schoolCommon/popUpModal/PopupModal";
+import BulkImportModal from "@/apps/common/BulkImportModal";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import Filter from "@/apps/common/filter/Filter";
@@ -88,6 +93,9 @@ export default function Student() {
   const [selectedData, setSelectedData] = useState<any>(null);
   const [buttonStatusSpinner, setButtonStatusSpinner] = useState(false);
 
+  // Import state
+  const [openImportModal, setOpenImportModal] = useState(false);
+
   const [openFilter, setOpenFilter] = useState(false);
   const [filterValues, setFilterValues] = useState({
     fullName: "",
@@ -99,7 +107,9 @@ export default function Student() {
     startYears: [] as number[],
   });
 
-  // ── Pending Admissions tab ──
+  const [exportingFormat, setExportingFormat] = useState<"excel" | "html" | "print" | null>(null);
+
+  // For Admission tabs ──
   const [tabValue, setTabValue] = useState(0);
   const [pendingAdmissions, setPendingAdmissions] = useState<any[]>([]);
   const [pendingTotal, setPendingTotal] = useState(0);
@@ -311,6 +321,86 @@ export default function Student() {
     }
   };
 
+  const handleExport = async (format: "excel" | "html" | "print") => {
+    try {
+      setExportingFormat(format);
+      const params = {
+        search: searchNameValue,
+        classId: filterValues.classId,
+        sectionId: filterValues.sectionId,
+        isActive: filterValues.isActive,
+        format,
+      };
+
+      const response: any = await masterService.exportStudents(params);
+      const data = response?.data || response;
+
+      if (format === "print") {
+        const printWindow = window.open("", "_blank");
+        if (printWindow) {
+          printWindow.document.write(data as any);
+          printWindow.document.close();
+          setTimeout(() => {
+            printWindow.print();
+          }, 500);
+        } else {
+          toast.error("Popup blocked! Please allow popups for printing.");
+        }
+      } else {
+        const blob = new Blob([data as any], {
+          type:
+            format === "excel"
+              ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              : "text/html; charset=utf-8",
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `Students_Report_${moment().format("YYYYMMDD_HHmmss")}.${
+            format === "excel" ? "xlsx" : "html"
+          }`
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+        toast.success(`Report exported successfully in ${format.toUpperCase()} format.`);
+      }
+    } catch (error: any) {
+      console.error("Export error:", error);
+      toast.error(error.message || "Failed to export students");
+    } finally {
+      setExportingFormat(null);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const csvContent = "data:text/csv;charset=utf-8,Full Name,Email,Phone,Gender,Class Name,Section Name,RoleName\nAlice Smith,alice@example.com,9876543210,Female,Class 1,Section A,Student";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Student_Import_Template.csv");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const handleUploadFile = async (file: File) => {
+    try {
+      const response = await masterService.importStudents(file);
+      handleGetData();
+      return { success: true, message: response.data.message };
+    } catch (error: any) {
+      return { 
+        success: false, 
+        message: error.response?.data?.message || "Failed to import students",
+        errors: error.response?.data?.errors
+      };
+    }
+  };
+
   return (
     <Box className="admin-dashboard-content">
       <Box className="admin-user-list-flex admin-page-title-main">
@@ -364,10 +454,20 @@ export default function Student() {
             </Button>
           </Box>
           {hasPermission(schoolAdminPermission.student.create) && (
-            <Box className="admin-add-user-btn-main">
+            <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1 }}>
+              <Button
+                variant="outlined"
+                className="admin-btn-theme"
+                onClick={() => setOpenImportModal(true)}
+                sx={{ backgroundColor: "#fff !important", color: "var(--primary-color) !important", borderColor: "var(--primary-color) !important" }}
+              >
+                Import
+              </Button>
               <Button
                 className="admin-btn-theme"
-                onClick={() => navigate("/student/add")}
+                onClick={() => {
+                  navigate("/student-list/add");
+                }}
               >
                 <AddIcon
                   sx={{
@@ -380,6 +480,42 @@ export default function Student() {
               </Button>
             </Box>
           )}
+          <Box className="admin-filter-btn-main">
+            <Tooltip title="Export to Excel">
+              <Button
+                className="admin-btn-theme"
+                onClick={() => handleExport("excel")}
+                disabled={exportingFormat !== null}
+                sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
+              >
+                {exportingFormat === "excel" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <DownloadIcon sx={{ color: "#fff", fontSize: "18px" }} />}
+              </Button>
+            </Tooltip>
+          </Box>
+          <Box className="admin-filter-btn-main">
+            <Tooltip title="Export to HTML">
+              <Button
+                className="admin-btn-theme"
+                onClick={() => handleExport("html")}
+                disabled={exportingFormat !== null}
+                sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
+              >
+                {exportingFormat === "html" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <HtmlIcon sx={{ color: "#fff", fontSize: "18px" }} />}
+              </Button>
+            </Tooltip>
+          </Box>
+          <Box className="admin-filter-btn-main">
+            <Tooltip title="Export to Print">
+              <Button
+                className="admin-btn-theme"
+                onClick={() => handleExport("print")}
+                disabled={exportingFormat !== null}
+                sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center" }}
+              >
+                {exportingFormat === "print" ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : <PrintIcon sx={{ color: "#fff", fontSize: "18px" }} />}
+              </Button>
+            </Tooltip>
+          </Box>
         </Box>
       </Box>
 
@@ -1095,11 +1231,22 @@ export default function Student() {
       <PopupModal
         type={selectedData?.isActive ? "deactivate" : "activate"}
         buttonText={selectedData?.isActive ? "Deactivate" : "Activate"}
-        module={`Student (${selectedData?.fullName})`}
+        module={`Are you sure you want to ${selectedData?.isActive ? "deactivate" : "activate"} this student?`}
         open={openStatusModal}
-        handleClose={() => setOpenStatusModal(false)}
+        handleClose={() => {
+          setOpenStatusModal(false);
+          setSelectedData(null);
+        }}
         handleFunction={handleConfirmStatusChange}
         buttonStatusSpinner={buttonStatusSpinner}
+      />
+
+      <BulkImportModal
+        open={openImportModal}
+        onClose={() => setOpenImportModal(false)}
+        title="Import Students"
+        onDownloadTemplate={handleDownloadTemplate}
+        onUpload={handleUploadFile}
       />
 
       {/* Review Admission Modal */}

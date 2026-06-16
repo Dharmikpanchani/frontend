@@ -90,7 +90,7 @@ export const deleteStudent = createAsyncThunk(
 
 export const getPendingAdmissionsCount = createAsyncThunk(
   "student/pendingAdmissionsCount",
-  async (_, { rejectWithValue }) => {
+  async () => {
     try {
       const res: any = await admissionService.getPendingAdmissions({ perPageData: 1 });
       return res?.data?.pagination?.totalArrayLength || 0;

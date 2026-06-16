@@ -15,4 +15,11 @@ export const roleService = {
     adminApiService.post<any>(Api.ADD_EDIT_ROLE, payload),
   delete: (id: string) =>
     adminApiService.delete<any>(`${Api.DELETE_ROLE}/${id}`),
+  importRoles: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return adminApiService.post<any>(`${Api.IMPORT_ROLES}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 };

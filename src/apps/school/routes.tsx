@@ -56,6 +56,7 @@ const AddEditTeacher = lazy(() => import("./pages/Teacher/AddEditTeacher"));
 
 const StudentList = lazy(() => import("./pages/Student/Student"));
 const AddEditStudent = lazy(() => import("./pages/Student/AddEditStudent"));
+const Inquiries = lazy(() => import("./pages/Student/Inquiries"));
 
 // Fee Management
 const SchoolSettingsPage = lazy(() => import("./pages/FeeManagement/Settings"));
@@ -428,6 +429,16 @@ export const schoolRoutes: RouteConfig[] = [
                 permission={schoolAdminPermission?.student?.read}
               >
                 <StudentList />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/student/inquiries",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.student?.read}
+              >
+                <Inquiries />
               </PermissionRoute>
             ),
           },

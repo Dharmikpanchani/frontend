@@ -310,7 +310,7 @@ export default function RoleList() {
       <PopupModal
         type="delete"
         buttonText="Delete"
-        module="Roles"
+        module={`Role (${selectedData?.role})`}
         open={openDelete}
         handleClose={handleCloseDelete}
         handleFunction={handleDelete}

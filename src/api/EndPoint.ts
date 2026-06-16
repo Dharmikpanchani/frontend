@@ -60,6 +60,7 @@ export const Api = {
   ADD_EDIT_ROLE: `${route}/add-edit-role`,
   DELETE_ROLE: `${route}/delete-role`,
   CHANGE_STATUS_ROLE: `${route}/change-role-status`,
+  IMPORT_ROLES: `${route}/import-roles`,
 
   // About Us management
   GET_ALL_ABOUT_US: `${route}/get-all-abouts`,
@@ -97,11 +98,15 @@ export const Api = {
   CHANGE_SECTION_STATUS: `${route}/section-action-status`,
   GET_ALL_TEACHERS: `${route}/get-all-teachers`,
   GET_TEACHER: `${route}/get-teacher`,
+  EXPORT_TEACHERS: `${route}/export-teachers`,
+  IMPORT_TEACHERS: `${route}/import-teachers`,
   ADD_EDIT_TEACHER: `${route}/add-edit-teacher`,
   DELETE_TEACHER: `${route}/delete-teacher`,
   CHANGE_TEACHER_STATUS: `${route}/teacher-action-status`,
   GET_ALL_STUDENTS: `${route}/get-all-students`,
   GET_STUDENT: `${route}/get-student`,
+  EXPORT_STUDENTS: `${route}/export-students`,
+  IMPORT_STUDENTS: `${route}/import-students`,
   ADD_EDIT_STUDENT: `${route}/add-edit-student`,
   DELETE_STUDENT: `${route}/delete-student`,
   CHANGE_STUDENT_STATUS: `${route}/student-action-status`,
@@ -109,6 +114,7 @@ export const Api = {
   GET_ALL_PLANS: `${route}/get-all-plans`,
   GET_PLAN: `${route}/get-plan`,
   ADD_EDIT_PLAN: `${route}/add-edit-plan`,
+  IMPORT_PLANS: `${route}/import-plans`,
   DELETE_PLAN: `${route}/delete-plan`,
   CHANGE_PLAN_STATUS: `${route}/plan-status`,
   GET_DEVELOPER_WISE_SCHOOL_PLAN: `${route}/get-developer-wise-school-plan`,
@@ -176,6 +182,13 @@ export const Api = {
   // Admission (Admin)
   ADMIN_GET_PENDING_ADMISSIONS: `${route}/pending-admission-students`,
   ADMIN_STUDENT_ADMISSION_ACTION: `${route}/student-admission-action`, // /:id
+
+  // Inquiries
+  INQUIRY_APPLY: `user/inquiries/submit`,
+  ADMIN_GET_INQUIRIES: `${route}/inquiries`,
+  EXPORT_INQUIRIES: `${route}/export-inquiries`,
+  ADMIN_INQUIRY_ACTION: `${route}/inquiries`, // PATCH /:id/status
+  ADMIN_INQUIRY_DELETE: `${route}/inquiries`, // DELETE /:id
 
   // Clearances & Developer Transactions (Phase 1.5)
   CLEAR_FEE_COLLECTION: `${route}/fee-collections`, // /:id/payment-status

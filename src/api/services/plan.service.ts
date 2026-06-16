@@ -35,4 +35,11 @@ export const planService = {
     adminApiService.delete<any>(`${Api.DELETE_PLAN}/${id}`),
   changeStatus: (id: string) =>
     adminApiService.post<any>(`${Api.CHANGE_PLAN_STATUS}/${id}`),
+  importPlans: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return adminApiService.post<any>(`${Api.IMPORT_PLANS}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 };
