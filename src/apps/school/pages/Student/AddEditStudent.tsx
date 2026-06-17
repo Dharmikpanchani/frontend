@@ -746,23 +746,26 @@ export default function AddEditStudent() {
                   />
                 </Box>
 
-                {/* Phone Number */}
+                {/* Phone Number — Student Login Phone */}
                 <Box>
                   <Typography sx={labelSx}>
-                    Phone Number <span style={{ color: "#f04438" }}>*</span>
+                    Student Login Phone <span style={{ color: "#f04438" }}>*</span>
                   </Typography>
                   <TextField
                     fullWidth
                     id="phoneNumber"
                     name="phoneNumber"
-                    placeholder="Enter phone number"
+                    placeholder="Enter student's own phone number"
                     value={values.phoneNumber}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={
                       touched.phoneNumber && Boolean(errors.phoneNumber)
                     }
-                    helperText={touched.phoneNumber && (errors.phoneNumber as string)}
+                    helperText={
+                      (touched.phoneNumber && (errors.phoneNumber as string)) ||
+                      "Student uses this number to login to the portal"
+                    }
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
@@ -932,21 +935,29 @@ export default function AddEditStudent() {
                   />
                 </Box>
 
-                {/* Father Phone */}
+                {/* Father Phone — Parent Login */}
                 <Box>
-                  <Typography sx={labelSx}>Father&apos;s Phone</Typography>
+                  <Typography sx={labelSx}>
+                    Father&apos;s Contact Phone{" "}
+                    <span style={{ color: "#667085", fontSize: "11px", fontWeight: 400 }}>
+                      (Parent Login)
+                    </span>
+                  </Typography>
                   <TextField
                     fullWidth
                     id="fatherPhone"
                     name="fatherPhone"
-                    placeholder="Enter father's phone"
+                    placeholder="Enter father's phone number"
                     value={values.fatherPhone}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={
                       touched.fatherPhone && Boolean(errors.fatherPhone)
                     }
-                    helperText={touched.fatherPhone && (errors.fatherPhone as string)}
+                    helperText={
+                      (touched.fatherPhone && (errors.fatherPhone as string)) ||
+                      "Father can use this number to login as parent"
+                    }
                     disabled={isReadOnly}
                     slotProps={{
                       input: { sx: inputSx },
