@@ -1,15 +1,20 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/Store";
 import { useCallback, useMemo } from "react";
+import { config } from "../utils/config";
 
 export const usePermissions = () => {
   const { adminDetails, loading, isAdminLogin } = useSelector(
     (state: RootState) => state.AdminReducer,
   );
 
-  const isSuperDeveloper = adminDetails?.type === "super_developer";
-  const isSchoolAdmin = adminDetails?.type === "school_admin";
-  const isSuperAdmin = adminDetails?.isSuperAdmin;
+  const isSuperDeveloper =
+    adminDetails?.type === "super_developer" ||
+    adminDetails?.type === config.super_developer_admin;
+  const isSchoolAdmin =
+    adminDetails?.type === config.super_school_admin ||
+    adminDetails?.type === config.school_admin;
+  const isSuperSchoolAdmin = adminDetails?.type === config.super_school_admin;
 
   const rolePermissions = useMemo((): string[] => {
     const roles = adminDetails?.roles;
@@ -35,12 +40,9 @@ export const usePermissions = () => {
 
       if (isSchoolAdmin) {
         // First layer: Plan check
-        if (!planPermissions.includes(p)) return false;
-        // Second layer: Super Admin bypass within the plan
-        if (isSuperAdmin) return true;
-      } else if (isSuperAdmin) {
-        // Non-school Super Admin bypass (e.g. platform admin)
-        return true;
+        if (planPermissions.length > 0 && !planPermissions.includes(p)) return false;
+        // Second layer: School Admin bypass within the plan
+        if (isSuperSchoolAdmin) return true;
       }
 
       // Third layer: Role check
@@ -50,7 +52,7 @@ export const usePermissions = () => {
       isSuperDeveloper,
       isSchoolAdmin,
       planPermissions,
-      isSuperAdmin,
+      isSuperSchoolAdmin,
       rolePermissions,
     ],
   );
@@ -86,7 +88,8 @@ export const usePermissions = () => {
     hasPermission,
     hasAllPermissions,
     hasAnyPermission,
-    isSuperDeveloper: isSuperDeveloper || isSuperAdmin,
+    isSuperDeveloper,
+    isSuperSchoolAdmin,
     loading,
     isAdminLogin,
   };

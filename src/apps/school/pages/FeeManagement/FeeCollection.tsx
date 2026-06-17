@@ -399,7 +399,7 @@ const FeeCollection = () => {
             </>
           )}
 
-          {canCollect && (
+          {canCollect && collections.length > 0 && (
             <Box className="admin-add-user-btn-main" sx={{ ml: 1 }}>
               <Button
                 variant="contained"

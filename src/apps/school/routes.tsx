@@ -84,11 +84,15 @@ function PermissionRoute({
     permissions,
     isAdminLogin,
     isSuperDeveloper,
+    isSuperSchoolAdmin,
   } = usePermissions();
 
   if (
     loading ||
-    (isAdminLogin && permissions.length === 0 && !isSuperDeveloper)
+    (isAdminLogin &&
+      permissions.length === 0 &&
+      !isSuperDeveloper &&
+      !isSuperSchoolAdmin)
   ) {
     return <PageLoader />;
   }

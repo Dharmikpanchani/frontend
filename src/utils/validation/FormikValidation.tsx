@@ -1065,6 +1065,19 @@ export const documentRejectionValidationSchema = Yup.object().shape({
 export const feeCategoryValidationSchema = Yup.object().shape({
   name: genericStringValidation("Category name", 3, 100, true),
   description: Yup.string()
+    .test(
+      "no-whitespace",
+      "Description cannot be empty spaces",
+      (_value, context) =>
+        typeof context.originalValue !== "string" ||
+        context.originalValue === "" ||
+        context.originalValue.trim() === context.originalValue,
+    )
+    .transform((value) => value?.trim())
+    .test("min-length", "Description must be at least 3 characters", (value) => {
+      if (!value) return true;
+      return value.length >= 3;
+    })
     .max(500, "Description must be at most 500 characters")
     .optional(),
   isMandatory: Yup.boolean().optional(),

@@ -159,11 +159,21 @@ export default function PlanView() {
 
   const isTypeAllChecked = (typeId: string) => {
     if (!initialValues) return false;
-    const allKeys = roleStaticData.flatMap((m: any) =>
-      m.subRole.some((sr: any) => sr.titleId === typeId)
-        ? [`${m.mainTitleId}_${typeId}`]
-        : [],
-    );
+    const allKeys = roleStaticData.flatMap((m: any) => {
+      let actualTypeId = typeId;
+      if (m.mainTitleId === "attendance" && typeId === "add") {
+        actualTypeId = "mark";
+      }
+      if (m.mainTitleId === "fee_collection" && typeId === "delete") {
+        actualTypeId = "collect";
+      }
+      const matchedSubRole = m.subRole.find(
+        (sr: any) => sr.titleId === actualTypeId || sr.titleId === typeId
+      );
+      return matchedSubRole
+        ? [`${m.mainTitleId}_${matchedSubRole.titleId}`]
+        : [];
+    });
     return (
       allKeys.length > 0 &&
       allKeys.every((k) => initialValues.permissions.includes(k))
@@ -662,7 +672,7 @@ export default function PlanView() {
                         )
                           actualTypeId = "mark";
                         if (
-                          module.mainTitleId === "fees" &&
+                          module.mainTitleId === "fee_collection" &&
                           typeId === "delete"
                         )
                           actualTypeId = "collect";
@@ -672,7 +682,7 @@ export default function PlanView() {
                             sr.titleId === actualTypeId ||
                             sr.titleId === typeId,
                         );
-                        const key = `${module.mainTitleId}_${subRole?.titleId}`;
+                        const key = `${module.mainTitleId}_${subRole?.titleId || typeId}`;
                         return (
                           <TableCell
                             key={typeId}

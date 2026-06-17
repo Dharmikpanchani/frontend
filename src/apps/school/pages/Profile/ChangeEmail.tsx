@@ -27,6 +27,7 @@ import { changeEmailRequestAdmin } from "@/redux/slices/authSlice";
 import { emailChangeValidationSchema } from "@/utils/validation/FormikValidation";
 import Spinner from "../../component/schoolCommon/spinner/Spinner";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
+import { config } from "@/utils/config";
 
 export default function ChangeEmail() {
   const [buttonSpinner, setButtonSpinner] = useState(false);
@@ -37,7 +38,7 @@ export default function ChangeEmail() {
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
   );
-  const isSuperAdmin = adminDetails?.isSuperAdmin === true;
+  const isSuperAdmin = adminDetails?.type === config.super_school_admin;
 
   const initialValues = {
     password: "",

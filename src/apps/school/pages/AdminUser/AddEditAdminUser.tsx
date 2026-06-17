@@ -13,7 +13,6 @@ import {
   InputAdornment,
   IconButton,
   Autocomplete,
-  Backdrop,
   TableContainer,
   Paper,
   Table,
@@ -72,7 +71,9 @@ export default function AddEditAdminUser() {
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
   );
-  const isSuperDeveloper = adminDetails?.type === "super_developer";
+  const isSuperDeveloper =
+    adminDetails?.type === "super_developer" ||
+    adminDetails?.type === "super_developer_admin";
 
   const [buttonSpinner, setButtonSpinner] = useState(false);
   // --- Associated Schools Server-side State ---
@@ -308,16 +309,6 @@ export default function AddEditAdminUser() {
         </Breadcrumbs>
       </Box>
 
-      <Backdrop
-        sx={{
-          color: "#fff",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          backgroundColor: "rgba(255, 255, 255, 0.6)",
-        }}
-        open={loading}
-      >
-        <Spinner />
-      </Backdrop>
       <Box
         className="card-border common-card"
         sx={{

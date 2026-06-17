@@ -4,6 +4,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import useIsValidToken from "./isValidToken";
 import ScrollToTop from "../apps/common/ScrollToTop";
+import { config } from "../utils/config";
 
 const PrivateRoutes: React.FC = () => {
   const location = useLocation();
@@ -20,7 +21,9 @@ const PrivateRoutes: React.FC = () => {
     (isAdminLogin && adminDetails?.isLogin && isValid) ||
     (!!cookieToken && isValid);
 
-  const isSchoolAdmin = adminDetails?.type === "school_admin";
+  const isSchoolAdmin =
+    adminDetails?.type === config.school_admin ||
+    adminDetails?.type === config.super_school_admin;
   const isActivePlan = adminDetails?.schoolData?.isActivePlan;
 
   // Safeguard: Only check plan status if the profile is fully loaded and the user is a school admin

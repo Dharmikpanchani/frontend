@@ -507,7 +507,8 @@ export default function AdminUser() {
                                           handleStatusChange(data)
                                         }
                                         disabled={
-                                          data?.type === "super_developer"
+                                          data?.type === "super_developer" ||
+                                          data?.type === "super_developer_admin"
                                         }
                                       />
                                     </Box>
@@ -589,7 +590,8 @@ export default function AdminUser() {
                                 {hasPermission(
                                   developerPermission.admin_user.delete,
                                 ) &&
-                                  data?.type !== "super_developer" && (
+                                  data?.type !== "super_developer" &&
+                                  data?.type !== "super_developer_admin" && (
                                     <Tooltip
                                       title="Delete"
                                       arrow

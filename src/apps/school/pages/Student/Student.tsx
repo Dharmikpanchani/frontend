@@ -34,13 +34,11 @@ import {
   Add as AddIcon,
   Wc as GenderIcon,
   CalendarMonth as CalendarIcon,
-  HourglassEmpty as PendingIcon,
   CheckCircle as ApprovedIcon,
   Cancel as RejectedIcon,
   Visibility as ViewIcon,
   School as SchoolIcon,
   Download as DownloadIcon,
-  Html as HtmlIcon,
   Print as PrintIcon,
   FileDownload as ExcelIcon,
   PictureAsPdf as PdfIcon,
@@ -122,7 +120,7 @@ export default function Student() {
   const [pendingTotal, setPendingTotal] = useState(0);
   const [pendingLoading, setPendingLoading] = useState(false);
   const [pendingPage, setPendingPage] = useState(0);
-  const [pendingRowsPerPage] = useState(10);
+  const [pendingRowsPerPage, setPendingRowsPerPage] = useState(10);
   const [pendingSearch, setPendingSearch] = useState("");
 
   const [reviewModal, setReviewModal] = useState<any>(null);
@@ -150,7 +148,7 @@ export default function Student() {
 
   useEffect(() => {
     if (tabValue === 1) fetchPendingAdmissions();
-  }, [tabValue, pendingPage, pendingSearch]);
+  }, [tabValue, pendingPage, pendingSearch, pendingRowsPerPage]);
 
   useEffect(() => {
     dispatch(getPendingAdmissionsCount() as any);
@@ -364,16 +362,15 @@ export default function Student() {
             format === "excel"
               ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               : format === "pdf"
-              ? "application/pdf"
-              : "text/html; charset=utf-8",
+                ? "application/pdf"
+                : "text/html; charset=utf-8",
         });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute(
           "download",
-          `Students_Report_${moment().format("YYYYMMDD_HHmmss")}.${
-            format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
+          `Students_Report_${moment().format("YYYYMMDD_HHmmss")}.${format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
           }`
         );
         document.body.appendChild(link);
@@ -407,8 +404,8 @@ export default function Student() {
       handleGetData();
       return { success: true, message: response.data.message };
     } catch (error: any) {
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: error.response?.data?.message || "Failed to import students",
         errors: error.response?.data?.errors
       };
@@ -718,250 +715,208 @@ export default function Student() {
                 </Table>
               </TableContainer>
             </Box>
+            <Box className="admin-pagination-main">
+              {pendingTotal ? (
+                <Pagination
+                  page={pendingPage}
+                  rowsPerPage={pendingRowsPerPage}
+                  setPage={setPendingPage}
+                  setRowsPerPage={setPendingRowsPerPage}
+                  count={pendingTotal}
+                />
+              ) : null}
+            </Box>
           </Box>
         </Box>
       ) : (
 
-      <Box className="card-border common-card">
-        <Box className="brand-table-main page-table-main">
-          <TableContainer component={Paper} className="table-container">
-            <Table aria-label="simple table" className="table">
-              <TableHead className="table-head">
-                <TableRow className="table-row">
-                  <TableCell component="th" className="table-th" width="22%">
-                    STUDENT INFO
-                  </TableCell>
-                  <TableCell component="th" className="table-th" width="15%">
-                    CLASS / SECTION
-                  </TableCell>
-                  <TableCell component="th" className="table-th" width="13%">
-                    PERSONAL
-                  </TableCell>
-                  <TableCell component="th" className="table-th" width="20%">
-                    GUARDIAN
-                  </TableCell>
-                  <TableCell component="th" className="table-th" width="17%">
-                    STATUS / LOGIN
-                  </TableCell>
-                  {hasAnyPermission([
-                    schoolAdminPermission.student.read,
-                    schoolAdminPermission.student.update,
-                    schoolAdminPermission.student.delete,
-                  ]) && (
-                      <TableCell
-                        component="th"
-                        className="table-th"
-                        width="10%"
-                        align="center"
-                      >
-                        ACTIONS
-                      </TableCell>
-                    )}
-                </TableRow>
-              </TableHead>
-              <TableBody className="table-body">
-                {!loading ? (
-                  students?.length ? (
-                    students?.map((data: any) => (
-                      <TableRow
-                        key={data._id}
-                        sx={{
-                          "&:last-child td, &:last-child th": { border: 0 },
-                          "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" },
-                        }}
-                      >
-                        {/* STUDENT INFO */}
-                        <TableCell component="td" className="table-td">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "flex-start",
-                              gap: 1.5,
-                            }}
-                          >
-                            <ProfileAvatar
-                              name={data?.fullName}
-                              imageUrl={data?.profileImage}
-                              size={45}
-                            />
-                            <Box sx={{ flex: 1 }}>
-                              <Typography
-                                sx={{
-                                  fontSize: "14px",
-                                  fontWeight: 600,
-                                  color: "#111827",
-                                  mb: 0.2,
-                                }}
-                              >
-                                {data?.fullName || "N/A"}
-                              </Typography>
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 0.8,
-                                  mb: 0.2,
-                                }}
-                              >
-                                <EmailIcon
-                                  sx={{
-                                    fontSize: 13,
-                                    color: "var(--primary-color)",
-                                  }}
-                                />
+        <Box className="card-border common-card">
+          <Box className="brand-table-main page-table-main">
+            <TableContainer component={Paper} className="table-container">
+              <Table aria-label="simple table" className="table">
+                <TableHead className="table-head">
+                  <TableRow className="table-row">
+                    <TableCell component="th" className="table-th" width="22%">
+                      STUDENT INFO
+                    </TableCell>
+                    <TableCell component="th" className="table-th" width="15%">
+                      CLASS / SECTION
+                    </TableCell>
+                    <TableCell component="th" className="table-th" width="13%">
+                      PERSONAL
+                    </TableCell>
+                    <TableCell component="th" className="table-th" width="20%">
+                      GUARDIAN
+                    </TableCell>
+                    <TableCell component="th" className="table-th" width="17%">
+                      STATUS / LOGIN
+                    </TableCell>
+                    {hasAnyPermission([
+                      schoolAdminPermission.student.read,
+                      schoolAdminPermission.student.update,
+                      schoolAdminPermission.student.delete,
+                    ]) && (
+                        <TableCell
+                          component="th"
+                          className="table-th"
+                          width="10%"
+                          align="center"
+                        >
+                          ACTIONS
+                        </TableCell>
+                      )}
+                  </TableRow>
+                </TableHead>
+                <TableBody className="table-body">
+                  {!loading ? (
+                    students?.length ? (
+                      students?.map((data: any) => (
+                        <TableRow
+                          key={data._id}
+                          sx={{
+                            "&:last-child td, &:last-child th": { border: 0 },
+                            "&:hover": { backgroundColor: "rgba(0,0,0,0.02)" },
+                          }}
+                        >
+                          {/* STUDENT INFO */}
+                          <TableCell component="td" className="table-td">
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: 1.5,
+                              }}
+                            >
+                              <ProfileAvatar
+                                name={data?.fullName}
+                                imageUrl={data?.profileImage}
+                                size={45}
+                              />
+                              <Box sx={{ flex: 1 }}>
                                 <Typography
-                                  sx={{ fontSize: "11px", color: "#6b7280" }}
-                                >
-                                  {data?.email || "N/A"}
-                                </Typography>
-                              </Box>
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 0.8,
-                                  mb: 0.2,
-                                }}
-                              >
-                                <PhoneIcon
                                   sx={{
-                                    fontSize: 13,
-                                    color: "var(--primary-color)",
+                                    fontSize: "14px",
+                                    fontWeight: 600,
+                                    color: "#111827",
+                                    mb: 0.2,
                                   }}
-                                />
-                                <Typography
-                                  sx={{ fontSize: "11px", color: "#6b7280" }}
                                 >
-                                  {data?.phoneNumber || "N/A"}
+                                  {data?.fullName || "N/A"}
                                 </Typography>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.8,
+                                    mb: 0.2,
+                                  }}
+                                >
+                                  <EmailIcon
+                                    sx={{
+                                      fontSize: 13,
+                                      color: "var(--primary-color)",
+                                    }}
+                                  />
+                                  <Typography
+                                    sx={{ fontSize: "11px", color: "#6b7280" }}
+                                  >
+                                    {data?.email || "N/A"}
+                                  </Typography>
+                                </Box>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.8,
+                                    mb: 0.2,
+                                  }}
+                                >
+                                  <PhoneIcon
+                                    sx={{
+                                      fontSize: 13,
+                                      color: "var(--primary-color)",
+                                    }}
+                                  />
+                                  <Typography
+                                    sx={{ fontSize: "11px", color: "#6b7280" }}
+                                  >
+                                    {data?.phoneNumber || "N/A"}
+                                  </Typography>
+                                </Box>
+                                {data?.admissionNumber && (
+                                  <Chip
+                                    label={`Adm: ${data.admissionNumber}`}
+                                    size="small"
+                                    sx={{
+                                      height: "18px",
+                                      fontSize: "10px",
+                                      fontWeight: 700,
+                                      backgroundColor:
+                                        "rgba(var(--primary-color-rgb, 92,26,26), 0.1)",
+                                      color: "var(--primary-color)",
+                                      borderRadius: "4px",
+                                      "& .MuiChip-label": { px: "6px" },
+                                    }}
+                                  />
+                                )}
                               </Box>
-                              {data?.admissionNumber && (
+                            </Box>
+                          </TableCell>
+
+                          {/* CLASS / SECTION */}
+                          <TableCell component="td" className="table-td">
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 0.5,
+                              }}
+                            >
+                              {data?.classId?.name && (
                                 <Chip
-                                  label={`Adm: ${data.admissionNumber}`}
+                                  label={data.classId.name}
                                   size="small"
                                   sx={{
-                                    height: "18px",
-                                    fontSize: "10px",
-                                    fontWeight: 700,
-                                    backgroundColor:
-                                      "rgba(var(--primary-color-rgb, 92,26,26), 0.1)",
-                                    color: "var(--primary-color)",
+                                    height: "20px",
+                                    fontSize: "11px",
+                                    fontWeight: 600,
+                                    backgroundColor: "#f0f7ff",
+                                    color: "#1565c0",
+                                    border: "1px solid #bae7ff",
                                     borderRadius: "4px",
-                                    "& .MuiChip-label": { px: "6px" },
                                   }}
                                 />
                               )}
+                              {data?.sectionId?.code && (
+                                <Typography
+                                  sx={{
+                                    fontSize: "11px",
+                                    color: "#475467",
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  Section: {data.sectionId.code}
+                                </Typography>
+                              )}
+                              {data?.rollNumber && (
+                                <Typography
+                                  sx={{ fontSize: "10px", color: "#9ca3af" }}
+                                >
+                                  Roll No: {data.rollNumber}
+                                </Typography>
+                              )}
                             </Box>
-                          </Box>
-                        </TableCell>
+                          </TableCell>
 
-                        {/* CLASS / SECTION */}
-                        <TableCell component="td" className="table-td">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: 0.5,
-                            }}
-                          >
-                            {data?.classId?.name && (
-                              <Chip
-                                label={data.classId.name}
-                                size="small"
-                                sx={{
-                                  height: "20px",
-                                  fontSize: "11px",
-                                  fontWeight: 600,
-                                  backgroundColor: "#f0f7ff",
-                                  color: "#1565c0",
-                                  border: "1px solid #bae7ff",
-                                  borderRadius: "4px",
-                                }}
-                              />
-                            )}
-                            {data?.sectionId?.code && (
-                              <Typography
-                                sx={{
-                                  fontSize: "11px",
-                                  color: "#475467",
-                                  fontWeight: 500,
-                                }}
-                              >
-                                Section: {data.sectionId.code}
-                              </Typography>
-                            )}
-                            {data?.rollNumber && (
-                              <Typography
-                                sx={{ fontSize: "10px", color: "#9ca3af" }}
-                              >
-                                Roll No: {data.rollNumber}
-                              </Typography>
-                            )}
-                          </Box>
-                        </TableCell>
-
-                        {/* PERSONAL */}
-                        <TableCell component="td" className="table-td">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: 0.5,
-                            }}
-                          >
+                          {/* PERSONAL */}
+                          <TableCell component="td" className="table-td">
                             <Box
                               sx={{
                                 display: "flex",
-                                alignItems: "center",
+                                flexDirection: "column",
                                 gap: 0.5,
                               }}
                             >
-                              <GenderIcon
-                                sx={{ fontSize: 13, color: "#9ca3af" }}
-                              />
-                              <Typography
-                                sx={{
-                                  fontSize: "10px",
-                                  color: "#9ca3af",
-                                  fontWeight: 600,
-                                }}
-                              >
-                                SEX:
-                              </Typography>
-                              <Typography
-                                sx={{ fontSize: "12px", color: "#111827" }}
-                              >
-                                {data?.gender || "N/A"}
-                              </Typography>
-                            </Box>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 0.5,
-                              }}
-                            >
-                              <CalendarIcon
-                                sx={{ fontSize: 13, color: "#9ca3af" }}
-                              />
-                              <Typography
-                                sx={{
-                                  fontSize: "10px",
-                                  color: "#9ca3af",
-                                  fontWeight: 600,
-                                }}
-                              >
-                                DOB:
-                              </Typography>
-                              <Typography
-                                sx={{ fontSize: "11px", color: "#111827" }}
-                              >
-                                {data?.dateOfBirth
-                                  ? moment(data.dateOfBirth).format("DD MMM YY")
-                                  : "N/A"}
-                              </Typography>
-                            </Box>
-                            {data?.bloodGroup && (
                               <Box
                                 sx={{
                                   display: "flex",
@@ -969,43 +924,9 @@ export default function Student() {
                                   gap: 0.5,
                                 }}
                               >
-                                <Typography
-                                  sx={{
-                                    fontSize: "10px",
-                                    color: "#9ca3af",
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  BLOOD:
-                                </Typography>
-                                <Chip
-                                  label={data.bloodGroup}
-                                  size="small"
-                                  sx={{
-                                    height: "16px",
-                                    fontSize: "9px",
-                                    backgroundColor: "#fff1f0",
-                                    color: "#f5222d",
-                                    border: "1px solid #ffccc7",
-                                    fontWeight: 700,
-                                  }}
+                                <GenderIcon
+                                  sx={{ fontSize: 13, color: "#9ca3af" }}
                                 />
-                              </Box>
-                            )}
-                          </Box>
-                        </TableCell>
-
-                        {/* GUARDIAN */}
-                        <TableCell component="td" className="table-td">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: 0.4,
-                            }}
-                          >
-                            {data?.fatherName && (
-                              <Box>
                                 <Typography
                                   sx={{
                                     fontSize: "10px",
@@ -1013,234 +934,321 @@ export default function Student() {
                                     fontWeight: 600,
                                   }}
                                 >
-                                  FATHER
+                                  SEX:
                                 </Typography>
                                 <Typography
                                   sx={{ fontSize: "12px", color: "#111827" }}
                                 >
-                                  {data.fatherName}
+                                  {data?.gender || "N/A"}
                                 </Typography>
-                                {data?.fatherPhone && (
-                                  <Typography
-                                    sx={{ fontSize: "10px", color: "#6b7280" }}
-                                  >
-                                    {data.fatherPhone}
-                                  </Typography>
-                                )}
                               </Box>
-                            )}
-                            {data?.motherName && (
-                              <Box>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 0.5,
+                                }}
+                              >
+                                <CalendarIcon
+                                  sx={{ fontSize: 13, color: "#9ca3af" }}
+                                />
                                 <Typography
                                   sx={{
                                     fontSize: "10px",
                                     color: "#9ca3af",
                                     fontWeight: 600,
-                                    mt: 0.3,
                                   }}
                                 >
-                                  MOTHER
+                                  DOB:
                                 </Typography>
                                 <Typography
-                                  sx={{ fontSize: "12px", color: "#111827" }}
+                                  sx={{ fontSize: "11px", color: "#111827" }}
                                 >
-                                  {data.motherName}
+                                  {data?.dateOfBirth
+                                    ? moment(data.dateOfBirth).format("DD MMM YY")
+                                    : "N/A"}
                                 </Typography>
-                                {data?.motherPhone && (
-                                  <Typography
-                                    sx={{ fontSize: "10px", color: "#6b7280" }}
-                                  >
-                                    {data.motherPhone}
-                                  </Typography>
-                                )}
                               </Box>
-                            )}
-                            {!data?.fatherName && !data?.motherName && (
-                              <Typography
-                                sx={{ fontSize: "11px", color: "#9ca3af" }}
-                              >
-                                N/A
-                              </Typography>
-                            )}
-                          </Box>
-                        </TableCell>
-
-                        {/* STATUS / LOGIN */}
-                        <TableCell component="td" className="table-td">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: 0.8,
-                            }}
-                          >
-                            {hasPermission(
-                              schoolAdminPermission.student.update,
-                            ) ? (
-                              <Tooltip
-                                title={
-                                  data?.isActive ? "Deactivate" : "Activate"
-                                }
-                                arrow
-                              >
+                              {data?.bloodGroup && (
                                 <Box
                                   sx={{
                                     display: "flex",
                                     alignItems: "center",
+                                    gap: 0.5,
                                   }}
                                 >
-                                  <IOSSwitch
-                                    checked={data?.isActive}
-                                    onChange={() => setOpenStatusChange(data)}
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#9ca3af",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    BLOOD:
+                                  </Typography>
+                                  <Chip
+                                    label={data.bloodGroup}
                                     size="small"
+                                    sx={{
+                                      height: "16px",
+                                      fontSize: "9px",
+                                      backgroundColor: "#fff1f0",
+                                      color: "#f5222d",
+                                      border: "1px solid #ffccc7",
+                                      fontWeight: 700,
+                                    }}
                                   />
                                 </Box>
-                              </Tooltip>
-                            ) : (
-                              <Typography
-                                sx={{
-                                  fontSize: "10px",
-                                  color: "#ff9800",
-                                  fontStyle: "italic",
-                                }}
-                              >
-                                Status locked
-                              </Typography>
-                            )}
+                              )}
+                            </Box>
+                          </TableCell>
 
+                          {/* GUARDIAN */}
+                          <TableCell component="td" className="table-td">
                             <Box
                               sx={{
                                 display: "flex",
-                                alignItems: "center",
-                                gap: 1,
+                                flexDirection: "column",
+                                gap: 0.4,
                               }}
                             >
-                              <Chip
-                                label={data?.isLogin ? "Online" : "Offline"}
-                                size="small"
-                                sx={{
-                                  backgroundColor: data?.isLogin
-                                    ? "#e8f5e9"
-                                    : "#f5f5f5",
-                                  color: data?.isLogin ? "#2e7d32" : "#9e9e9e",
-                                  fontWeight: 700,
-                                  fontSize: "9px",
-                                  height: "18px",
-                                }}
-                              />
+                              {data?.fatherName && (
+                                <Box>
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#9ca3af",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    FATHER
+                                  </Typography>
+                                  <Typography
+                                    sx={{ fontSize: "12px", color: "#111827" }}
+                                  >
+                                    {data.fatherName}
+                                  </Typography>
+                                  {data?.fatherPhone && (
+                                    <Typography
+                                      sx={{ fontSize: "10px", color: "#6b7280" }}
+                                    >
+                                      {data.fatherPhone}
+                                    </Typography>
+                                  )}
+                                </Box>
+                              )}
+                              {data?.motherName && (
+                                <Box>
+                                  <Typography
+                                    sx={{
+                                      fontSize: "10px",
+                                      color: "#9ca3af",
+                                      fontWeight: 600,
+                                      mt: 0.3,
+                                    }}
+                                  >
+                                    MOTHER
+                                  </Typography>
+                                  <Typography
+                                    sx={{ fontSize: "12px", color: "#111827" }}
+                                  >
+                                    {data.motherName}
+                                  </Typography>
+                                  {data?.motherPhone && (
+                                    <Typography
+                                      sx={{ fontSize: "10px", color: "#6b7280" }}
+                                    >
+                                      {data.motherPhone}
+                                    </Typography>
+                                  )}
+                                </Box>
+                              )}
+                              {!data?.fatherName && !data?.motherName && (
+                                <Typography
+                                  sx={{ fontSize: "11px", color: "#9ca3af" }}
+                                >
+                                  N/A
+                                </Typography>
+                              )}
                             </Box>
-                          </Box>
-                        </TableCell>
+                          </TableCell>
 
-                        {hasAnyPermission([
-                          schoolAdminPermission.student.read,
-                          schoolAdminPermission.student.update,
-                          schoolAdminPermission.student.delete,
-                        ]) && (
-                            <TableCell
-                              component="td"
-                              className="table-td"
-                              align="center"
+                          {/* STATUS / LOGIN */}
+                          <TableCell component="td" className="table-td">
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 0.8,
+                              }}
                             >
+                              {hasPermission(
+                                schoolAdminPermission.student.update,
+                              ) ? (
+                                <Tooltip
+                                  title={
+                                    data?.isActive ? "Deactivate" : "Activate"
+                                  }
+                                  arrow
+                                >
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <IOSSwitch
+                                      checked={data?.isActive}
+                                      onChange={() => setOpenStatusChange(data)}
+                                      size="small"
+                                    />
+                                  </Box>
+                                </Tooltip>
+                              ) : (
+                                <Typography
+                                  sx={{
+                                    fontSize: "10px",
+                                    color: "#ff9800",
+                                    fontStyle: "italic",
+                                  }}
+                                >
+                                  Status locked
+                                </Typography>
+                              )}
+
                               <Box
-                                className="admin-table-data-btn-flex"
-                                sx={{ justifyContent: "center" }}
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
                               >
-                                {hasPermission(
-                                  schoolAdminPermission.student.read,
-                                ) && (
-                                    <Tooltip
-                                      title="View"
-                                      arrow
-                                      placement="bottom"
-                                    >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-view-btn"
-                                        onClick={() =>
-                                          navigate("/student/view", {
-                                            state: { id: data?._id },
-                                          })
-                                        }
-                                      >
-                                        <img
-                                          src={Svg.yellowEye}
-                                          className="admin-icon"
-                                          alt="View"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
-                                {hasPermission(
-                                  schoolAdminPermission.student.update,
-                                ) && (
-                                    <Tooltip
-                                      title="Edit"
-                                      arrow
-                                      placement="bottom"
-                                    >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-edit-btn"
-                                        onClick={() =>
-                                          navigate("/student/edit", {
-                                            state: { id: data?._id },
-                                          })
-                                        }
-                                      >
-                                        <img
-                                          src={Svg.editIcon}
-                                          className="admin-icon"
-                                          alt="Edit"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
-                                {hasPermission(
-                                  schoolAdminPermission.student.delete,
-                                ) && (
-                                    <Tooltip
-                                      title="Delete"
-                                      arrow
-                                      placement="bottom"
-                                    >
-                                      <Button
-                                        className="admin-table-data-btn admin-table-delete-btn"
-                                        onClick={() => handleOpenDelete(data)}
-                                      >
-                                        <img
-                                          src={Svg.trash}
-                                          className="admin-icon"
-                                          alt="Delete"
-                                        />
-                                      </Button>
-                                    </Tooltip>
-                                  )}
+                                <Chip
+                                  label={data?.isLogin ? "Online" : "Offline"}
+                                  size="small"
+                                  sx={{
+                                    backgroundColor: data?.isLogin
+                                      ? "#e8f5e9"
+                                      : "#f5f5f5",
+                                    color: data?.isLogin ? "#2e7d32" : "#9e9e9e",
+                                    fontWeight: 700,
+                                    fontSize: "9px",
+                                    height: "18px",
+                                  }}
+                                />
                               </Box>
-                            </TableCell>
-                          )}
-                      </TableRow>
-                    ))
+                            </Box>
+                          </TableCell>
+
+                          {hasAnyPermission([
+                            schoolAdminPermission.student.read,
+                            schoolAdminPermission.student.update,
+                            schoolAdminPermission.student.delete,
+                          ]) && (
+                              <TableCell
+                                component="td"
+                                className="table-td"
+                                align="center"
+                              >
+                                <Box
+                                  className="admin-table-data-btn-flex"
+                                  sx={{ justifyContent: "center" }}
+                                >
+                                  {hasPermission(
+                                    schoolAdminPermission.student.read,
+                                  ) && (
+                                      <Tooltip
+                                        title="View"
+                                        arrow
+                                        placement="bottom"
+                                      >
+                                        <Button
+                                          className="admin-table-data-btn admin-table-view-btn"
+                                          onClick={() =>
+                                            navigate("/student/view", {
+                                              state: { id: data?._id },
+                                            })
+                                          }
+                                        >
+                                          <img
+                                            src={Svg.yellowEye}
+                                            className="admin-icon"
+                                            alt="View"
+                                          />
+                                        </Button>
+                                      </Tooltip>
+                                    )}
+                                  {hasPermission(
+                                    schoolAdminPermission.student.update,
+                                  ) && (
+                                      <Tooltip
+                                        title="Edit"
+                                        arrow
+                                        placement="bottom"
+                                      >
+                                        <Button
+                                          className="admin-table-data-btn admin-table-edit-btn"
+                                          onClick={() =>
+                                            navigate("/student/edit", {
+                                              state: { id: data?._id },
+                                            })
+                                          }
+                                        >
+                                          <img
+                                            src={Svg.editIcon}
+                                            className="admin-icon"
+                                            alt="Edit"
+                                          />
+                                        </Button>
+                                      </Tooltip>
+                                    )}
+                                  {hasPermission(
+                                    schoolAdminPermission.student.delete,
+                                  ) && (
+                                      <Tooltip
+                                        title="Delete"
+                                        arrow
+                                        placement="bottom"
+                                      >
+                                        <Button
+                                          className="admin-table-data-btn admin-table-delete-btn"
+                                          onClick={() => handleOpenDelete(data)}
+                                        >
+                                          <img
+                                            src={Svg.trash}
+                                            className="admin-icon"
+                                            alt="Delete"
+                                          />
+                                        </Button>
+                                      </Tooltip>
+                                    )}
+                                </Box>
+                              </TableCell>
+                            )}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <DataNotFound text="No Students Found" colSpan={6} />
+                    )
                   ) : (
-                    <DataNotFound text="No Students Found" colSpan={6} />
-                  )
-                ) : (
-                  <Loader colSpan={6} />
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    <Loader colSpan={6} />
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+          <Box className="admin-pagination-main">
+            {total ? (
+              <Pagination
+                page={currentPage}
+                rowsPerPage={rowsPerPage}
+                setPage={setCurrentPage}
+                setRowsPerPage={setRowsPerPage}
+                count={total}
+              />
+            ) : null}
+          </Box>
         </Box>
-        <Box className="admin-pagination-main">
-          {total ? (
-            <Pagination
-              page={currentPage}
-              rowsPerPage={rowsPerPage}
-              setPage={setCurrentPage}
-              setRowsPerPage={setRowsPerPage}
-              count={total}
-            />
-          ) : null}
-        </Box>
-      </Box>
 
       )} {/* end tabValue === 0 */}
 

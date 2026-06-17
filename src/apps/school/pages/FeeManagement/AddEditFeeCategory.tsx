@@ -139,7 +139,6 @@ export default function AddEditFeeCategory() {
                 values,
                 errors,
                 touched,
-                handleChange,
                 handleBlur,
                 setFieldValue,
                 handleSubmit: formikSubmit,
@@ -173,7 +172,16 @@ export default function AddEditFeeCategory() {
                           variant="outlined"
                           sx={inputSx}
                           value={values.name}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            let val = e.target.value;
+                            if (val.startsWith(" ")) {
+                              val = val.trimStart();
+                            }
+                            val = val.replace(/  +/g, " ");
+                            if (val.length <= 100) {
+                              setFieldValue("name", val);
+                            }
+                          }}
                           onBlur={handleBlur}
                           error={touched.name && Boolean(errors.name)}
                           slotProps={{ htmlInput: { maxLength: 100 } }}
@@ -220,7 +228,16 @@ export default function AddEditFeeCategory() {
                             },
                           }}
                           value={values.description}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            let val = e.target.value;
+                            if (val.startsWith(" ")) {
+                              val = val.trimStart();
+                            }
+                            val = val.replace(/  +/g, " ");
+                            if (val.length <= 500) {
+                              setFieldValue("description", val);
+                            }
+                          }}
                           onBlur={handleBlur}
                           error={touched.description && Boolean(errors.description)}
                           slotProps={{ htmlInput: { maxLength: 500 } }}

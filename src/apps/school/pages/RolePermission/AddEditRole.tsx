@@ -163,11 +163,16 @@ export default function AddEditRole() {
 
     const relatedKeys = [
       ...new Set(
-        roleStaticData.flatMap((module: any) =>
-          module.subRole.some((sr: any) => sr.titleId === typeId)
-            ? [`${module.mainTitleId}_${typeId}`]
-            : [],
-        ),
+        roleStaticData.flatMap((module: any) => {
+          const matchedSubRole = module.subRole.find(
+            (sr: any) =>
+              sr.titleId === typeId ||
+              (typeId === "add" && sr.titleId === "collect"),
+          );
+          return matchedSubRole
+            ? [`${module.mainTitleId}_${matchedSubRole.titleId}`]
+            : [];
+        }),
       ),
     ];
 
@@ -175,12 +180,16 @@ export default function AddEditRole() {
       let newPermissions = [...permissions, ...relatedKeys];
       // If adding any action other than 'view', also add all corresponding 'view' permissions
       if (typeId !== "view") {
-        const correspondingViewKeys = roleStaticData.flatMap((module: any) =>
-          module.subRole.some((sr: any) => sr.titleId === typeId) &&
-          module.subRole.some((sr: any) => sr.titleId === "view")
+        const correspondingViewKeys = roleStaticData.flatMap((module: any) => {
+          const matchedSubRole = module.subRole.find(
+            (sr: any) =>
+              sr.titleId === typeId ||
+              (typeId === "add" && sr.titleId === "collect"),
+          );
+          return matchedSubRole && module.subRole.some((sr: any) => sr.titleId === "view")
             ? [`${module.mainTitleId}_view`]
-            : [],
-        );
+            : [];
+        });
         newPermissions = [...newPermissions, ...correspondingViewKeys];
       }
       setPermissions([...new Set(newPermissions)]);
@@ -204,11 +213,16 @@ export default function AddEditRole() {
   const isTypeAllChecked = (typeId: string) => {
     const allKeysForType = [
       ...new Set(
-        roleStaticData.flatMap((module: any) =>
-          module.subRole.some((sr: any) => sr.titleId === typeId)
-            ? [`${module.mainTitleId}_${typeId}`]
-            : [],
-        ),
+        roleStaticData.flatMap((module: any) => {
+          const matchedSubRole = module.subRole.find(
+            (sr: any) =>
+              sr.titleId === typeId ||
+              (typeId === "add" && sr.titleId === "collect"),
+          );
+          return matchedSubRole
+            ? [`${module.mainTitleId}_${matchedSubRole.titleId}`]
+            : [];
+        }),
       ),
     ];
     return (
@@ -623,9 +637,11 @@ export default function AddEditRole() {
                             {["view", "add", "edit", "delete", "status", "export"].map(
                               (typeId) => {
                                 const subRole = module.subRole.find(
-                                  (sr) => sr.titleId === typeId,
+                                  (sr) =>
+                                    sr.titleId === typeId ||
+                                    (typeId === "add" && sr.titleId === "collect"),
                                 );
-                                const key = `${module.mainTitleId}_${typeId}`;
+                                const key = `${module.mainTitleId}_${subRole?.titleId || typeId}`;
                                 return (
                                   <TableCell
                                     key={typeId}

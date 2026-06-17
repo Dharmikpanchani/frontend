@@ -11,6 +11,7 @@ import {
   Description as DocumentIcon,
 } from "@mui/icons-material";
 import Svg from "@/assets/Svg";
+import { config } from "@/utils/config";
 import EditProfile from "./EditProfile";
 import ChangePassword from "./ChangePassword";
 import SchoolDetails from "./SchoolDetails";
@@ -90,7 +91,7 @@ export default function AccountLayout() {
       label: "My Plan",
       icon: <AssignmentIcon />,
       component: <PlanView />,
-      show: adminDetails?.isSuperAdmin === true,
+      show: adminDetails?.type === config.super_school_admin,
     },
     {
       label: "My Documents",

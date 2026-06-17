@@ -47,7 +47,6 @@ import {
   PictureAsPdf as PdfIcon,
   InsertDriveFile as FileIcon,
   Download as DownloadIcon,
-  Html as HtmlIcon,
   Print as PrintIcon,
   FileDownload as ExcelIcon,
 } from "@mui/icons-material";
@@ -475,16 +474,15 @@ export default function Teacher() {
             format === "excel"
               ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               : format === "pdf"
-              ? "application/pdf"
-              : "text/html; charset=utf-8",
+                ? "application/pdf"
+                : "text/html; charset=utf-8",
         });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute(
           "download",
-          `Teachers_Report_${moment().format("YYYYMMDD_HHmmss")}.${
-            format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
+          `Teachers_Report_${moment().format("YYYYMMDD_HHmmss")}.${format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
           }`
         );
         document.body.appendChild(link);
@@ -518,8 +516,8 @@ export default function Teacher() {
       handleGetData();
       return { success: true, message: response.data.message };
     } catch (error: any) {
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: error.response?.data?.message || "Failed to import teachers",
         errors: error.response?.data?.errors
       };

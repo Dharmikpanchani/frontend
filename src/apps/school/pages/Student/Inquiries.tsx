@@ -29,13 +29,10 @@ import Loader from "@/apps/common/loader/Loader";
 import DataNotFound from "@/apps/school/component/schoolCommon/dataNotFound/DataNotFound";
 import toast from "react-hot-toast";
 import moment from "moment";
-import { usePermissions } from "@/hooks/usePermissions";
-import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import Filter from "@/apps/common/filter/Filter";
 import Pagination from "@/apps/common/pagination/Pagination";
 
 export default function Inquiries() {
-  const { hasPermission } = usePermissions();
 
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -138,16 +135,15 @@ export default function Inquiries() {
             format === "excel"
               ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               : format === "pdf"
-              ? "application/pdf"
-              : "text/html; charset=utf-8",
+                ? "application/pdf"
+                : "text/html; charset=utf-8",
         });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute(
           "download",
-          `Inquiries_Report_${moment().format("YYYYMMDD_HHmmss")}.${
-            format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
+          `Inquiries_Report_${moment().format("YYYYMMDD_HHmmss")}.${format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
           }`
         );
         document.body.appendChild(link);

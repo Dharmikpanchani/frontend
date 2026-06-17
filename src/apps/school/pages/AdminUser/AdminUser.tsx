@@ -39,6 +39,7 @@ import Filter from "@/apps/common/filter/Filter";
 import { IOSSwitch } from "../../component/schoolCommon/commonCssFunction/cssFunction";
 import { changeAdminUserStatus } from "@/redux/slices/adminUserSlice";
 import type { RootState } from "@/redux/Store";
+import { config } from "@/utils/config";
 
 export default function AdminUser() {
   const dispatch = useDispatch();
@@ -506,7 +507,7 @@ export default function AdminUser() {
                                         onChange={() =>
                                           handleStatusChange(data)
                                         }
-                                        disabled={data?.isSuperAdmin}
+                                        disabled={data?.type === config.super_school_admin}
                                       />
                                     </Box>
                                   </Tooltip>
@@ -587,7 +588,7 @@ export default function AdminUser() {
                                 {hasPermission(
                                   schoolAdminPermission.admin_user.delete,
                                 ) &&
-                                  !data?.isSuperAdmin && (
+                                  data?.type !== config.super_school_admin && (
                                     <Tooltip
                                       title="Delete"
                                       arrow

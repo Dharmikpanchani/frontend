@@ -129,7 +129,9 @@ export default function AddEditPlan() {
     setPermissionsError("");
 
     const isFreePlan = values.planName?.trim().toLowerCase() === "free";
-    const isSuperDeveloper = adminDetails?.type === "super_developer";
+    const isSuperDeveloper =
+      adminDetails?.type === "super_developer" ||
+      adminDetails?.type === "super_developer_admin";
 
     if (isFreePlan && !isSuperDeveloper) {
       toast.error("Only Super Developer can create or edit a Free plan.");
@@ -295,21 +297,40 @@ export default function AddEditPlan() {
                 typeId: string,
               ) => {
                 if (isView) return;
-                const relatedKeys = roleStaticData.flatMap((module: any) =>
-                  module.subRole.some((sr: any) => sr.titleId === typeId)
-                    ? [`${module.mainTitleId}_${typeId}`]
-                    : [],
-                );
+                const relatedKeys = roleStaticData.flatMap((module: any) => {
+                  let actualTypeId = typeId;
+                  if (module.mainTitleId === "attendance" && typeId === "add") {
+                    actualTypeId = "mark";
+                  }
+                  if (module.mainTitleId === "fee_collection" && typeId === "delete") {
+                    actualTypeId = "collect";
+                  }
+                  const matchedSubRole = module.subRole.find(
+                    (sr: any) => sr.titleId === actualTypeId || sr.titleId === typeId
+                  );
+                  return matchedSubRole
+                    ? [`${module.mainTitleId}_${matchedSubRole.titleId}`]
+                    : [];
+                });
 
                 if (action === "add") {
                   let newPermissions = [...permissions, ...relatedKeys];
                   if (typeId !== "view") {
-                    const views = roleStaticData.flatMap((m: any) =>
-                      m.subRole.some((sr: any) => sr.titleId === typeId) &&
-                      m.subRole.some((sr: any) => sr.titleId === "view")
+                    const views = roleStaticData.flatMap((m: any) => {
+                      let actualTypeId = typeId;
+                      if (m.mainTitleId === "attendance" && typeId === "add") {
+                        actualTypeId = "mark";
+                      }
+                      if (m.mainTitleId === "fee_collection" && typeId === "delete") {
+                        actualTypeId = "collect";
+                      }
+                      const hasType = m.subRole.some(
+                        (sr: any) => sr.titleId === actualTypeId || sr.titleId === typeId
+                      );
+                      return hasType && m.subRole.some((sr: any) => sr.titleId === "view")
                         ? [`${m.mainTitleId}_view`]
-                        : [],
-                    );
+                        : [];
+                    });
                     newPermissions = [...newPermissions, ...views];
                   }
                   setFieldValue("permissions", [...new Set(newPermissions)]);
@@ -332,11 +353,21 @@ export default function AddEditPlan() {
               };
 
               const isTypeAllChecked = (typeId: string) => {
-                const allKeys = roleStaticData.flatMap((m: any) =>
-                  m.subRole.some((sr: any) => sr.titleId === typeId)
-                    ? [`${m.mainTitleId}_${typeId}`]
-                    : [],
-                );
+                const allKeys = roleStaticData.flatMap((m: any) => {
+                  let actualTypeId = typeId;
+                  if (m.mainTitleId === "attendance" && typeId === "add") {
+                    actualTypeId = "mark";
+                  }
+                  if (m.mainTitleId === "fee_collection" && typeId === "delete") {
+                    actualTypeId = "collect";
+                  }
+                  const matchedSubRole = m.subRole.find(
+                    (sr: any) => sr.titleId === actualTypeId || sr.titleId === typeId
+                  );
+                  return matchedSubRole
+                    ? [`${m.mainTitleId}_${matchedSubRole.titleId}`]
+                    : [];
+                });
                 return (
                   allKeys.length > 0 &&
                   allKeys.every((k) => permissions.includes(k))
@@ -1073,7 +1104,7 @@ export default function AddEditPlan() {
                                   )
                                     actualTypeId = "mark";
                                   if (
-                                    module.mainTitleId === "fees" &&
+                                    module.mainTitleId === "fee_collection" &&
                                     typeId === "delete"
                                   )
                                     actualTypeId = "collect";
@@ -1083,7 +1114,7 @@ export default function AddEditPlan() {
                                       sr.titleId === actualTypeId ||
                                       sr.titleId === typeId,
                                   );
-                                  const key = `${module.mainTitleId}_${subRole?.titleId}`;
+                                  const key = `${module.mainTitleId}_${subRole?.titleId || typeId}`;
                                   return (
                                     <TableCell
                                       key={typeId}

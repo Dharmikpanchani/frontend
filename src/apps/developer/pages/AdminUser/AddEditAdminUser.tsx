@@ -66,7 +66,9 @@ export default function AddEditAdminUser() {
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
   );
-  const isSuperDeveloper = adminDetails?.type === "super_developer";
+  const isSuperDeveloper =
+    adminDetails?.type === "super_developer" ||
+    adminDetails?.type === "super_developer_admin";
 
   const [buttonSpinner, setButtonSpinner] = useState(false);
   // --- Associated Schools Server-side State ---
