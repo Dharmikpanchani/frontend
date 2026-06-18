@@ -8,13 +8,12 @@ import {
   Button,
   Breadcrumbs,
   Link,
-  FormControl,
-  Select,
-  MenuItem,
   IconButton,
   FormHelperText,
   Tooltip,
+  Autocomplete,
 } from "@mui/material";
+import Svg from "@/assets/Svg";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import {
@@ -99,10 +98,11 @@ export default function AddEditFeeStructure() {
   }, [id]);
 
   const initialValues = useMemo(() => ({
+    id: id || "",
     classId: formData.classId,
     feeCategoryId: formData.feeCategoryId,
     installments: formData.installments,
-  }), [formData]);
+  }), [formData, id]);
 
   const handleSubmit = async (values: any) => {
     setActionLoading(true);
@@ -110,8 +110,9 @@ export default function AddEditFeeStructure() {
       (sum: number, inst: any) => sum + Number(inst.amount || 0),
       0
     );
+    const { id: _, ...restValues } = values;
     const payload = {
-      ...values,
+      ...restValues,
       totalAmount,
     };
     try {
@@ -176,7 +177,6 @@ export default function AddEditFeeStructure() {
                   values,
                   errors,
                   touched,
-                  handleChange,
                   handleBlur,
                   setFieldValue,
                   handleSubmit: formikSubmit,
@@ -245,31 +245,55 @@ export default function AddEditFeeStructure() {
                               </Tooltip>
                             )}
                           </Box>
-                          <FormControl fullWidth error={touched.classId && Boolean(errors.classId)}>
-                            <Select
-                              displayEmpty
-                              name="classId"
-                              value={values.classId}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              disabled={isView}
+                        <Autocomplete
+                          options={allClasses || []}
+                          getOptionLabel={(option: any) => option.name || ""}
+                          value={
+                            allClasses?.find((cls: any) => cls._id === values.classId) || null
+                          }
+                          onChange={(_, newValue: any) => {
+                            setFieldValue("classId", newValue ? newValue._id : "");
+                          }}
+                          disabled={isView}
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Class"
+                              variant="outlined"
                               sx={inputSx}
-                            >
-                              <MenuItem value="" disabled>
-                                Select Class
-                              </MenuItem>
-                              {allClasses?.map((cls: any) => (
-                                <MenuItem key={cls._id} value={cls._id}>
-                                  {cls.name}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                            {touched.classId && errors.classId && (
-                              <FormHelperText className="error-text">
-                                {errors.classId as string}
-                              </FormHelperText>
-                            )}
-                          </FormControl>
+                              error={touched.classId && Boolean(errors.classId)}
+                            />
+                          )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.classId && errors.classId
+                            ? (errors.classId as string)
+                            : ""}
+                        </FormHelperText>
                         </Box>
 
                         <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
@@ -303,33 +327,55 @@ export default function AddEditFeeStructure() {
                               </Tooltip>
                             )}
                           </Box>
-                          <FormControl fullWidth error={touched.feeCategoryId && Boolean(errors.feeCategoryId)}>
-                            <Select
-                              displayEmpty
-                              name="feeCategoryId"
-                              value={values.feeCategoryId}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              disabled={isView}
+                        <Autocomplete
+                          options={categories?.filter((c: any) => c.isActive) || []}
+                          getOptionLabel={(option: any) => option.name || ""}
+                          value={
+                            categories?.find((cat: any) => cat._id === values.feeCategoryId) || null
+                          }
+                          onChange={(_, newValue: any) => {
+                            setFieldValue("feeCategoryId", newValue ? newValue._id : "");
+                          }}
+                          disabled={isView}
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Category"
+                              variant="outlined"
                               sx={inputSx}
-                            >
-                              <MenuItem value="" disabled>
-                                Select Category
-                              </MenuItem>
-                              {categories
-                                .filter((c: any) => c.isActive)
-                                .map((cat: any) => (
-                                  <MenuItem key={cat._id} value={cat._id}>
-                                    {cat.name}
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                            {touched.feeCategoryId && errors.feeCategoryId && (
-                              <FormHelperText className="error-text">
-                                {errors.feeCategoryId as string}
-                              </FormHelperText>
-                            )}
-                          </FormControl>
+                              error={touched.feeCategoryId && Boolean(errors.feeCategoryId)}
+                            />
+                          )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.feeCategoryId && errors.feeCategoryId
+                            ? (errors.feeCategoryId as string)
+                            : ""}
+                        </FormHelperText>
                         </Box>
                       </Box>
 
@@ -367,112 +413,119 @@ export default function AddEditFeeStructure() {
                         )}
                       </Box>
 
-                      {values.installments.map((inst: any, index: number) => (
-                        <Box
-                          key={index}
-                          sx={{
-                            display: "flex",
-                            gap: 2,
-                            alignItems: "flex-end",
-                            mb: 2,
-                            p: 2,
-                            backgroundColor: "#F9FAFB",
-                            borderRadius: "8px",
-                            border: "1px solid #eaecf0",
-                          }}
-                        >
-                          <Box sx={{ flex: 1 }}>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                mb: "6px",
-                                height: "32px",
-                              }}
-                            >
-                              <Typography sx={{ ...labelSx, fontSize: "12px", mb: 0 }}>
-                                Label
-                              </Typography>
-                            </Box>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              name={`installments[${index}].label`}
-                              value={inst.label}
-                              onChange={(e) => handleInstallmentChange(index, "label", e.target.value)}
-                              onBlur={handleBlur}
-                              disabled={isView}
-                              error={instTouched?.[index]?.label && Boolean(instErrors?.[index]?.label)}
-                              placeholder="e.g. Q1"
-                              sx={inputSx}
-                            />
-                            {instTouched?.[index]?.label && instErrors?.[index]?.label && (
+                      {values.installments.map((inst: any, index: number) => {
+                        const prevDate = index > 0 ? values.installments[index - 1].dueDate : null;
+                        const minDate = prevDate
+                          ? moment(prevDate).add(1, "days")
+                          : (!id ? moment() : undefined);
+
+                        return (
+                          <Box
+                            key={index}
+                            sx={{
+                              display: "flex",
+                              gap: 2,
+                              alignItems: "flex-start",
+                              mb: 2,
+                              p: 2,
+                              backgroundColor: "#F9FAFB",
+                              borderRadius: "8px",
+                              border: "1px solid #eaecf0",
+                            }}
+                          >
+                            <Box sx={{ flex: 1 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  mb: "6px",
+                                  height: "32px",
+                                }}
+                              >
+                                <Typography sx={{ ...labelSx, fontSize: "12px", mb: 0 }}>
+                                  Label
+                                </Typography>
+                              </Box>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                name={`installments[${index}].label`}
+                                value={inst.label}
+                                onChange={(e) => handleInstallmentChange(index, "label", e.target.value)}
+                                onBlur={handleBlur}
+                                disabled={isView}
+                                error={instTouched?.[index]?.label && Boolean(instErrors?.[index]?.label)}
+                                placeholder="e.g. Q1"
+                                sx={inputSx}
+                              />
                               <FormHelperText className="error-text">
-                                {instErrors[index].label}
+                                {instTouched?.[index]?.label && instErrors?.[index]?.label
+                                  ? instErrors[index].label
+                                  : ""}
                               </FormHelperText>
-                            )}
-                          </Box>
-                          <Box sx={{ flex: 1 }}>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                mb: "6px",
-                                height: "32px",
-                              }}
-                            >
-                              <Typography sx={{ ...labelSx, fontSize: "12px", mb: 0 }}>
-                                Amount (₹)
-                              </Typography>
                             </Box>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              type="number"
-                              name={`installments[${index}].amount`}
-                              value={inst.amount === 0 ? "" : inst.amount}
-                              onChange={(e) =>
-                                handleInstallmentChange(
-                                  index,
-                                  "amount",
-                                  e.target.value === "" ? "" : Number(e.target.value)
-                                )
-                              }
-                              onBlur={handleBlur}
-                              disabled={isView}
-                              error={instTouched?.[index]?.amount && Boolean(instErrors?.[index]?.amount)}
-                              sx={inputSx}
-                            />
-                            {instTouched?.[index]?.amount && instErrors?.[index]?.amount && (
+                            <Box sx={{ flex: 1 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  mb: "6px",
+                                  height: "32px",
+                                }}
+                              >
+                                <Typography sx={{ ...labelSx, fontSize: "12px", mb: 0 }}>
+                                  Amount (₹)
+                                </Typography>
+                              </Box>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                type="number"
+                                name={`installments[${index}].amount`}
+                                value={inst.amount === 0 ? "" : inst.amount}
+                                onChange={(e) =>
+                                  handleInstallmentChange(
+                                    index,
+                                    "amount",
+                                    e.target.value === "" ? "" : Number(e.target.value)
+                                  )
+                                }
+                                onBlur={handleBlur}
+                                disabled={isView}
+                                error={instTouched?.[index]?.amount && Boolean(instErrors?.[index]?.amount)}
+                                sx={inputSx}
+                              />
                               <FormHelperText className="error-text">
-                                {instErrors[index].amount}
+                                {instTouched?.[index]?.amount && instErrors?.[index]?.amount
+                                  ? instErrors[index].amount
+                                  : ""}
                               </FormHelperText>
-                            )}
-                          </Box>
-                          <Box sx={{ flex: 1 }}>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                mb: "6px",
-                                height: "32px",
-                              }}
-                            >
-                              <Typography sx={{ ...labelSx, fontSize: "12px", mb: 0 }}>
-                                Due Date
-                              </Typography>
                             </Box>
-                            <DatePicker
-                              format="DD/MM/YYYY"
-                              value={inst.dueDate ? moment(inst.dueDate) : null}
-                              open={!isView && !!openDates[index]}
-                              onOpen={() => !isView && setOpenDates((prev) => ({ ...prev, [index]: true }))}
-                              onClose={() => !isView && setOpenDates((prev) => ({ ...prev, [index]: false }))}
-                              onChange={(v) => {
-                                const dateStr = v ? moment(v).format("YYYY-MM-DD") : "";
-                                handleInstallmentChange(index, "dueDate", dateStr);
-                              }}
-                              disabled={isView}
+                            <Box sx={{ flex: 1 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  mb: "6px",
+                                  height: "32px",
+                                }}
+                              >
+                                <Typography sx={{ ...labelSx, fontSize: "12px", mb: 0 }}>
+                                  Due Date
+                                </Typography>
+                              </Box>
+                              <DatePicker
+                                minDate={minDate}
+                                format="DD/MM/YYYY"
+                                value={inst.dueDate ? moment(inst.dueDate) : null}
+                                open={!isView && !!openDates[index]}
+                                onOpen={() => !isView && setOpenDates((prev) => ({ ...prev, [index]: true }))}
+                                onClose={() => !isView && setOpenDates((prev) => ({ ...prev, [index]: false }))}
+                                onChange={(v) => {
+                                  const dateStr = v ? moment(v).format("YYYY-MM-DD") : "";
+                                  handleInstallmentChange(index, "dueDate", dateStr);
+                                }}
+                                disabled={isView}
                               slotProps={{
                                 textField: {
                                   fullWidth: true,
@@ -534,22 +587,36 @@ export default function AddEditFeeStructure() {
                                 },
                               }}
                             />
-                            {instTouched?.[index]?.dueDate && instErrors?.[index]?.dueDate && (
-                              <FormHelperText className="error-text">
-                                {instErrors[index].dueDate}
-                              </FormHelperText>
-                            )}
+                            <FormHelperText className="error-text">
+                              {instTouched?.[index]?.dueDate && instErrors?.[index]?.dueDate
+                                ? instErrors[index].dueDate
+                                : ""}
+                            </FormHelperText>
                           </Box>
                           {values.installments.length > 1 && !isView && (
-                            <IconButton
-                              onClick={() => handleRemoveInstallment(index)}
-                              sx={{ color: "#D92D20", mb: 0.5 }}
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                              }}
                             >
-                              <RemoveIcon />
-                            </IconButton>
+                              <Box sx={{ height: "32px", mb: "6px" }} />
+                              <IconButton
+                                onClick={() => handleRemoveInstallment(index)}
+                                sx={{
+                                  color: "#D92D20",
+                                  p: "8px",
+                                }}
+                              >
+                                <RemoveIcon />
+                              </IconButton>
+                              <Box sx={{ height: "19px" }} />
+                            </Box>
                           )}
                         </Box>
-                      ))}
+                      );
+                    })}
 
                       <Box
                         sx={{

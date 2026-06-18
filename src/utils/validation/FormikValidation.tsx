@@ -343,9 +343,14 @@ export const panValidation = (required = false) => {
         typeof context.originalValue !== "string" ||
         context.originalValue.trim() === context.originalValue,
     )
-    .transform((value) => value?.toUpperCase().trim())
-    .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Please enter a valid PAN number");
-  return required ? schema.required("PAN number is required") : schema;
+    .transform((value) => {
+      if (!value) return undefined;
+      const clean = value.toUpperCase().trim();
+      return clean === "" ? undefined : clean;
+    });
+
+  schema = schema.matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Please enter a valid PAN number");
+  return required ? schema.required("PAN number is required") : schema.optional();
 };
 
 export const registrationNumberValidation = (required = true) => {
@@ -432,6 +437,94 @@ export const fileValidation = (
     );
 
   return required ? schema.required(`${fieldName} is required`) : schema;
+};
+
+export const bankNameValidation = (required = true) => {
+  let schema = Yup.string()
+    .test(
+      "no-whitespace",
+      "Please enter a valid bank name",
+      (_value, context) =>
+        typeof context.originalValue !== "string" ||
+        context.originalValue.trim() === context.originalValue,
+    )
+    .transform((value) => value?.trim())
+    .matches(englishOnlyRegex, "Bank name must contain letters only")
+    .min(2, "Bank name must be at least 2 characters")
+    .max(100, "Bank name must be at most 100 characters");
+
+  return required ? schema.required("Bank name is required") : schema;
+};
+
+export const accountHolderNameValidation = (required = true, max = 100) => {
+  let schema = Yup.string()
+    .test(
+      "no-whitespace",
+      "Please enter a valid account holder name",
+      (_value, context) =>
+        typeof context.originalValue !== "string" ||
+        context.originalValue.trim() === context.originalValue,
+    )
+    .transform((value) => value?.trim())
+    .matches(englishOnlyRegex, "Account holder name must contain letters only")
+    .min(2, "Account holder name must be at least 2 characters")
+    .max(max, `Account holder name must be at most ${max} characters`);
+
+  return required ? schema.required("Account holder name is required") : schema;
+};
+
+export const accountNumberValidation = (required = true) => {
+  let schema = Yup.string()
+    .test(
+      "no-whitespace",
+      "Please enter a valid account number",
+      (_value, context) =>
+        typeof context.originalValue !== "string" ||
+        context.originalValue.trim() === context.originalValue,
+    )
+    .transform((value) => {
+      if (!value) return undefined;
+      const clean = value.trim();
+      return clean === "" ? undefined : clean;
+    })
+    .matches(/^\d{9,18}$/, "Account number must be between 9 and 18 digits");
+
+  return required ? schema.required("Account number is required") : schema;
+};
+
+export const ifscValidation = (required = true) => {
+  let schema = Yup.string()
+    .test(
+      "no-whitespace",
+      "Please enter a valid IFSC code",
+      (_value, context) =>
+        typeof context.originalValue !== "string" ||
+        context.originalValue.trim() === context.originalValue,
+    )
+    .transform((value) => {
+      if (!value) return undefined;
+      const clean = value.toUpperCase().trim();
+      return clean === "" ? undefined : clean;
+    })
+    .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format (e.g. SBIN0001234)");
+
+  return required ? schema.required("IFSC code is required") : schema;
+};
+
+export const branchValidation = (required = true, max = 100) => {
+  let schema = Yup.string()
+    .test(
+      "no-whitespace",
+      "Please enter a valid branch name",
+      (_value, context) =>
+        typeof context.originalValue !== "string" ||
+        context.originalValue.trim() === context.originalValue,
+    )
+    .transform((value) => value?.trim())
+    .min(2, "Branch name must be at least 2 characters")
+    .max(max, `Branch name must be at most ${max} characters`);
+
+  return required ? schema.required("Branch is required") : schema;
 };
 /*#endregion */
 
@@ -871,44 +964,81 @@ export const teacherValidationSchema = Yup.object().shape(
       .positive("Salary must be positive")
       .required("Salary amount is required"),
     salaryType: Yup.string().required("Salary type is required"),
-    bankName: Yup.string()
-      .test(
-        "no-whitespace",
-        "Please enter a valid bank name",
-        (_value, context) =>
-          typeof context.originalValue !== "string" ||
-          context.originalValue.trim() === context.originalValue,
-      )
-      .transform((value) => value?.trim())
-      .matches(englishOnlyRegex, "Bank name must contain letters only")
-      .optional(),
-    accountNumber: Yup.string()
-      .matches(/^\d+$/, "Account number must be numeric")
-      .min(10, "Account number is too short")
-      .max(18, "Account number is too long")
-      .optional(),
-    accountHolderName: Yup.string().max(50, "Account holder name must be at most 50 characters").optional(),
-    branchName: Yup.string().max(50, "Branch name must be at most 50 characters").optional(),
+    bankName: bankNameValidation(false)
+      .test("bankName-required", "Bank name is required when bank details are provided", function (value) {
+        const { accountNumber, ifscCode, accountHolderName, branchName } = this.parent || {};
+        const hasAny = accountNumber || ifscCode || accountHolderName || branchName;
+        if (hasAny && !value) {
+          return false;
+        }
+        return true;
+      }),
+    accountNumber: accountNumberValidation(false)
+      .test("accountNumber-required", "Account number is required when bank details are provided", function (value) {
+        const { bankName, ifscCode, accountHolderName, branchName } = this.parent || {};
+        const hasAny = bankName || ifscCode || accountHolderName || branchName;
+        if (hasAny && !value) {
+          return false;
+        }
+        return true;
+      }),
+    accountHolderName: accountHolderNameValidation(false, 50)
+      .test("accountHolderName-required", "Account holder name is required when bank details are provided", function (value) {
+        const { bankName, accountNumber, ifscCode, branchName } = this.parent || {};
+        const hasAny = bankName || accountNumber || ifscCode || branchName;
+        if (hasAny && !value) {
+          return false;
+        }
+        return true;
+      }),
+    branchName: branchValidation(false, 50)
+      .test("branchName-required", "Branch name is required when bank details are provided", function (value) {
+        const { bankName, accountNumber, ifscCode, accountHolderName } = this.parent || {};
+        const hasAny = bankName || accountNumber || ifscCode || accountHolderName;
+        if (hasAny && !value) {
+          return false;
+        }
+        return true;
+      }),
     confirmAccountNumber: Yup.string()
       .oneOf([Yup.ref("accountNumber")], "Account numbers must match")
-      .when("accountNumber", {
-        is: (val: string) => val && val.length > 0,
-        then: (schema) => schema.required("Please confirm your account number"),
-        otherwise: (schema) => schema.optional(),
-      }),
-    ifscCode: Yup.string()
-      .matches(ifscRegex, "Invalid IFSC code format (e.g. SBIN0012345)")
+      .test("confirmAccountNumber-required", "Please confirm your account number", function (value) {
+        const { accountNumber } = this.parent || {};
+        if (accountNumber && !value) {
+          return false;
+        }
+        return true;
+      })
       .optional(),
+    ifscCode: ifscValidation(false)
+      .test("ifscCode-required", "IFSC code is required when bank details are provided", function (value) {
+        const { bankName, accountNumber, accountHolderName, branchName } = this.parent || {};
+        const hasAny = bankName || accountNumber || accountHolderName || branchName;
+        if (hasAny && !value) {
+          return false;
+        }
+        return true;
+      }),
 
     panNumber: panValidation(false),
     aadharNumber: Yup.string()
+      .transform((value) => (value === "" ? undefined : value))
       .matches(/^\d+$/, "Aadhar number must be numeric")
-      .min(12, "Aadhar number must be at least 12 digits")
-      .max(12, "Aadhar number must be at most 12 digits")
+      .min(12, "Aadhar number must be exactly 12 digits")
+      .max(12, "Aadhar number must be exactly 12 digits")
       .optional(),
-    pfNumber: Yup.string().max(22, "PF number must be at most 22 characters").optional(),
-    uanNumber: Yup.string().matches(/^\d{12}$/, "UAN number must be exactly 12 digits").optional(),
-    esicNumber: Yup.string().matches(/^\d{17}$/, "ESIC number must be exactly 17 digits").optional(),
+    pfNumber: Yup.string()
+      .transform((value) => (value === "" ? undefined : value))
+      .max(22, "PF number must be at most 22 characters")
+      .optional(),
+    uanNumber: Yup.string()
+      .transform((value) => (value === "" ? undefined : value))
+      .matches(/^\d{12}$/, "UAN number must be exactly 12 digits")
+      .optional(),
+    esicNumber: Yup.string()
+      .transform((value) => (value === "" ? undefined : value))
+      .matches(/^\d{17}$/, "ESIC number must be exactly 17 digits")
+      .optional(),
 
     // Auth
     id: Yup.string().optional(),
@@ -1084,6 +1214,7 @@ export const feeCategoryValidationSchema = Yup.object().shape({
 });
 
 export const feeStructureValidationSchema = Yup.object().shape({
+  id: Yup.string().optional(),
   classId: Yup.string().required("Class is required"),
   feeCategoryId: Yup.string().required("Fee Category is required"),
   installments: Yup.array()
@@ -1100,9 +1231,107 @@ export const feeStructureValidationSchema = Yup.object().shape({
           .test("is-valid-date", "Please select a valid due date", (value) => {
             if (!value) return false;
             return moment(value).isValid();
+          })
+          .test("future-date", "Due date must be today or in the future", function (value) {
+            if (!value) return false;
+            const contextValues = this.options.context || (this.from && this.from[2]?.value);
+            if (contextValues && contextValues.id) {
+              return true;
+            }
+            return moment(value).isSameOrAfter(moment(), "day");
+          })
+          .test("chronological-order", "Due date must be after the previous installment's due date", function (value) {
+            if (!value) return false;
+            const rootValues = this.from && this.from[1]?.value;
+            const installments = rootValues?.installments || [];
+            const currentIndex = installments.indexOf(this.parent);
+            if (currentIndex > 0) {
+              const prevDueDate = installments[currentIndex - 1]?.dueDate;
+              if (prevDueDate) {
+                return moment(value).isAfter(moment(prevDueDate), "day");
+              }
+            }
+            return true;
           }),
       })
     )
     .min(1, "At least one installment is required"),
+});
+
+export const settingsValidationSchema = Yup.object().shape({
+  admission: Yup.object().shape({
+    enableOnlineAdmission: Yup.boolean(),
+  }),
+  fee: Yup.object().shape({
+    enableLateFine: Yup.boolean(),
+    fineAmountPerDay: Yup.number()
+      .typeError("Must be a number")
+      .min(0, "Cannot be negative")
+      .when("enableLateFine", {
+        is: true,
+        then: (schema) => schema.required("Fine amount is required"),
+        otherwise: (schema) => schema.optional(),
+      }),
+    gracePeriodDays: Yup.number()
+      .typeError("Must be a number")
+      .min(0, "Cannot be negative")
+      .when("enableLateFine", {
+        is: true,
+        then: (schema) => schema.required("Grace period is required"),
+        otherwise: (schema) => schema.optional(),
+      }),
+  }),
+  export: Yup.object().shape({
+    pdfFooterText: Yup.string().max(200, "Footer text too long").optional(),
+    pdfWatermark: Yup.string().max(50, "Watermark too long").optional(),
+  }),
+  paymentConfiguration: Yup.object().shape({
+    paymentMethods: Yup.object().shape({
+      cash: Yup.boolean(),
+      cheque: Yup.boolean(),
+      upi: Yup.boolean(),
+      bankTransfer: Yup.boolean(),
+      onlineGateway: Yup.boolean(),
+    }),
+    bankAccounts: Yup.array().when("paymentMethods", {
+      is: (paymentMethods: any) => paymentMethods?.bankTransfer,
+      then: (schema) =>
+        schema.of(
+          Yup.object().shape({
+            bankName: bankNameValidation(true),
+            accountHolderName: accountHolderNameValidation(true),
+            accountNumber: accountNumberValidation(true)
+              .test("unique-account-number", "Duplicate bank account number is not allowed", function (value) {
+                if (!value) return true;
+                const parentList = this.from?.[1]?.value?.bankAccounts;
+                if (!parentList) return true;
+                const count = parentList.filter((item: any) => item?.accountNumber?.trim() === value.trim()).length;
+                return count <= 1;
+              }),
+            ifsc: ifscValidation(true),
+            branch: branchValidation(true),
+          })
+        ),
+      otherwise: (schema) => schema.optional(),
+    }),
+    upiAccounts: Yup.array().when("paymentMethods", {
+      is: (paymentMethods: any) => paymentMethods?.upi,
+      then: (schema) =>
+        schema.of(
+          Yup.object().shape({
+            upiId: upiIdValidation(true)
+              .test("unique-upi-id", "Duplicate UPI ID is not allowed", function (value) {
+                if (!value) return true;
+                const parentList = this.from?.[1]?.value?.upiAccounts;
+                if (!parentList) return true;
+                const count = parentList.filter((item: any) => item?.upiId?.trim() === value.trim()).length;
+                return count <= 1;
+              }),
+            accountHolder: accountHolderNameValidation(true),
+          })
+        ),
+      otherwise: (schema) => schema.optional(),
+    }),
+  }),
 });
 

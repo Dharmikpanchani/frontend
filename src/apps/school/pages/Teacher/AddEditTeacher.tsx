@@ -35,11 +35,13 @@ import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
 import { teacherValidationSchema } from "@/utils/validation/FormikValidation";
 import { addEditTeacher, getTeacherById } from "@/redux/slices/teacherSlice";
+import { getProfileAdmin } from "@/redux/slices/authSlice";
 import { getDepartments } from "@/redux/slices/departmentSlice";
 import { getSubjects } from "@/redux/slices/subjectSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import { getSections } from "@/redux/slices/sectionSlice";
 import { getAllRolesSimple } from "@/redux/slices/roleSlice";
+import Svg from "@/assets/Svg";
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
@@ -78,7 +80,7 @@ const socialCategoryOptions = [
   { label: "Other", value: "Other" },
 ];
 
-const FormikSyncAddress = ({ values, setFieldValue, sameAsCurrentAddress }: any) => {
+const FormikSyncAddress = ({ values, setFieldValue, sameAsCurrentAddress, sameAsSchoolAddress, schoolData }: any) => {
   useEffect(() => {
     if (sameAsCurrentAddress) {
       setFieldValue("permanentAddress", values.address || "");
@@ -96,6 +98,21 @@ const FormikSyncAddress = ({ values, setFieldValue, sameAsCurrentAddress }: any)
     values.pincode,
     setFieldValue
   ]);
+
+  useEffect(() => {
+    if (sameAsSchoolAddress && schoolData) {
+      setFieldValue("permanentAddress", schoolData.address || "");
+      setFieldValue("permanentCity", schoolData.city || "");
+      setFieldValue("permanentState", schoolData.state || "");
+      setFieldValue("permanentCountry", schoolData.country || "");
+      setFieldValue("permanentPincode", schoolData.zipCode || schoolData.pincode || "");
+    }
+  }, [
+    sameAsSchoolAddress,
+    schoolData,
+    setFieldValue
+  ]);
+
   return null;
 };
 
@@ -153,8 +170,13 @@ export default function AddEditTeacher() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const { adminDetails } = useSelector(
+    (state: RootState) => state.AdminReducer,
+  );
+
   const [teacherData, setTeacherData] = useState<any>(null);
   const [sameAsCurrentAddress, setSameAsCurrentAddress] = useState(false);
+  const [sameAsSchoolAddress, setSameAsSchoolAddress] = useState(false);
 
   useEffect(() => {
     if (teacherData) {
@@ -171,6 +193,22 @@ export default function AddEditTeacher() {
     }
   }, [teacherData]);
 
+  useEffect(() => {
+    if (teacherData && adminDetails?.schoolData) {
+      const schoolData = adminDetails.schoolData;
+      if (
+        teacherData.permanentAddress &&
+        teacherData.permanentAddress === schoolData.address &&
+        teacherData.permanentCity === schoolData.city &&
+        teacherData.permanentState === schoolData.state &&
+        teacherData.permanentCountry === schoolData.country &&
+        teacherData.permanentPincode === (schoolData.zipCode || schoolData.pincode)
+      ) {
+        setSameAsSchoolAddress(true);
+      }
+    }
+  }, [teacherData, adminDetails?.schoolData]);
+
   const fetchTeacherDetails = async () => {
     const result = await dispatch(getTeacherById(id as string) as any);
     if (getTeacherById.fulfilled.match(result)) {
@@ -186,10 +224,14 @@ export default function AddEditTeacher() {
     dispatch(getSections(params) as any);
     dispatch(getAllRolesSimple("filter") as any);
 
+    if (!adminDetails || !adminDetails.schoolData) {
+      dispatch(getProfileAdmin() as any);
+    }
+
     if (id) {
       fetchTeacherDetails();
     }
-  }, [id]);
+  }, [id, dispatch, adminDetails]);
 
   const initialValues = useMemo(
     () => ({
@@ -567,7 +609,13 @@ export default function AddEditTeacher() {
                   onSubmit={handleSubmit}
                   style={{ pointerEvents: isView ? "none" : "auto" }}
                 >
-                  <FormikSyncAddress values={values} setFieldValue={setFieldValue} sameAsCurrentAddress={sameAsCurrentAddress} />
+                  <FormikSyncAddress
+                    values={values}
+                    setFieldValue={setFieldValue}
+                    sameAsCurrentAddress={sameAsCurrentAddress}
+                    sameAsSchoolAddress={sameAsSchoolAddress}
+                    schoolData={adminDetails?.schoolData}
+                  />
                   <Box sx={{ maxWidth: 1100 }}>
                     {/* 1. Basic Information */}
                     <SectionTitle
@@ -807,6 +855,14 @@ export default function AddEditTeacher() {
                           onChange={(_, v) =>
                             setFieldValue("gender", v?.value || "")
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -815,6 +871,22 @@ export default function AddEditTeacher() {
                               sx={inputSx}
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                       </Box>
 
@@ -831,6 +903,14 @@ export default function AddEditTeacher() {
                           onChange={(_, v) =>
                             setFieldValue("bloodGroup", v?.value || "")
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -839,6 +919,22 @@ export default function AddEditTeacher() {
                               sx={inputSx}
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                       </Box>
 
@@ -1010,6 +1106,14 @@ export default function AddEditTeacher() {
                           onChange={(_, v) =>
                             setFieldValue("maritalStatus", v?.value || "")
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -1019,6 +1123,22 @@ export default function AddEditTeacher() {
                               error={touched.maritalStatus && Boolean(errors.maritalStatus)}
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                         {touched.maritalStatus && errors.maritalStatus && (
                           <FormHelperText className="error-text">
@@ -1043,6 +1163,14 @@ export default function AddEditTeacher() {
                           onChange={(_, v) =>
                             setFieldValue("socialCategory", v?.value || "")
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -1052,6 +1180,22 @@ export default function AddEditTeacher() {
                               error={touched.socialCategory && Boolean(errors.socialCategory)}
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                         {touched.socialCategory && errors.socialCategory && (
                           <FormHelperText className="error-text">
@@ -1262,6 +1406,14 @@ export default function AddEditTeacher() {
                             );
                           }}
                           disabled={isView}
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(params) => (
                             <TextField
                               {...params}
@@ -1271,6 +1423,22 @@ export default function AddEditTeacher() {
                               error={touched.roles && Boolean(errors.roles)}
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                         <FormHelperText className="error-text">
                           {touched.roles && errors.roles
@@ -1344,36 +1512,74 @@ export default function AddEditTeacher() {
                       </Box>
 
                       {/* Checkbox for same address */}
-                      <Box gridColumn="span 12" sx={{ mt: 2, display: "flex", alignItems: "center", gap: 1 }}>
-                        <input
-                          type="checkbox"
-                          id="sameAsCurrentAddressCheckbox"
-                          checked={sameAsCurrentAddress}
-                          onChange={(e) => {
-                            const checked = e.target.checked;
-                            setSameAsCurrentAddress(checked);
-                            if (checked) {
-                              setFieldValue("permanentAddress", values.address);
-                              setFieldValue("permanentCity", values.city);
-                              setFieldValue("permanentState", values.state);
-                              setFieldValue("permanentCountry", values.country);
-                              setFieldValue("permanentPincode", values.pincode);
-                            }
-                          }}
-                          disabled={isView}
-                          style={{ width: "16px", height: "16px", cursor: isView ? "default" : "pointer" }}
-                        />
-                        <label
-                          htmlFor="sameAsCurrentAddressCheckbox"
-                          style={{
-                            fontSize: "14px",
-                            fontWeight: 500,
-                            color: "#475467",
-                            cursor: isView ? "default" : "pointer"
-                          }}
-                        >
-                          Permanent address same as current address
-                        </label>
+                      <Box gridColumn="span 12" sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 3 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <input
+                            type="checkbox"
+                            id="sameAsCurrentAddressCheckbox"
+                            checked={sameAsCurrentAddress}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setSameAsCurrentAddress(checked);
+                              if (checked) {
+                                setSameAsSchoolAddress(false);
+                                setFieldValue("permanentAddress", values.address);
+                                setFieldValue("permanentCity", values.city);
+                                setFieldValue("permanentState", values.state);
+                                setFieldValue("permanentCountry", values.country);
+                                setFieldValue("permanentPincode", values.pincode);
+                              }
+                            }}
+                            disabled={isView}
+                            style={{ width: "16px", height: "16px", cursor: isView ? "default" : "pointer" }}
+                          />
+                          <label
+                            htmlFor="sameAsCurrentAddressCheckbox"
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: 500,
+                              color: "#475467",
+                              cursor: isView ? "default" : "pointer"
+                            }}
+                          >
+                            Permanent address same as current address
+                          </label>
+                        </Box>
+
+                        {adminDetails?.schoolData && (
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <input
+                              type="checkbox"
+                              id="sameAsSchoolAddressCheckbox"
+                              checked={sameAsSchoolAddress}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setSameAsSchoolAddress(checked);
+                                if (checked) {
+                                  setSameAsCurrentAddress(false);
+                                  setFieldValue("permanentAddress", adminDetails.schoolData.address || "");
+                                  setFieldValue("permanentCity", adminDetails.schoolData.city || "");
+                                  setFieldValue("permanentState", adminDetails.schoolData.state || "");
+                                  setFieldValue("permanentCountry", adminDetails.schoolData.country || "");
+                                  setFieldValue("permanentPincode", adminDetails.schoolData.zipCode || adminDetails.schoolData.pincode || "");
+                                }
+                              }}
+                              disabled={isView}
+                              style={{ width: "16px", height: "16px", cursor: isView ? "default" : "pointer" }}
+                            />
+                            <label
+                              htmlFor="sameAsSchoolAddressCheckbox"
+                              style={{
+                                fontSize: "14px",
+                                fontWeight: 500,
+                                color: "#475467",
+                                cursor: isView ? "default" : "pointer"
+                              }}
+                            >
+                              Permanent address same as school address
+                            </label>
+                          </Box>
+                        )}
                       </Box>
 
                       {/* Permanent Address fields */}
@@ -1388,7 +1594,7 @@ export default function AddEditTeacher() {
                           setFieldValue={setFieldValue}
                           touched={touched}
                           errors={errors}
-                          disabled={isView || sameAsCurrentAddress}
+                          disabled={isView || sameAsCurrentAddress || sameAsSchoolAddress}
                         />
                       </Box>
                       <Box gridColumn={{ xs: "span 12", sm: "span 3" }}>
@@ -1399,10 +1605,10 @@ export default function AddEditTeacher() {
                           placeholder="City"
                           variant="outlined"
                           sx={inputSx}
-                          value={sameAsCurrentAddress ? values.city : values.permanentCity}
+                          value={sameAsCurrentAddress ? values.city : sameAsSchoolAddress ? (adminDetails?.schoolData?.city || "") : values.permanentCity}
                           onChange={handleChange}
                           error={touched.permanentCity && Boolean(errors.permanentCity)}
-                          disabled={isView || sameAsCurrentAddress}
+                          disabled={isView || sameAsCurrentAddress || sameAsSchoolAddress}
                           slotProps={{ htmlInput: { maxLength: 50 } }}
                         />
                         {touched.permanentCity && errors.permanentCity && (
@@ -1419,10 +1625,10 @@ export default function AddEditTeacher() {
                           placeholder="State"
                           variant="outlined"
                           sx={inputSx}
-                          value={sameAsCurrentAddress ? values.state : values.permanentState}
+                          value={sameAsCurrentAddress ? values.state : sameAsSchoolAddress ? (adminDetails?.schoolData?.state || "") : values.permanentState}
                           onChange={handleChange}
                           error={touched.permanentState && Boolean(errors.permanentState)}
-                          disabled={isView || sameAsCurrentAddress}
+                          disabled={isView || sameAsCurrentAddress || sameAsSchoolAddress}
                           slotProps={{ htmlInput: { maxLength: 50 } }}
                         />
                         {touched.permanentState && errors.permanentState && (
@@ -1439,10 +1645,10 @@ export default function AddEditTeacher() {
                           placeholder="Pincode"
                           variant="outlined"
                           sx={inputSx}
-                          value={sameAsCurrentAddress ? values.pincode : values.permanentPincode}
+                          value={sameAsCurrentAddress ? values.pincode : sameAsSchoolAddress ? (adminDetails?.schoolData?.zipCode || adminDetails?.schoolData?.pincode || "") : values.permanentPincode}
                           onChange={handleChange}
                           error={touched.permanentPincode && Boolean(errors.permanentPincode)}
-                          disabled={isView || sameAsCurrentAddress}
+                          disabled={isView || sameAsCurrentAddress || sameAsSchoolAddress}
                           slotProps={{ htmlInput: { maxLength: 6 } }}
                         />
                         {touched.permanentPincode && errors.permanentPincode && (
@@ -1459,10 +1665,10 @@ export default function AddEditTeacher() {
                           placeholder="Country"
                           variant="outlined"
                           sx={inputSx}
-                          value={sameAsCurrentAddress ? values.country : values.permanentCountry}
+                          value={sameAsCurrentAddress ? values.country : sameAsSchoolAddress ? (adminDetails?.schoolData?.country || "") : values.permanentCountry}
                           onChange={handleChange}
                           error={touched.permanentCountry && Boolean(errors.permanentCountry)}
-                          disabled={isView || sameAsCurrentAddress}
+                          disabled={isView || sameAsCurrentAddress || sameAsSchoolAddress}
                           slotProps={{ htmlInput: { maxLength: 50 } }}
                         />
                         {touched.permanentCountry && errors.permanentCountry && (
@@ -1796,6 +2002,14 @@ export default function AddEditTeacher() {
                           onChange={(_, v) =>
                             setFieldValue("departmentId", v?._id || "")
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -1808,6 +2022,22 @@ export default function AddEditTeacher() {
                               }
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                         {touched.departmentId && errors.departmentId && (
                           <FormHelperText className="error-text">
@@ -1861,6 +2091,14 @@ export default function AddEditTeacher() {
                               v.map((item: any) => item._id),
                             )
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -1873,6 +2111,22 @@ export default function AddEditTeacher() {
                               }
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                         {touched.classesAssigned && errors.classesAssigned && (
                           <FormHelperText className="error-text">
@@ -1926,6 +2180,14 @@ export default function AddEditTeacher() {
                               v.map((item: any) => item._id),
                             )
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -1938,6 +2200,22 @@ export default function AddEditTeacher() {
                               }
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                         {touched.sectionsAssigned &&
                           errors.sectionsAssigned && (
@@ -1992,6 +2270,14 @@ export default function AddEditTeacher() {
                               v.map((item: any) => item._id),
                             )
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -2003,6 +2289,22 @@ export default function AddEditTeacher() {
                               }
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                         {touched.subjects && errors.subjects && (
                           <FormHelperText className="error-text">
@@ -2232,6 +2534,14 @@ export default function AddEditTeacher() {
                           onChange={(_, v) =>
                             setFieldValue("employmentType", v?.value || "")
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -2244,6 +2554,22 @@ export default function AddEditTeacher() {
                               }
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                         {touched.employmentType && errors.employmentType && (
                           <FormHelperText className="error-text">
@@ -2288,6 +2614,14 @@ export default function AddEditTeacher() {
                           onChange={(_, v) =>
                             setFieldValue("salaryType", v?.value || "")
                           }
+                          popupIcon={
+                            <img
+                              src={Svg.down}
+                              style={{ width: "10px" }}
+                              alt="dropdown"
+                            />
+                          }
+                          clearIcon={null}
                           renderInput={(p) => (
                             <TextField
                               {...p}
@@ -2299,6 +2633,22 @@ export default function AddEditTeacher() {
                               }
                             />
                           )}
+                          sx={{
+                            "& .MuiAutocomplete-inputRoot": {
+                              paddingTop: "0 !important",
+                              paddingBottom: "0 !important",
+                              paddingLeft: "0 !important",
+                              paddingRight: "30px !important",
+                              height: "auto",
+                              minHeight: "40px",
+                              "& .MuiAutocomplete-input": {
+                                padding: "0 10px !important",
+                                height: "40px",
+                                fontFamily: "'Poppins', sans-serif !important",
+                                fontSize: "14px !important",
+                              },
+                            },
+                          }}
                         />
                         {touched.salaryType && errors.salaryType && (
                           <FormHelperText className="error-text">
@@ -2321,7 +2671,14 @@ export default function AddEditTeacher() {
                               e.target.value.replace(/[^A-Za-z\s]/g, ""),
                             )
                           }
-                                                  />
+                          onBlur={handleBlur}
+                          error={touched.bankName && Boolean(errors.bankName)}
+                        />
+                        {touched.bankName && errors.bankName && (
+                          <FormHelperText className="error-text">
+                            {errors.bankName as string}
+                          </FormHelperText>
+                        )}
                       </Box>
                       <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                         <Typography sx={labelSx}>IFSC Code</Typography>
@@ -2341,6 +2698,7 @@ export default function AddEditTeacher() {
                                 .slice(0, 11),
                             )
                           }
+                          onBlur={handleBlur}
                           error={touched.ifscCode && Boolean(errors.ifscCode)}
                           slotProps={{ htmlInput: { maxLength: 11 } }}
                         />
@@ -2365,8 +2723,15 @@ export default function AddEditTeacher() {
                               e.target.value.replace(/\D/g, "").slice(0, 18),
                             )
                           }
+                          onBlur={handleBlur}
+                          error={touched.accountNumber && Boolean(errors.accountNumber)}
                           slotProps={{ htmlInput: { maxLength: 18 } }}
                         />
+                        {touched.accountNumber && errors.accountNumber && (
+                          <FormHelperText className="error-text">
+                            {errors.accountNumber as string}
+                          </FormHelperText>
+                        )}
                       </Box>
                       <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                         <Typography sx={labelSx}>
@@ -2385,6 +2750,7 @@ export default function AddEditTeacher() {
                               e.target.value.replace(/\D/g, "").slice(0, 18),
                             )
                           }
+                          onBlur={handleBlur}
                           error={
                             touched.confirmAccountNumber &&
                             Boolean(errors.confirmAccountNumber)
@@ -2418,8 +2784,15 @@ export default function AddEditTeacher() {
                                 .slice(0, 10),
                             )
                           }
+                          onBlur={handleBlur}
+                          error={touched.panNumber && Boolean(errors.panNumber)}
                           slotProps={{ htmlInput: { maxLength: 10 } }}
                         />
+                        {touched.panNumber && errors.panNumber && (
+                          <FormHelperText className="error-text">
+                            {errors.panNumber as string}
+                          </FormHelperText>
+                        )}
                       </Box>
                       <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                         <Typography sx={labelSx}>Aadhar Number</Typography>
@@ -2436,8 +2809,15 @@ export default function AddEditTeacher() {
                               e.target.value.replace(/\D/g, "").slice(0, 12),
                             )
                           }
+                          onBlur={handleBlur}
+                          error={touched.aadharNumber && Boolean(errors.aadharNumber)}
                           slotProps={{ htmlInput: { maxLength: 12 } }}
                         />
+                        {touched.aadharNumber && errors.aadharNumber && (
+                          <FormHelperText className="error-text">
+                            {errors.aadharNumber as string}
+                          </FormHelperText>
+                        )}
                       </Box>
 
                       {/* Account Holder Name */}
@@ -2456,6 +2836,7 @@ export default function AddEditTeacher() {
                               e.target.value.replace(/[^A-Za-z\s]/g, ""),
                             )
                           }
+                          onBlur={handleBlur}
                           error={touched.accountHolderName && Boolean(errors.accountHolderName)}
                           slotProps={{ htmlInput: { maxLength: 50 } }}
                         />
@@ -2477,6 +2858,7 @@ export default function AddEditTeacher() {
                           sx={inputSx}
                           value={values.branchName}
                           onChange={handleChange}
+                          onBlur={handleBlur}
                           error={touched.branchName && Boolean(errors.branchName)}
                           slotProps={{ htmlInput: { maxLength: 50 } }}
                         />
@@ -2503,6 +2885,7 @@ export default function AddEditTeacher() {
                               e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""),
                             )
                           }
+                          onBlur={handleBlur}
                           error={touched.pfNumber && Boolean(errors.pfNumber)}
                           slotProps={{ htmlInput: { maxLength: 22 } }}
                         />
@@ -2529,6 +2912,7 @@ export default function AddEditTeacher() {
                               e.target.value.replace(/\D/g, "").slice(0, 12),
                             )
                           }
+                          onBlur={handleBlur}
                           error={touched.uanNumber && Boolean(errors.uanNumber)}
                           slotProps={{ htmlInput: { maxLength: 12 } }}
                         />
@@ -2555,6 +2939,7 @@ export default function AddEditTeacher() {
                               e.target.value.replace(/\D/g, "").slice(0, 17),
                             )
                           }
+                          onBlur={handleBlur}
                           error={touched.esicNumber && Boolean(errors.esicNumber)}
                           slotProps={{ htmlInput: { maxLength: 17 } }}
                         />
@@ -3574,39 +3959,37 @@ export default function AddEditTeacher() {
                       </>
                     )}
 
-                    {!isView && (id ? canEdit : canAdd) && (
-                      <Box
+                    <Box
+                      sx={{
+                        mt: 6,
+                        pt: 4,
+                        display: "flex",
+                        gap: 2,
+                        justifyContent: "flex-end",
+                        borderTop: "1px solid #f0f0f0",
+                        flexDirection: { xs: "column-reverse", sm: "row" },
+                        pointerEvents: "auto",
+                      }}
+                    >
+                      <Button
+                        className="admin-btn-secondary"
+                        onClick={() => navigate("/teacher")}
+                        disabled={actionLoading}
+                        variant="outlined"
                         sx={{
-                          mt: 6,
-                          pt: 4,
-                          display: "flex",
-                          gap: 2,
-                          justifyContent: "flex-end",
-                          borderTop: "1px solid #f0f0f0",
+                          minWidth: { xs: "100%", sm: "130px" },
+                          borderRadius: "8px",
+                          textTransform: "none",
+                          fontWeight: 600,
                         }}
                       >
-                        <Button
-                          onClick={() => navigate("/teacher")}
-                          variant="outlined"
-                          sx={{
-                            minWidth: "130px",
-                            height: "42px",
-                            borderRadius: "8px",
-                            borderColor: "#ad1e1e",
-                            color: "#ad1e1e",
-                            textTransform: "none",
-                            fontWeight: 600,
-                            "&:hover": {
-                              borderColor: "#8e1818",
-                              bgcolor: "rgba(173, 30, 30, 0.04)",
-                            },
-                          }}
-                        >
-                          Discard
-                        </Button>
+                        Discard
+                      </Button>
+                      {!isView && (id ? canEdit : canAdd) && (
                         <Button
                           type="submit"
                           disabled={actionLoading}
+                          className="admin-btn-theme"
                           variant="contained"
                           startIcon={
                             !actionLoading ? (
@@ -3618,15 +4001,12 @@ export default function AddEditTeacher() {
                             ) : null
                           }
                           sx={{
-                            minWidth: "180px",
-                            height: "42px",
+                            minWidth: { xs: "100%", sm: "180px" },
                             borderRadius: "8px",
-                            bgcolor: "#ad1e1e",
-                            color: "white",
                             textTransform: "none",
                             fontWeight: 600,
-                            "&:hover": { bgcolor: "#8e1818" },
-                            "&.Mui-disabled": { bgcolor: "#e5e7eb" },
+                            boxShadow: "none",
+                            "&:hover": { boxShadow: "none" },
                           }}
                         >
                           {actionLoading ? (
@@ -3637,8 +4017,8 @@ export default function AddEditTeacher() {
                             "Add Teacher"
                           )}
                         </Button>
-                      </Box>
-                    )}
+                      )}
+                    </Box>
                   </Box>
                 </Form>
               );

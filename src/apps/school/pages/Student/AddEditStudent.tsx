@@ -1190,43 +1190,44 @@ export default function AddEditStudent() {
               </Box>
             )}
 
-            {/* Submit / Cancel */}
-            {!isView && (
-              <Box
+            {/* Submit / Discard */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 2,
+                mt: 2,
+                mb: 3,
+                flexDirection: { xs: "column-reverse", sm: "row" },
+              }}
+            >
+              <Button
+                className="admin-btn-secondary"
+                variant="outlined"
+                onClick={() => navigate("/student")}
+                disabled={actionLoading || isSubmitting}
                 sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: 2,
-                  mt: 2,
-                  mb: 3,
+                  minWidth: { xs: "100%", sm: "130px" },
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontWeight: 600,
                 }}
               >
-                <Button
-                  variant="outlined"
-                  onClick={() => navigate("/student")}
-                  sx={{
-                    textTransform: "none",
-                    fontWeight: 600,
-                    borderRadius: "var(--button-radius, 6px)",
-                    px: 3,
-                    borderColor: "#D0D5DD",
-                    color: "#344054",
-                    "&:hover": { borderColor: "#98A2B3", backgroundColor: "#F9FAFB" },
-                  }}
-                >
-                  Cancel
-                </Button>
+                Discard
+              </Button>
+              {!isView && (
                 <Button
                   type="submit"
                   variant="contained"
                   disabled={actionLoading || isSubmitting}
                   className="admin-btn-theme"
                   sx={{
+                    minWidth: { xs: "100%", sm: "120px" },
+                    borderRadius: "8px",
                     textTransform: "none",
                     fontWeight: 600,
-                    borderRadius: "var(--button-radius, 6px)",
-                    px: 3,
-                    minWidth: 120,
+                    boxShadow: "none",
+                    "&:hover": { boxShadow: "none" },
                   }}
                 >
                   {actionLoading || isSubmitting
@@ -1237,8 +1238,8 @@ export default function AddEditStudent() {
                       ? "Update Student"
                       : "Add Student"}
                 </Button>
-              </Box>
-            )}
+              )}
+            </Box>
           </Form>
         )}
       </Formik>
