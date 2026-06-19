@@ -250,4 +250,8 @@ export const masterService = {
     adminApiService.delete<any>(`${Api.DELETE_STUDENT}/${id}`),
   changeStudentStatus: (id: string) =>
     adminApiService.post<any>(`${Api.CHANGE_STUDENT_STATUS}/${id}`, {}),
+  getStudentIdCard: (id: string) =>
+    adminApiService.get<Blob>(`${Api.STUDENT_ID_CARD}/${id}/id-card`, {
+      responseType: 'blob',
+    }),
 };
