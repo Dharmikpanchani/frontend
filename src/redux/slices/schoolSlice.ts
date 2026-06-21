@@ -225,11 +225,13 @@ const schoolSlice = createSlice({
         state.loading = false;
         state.schoolLogo = action.payload?.logo || "";
         state.schoolBanner = action.payload?.banner || "";
+        state.selectedSchool = action.payload || null;
       })
       .addCase(getSchoolLogo.rejected, (state) => {
         state.loading = false;
         state.schoolLogo = "";
         state.schoolBanner = "";
+        state.selectedSchool = null;
       });
   },
 });

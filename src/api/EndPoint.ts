@@ -24,6 +24,7 @@ export const Api = {
   CREATE_USER: `${route}/create-admin`,
   VERYFY_OTP: `${route}/verify-otp`,
   RESEND_OTP: `${route}/re-send-otp`,
+  OTP_STATUS: `${route}/otp-status`,
   SET_PASSWORD: `${route}/reset-password`,
   CHANGE_PASSWORD: `${route}/change-password`,
   RESET_PASSWORD: `${route}/reset-password`,
@@ -111,6 +112,7 @@ export const Api = {
   DELETE_STUDENT: `${route}/delete-student`,
   CHANGE_STUDENT_STATUS: `${route}/student-action-status`,
   STUDENT_ID_CARD: `${route}/students`,
+  GENERATE_ROLL_NUMBERS: `${route}/students/generate-roll-numbers`,
   // Plan management
   GET_ALL_PLANS: `${route}/get-all-plans`,
   GET_PLAN: `${route}/get-plan`,

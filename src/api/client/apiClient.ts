@@ -19,6 +19,19 @@ const DataService = axios.create({
   withCredentials: true,
 });
 
+// Prevents multiple simultaneous refresh calls (race condition fix)
+let isRefreshing = false;
+let refreshSubscribers: Array<(token: string | null) => void> = [];
+
+const subscribeTokenRefresh = (cb: (token: string | null) => void) => {
+  refreshSubscribers.push(cb);
+};
+
+const onTokenRefreshed = (token: string | null) => {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+};
+
 DataService.interceptors.request.use(
   (config) => {
     const token = Cookies.get("auth_token");
@@ -80,8 +93,24 @@ DataService.interceptors.response.use(
         return Promise.reject(error);
       }
 
+      // If a refresh is already in progress, queue this request and wait
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          subscribeTokenRefresh((token) => {
+            if (token) {
+              originalRequest._retry = true;
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(DataService(originalRequest));
+            } else {
+              reject(error);
+            }
+          });
+        });
+      }
+
       if (!originalRequest._retry) {
         originalRequest._retry = true;
+        isRefreshing = true;
         try {
           const res: any = await axios.post(
             `${getBaseURL()}/${Api.REFRESH_TOKEN}`,
@@ -97,15 +126,38 @@ DataService.interceptors.response.use(
                 path: "/",
               });
               originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              onTokenRefreshed(newToken);
+              isRefreshing = false;
               return DataService(originalRequest);
             }
           }
-        } catch (refreshError) {
+          // Refresh succeeded but no token in response
+          onTokenRefreshed(null);
+          isRefreshing = false;
           await handleLogout();
+          return Promise.reject(error);
+        } catch (refreshError: any) {
+          onTokenRefreshed(null);
+          isRefreshing = false;
+          if (refreshError.response?.data?.message === SESSION_REPLACED_MSG) {
+            Cookies.remove("auth_token", { domain: getCookieDomain(), path: "/" });
+            Cookies.remove("auth_token", { path: "/" });
+            if (typeof window !== "undefined") {
+              toasterInfo({
+                title: "Session Expired",
+                body: "You have been logged out because your account was accessed from another device.",
+              });
+              setTimeout(() => {
+                window.location.href = "/";
+              }, 3000);
+            }
+          } else {
+            await handleLogout();
+          }
           return Promise.reject(refreshError);
         }
       } else {
-        // If _retry is already true and we get 401, force logout
+        // _retry already true and still 401 — genuine auth failure
         await handleLogout();
         return Promise.reject(error);
       }

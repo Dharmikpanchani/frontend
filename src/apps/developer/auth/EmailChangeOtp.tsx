@@ -8,6 +8,7 @@ import {
 import { toasterError } from "@/utils/toaster/Toaster";
 import SharedOtp from "@/apps/common/Otp/SharedOtp";
 import type { OtpNumberInterface } from "@/types/interfaces/LoginInterface";
+import { authService } from "@/api/services/auth.service";
 
 export default function EmailChangeOtp() {
   const navigate = useNavigate();
@@ -74,6 +75,18 @@ export default function EmailChangeOtp() {
     }
   };
 
+  const handleGetOtpStatus = async (): Promise<number> => {
+    try {
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("email", email);
+      urlencoded.append("type", type);
+      const response = await authService.getOtpStatus(urlencoded);
+      return response?.data?.remainingSeconds ?? 0;
+    } catch {
+      return 0;
+    }
+  };
+
   return (
     <SharedOtp
       title="Verify New Email"
@@ -84,6 +97,7 @@ export default function EmailChangeOtp() {
       backLabel="Back to Profile"
       loading={loading}
       resendLoading={resendLoading}
+      onGetStatus={handleGetOtpStatus}
     />
   );
 }

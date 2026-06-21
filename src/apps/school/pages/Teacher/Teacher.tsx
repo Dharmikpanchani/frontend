@@ -29,6 +29,9 @@ import {
   CircularProgress,
   Menu,
   MenuItem,
+  Select,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import {
   Email as EmailIcon,
@@ -51,6 +54,7 @@ import {
   FileDownload as ExcelIcon,
 } from "@mui/icons-material";
 import moment from "moment";
+import { labelSx, inputSx } from "@/utils/styles/commonSx";
 import {
   getTeachers,
   changeTeacherStatus,
@@ -117,9 +121,101 @@ export default function Teacher() {
   const [openImportModal, setOpenImportModal] = useState(false);
 
   // Export states
-  const [exportingFormat, setExportingFormat] = useState<"excel" | "pdf" | "print" | null>(null);
+  const [exportingFormat, setExportingFormat] = useState<"excel" | "print" | null>(null);
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
   const exporting = exportingFormat !== null;
+
+  const [openRangeModal, setOpenRangeModal] = useState<boolean>(false);
+  const [pendingFormat, setPendingFormat] = useState<"excel" | "print" | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<any>(null);
+
+  const teacherExportFields = [
+    { key: "teacherCode", label: "Code" },
+    { key: "fullName", label: "Teacher Name" },
+    { key: "email", label: "Email" },
+    { key: "phoneNumber", label: "Mobile" },
+    { key: "alternatePhoneNumber", label: "Alt Mobile" },
+    { key: "gender", label: "Gender" },
+    { key: "dateOfBirth", label: "DOB" },
+    { key: "bloodGroup", label: "Blood Group" },
+    { key: "joiningDate", label: "Joining Date" },
+    { key: "experienceYears", label: "Experience" },
+    { key: "qualification", label: "Qualification" },
+    { key: "specialization", label: "Specialization" },
+    { key: "department", label: "Department" },
+    { key: "designation", label: "Designation" },
+    { key: "employmentType", label: "Type" },
+    { key: "attendanceId", label: "Attendance ID" },
+    { key: "status", label: "Status" },
+  ];
+
+  const [selectedExportFields, setSelectedExportFields] = useState<string[]>(
+    teacherExportFields.map((f) => f.key)
+  );
+
+  const generateSlots = (totalCount: number) => {
+    if (!totalCount) return [];
+    const slots = [];
+    const slotSize = 1000;
+    const numSlots = Math.ceil(totalCount / slotSize);
+    for (let i = 0; i < numSlots; i++) {
+      const start = i * slotSize + 1;
+      const end = Math.min((i + 1) * slotSize, totalCount);
+      slots.push({
+        label: `${start} to ${end}`,
+        offset: i * slotSize,
+        limit: end - start + 1,
+        start,
+        end,
+      });
+    }
+    return slots;
+  };
+
+  const getModalHeaderDetails = () => {
+    switch (pendingFormat) {
+      case "excel":
+        return {
+          title: "Export Report to Excel",
+          icon: <ExcelIcon sx={{ color: "#12B76A", fontSize: "24px" }} />,
+          description: "Generate and download the teachers directory report in Microsoft Excel (.xlsx) format.",
+        };
+      case "print":
+        return {
+          title: "Print Report View",
+          icon: <PrintIcon sx={{ color: "#667085", fontSize: "24px" }} />,
+          description: "Open the printer-friendly teachers directory report view.",
+        };
+      default:
+        return {
+          title: "Export Report",
+          icon: <DownloadIcon sx={{ color: "var(--primary-color)", fontSize: "24px" }} />,
+          description: "Select record range slot to export.",
+        };
+    }
+  };
+
+  const handleExportClick = (format: "excel" | "print") => {
+    setPendingFormat(format);
+    const slots = generateSlots(total);
+    if (slots.length > 0) {
+      setSelectedSlot(slots[0]);
+    } else {
+      setSelectedSlot(null);
+    }
+    setOpenRangeModal(true);
+  };
+
+  const handleConfirmRangeExport = () => {
+    if (selectedExportFields.length === 0) {
+      toast.error("Please select at least one column to export.");
+      return;
+    }
+    setOpenRangeModal(false);
+    if (pendingFormat && selectedSlot) {
+      handleExport(pendingFormat, selectedSlot.limit, selectedSlot.offset);
+    }
+  };
 
   // Bulk AI Verification states
 
@@ -435,7 +531,11 @@ export default function Teacher() {
     }
   };
 
-  const handleExport = async (format: "excel" | "pdf" | "print") => {
+  const handleExport = async (
+    format: "excel" | "print",
+    limit?: number,
+    offset?: number
+  ) => {
     try {
       setExportingFormat(format);
       const params = {
@@ -451,7 +551,13 @@ export default function Teacher() {
         isActive: filterValues.isActive,
         isVerified: filterValues.isVerified,
         teacherCode: filterValues.teacherCode,
+        fullName: filterValues.fullName,
+        phoneNumber: filterValues.phoneNumber,
+        email: filterValues.email,
         format,
+        limit,
+        offset,
+        fields: selectedExportFields.join(","),
       };
 
       const response: any = await masterService.exportTeachers(params);
@@ -473,16 +579,15 @@ export default function Teacher() {
           type:
             format === "excel"
               ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              : format === "pdf"
-                ? "application/pdf"
-                : "text/html; charset=utf-8",
+              : "text/html; charset=utf-8",
         });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute(
           "download",
-          `Teachers_Report_${moment().format("YYYYMMDD_HHmmss")}.${format === "excel" ? "xlsx" : format === "pdf" ? "pdf" : "html"
+          `Teachers Report_${moment().format("DD-MM-YY")}.${
+            format === "excel" ? "xlsx" : "html"
           }`
         );
         document.body.appendChild(link);
@@ -660,10 +765,13 @@ export default function Teacher() {
                   onClick={() => setOpenFilter(true)}
                   sx={{
                     ml: 1,
-                    minWidth: "45px",
-                    p: "0 12px",
+                    minWidth: "45px !important",
+                    height: "36px !important",
+                    p: "0 12px !important",
+                    borderRadius: "6px !important",
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center",
                     gap: "8px",
                   }}
                 >
@@ -677,18 +785,30 @@ export default function Teacher() {
                   <Button
                     className="admin-btn-theme"
                     onClick={() => setOpenImportModal(true)}
+                    sx={{
+                      height: "36px !important",
+                      px: "20px !important",
+                      fontSize: "12px !important",
+                      borderRadius: "6px !important",
+                    }}
                   >
                     Import
                   </Button>
                   <Button
                     className="admin-btn-theme"
                     onClick={() => navigate("/teacher/add")}
+                    sx={{
+                      height: "36px !important",
+                      px: "20px !important",
+                      fontSize: "12px !important",
+                      borderRadius: "6px !important",
+                    }}
                   >
                     <AddIcon
                       sx={{
                         color: "var(--button-text, #fff)",
-                        fontSize: "18px",
-                        mr: 1,
+                        fontSize: "16px !important",
+                        mr: 0.5,
                       }}
                     />
                     Add Teacher
@@ -699,21 +819,26 @@ export default function Teacher() {
                 <>
                   <Button
                     variant="outlined"
-                    startIcon={exporting ? <CircularProgress size={16} /> : <DownloadIcon />}
+                    startIcon={exporting ? <CircularProgress size={14} /> : <DownloadIcon sx={{ fontSize: "16px !important" }} />}
                     disabled={exporting}
                     onClick={(e) => setExportAnchorEl(e.currentTarget)}
-                    sx={{ textTransform: "none", borderRadius: "8px", borderColor: "#eaecf0", color: "#344054", height: "40px", ml: 1 }}
+                    sx={{
+                      textTransform: "none",
+                      borderRadius: "6px !important",
+                      borderColor: "#eaecf0",
+                      color: "#344054",
+                      height: "36px !important",
+                      fontSize: "12px !important",
+                      ml: 1,
+                    }}
                   >
                     Export Report
                   </Button>
                   <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
-                    <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
                       <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
                     </MenuItem>
-                    <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
-                      <PdfIcon sx={{ fontSize: "18px", color: "#F04438" }} /> Export PDF
-                    </MenuItem>
-                    <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
                       <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Print View
                     </MenuItem>
                   </Menu>
@@ -842,7 +967,7 @@ export default function Teacher() {
                                   </Box>
                                   {data?.teacherCode && (
                                     <Chip
-                                      label={data.teacherCode}
+                                      label={`Code: ${data.teacherCode}`}
                                       size="small"
                                       sx={{
                                         height: "18px",
@@ -1659,15 +1784,17 @@ export default function Teacher() {
                                             setViewingTeacherId(row.teacherId)
                                           }
                                           startIcon={
-                                            <ViewIcon sx={{ fontSize: 16 }} />
+                                            <ViewIcon sx={{ fontSize: 14 }} />
                                           }
                                           sx={{
                                             textTransform: "none",
                                             borderColor: "var(--primary-color)",
                                             color: "var(--primary-color)",
-                                            fontSize: "12px",
+                                            fontSize: "11px !important",
                                             fontWeight: 700,
-                                            borderRadius: "8px",
+                                            height: "32px !important",
+                                            borderRadius: "6px !important",
+                                            px: "12px !important",
                                             "&:hover": {
                                               backgroundColor:
                                                 "rgba(var(--primary-color-rgb, 92, 26, 26), 0.04)",
@@ -1974,9 +2101,10 @@ export default function Teacher() {
                                     disabled={verifying}
                                     sx={{
                                       textTransform: "none",
-                                      fontSize: "12px",
+                                      fontSize: "11px !important",
                                       fontWeight: 700,
-                                      borderRadius: "8px",
+                                      height: "32px !important",
+                                      borderRadius: "6px !important",
                                       boxShadow: "none",
                                       backgroundColor: "#12B76A",
                                       "&:hover": { backgroundColor: "#027A48" },
@@ -1996,9 +2124,10 @@ export default function Teacher() {
                                     disabled={verifying}
                                     sx={{
                                       textTransform: "none",
-                                      fontSize: "12px",
+                                      fontSize: "11px !important",
                                       fontWeight: 700,
-                                      borderRadius: "8px",
+                                      height: "32px !important",
+                                      borderRadius: "6px !important",
                                       boxShadow: "none",
                                       backgroundColor: "#F04438",
                                       "&:hover": { backgroundColor: "#B42318" },
@@ -2186,6 +2315,194 @@ export default function Teacher() {
         onDownloadTemplate={handleDownloadTemplate}
         onUpload={handleUploadFile}
       />
+
+      <Dialog
+        open={openRangeModal}
+        onClose={() => setOpenRangeModal(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+            overflow: "hidden",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 3,
+            fontWeight: 700,
+            fontSize: "1.25rem",
+            color: "var(--primary-color)",
+            borderBottom: "1px solid #f3f4f6",
+            bgcolor: "#fafafa",
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+          }}
+        >
+          {getModalHeaderDetails().icon}
+          <span>{getModalHeaderDetails().title}</span>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, mt: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{ mb: 2, color: "#4b5563", lineHeight: 1.6 }}
+          >
+            {getModalHeaderDetails().description} Exporting a large number of records may cause browser performance issues or print preview crashes. Please select a record range slot to export (max 1,000 records per slot):
+          </Typography>
+          <Box sx={{ mb: 2 }}>
+            <Typography sx={labelSx}>
+              Record Range
+            </Typography>
+            <Select
+              id="range-slot-select"
+              value={selectedSlot ? JSON.stringify(selectedSlot) : ""}
+              onChange={(e) => {
+                try {
+                  setSelectedSlot(JSON.parse(e.target.value));
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+              fullWidth
+              sx={inputSx}
+            >
+              {generateSlots(total).map((slot, idx) => (
+                <MenuItem key={idx} value={JSON.stringify(slot)}>
+                  Records {slot.label} ({slot.limit} items)
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+
+          <Box sx={{ mt: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 1.5,
+              }}
+            >
+              <Typography sx={{ ...labelSx, mb: 0 }}>
+                Select Columns to Export
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={selectedExportFields.length === teacherExportFields.length}
+                    indeterminate={
+                      selectedExportFields.length > 0 &&
+                      selectedExportFields.length < teacherExportFields.length
+                    }
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedExportFields(teacherExportFields.map((f) => f.key));
+                      } else {
+                        setSelectedExportFields([]);
+                      }
+                    }}
+                    size="small"
+                    sx={{
+                      color: "var(--primary-color)",
+                      "&.Mui-checked": {
+                        color: "var(--primary-color)",
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#344054" }}>
+                    Select All
+                  </Typography>
+                }
+                sx={{ mr: 0 }}
+              />
+            </Box>
+            <Grid container spacing={1}>
+              {teacherExportFields.map((field) => (
+                <Grid item xs={6} key={field.key}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={selectedExportFields.includes(field.key)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedExportFields((prev) => [...prev, field.key]);
+                          } else {
+                            setSelectedExportFields((prev) =>
+                              prev.filter((k) => k !== field.key)
+                            );
+                          }
+                        }}
+                        size="small"
+                        sx={{
+                          color: "var(--primary-color)",
+                          "&.Mui-checked": {
+                            color: "var(--primary-color)",
+                          },
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography sx={{ fontSize: "12px", color: "#475467" }}>
+                        {field.label}
+                      </Typography>
+                    }
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            p: 3,
+            borderTop: "1px solid #f3f4f6",
+            bgcolor: "#fafafa",
+            gap: 1.5,
+          }}
+        >
+          <Button
+            onClick={() => setOpenRangeModal(false)}
+            sx={{
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 600,
+              color: "#4b5563",
+              border: "1px solid #e5e7eb",
+              "&:hover": {
+                bgcolor: "#f3f4f6",
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmRangeExport}
+            variant="contained"
+            className="admin-btn-theme"
+            sx={{
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 600,
+              boxShadow: "none",
+              "&:hover": {
+                boxShadow: "none",
+              },
+            }}
+          >
+            Export Now
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -2,24 +2,22 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
-import useIsValidToken from "./isValidToken";
 import ScrollToTop from "../apps/common/ScrollToTop";
 import { config } from "../utils/config";
 
 const PrivateRoutes: React.FC = () => {
   const location = useLocation();
-  const { isAdminLogin, adminDetails, token } = useSelector(
+  const { isAdminLogin, adminDetails } = useSelector(
     (state: any) => state.AdminReducer,
   );
 
   const cookieToken = Cookies.get("auth_token");
-  // Check validity of either the redux token or the cookie token
-  const isValid = useIsValidToken(token || cookieToken || null);
 
-  // If Redux says logged in AND it's valid, OR a valid cookie exists
-  const canAccess =
-    (isAdminLogin && adminDetails?.isLogin && isValid) ||
-    (!!cookieToken && isValid);
+  // Do NOT check JWT expiry here. An expired cookie still means a session MAY be valid
+  // (the refresh token is httpOnly and invisible to JS). The Axios interceptor handles
+  // 401s by calling the refresh endpoint. If we redirect on expiry, we race against the
+  // interceptor and log the user out before it can refresh.
+  const canAccess = !!cookieToken || (isAdminLogin && adminDetails?.isLogin);
 
   const isSchoolAdmin =
     adminDetails?.type === config.school_admin ||

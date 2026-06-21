@@ -148,6 +148,12 @@ export const masterService = {
       queryParams.append("isVerified", params.isVerified);
     if (params.teacherCode)
       queryParams.append("teacherCode", params.teacherCode);
+    if (params.fullName)
+      queryParams.append("fullName", params.fullName);
+    if (params.phoneNumber)
+      queryParams.append("phoneNumber", params.phoneNumber);
+    if (params.email)
+      queryParams.append("email", params.email);
     if (params.type) queryParams.append("type", params.type);
     if (params.startYear) {
       if (Array.isArray(params.startYear)) {
@@ -163,7 +169,7 @@ export const masterService = {
   },
   exportTeachers: (params?: any) => {
     const format = params?.format || "excel";
-    return adminApiService.get<any>(`${Api.EXPORT_TEACHERS}`, {
+    return adminApiService.getFile<any>(`${Api.EXPORT_TEACHERS}`, {
       params,
       responseType: format === "excel" || format === "pdf" ? "blob" : "text",
     });
@@ -208,6 +214,12 @@ export const masterService = {
     if (params.sectionId) queryParams.append("sectionId", params.sectionId);
     if (params.isActive !== undefined && params.isActive !== "")
       queryParams.append("isActive", params.isActive);
+    if (params.fullName)
+      queryParams.append("fullName", params.fullName);
+    if (params.phoneNumber)
+      queryParams.append("phoneNumber", params.phoneNumber);
+    if (params.email)
+      queryParams.append("email", params.email);
     if (params.type) queryParams.append("type", params.type);
 
     const queryString = queryParams.toString();
@@ -216,7 +228,7 @@ export const masterService = {
   },
   exportStudents: (params?: any) => {
     const format = params?.format || "excel";
-    return adminApiService.get<any>(`${Api.EXPORT_STUDENTS}`, {
+    return adminApiService.getFile<any>(`${Api.EXPORT_STUDENTS}`, {
       params,
       responseType: format === "excel" || format === "pdf" ? "blob" : "text",
     });
@@ -251,7 +263,9 @@ export const masterService = {
   changeStudentStatus: (id: string) =>
     adminApiService.post<any>(`${Api.CHANGE_STUDENT_STATUS}/${id}`, {}),
   getStudentIdCard: (id: string) =>
-    adminApiService.get<Blob>(`${Api.STUDENT_ID_CARD}/${id}/id-card`, {
+    adminApiService.getFile<Blob>(`${Api.STUDENT_ID_CARD}/${id}/id-card`, {
       responseType: 'blob',
     }),
+  generateRollNumbers: (payload: { classId: string; sectionId: string }) =>
+    adminApiService.post<any>(Api.GENERATE_ROLL_NUMBERS, payload),
 };

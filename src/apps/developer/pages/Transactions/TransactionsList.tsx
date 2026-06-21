@@ -24,14 +24,24 @@ import {
   Select,
   MenuItem,
   debounce,
+  IconButton,
+  Divider,
+  Menu,
 } from "@mui/material";
 import {
   Search as SearchIcon,
   FilterList as FilterIcon,
   Download as DownloadIcon,
-  Html as HtmlIcon,
   Print as PrintIcon,
   ContentCopy as CopyIcon,
+  Visibility as VisibilityIcon,
+  Close as CloseIcon,
+  CheckCircle as CheckCircleIcon,
+  Error as ErrorIcon,
+  Info as InfoIcon,
+  AccessTime as AccessTimeIcon,
+  PictureAsPdf as PdfIcon,
+  FileDownload as ExcelIcon,
 } from "@mui/icons-material";
 import { fetchDeveloperTransactions } from "@/redux/slices/developerTransactionSlice";
 import { getAllPlans } from "@/redux/slices/planSlice";
@@ -44,6 +54,7 @@ import Filter from "@/apps/common/filter/Filter";
 import moment from "moment";
 import type { RootState } from "@/redux/Store";
 import toast from "react-hot-toast";
+import { labelSx, inputSx } from "@/utils/styles/commonSx";
 
 export default function TransactionsList() {
   const dispatch = useDispatch();
@@ -58,11 +69,26 @@ export default function TransactionsList() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [exportingFormat, setExportingFormat] = useState<
-    "excel" | "html" | "print" | null
+    "excel" | "print" | null
   >(null);
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+  const exporting = exportingFormat !== null;
 
   const [copiedSchoolId, setCopiedSchoolId] = useState<string | null>(null);
   const [copiedTxId, setCopiedTxId] = useState<string | null>(null);
+
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [openDetailsModal, setOpenDetailsModal] = useState<boolean>(false);
+
+  const handleOpenDetailsModal = (transaction: any) => {
+    setSelectedTransaction(transaction);
+    setOpenDetailsModal(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setSelectedTransaction(null);
+    setOpenDetailsModal(false);
+  };
 
   const handleCopySchoolCode = (id: string, code: string) => {
     navigator.clipboard.writeText(code);
@@ -108,7 +134,7 @@ export default function TransactionsList() {
 
   const [openRangeModal, setOpenRangeModal] = useState<boolean>(false);
   const [pendingFormat, setPendingFormat] = useState<
-    "excel" | "html" | "print" | null
+    "excel" | "print" | null
   >(null);
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
 
@@ -131,19 +157,38 @@ export default function TransactionsList() {
     return slots;
   };
 
-  const handleExportClick = (format: "excel" | "html" | "print") => {
-    if (format === "excel") {
-      handleExport(format);
-    } else {
-      setPendingFormat(format);
-      const slots = generateSlots(total);
-      if (slots.length > 1) {
-        setSelectedSlot(slots[0]);
-        setOpenRangeModal(true);
-      } else {
-        handleExport(format, slots[0]?.limit, slots[0]?.offset);
-      }
+  const getModalHeaderDetails = () => {
+    switch (pendingFormat) {
+      case "excel":
+        return {
+          title: "Export Report to Excel",
+          icon: <ExcelIcon sx={{ color: "#12B76A", fontSize: "24px" }} />,
+          description: "Generate and download the transactions report in Microsoft Excel (.xlsx) format.",
+        };
+      case "print":
+        return {
+          title: "Print Report View",
+          icon: <PrintIcon sx={{ color: "#667085", fontSize: "24px" }} />,
+          description: "Open the printer-friendly transactions report view.",
+        };
+      default:
+        return {
+          title: "Export Report",
+          icon: <DownloadIcon sx={{ color: "var(--primary-color)", fontSize: "24px" }} />,
+          description: "Select record range slot to export.",
+        };
     }
+  };
+
+  const handleExportClick = (format: "excel" | "print") => {
+    setPendingFormat(format);
+    const slots = generateSlots(total);
+    if (slots.length > 0) {
+      setSelectedSlot(slots[0]);
+    } else {
+      setSelectedSlot(null);
+    }
+    setOpenRangeModal(true);
   };
 
   const handleConfirmRangeExport = () => {
@@ -221,7 +266,7 @@ export default function TransactionsList() {
   );
 
   const handleExport = async (
-    format: "excel" | "html" | "print",
+    format: "excel" | "print",
     limit?: number,
     offset?: number
   ) => {
@@ -263,6 +308,8 @@ export default function TransactionsList() {
           type:
             format === "excel"
               ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              : format === "pdf"
+              ? "application/pdf"
               : "text/html; charset=utf-8",
         });
         const url = window.URL.createObjectURL(blob);
@@ -270,14 +317,16 @@ export default function TransactionsList() {
         link.href = url;
         link.setAttribute(
           "download",
-          `SaaS_Transactions_${moment().format("YYYYMMDD_HHmmss")}.${
+          `SaaS Transactions Report_${moment().format("DD-MM-YY")}.${
             format === "excel" ? "xlsx" : "html"
           }`
         );
         document.body.appendChild(link);
         link.click();
         link.remove();
+
         window.URL.revokeObjectURL(url);
+
         toast.success(`Report exported successfully in ${format.toUpperCase()} format.`);
       }
     } catch (error: any) {
@@ -396,83 +445,40 @@ export default function TransactionsList() {
             </Tooltip>
           </Box>
 
-          <Box className="admin-filter-btn-main">
-            <Tooltip title="Export to Excel">
+          {transactions?.length > 0 && (
+            <>
               <Button
-                className="admin-btn-theme"
-                onClick={() => handleExportClick("excel")}
-                disabled={exportingFormat !== null}
+                variant="outlined"
+                startIcon={exporting ? <CircularProgress size={14} /> : <DownloadIcon sx={{ fontSize: "16px !important" }} />}
+                disabled={exporting}
+                onClick={(e) => setExportAnchorEl(e.currentTarget)}
                 sx={{
+                  textTransform: "none",
+                  borderRadius: "6px !important",
+                  borderColor: "#eaecf0",
+                  color: "#344054",
+                  height: "36px !important",
+                  fontSize: "12px !important",
                   ml: 1,
-                  minWidth: "45px",
-                  p: "0 12px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
+                  backgroundColor: "#fff",
+                  "&:hover": {
+                    borderColor: "#d0d5dd",
+                    backgroundColor: "#f9fafb",
+                  }
                 }}
               >
-                {exportingFormat === "excel" ? (
-                  <CircularProgress size={18} sx={{ color: "var(--button-text, #fff)" }} />
-                ) : (
-                  <DownloadIcon
-                    sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
-                  />
-                )}
+                Export Report
               </Button>
-            </Tooltip>
-          </Box>
-
-          <Box className="admin-filter-btn-main">
-            <Tooltip title="Export to HTML">
-              <Button
-                className="admin-btn-theme"
-                onClick={() => handleExportClick("html")}
-                disabled={exportingFormat !== null}
-                sx={{
-                  ml: 1,
-                  minWidth: "45px",
-                  p: "0 12px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
-                {exportingFormat === "html" ? (
-                  <CircularProgress size={18} sx={{ color: "var(--button-text, #fff)" }} />
-                ) : (
-                  <HtmlIcon
-                    sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
-                  />
-                )}
-              </Button>
-            </Tooltip>
-          </Box>
-
-          <Box className="admin-filter-btn-main">
-            <Tooltip title="Print List">
-              <Button
-                className="admin-btn-theme"
-                onClick={() => handleExportClick("print")}
-                disabled={exportingFormat !== null}
-                sx={{
-                  ml: 1,
-                  minWidth: "45px",
-                  p: "0 12px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
-                {exportingFormat === "print" ? (
-                  <CircularProgress size={18} sx={{ color: "var(--button-text, #fff)" }} />
-                ) : (
-                  <PrintIcon
-                    sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }}
-                  />
-                )}
-              </Button>
-            </Tooltip>
-          </Box>
+              <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                  <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                </MenuItem>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                  <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Print View
+                </MenuItem>
+              </Menu>
+            </>
+          )}
         </Box>
       </Box>
 
@@ -509,6 +515,9 @@ export default function TransactionsList() {
                   </TableCell>
                   <TableCell className="table-th" sx={{ fontWeight: 700 }} align="center">
                     Status
+                  </TableCell>
+                  <TableCell className="table-th" sx={{ fontWeight: 700 }} align="center">
+                    Actions
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -783,14 +792,30 @@ export default function TransactionsList() {
                               </Typography>
                             </Box>
                           </TableCell>
+                          <TableCell className="table-td" align="center">
+                            <Tooltip title="View Roadmap Details" arrow placement="top">
+                              <IconButton
+                                onClick={() => handleOpenDetailsModal(data)}
+                                size="small"
+                                sx={{
+                                  color: "var(--primary-color)",
+                                  "&:hover": {
+                                    bgcolor: "rgba(139, 92, 246, 0.08)",
+                                  },
+                                }}
+                              >
+                                <VisibilityIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
                         </TableRow>
                       );
                     })
                   ) : (
-                    <DataNotFound colSpan={8} />
+                    <DataNotFound colSpan={9} />
                   )
                 ) : (
-                  <Loader colSpan={8} />
+                  <Loader colSpan={9} />
                 )}
               </TableBody>
             </Table>
@@ -841,26 +866,28 @@ export default function TransactionsList() {
             color: "var(--primary-color)",
             borderBottom: "1px solid #f3f4f6",
             bgcolor: "#fafafa",
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
           }}
         >
-          Select Record Range
+          {getModalHeaderDetails().icon}
+          <span>{getModalHeaderDetails().title}</span>
         </DialogTitle>
         <DialogContent sx={{ p: 3, mt: 2 }}>
           <Typography
             variant="body2"
             sx={{ mb: 2, color: "#4b5563", lineHeight: 1.6 }}
           >
-            Exporting a large number of records may cause browser performance issues or print preview crashes. Please select a record range slot to export (max 1,000 records per slot):
+            {getModalHeaderDetails().description} Exporting a large number of records may cause browser performance issues or print preview crashes. Please select a record range slot to export (max 1,000 records per slot):
           </Typography>
-          <FormControl fullWidth size="medium">
-            <InputLabel id="range-slot-select-label" sx={{ fontWeight: 500 }}>
+          <Box sx={{ mb: 2 }}>
+            <Typography sx={labelSx}>
               Record Range
-            </InputLabel>
+            </Typography>
             <Select
-              labelId="range-slot-select-label"
               id="range-slot-select"
               value={selectedSlot ? JSON.stringify(selectedSlot) : ""}
-              label="Record Range"
               onChange={(e) => {
                 try {
                   setSelectedSlot(JSON.parse(e.target.value));
@@ -868,15 +895,8 @@ export default function TransactionsList() {
                   console.error(err);
                 }
               }}
-              sx={{
-                borderRadius: "8px",
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#e5e7eb",
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "var(--primary-color)",
-                },
-              }}
+              fullWidth
+              sx={inputSx}
             >
               {generateSlots(total).map((slot, idx) => (
                 <MenuItem key={idx} value={JSON.stringify(slot)}>
@@ -884,7 +904,7 @@ export default function TransactionsList() {
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </Box>
         </DialogContent>
         <DialogActions
           sx={{
@@ -928,6 +948,258 @@ export default function TransactionsList() {
             }}
           >
             Export Now
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Transaction Details & Roadmap Modal */}
+      <Dialog
+        open={openDetailsModal}
+        onClose={handleCloseDetailsModal}
+        maxWidth={false}
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+            overflow: "hidden",
+            width: "680px",
+            maxWidth: "95%",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 3,
+            fontWeight: 700,
+            fontSize: "1.25rem",
+            color: "var(--primary-color)",
+            borderBottom: "1px solid #f3f4f6",
+            bgcolor: "#fafafa",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span>Payment Details & Roadmap</span>
+          <IconButton onClick={handleCloseDetailsModal} size="small" sx={{ color: "#9ca3af" }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: 3, mt: 2 }}>
+          {selectedTransaction && (
+            <Box>
+              {/* School Details Section */}
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
+                <Avatar
+                  src={`${import.meta.env.VITE_BASE_URL_IMAGE}/${selectedTransaction.schoolId?.logo}`}
+                  variant="circular"
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    border: "2px solid #e5e7eb",
+                    bgcolor: "var(--primary-color)",
+                    color: "#fff",
+                    fontSize: "20px",
+                    fontWeight: 600,
+                  }}
+                >
+                  {selectedTransaction.schoolId?.schoolName?.[0] || "S"}
+                </Avatar>
+                <Box>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#111827" }}>
+                    {selectedTransaction.schoolId?.schoolName || "N/A"}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "#6b7280" }}>
+                    Code: #{selectedTransaction.schoolId?.schoolCode || "N/A"} | Email: {selectedTransaction.schoolId?.email || "N/A"}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Divider sx={{ mb: 3 }} />
+
+              {/* Roadmap Timeline */}
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#374151", mb: 2, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Payment Distribution Roadmap
+              </Typography>
+
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3, pl: 1 }}>
+                
+                {/* Step 1: School Payment */}
+                <Box sx={{ display: "flex", gap: 2, position: "relative" }}>
+                  {/* Vertical connector line */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      left: 11,
+                      top: 24,
+                      bottom: -24,
+                      width: 2,
+                      bgcolor: "#e5e7eb",
+                      zIndex: 0,
+                    }}
+                  />
+                  <Box sx={{ zIndex: 1 }}>
+                    {selectedTransaction.status === "success" || selectedTransaction.status === "active" ? (
+                      <CheckCircleIcon sx={{ color: "#10b981", bgcolor: "#fff", borderRadius: "50%" }} />
+                    ) : selectedTransaction.status === "failed" ? (
+                      <ErrorIcon sx={{ color: "#ef4444", bgcolor: "#fff", borderRadius: "50%" }} />
+                    ) : (
+                      <AccessTimeIcon sx={{ color: "#f59e0b", bgcolor: "#fff", borderRadius: "50%" }} />
+                    )}
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#111827" }}>
+                      Step 1: School Payment ({selectedTransaction.status?.toUpperCase()})
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#4b5563", mt: 0.5 }}>
+                      Total amount paid: <strong>₹{selectedTransaction.totalAmount?.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong> (Base: ₹{selectedTransaction.amount} + GST Tax: ₹{selectedTransaction.taxAmount})
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "#9ca3af", display: "block", mt: 0.5 }}>
+                      Tx ID: {selectedTransaction.transactionId || selectedTransaction.razorpayPaymentId || "N/A"} | Method: {selectedTransaction.method || "Online"} | Date: {selectedTransaction.createdAt ? moment(selectedTransaction.createdAt).format("DD MMM YYYY, hh:mm A") : "N/A"}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Step 2: Commission Split */}
+                <Box sx={{ display: "flex", gap: 2, position: "relative" }}>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      left: 11,
+                      top: 24,
+                      bottom: -24,
+                      width: 2,
+                      bgcolor: "#e5e7eb",
+                      zIndex: 0,
+                    }}
+                  />
+                  <Box sx={{ zIndex: 1 }}>
+                    {selectedTransaction.referralId ? (
+                      <CheckCircleIcon sx={{ color: "#3b82f6", bgcolor: "#fff", borderRadius: "50%" }} />
+                    ) : (
+                      <InfoIcon sx={{ color: "#6b7280", bgcolor: "#fff", borderRadius: "50%" }} />
+                    )}
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#111827" }}>
+                      Step 2: Commission Calculation (30% split)
+                    </Typography>
+                    {selectedTransaction.referralId ? (
+                      <Box sx={{ mt: 0.5 }}>
+                        <Typography variant="body2" sx={{ color: "#4b5563" }}>
+                          Referral Commission Amount: <strong>₹{(selectedTransaction.commissionAmount || selectedTransaction.referralAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong>
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "#6b7280", mt: 0.5 }}>
+                          Sales Admin: <strong>{selectedTransaction.referralId?.name || "Referral Developer"}</strong> ({selectedTransaction.referralId?.email || "N/A"})
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "#6b7280" }}>
+                          Target UPI ID: <code>{selectedTransaction.referralUpiId || selectedTransaction.referralId?.UPIId || "N/A"}</code>
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Typography variant="body2" sx={{ color: "#6b7280", mt: 0.5, fontStyle: "italic" }}>
+                        No Referral / Sales Admin linked. 100% of revenue is allocated to Platform Admin.
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* Step 3: Referral Payout Status */}
+                {selectedTransaction.referralId && (
+                  <Box sx={{ display: "flex", gap: 2, position: "relative" }}>
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        left: 11,
+                        top: 24,
+                        bottom: -24,
+                        width: 2,
+                        bgcolor: "#e5e7eb",
+                        zIndex: 0,
+                      }}
+                    />
+                    <Box sx={{ zIndex: 1 }}>
+                      {selectedTransaction.referralPaymentStatus === "sent" ? (
+                        <CheckCircleIcon sx={{ color: "#10b981", bgcolor: "#fff", borderRadius: "50%" }} />
+                      ) : selectedTransaction.referralPaymentStatus === "failed" ? (
+                        <ErrorIcon sx={{ color: "#ef4444", bgcolor: "#fff", borderRadius: "50%" }} />
+                      ) : (
+                        <AccessTimeIcon sx={{ color: "#f59e0b", bgcolor: "#fff", borderRadius: "50%" }} />
+                      )}
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#111827" }}>
+                        Step 3: Referral Payout ({selectedTransaction.referralPaymentStatus?.toUpperCase() || "PENDING"})
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: "#4b5563", mt: 0.5 }}>
+                        Payout amount: <strong>₹{(selectedTransaction.commissionAmount || selectedTransaction.referralAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong>
+                      </Typography>
+                      {selectedTransaction.referralPayoutId && (
+                        <Typography variant="caption" sx={{ color: "#6b7280", display: "block" }}>
+                          Payout ID: {selectedTransaction.referralPayoutId}
+                        </Typography>
+                      )}
+                      {selectedTransaction.referralPaymentStatus === "failed" && (
+                        <Box sx={{ mt: 1, p: 1, bgcolor: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "6px" }}>
+                          <Typography variant="caption" sx={{ color: "#991b1b", fontWeight: 600, display: "block" }}>
+                            Payout Error Message:
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: "#991b1b" }}>
+                            {selectedTransaction.errorMessage || "Unknown Razorpay error / invalid UPI ID"}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Step 4: Platform Revenue Allocation */}
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  <Box sx={{ zIndex: 1 }}>
+                    {selectedTransaction.status === "success" || selectedTransaction.status === "active" ? (
+                      <CheckCircleIcon sx={{ color: "#10b981", bgcolor: "#fff", borderRadius: "50%" }} />
+                    ) : (
+                      <AccessTimeIcon sx={{ color: "#f59e0b", bgcolor: "#fff", borderRadius: "50%" }} />
+                    )}
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#111827" }}>
+                      {selectedTransaction.referralId ? "Step 4: Platform Net Revenue" : "Step 3: Platform Gross Revenue"}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#4b5563", mt: 0.5 }}>
+                      Allocated to Platform Admin: <strong>₹{(selectedTransaction.adminAmount || selectedTransaction.totalAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong>
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "#9ca3af", display: "block" }}>
+                      Settlement Status: {selectedTransaction.adminPaymentStatus?.toUpperCase() || "PENDING"}
+                    </Typography>
+                  </Box>
+                </Box>
+
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ p: 3, borderTop: "1px solid #f3f4f6", bgcolor: "#fafafa" }}>
+          <Button
+            onClick={handleCloseDetailsModal}
+            sx={{
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 600,
+              color: "#4b5563",
+              border: "1px solid #e5e7eb",
+              "&:hover": {
+                bgcolor: "#f3f4f6",
+              },
+            }}
+          >
+            Close Details
           </Button>
         </DialogActions>
       </Dialog>

@@ -6,6 +6,7 @@ import { toasterError } from "@/utils/toaster/Toaster";
 import SharedOtp from "@/apps/common/Otp/SharedOtp";
 import { getSubdomain } from "@/apps/common/commonJsFunction";
 import type { OtpNumberInterface } from "@/types/interfaces/LoginInterface";
+import { authService } from "@/api/services/auth.service";
 
 export default function TeacherOtp() {
   const navigate = useNavigate();
@@ -75,6 +76,19 @@ export default function TeacherOtp() {
     }
   };
 
+  const handleGetOtpStatus = async (): Promise<number> => {
+    try {
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("email", phone);
+      urlencoded.append("type", "teacher");
+      urlencoded.append("schoolCode", isSubdomain?.name);
+      const response = await authService.getOtpStatus(urlencoded);
+      return response?.data?.remainingSeconds ?? 0;
+    } catch {
+      return 0;
+    }
+  };
+
   return (
     <SharedOtp
       title="Teacher Verification"
@@ -85,6 +99,7 @@ export default function TeacherOtp() {
       backLabel="Back to Teacher List?"
       loading={loading}
       resendLoading={resendLoading}
+      onGetStatus={handleGetOtpStatus}
     />
   );
 }

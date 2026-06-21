@@ -1595,6 +1595,12 @@ export default function AddEditTeacher() {
                           touched={touched}
                           errors={errors}
                           disabled={isView || sameAsCurrentAddress || sameAsSchoolAddress}
+                          fieldNames={{
+                            city: "permanentCity",
+                            state: "permanentState",
+                            country: "permanentCountry",
+                            pincode: "permanentPincode",
+                          }}
                         />
                       </Box>
                       <Box gridColumn={{ xs: "span 12", sm: "span 3" }}>

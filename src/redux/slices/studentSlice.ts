@@ -120,6 +120,26 @@ export const changeStudentStatus = createAsyncThunk(
   },
 );
 
+export const generateRollNumbers = createAsyncThunk(
+  "student/generateRollNumbers",
+  async (payload: { classId: string; sectionId: string }, { dispatch, rejectWithValue }) => {
+    try {
+      const res: any = await masterService.generateRollNumbers(payload);
+      if (res.status === 200) {
+        toast.success(res.message || "Roll numbers generated successfully");
+        dispatch(getstudents({ page: 1, perPage: 10 }));
+        return res.data;
+      }
+      toast.error(res.message || "Failed to generate roll numbers");
+      return rejectWithValue(res.message);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message;
+      toast.error(msg);
+      return rejectWithValue(msg);
+    }
+  },
+);
+
 const studentSlice = createSlice({
   name: "student",
   initialState,
@@ -191,6 +211,16 @@ const studentSlice = createSlice({
       })
       .addCase(changeStudentStatus.rejected, (state) => {
         state.actionLoading = false;
+      })
+      // generateRollNumbers
+      .addCase(generateRollNumbers.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(generateRollNumbers.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(generateRollNumbers.rejected, (state) => {
+        state.actionLoading = false;
       });
   },
 });
@@ -198,6 +228,6 @@ const studentSlice = createSlice({
 export const { clearSelectedstudent } = studentSlice.actions;
 export default studentSlice.reducer;
 
-// Aliases for component imports
 export const getStudents = getstudents;
 export const addEditStudent = addEditStudentAction;
+export const generateRollNumbersAction = generateRollNumbers;

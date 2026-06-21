@@ -10,6 +10,15 @@ import { debounce } from "@mui/material/utils";
 import parse from "autosuggest-highlight/parse";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
+interface RelatedFieldNames {
+  city?: string;
+  state?: string;
+  country?: string;
+  pincode?: string;
+  latitude?: string;
+  longitude?: string;
+}
+
 interface AutoCompleteLocationProps {
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
   errors: any;
@@ -19,6 +28,7 @@ interface AutoCompleteLocationProps {
   name?: string;
   disabled?: boolean;
   focusedColor?: string;
+  fieldNames?: RelatedFieldNames;
 }
 
 const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
@@ -30,7 +40,16 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
   name = "address",
   disabled = false,
   focusedColor = "var(--primary-color, #ff8c00)",
+  fieldNames = {},
 }) => {
+  const fields = {
+    city: fieldNames.city ?? "city",
+    state: fieldNames.state ?? "state",
+    country: fieldNames.country ?? "country",
+    pincode: fieldNames.pincode ?? "pincode",
+    latitude: fieldNames.latitude ?? "latitude",
+    longitude: fieldNames.longitude ?? "longitude",
+  };
   const autocompleteService =
     useRef<google.maps.places.AutocompleteService | null>(null);
   const placeService = useRef<google.maps.places.PlacesService | null>(null);
@@ -153,8 +172,12 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
         onChange={(_event, newValue: any) => {
           if (newValue === null) {
             setFieldValue(name, "");
-            setFieldValue("latitude", "");
-            setFieldValue("longitude", "");
+            setFieldValue(fields.city, "");
+            setFieldValue(fields.state, "");
+            setFieldValue(fields.country, "");
+            setFieldValue(fields.pincode, "");
+            setFieldValue(fields.latitude, "");
+            setFieldValue(fields.longitude, "");
           } else {
             setFieldValue(name, newValue.description);
             if (placeService.current && newValue.place_id) {
@@ -188,16 +211,16 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
                   );
 
                   setFieldValue(
-                    "city",
+                    fields.city,
                     locality?.long_name || sublocality?.long_name || "",
                   );
-                  setFieldValue("state", state?.long_name || "");
-                  setFieldValue("country", country?.long_name || "India");
-                  setFieldValue("pincode", zipCode?.long_name || "");
+                  setFieldValue(fields.state, state?.long_name || "");
+                  setFieldValue(fields.country, country?.long_name || "India");
+                  setFieldValue(fields.pincode, zipCode?.long_name || "");
 
                   if (place.geometry?.location) {
-                    setFieldValue("latitude", place.geometry.location.lat());
-                    setFieldValue("longitude", place.geometry.location.lng());
+                    setFieldValue(fields.latitude, place.geometry.location.lat());
+                    setFieldValue(fields.longitude, place.geometry.location.lng());
                   }
                 }
               });

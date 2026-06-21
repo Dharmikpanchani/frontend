@@ -102,6 +102,9 @@ const ThemeSettings = () => {
   const dispatch = useDispatch();
   const { hasPermission } = usePermissions();
   const theme = useSelector((state: RootState) => state.ThemeReducer);
+  const { adminDetails } = useSelector(
+    (state: RootState) => state.AdminReducer,
+  );
   const initialTheme = useRef<ThemeState | null>(null);
 
   const [profileLoading, setProfileLoading] = useState(false);
@@ -113,15 +116,26 @@ const ThemeSettings = () => {
       setProfileLoading(true);
       const res: any = await authService.getSchoolProfile();
       if (res.status === 200 || res.status === 201) {
+        const school = res.data?.school || res.data;
         setSchoolData({
-          ...res.data,
-          logoUrl: res.data.logo ? `${imageBaseUrl}/${res.data.logo}` : "",
+          ...school,
+          logoUrl: school?.logo ? `${imageBaseUrl}/${school.logo}` : "",
         });
+        return;
       }
     } catch (e) {
       console.error("Failed to fetch school profile", e);
     } finally {
       setProfileLoading(false);
+    }
+
+    // Fallback: if API fails or logo isn't set, try using adminDetails from redux
+    if (adminDetails?.schoolData) {
+      const school = adminDetails.schoolData;
+      setSchoolData({
+        ...school,
+        logoUrl: school?.logo ? `${imageBaseUrl}/${school.logo}` : "",
+      });
     }
   };
 
@@ -129,8 +143,16 @@ const ThemeSettings = () => {
     if (!initialTheme.current) {
       initialTheme.current = theme;
     }
+    // Initialize immediately from Redux if available
+    if (adminDetails?.schoolData) {
+      const school = adminDetails.schoolData;
+      setSchoolData({
+        ...school,
+        logoUrl: school?.logo ? `${imageBaseUrl}/${school.logo}` : "",
+      });
+    }
     fetchProfile();
-  }, []);
+  }, [adminDetails]);
 
   const canEdit = hasPermission(schoolAdminPermission.theme.update);
 

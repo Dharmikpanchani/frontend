@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { OtpNumberInterface } from "@/types/interfaces/LoginInterface";
 import type { FormikProps } from "formik";
 import { otpNumberValidationSchema } from "@/utils/validation/FormikValidation";
@@ -21,6 +21,7 @@ interface SharedOtpProps {
   backLabel: string;
   loading: boolean;
   resendLoading: boolean;
+  onGetStatus?: () => Promise<number>;
 }
 
 export default function SharedOtp({
@@ -32,40 +33,52 @@ export default function SharedOtp({
   backLabel,
   loading,
   resendLoading,
+  onGetStatus,
 }: SharedOtpProps) {
   useThemeManager();
   const isSubdomain = getSubdomain();
   const { schoolLogo, schoolBanner } = useSelector(
     (state: RootState) => state.SchoolReducer,
   );
-  const [timeLeft, setTimeLeft] = useState(120);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const initialValues: OtpNumberInterface = {
     code: "",
   };
 
-  const startOtpTimer = () => {
-    setTimeLeft(120);
-    const expirationTime = Date.now() + 120 * 1000;
-
-    const interval = setInterval(() => {
+  const startOtpTimer = (initialSeconds: number) => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (initialSeconds <= 0) {
+      setTimeLeft(0);
+      return;
+    }
+    setTimeLeft(initialSeconds);
+    const expirationTime = Date.now() + initialSeconds * 1000;
+    intervalRef.current = setInterval(() => {
       const remainingTime = Math.max(
         0,
         Math.floor((expirationTime - Date.now()) / 1000),
       );
       setTimeLeft(remainingTime);
-
       if (remainingTime <= 0) {
-        clearInterval(interval);
+        clearInterval(intervalRef.current!);
+        intervalRef.current = null;
       }
     }, 1000);
-
-    return interval;
   };
 
   useEffect(() => {
-    const interval = startOtpTimer();
-    return () => clearInterval(interval);
+    if (onGetStatus) {
+      onGetStatus()
+        .then((remaining) => startOtpTimer(remaining))
+        .catch(() => startOtpTimer(120));
+    } else {
+      startOtpTimer(120);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, []);
 
   const formatTime = (seconds: number) => {
@@ -79,7 +92,7 @@ export default function SharedOtp({
   const handleResendClick = async (setFieldValue: any) => {
     const success = await onResend(setFieldValue);
     if (success) {
-      startOtpTimer();
+      startOtpTimer(120);
     }
   };
 
@@ -148,7 +161,11 @@ export default function SharedOtp({
                 </Box>
 
                 <Box className="resend-otp-box">
-                  {timeLeft ? (
+                  {timeLeft === null ? (
+                    <Typography className="timer-text">
+                      Checking OTP status...
+                    </Typography>
+                  ) : timeLeft > 0 ? (
                     <Typography className="timer-text">
                       Resend OTP in <span>{formatTime(timeLeft)}</span>
                     </Typography>

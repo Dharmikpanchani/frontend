@@ -6,6 +6,7 @@ import { addEditAdminUser } from "@/redux/slices/adminUserSlice";
 import { toasterError } from "@/utils/toaster/Toaster";
 import SharedOtp from "@/apps/common/Otp/SharedOtp";
 import type { OtpNumberInterface } from "@/types/interfaces/LoginInterface";
+import { authService } from "@/api/services/auth.service";
 
 export default function AdminUserOtp() {
   const navigate = useNavigate();
@@ -83,6 +84,18 @@ export default function AdminUserOtp() {
     }
   };
 
+  const handleGetOtpStatus = async (): Promise<number> => {
+    try {
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("email", email);
+      urlencoded.append("type", type || "registration");
+      const response = await authService.getOtpStatus(urlencoded);
+      return response?.data?.remainingSeconds ?? 0;
+    } catch {
+      return 0;
+    }
+  };
+
   return (
     <SharedOtp
       title="Admin User Verification"
@@ -93,6 +106,7 @@ export default function AdminUserOtp() {
       backLabel="Back to Admin List?"
       loading={loading}
       resendLoading={resendLoading}
+      onGetStatus={handleGetOtpStatus}
     />
   );
 }

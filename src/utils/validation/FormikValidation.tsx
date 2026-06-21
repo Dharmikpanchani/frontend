@@ -682,7 +682,7 @@ export const schoolProfileUpdateValidationSchema = Yup.object({
   medium: Yup.string().required("Medium is required"),
   establishedYear: dateValidation(true),
   trustName: Yup.string().max(120, "Trust name must be at most 120 characters").optional(),
-  schoolGenderType: Yup.string().required("School gender type is required"),
+  schoolGenderType: Yup.string().optional().nullable(),
   address: addressValidation(true),
   city: cityValidation(true),
   state: stateValidation(true),
@@ -848,7 +848,6 @@ export const studentValidationSchema = Yup.object().shape({
     .max(30, "Admission number must be at most 30 characters")
     .required("Admission number is required"),
   admissionDate: dateValidation(true, "Admission date is required"),
-  rollNumber: Yup.string().optional(),
   classId: Yup.string().required("Class is required"),
   sectionId: Yup.string().required("Section is required"),
   // Contact
@@ -880,6 +879,23 @@ export const studentValidationSchema = Yup.object().shape({
         .required("Please confirm your password"),
     otherwise: () => Yup.string().optional(),
   }),
+});
+
+export const generateRollNumbersValidationSchema = Yup.object().shape({
+  classId: Yup.string().required("Class is required"),
+  sectionId: Yup.string().required("Section is required"),
+});
+
+export const bulkImportValidationSchema = Yup.object().shape({
+  file: Yup.mixed()
+    .required("Please select a file to upload")
+    .test("fileType", "Only CSV and Excel files are supported", (value) => {
+      if (!value) return false;
+      const file = value as File;
+      const allowedExtensions = ["csv", "xlsx", "xls"];
+      const extension = file.name.split(".").pop()?.toLowerCase();
+      return allowedExtensions.includes(extension || "");
+    }),
 });
 
 export const teacherValidationSchema = Yup.object().shape(

@@ -352,7 +352,7 @@ export default function AdminUser() {
                                 </Tooltip>
                                 {data?.adminCode && (
                                   <Chip
-                                    label={data.adminCode}
+                                    label={`Code: ${data.adminCode}`}
                                     size="small"
                                     sx={{
                                       height: "18px",

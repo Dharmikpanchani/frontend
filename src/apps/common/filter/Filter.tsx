@@ -311,10 +311,19 @@ const Filter: React.FC<FilterProps> = ({
             <TextField
               fullWidth
               value={values[field.name] || ""}
-              onChange={(e) => setFieldValue(field.name, e.target.value)}
+              onChange={(e) => {
+                let val = e.target.value;
+                if (
+                  field.name.toLowerCase().includes("phone") ||
+                  field.name.toLowerCase().includes("mobile")
+                ) {
+                  val = val.replace(/\D/g, "");
+                }
+                setFieldValue(field.name, val);
+              }}
               placeholder={field.placeholder || "Enter text"}
               sx={inputSx}
-                          />
+            />
           </Box>
         );
       case "priceRange":

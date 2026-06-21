@@ -36,7 +36,7 @@ export const admissionService = {
   /** Admin — export inquiries */
   exportInquiries: (params?: any) => {
     const format = params?.format || "excel";
-    return adminApiService.get<any>(`${Api.EXPORT_INQUIRIES}`, {
+    return adminApiService.getFile<any>(`${Api.EXPORT_INQUIRIES}`, {
       params,
       responseType: format === "excel" || format === "pdf" ? "blob" : "text",
     });

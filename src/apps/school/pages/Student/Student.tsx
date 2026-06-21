@@ -18,13 +18,20 @@ import {
   Tooltip,
   Tabs,
   Tab,
+  Menu,
+  MenuItem,
+  IconButton,
+  Autocomplete,
+  FormHelperText,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  Select,
+  Grid,
+  Checkbox,
+  FormControlLabel,
   CircularProgress,
-  Menu,
-  MenuItem,
 } from "@mui/material";
 import {
   Email as EmailIcon,
@@ -42,6 +49,7 @@ import {
   Print as PrintIcon,
   FileDownload as ExcelIcon,
   PictureAsPdf as PdfIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { masterService } from "@/api/services/master.service";
 import { admissionService } from "@/api/services/admission.service";
@@ -52,6 +60,7 @@ import {
   changeStudentStatus,
   deleteStudent,
   getPendingAdmissionsCount,
+  generateRollNumbersAction,
 } from "@/redux/slices/studentSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import { getSections } from "@/redux/slices/sectionSlice";
@@ -66,7 +75,16 @@ import BulkImportModal from "@/apps/common/BulkImportModal";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import Filter from "@/apps/common/filter/Filter";
-import type { RootState } from "@/redux/Store";
+import type { RootState, AppDispatch } from "@/redux/Store";
+import { Formik, Form } from "formik";
+import { generateRollNumbersValidationSchema } from "@/utils/validation/FormikValidation";
+import { labelSx, inputSx } from "@/utils/styles/commonSx";
+interface SectionItem {
+  _id: string;
+  code?: string;
+  name?: string;
+  classId?: string | { _id: string };
+}
 
 const getAvailableYears = (): number[] => {
   const now = new Date();
@@ -80,7 +98,7 @@ const getAvailableYears = (): number[] => {
 };
 
 export default function Student() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { hasPermission, hasAnyPermission } = usePermissions();
   const { students, total, loading, pendingAdmissionsCount } = useSelector(
@@ -99,6 +117,10 @@ export default function Student() {
   // Import state
   const [openImportModal, setOpenImportModal] = useState(false);
 
+  // Auto Roll Number state
+  const [openRollNoModal, setOpenRollNoModal] = useState(false);
+  const [generatingRollNos, setGeneratingRollNos] = useState(false);
+
   const [openFilter, setOpenFilter] = useState(false);
   const [filterValues, setFilterValues] = useState({
     fullName: "",
@@ -113,6 +135,102 @@ export default function Student() {
   const [exportingFormat, setExportingFormat] = useState<"excel" | "pdf" | "print" | null>(null);
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
   const exporting = exportingFormat !== null;
+
+  const [openRangeModal, setOpenRangeModal] = useState<boolean>(false);
+  const [pendingFormat, setPendingFormat] = useState<"excel" | "pdf" | "print" | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<any>(null);
+
+  const studentExportFields = [
+    { key: "admissionNo", label: "Adm No" },
+    { key: "rollNo", label: "Roll No" },
+    { key: "fullName", label: "Student Name" },
+    { key: "classSection", label: "Class/Section" },
+    { key: "mobile", label: "Mobile" },
+    { key: "email", label: "Email" },
+    { key: "gender", label: "Gender" },
+    { key: "dateOfBirth", label: "DOB" },
+    { key: "bloodGroup", label: "Blood Group" },
+    { key: "fatherName", label: "Father Name" },
+    { key: "fatherPhone", label: "Father Phone" },
+    { key: "motherName", label: "Mother Name" },
+    { key: "admissionDate", label: "Adm Date" },
+    { key: "address", label: "Address" },
+    { key: "status", label: "Status" },
+  ];
+
+  const [selectedExportFields, setSelectedExportFields] = useState<string[]>(
+    studentExportFields.map((f) => f.key)
+  );
+
+  const generateSlots = (totalCount: number) => {
+    if (!totalCount) return [];
+    const slots = [];
+    const slotSize = 1000;
+    const numSlots = Math.ceil(totalCount / slotSize);
+    for (let i = 0; i < numSlots; i++) {
+      const start = i * slotSize + 1;
+      const end = Math.min((i + 1) * slotSize, totalCount);
+      slots.push({
+        label: `${start} to ${end}`,
+        offset: i * slotSize,
+        limit: end - start + 1,
+        start,
+        end,
+      });
+    }
+    return slots;
+  };
+
+  const getModalHeaderDetails = () => {
+    switch (pendingFormat) {
+      case "excel":
+        return {
+          title: "Export Report to Excel",
+          icon: <ExcelIcon sx={{ color: "#12B76A", fontSize: "24px" }} />,
+          description: "Generate and download the students directory report in Microsoft Excel (.xlsx) format.",
+        };
+      case "pdf":
+        return {
+          title: "Export Report to PDF",
+          icon: <PdfIcon sx={{ color: "#F04438", fontSize: "24px" }} />,
+          description: "Generate and download the students directory report in PDF format.",
+        };
+      case "print":
+        return {
+          title: "Print Report View",
+          icon: <PrintIcon sx={{ color: "#667085", fontSize: "24px" }} />,
+          description: "Open the printer-friendly students directory report view.",
+        };
+      default:
+        return {
+          title: "Export Report",
+          icon: <DownloadIcon sx={{ color: "var(--primary-color)", fontSize: "24px" }} />,
+          description: "Select record range slot to export.",
+        };
+    }
+  };
+
+  const handleExportClick = (format: "excel" | "pdf" | "print") => {
+    setPendingFormat(format);
+    const slots = generateSlots(total);
+    if (slots.length > 0) {
+      setSelectedSlot(slots[0]);
+    } else {
+      setSelectedSlot(null);
+    }
+    setOpenRangeModal(true);
+  };
+
+  const handleConfirmRangeExport = () => {
+    if (selectedExportFields.length === 0) {
+      toast.error("Please select at least one column to export.");
+      return;
+    }
+    setOpenRangeModal(false);
+    if (pendingFormat && selectedSlot) {
+      handleExport(pendingFormat, selectedSlot.limit, selectedSlot.offset);
+    }
+  };
 
   // For Admission tabs ──
   const [tabValue, setTabValue] = useState(0);
@@ -180,6 +298,8 @@ export default function Student() {
       setActionLoading(false);
     }
   };
+
+
 
   const { allClasses } = useSelector((state: RootState) => state.ClassReducer);
   const { allSections } = useSelector(
@@ -342,7 +462,11 @@ export default function Student() {
     }
   };
 
-  const handleExport = async (format: "excel" | "pdf" | "print") => {
+  const handleExport = async (
+    format: "excel" | "pdf" | "print",
+    limit?: number,
+    offset?: number
+  ) => {
     try {
       setExportingFormat(format);
       const params = {
@@ -350,7 +474,13 @@ export default function Student() {
         classId: filterValues.classId,
         sectionId: filterValues.sectionId,
         isActive: filterValues.isActive,
+        fullName: filterValues.fullName,
+        phoneNumber: filterValues.phoneNumber,
+        email: filterValues.email,
         format,
+        limit,
+        offset,
+        fields: selectedExportFields.join(","),
       };
 
       const response: any = await masterService.exportStudents(params);
@@ -495,8 +625,10 @@ export default function Student() {
                 onClick={() => setOpenFilter(true)}
                 sx={{
                   ml: 1,
-                  minWidth: "45px",
-                  p: "0 12px",
+                  minWidth: "45px !important",
+                  height: "36px !important",
+                  p: "0 12px !important",
+                  borderRadius: "6px !important",
                   display: "flex",
                   alignItems: "center",
                   gap: "8px",
@@ -507,35 +639,31 @@ export default function Student() {
                 />
               </Button>
             </Box>
-            {hasPermission(schoolAdminPermission.student.read) && students?.length > 0 && (
-              <>
-                <Button
-                  variant="outlined"
-                  startIcon={exporting ? <CircularProgress size={16} /> : <DownloadIcon />}
-                  disabled={exporting}
-                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
-                  sx={{ textTransform: "none", borderRadius: "8px", borderColor: "#eaecf0", color: "#344054", height: "40px", ml: 1 }}
-                >
-                  Export Report
-                </Button>
-                <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
-                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
-                    <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
-                  </MenuItem>
-                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
-                    <PdfIcon sx={{ fontSize: "18px", color: "#F04438" }} /> Export PDF
-                  </MenuItem>
-                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
-                    <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Print View
-                  </MenuItem>
-                </Menu>
-              </>
-            )}
             {hasPermission(schoolAdminPermission.student.create) && (
               <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1 }}>
+                {hasPermission(schoolAdminPermission.student.update) && students?.length > 0 && (
+                  <Button
+                    className="admin-btn-theme"
+                    onClick={() => setOpenRollNoModal(true)}
+                    sx={{
+                      height: "36px !important",
+                      px: "20px !important",
+                      fontSize: "12px !important",
+                      borderRadius: "6px !important",
+                    }}
+                  >
+                    Auto Roll No
+                  </Button>
+                )}
                 <Button
                   className="admin-btn-theme"
                   onClick={() => setOpenImportModal(true)}
+                  sx={{
+                    height: "36px !important",
+                    px: "20px !important",
+                    fontSize: "12px !important",
+                    borderRadius: "6px !important",
+                  }}
                 >
                   Import
                 </Button>
@@ -544,17 +672,55 @@ export default function Student() {
                   onClick={() => {
                     navigate("/student/add");
                   }}
+                  sx={{
+                    height: "36px !important",
+                    px: "20px !important",
+                    fontSize: "12px !important",
+                    borderRadius: "6px !important",
+                  }}
                 >
                   <AddIcon
                     sx={{
                       color: "var(--button-text, #fff)",
-                      fontSize: "18px",
-                      mr: 1,
+                      fontSize: "16px !important",
+                      mr: 0.5,
                     }}
                   />
                   Add Student
                 </Button>
               </Box>
+            )}
+            {hasPermission(schoolAdminPermission.student.read) && students?.length > 0 && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={exporting ? <CircularProgress size={14} /> : <DownloadIcon sx={{ fontSize: "16px !important" }} />}
+                  disabled={exporting}
+                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
+                  sx={{
+                    textTransform: "none",
+                    borderRadius: "6px !important",
+                    borderColor: "#eaecf0",
+                    color: "#344054",
+                    height: "36px !important",
+                    fontSize: "12px !important",
+                    ml: 1,
+                  }}
+                >
+                  Export Report
+                </Button>
+                <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                  </MenuItem>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <PdfIcon sx={{ fontSize: "18px", color: "#F04438" }} /> Export PDF
+                  </MenuItem>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Print View
+                  </MenuItem>
+                </Menu>
+              </>
             )}
           </Box>
         </Box>
@@ -856,7 +1022,7 @@ export default function Student() {
                                 </Box>
                                 {data?.admissionNumber && (
                                   <Chip
-                                    label={`Adm: ${data.admissionNumber}`}
+                                    label={`Code: ${data.admissionNumber}`}
                                     size="small"
                                     sx={{
                                       height: "18px",
@@ -1375,12 +1541,12 @@ export default function Student() {
               {/* Custom admission number */}
               <Box>
                 <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#667085", mb: 0.5 }}>
-                  ADMISSION NUMBER (optional — auto-generated if blank)
+                  ADMISSION NUMBER (GR NUMBER) (optional — auto-generated if blank)
                 </Typography>
                 <TextField
                   value={admissionNumberOverride}
                   onChange={(e) => setAdmissionNumberOverride(e.target.value)}
-                  placeholder="e.g. STU-2024-001"
+                  placeholder="e.g. GR-2024-001"
                   fullWidth size="small"
                 />
               </Box>
@@ -1448,6 +1614,410 @@ export default function Student() {
             startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <RejectedIcon sx={{ fontSize: 16 }} />}
           >
             {actionLoading ? "Rejecting..." : "Confirm Reject"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Auto Roll Number Modal */}
+      <Dialog
+        open={openRollNoModal}
+        onClose={() => !generatingRollNos && setOpenRollNoModal(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+            overflow: "hidden",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 3,
+            fontWeight: 700,
+            fontSize: "1.25rem",
+            color: "var(--primary-color)",
+            borderBottom: "1px solid #f3f4f6",
+            bgcolor: "#fafafa",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span>Auto Generate Roll Numbers</span>
+          <IconButton
+            onClick={() => !generatingRollNos && setOpenRollNoModal(false)}
+            size="small"
+            sx={{ color: "#9ca3af" }}
+            disabled={generatingRollNos}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <Formik
+          initialValues={{
+            classId: "",
+            sectionId: "",
+          }}
+          validationSchema={generateRollNumbersValidationSchema}
+          onSubmit={async (values, { resetForm }) => {
+            setGeneratingRollNos(true);
+            try {
+              const result = await dispatch(
+                generateRollNumbersAction({
+                  classId: values.classId,
+                  sectionId: values.sectionId,
+                })
+              );
+              if (generateRollNumbersAction.fulfilled.match(result)) {
+                setOpenRollNoModal(false);
+                resetForm();
+                handleGetData(searchNameValue);
+              }
+            } catch (err) {
+              const errMsg = err instanceof Error ? err.message : String(err);
+              toast.error(errMsg || "Failed to generate roll numbers");
+            } finally {
+              setGeneratingRollNos(false);
+            }
+          }}
+        >
+          {({ values, errors, touched, setFieldValue, handleSubmit, resetForm }) => (
+            <Form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", overflow: "hidden", maxHeight: "inherit" }}>
+              <DialogContent
+                sx={{
+                  p: 3,
+                  mt: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2.5,
+                  overflowY: "auto",
+                  maxHeight: "60vh",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#4b5563", lineHeight: 1.6 }}
+                >
+                  Select Class and Section to automatically generate roll numbers sequentially (1, 2, 3...) for all active students sorted by their **Admission Number (GR Number)**.
+                </Typography>
+
+                {/* Class Select */}
+                <Box>
+                  <Typography sx={labelSx}>
+                    Class <span style={{ color: "#f04438" }}>*</span>
+                  </Typography>
+                  <Autocomplete
+                    options={allClasses || []}
+                    getOptionLabel={(opt: any) => opt.name || ""}
+                    value={
+                      (allClasses || []).find(
+                        (c: any) => c._id === values.classId,
+                      ) || null
+                    }
+                    onChange={(_, newVal) => {
+                      setFieldValue("classId", (newVal as any)?._id || "");
+                      setFieldValue("sectionId", ""); // Reset section
+                    }}
+                    disabled={generatingRollNos}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Select Class"
+                        error={touched.classId && Boolean(errors.classId)}
+                        slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
+                      />
+                    )}
+                  />
+                  {touched.classId && errors.classId && (
+                    <FormHelperText className="error-text">
+                      {errors.classId as string}
+                    </FormHelperText>
+                  )}
+                </Box>
+
+                {/* Section Select */}
+                <Box>
+                  <Typography sx={labelSx}>
+                    Section <span style={{ color: "#f04438" }}>*</span>
+                  </Typography>
+                  <Autocomplete
+                    options={(allSections || []).filter((sec: SectionItem) => {
+                      const classId = typeof sec.classId === "object" && sec.classId !== null ? sec.classId._id : sec.classId;
+                      return classId === values.classId;
+                    })}
+                    getOptionLabel={(opt: any) => opt.code || opt.name || ""}
+                    value={
+                      (allSections || []).find(
+                        (s: any) => s._id === values.sectionId,
+                      ) || null
+                    }
+                    onChange={(_, newVal) =>
+                      setFieldValue("sectionId", (newVal as any)?._id || "")
+                    }
+                    disabled={!values.classId || generatingRollNos}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Select Section"
+                        error={touched.sectionId && Boolean(errors.sectionId)}
+                        slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
+                      />
+                    )}
+                  />
+                  {touched.sectionId && errors.sectionId && (
+                    <FormHelperText className="error-text">
+                      {errors.sectionId as string}
+                    </FormHelperText>
+                  )}
+                </Box>
+              </DialogContent>
+
+              <DialogActions
+                sx={{
+                  p: 3,
+                  borderTop: "1px solid #f3f4f6",
+                  bgcolor: "#fafafa",
+                  gap: 1.5,
+                }}
+              >
+                <Button
+                  onClick={() => {
+                    resetForm();
+                    setOpenRollNoModal(false);
+                  }}
+                  disabled={generatingRollNos}
+                  sx={{
+                    borderRadius: "8px",
+                    px: 3,
+                    py: 1,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    color: "#4b5563",
+                    border: "1px solid #e5e7eb",
+                    "&:hover": {
+                      bgcolor: "#f3f4f6",
+                    },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  className="admin-btn-theme"
+                  disabled={generatingRollNos}
+                  sx={{
+                    borderRadius: "8px",
+                    px: 3,
+                    py: 1,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    boxShadow: "none",
+                    "&:hover": {
+                      boxShadow: "none",
+                    },
+                  }}
+                >
+                  {generatingRollNos ? (
+                    <CircularProgress size={20} sx={{ color: "var(--button-text, #fff)" }} />
+                  ) : (
+                    "Generate Now"
+                  )}
+                </Button>
+              </DialogActions>
+            </Form>
+          )}
+        </Formik>
+      </Dialog>
+
+      <Dialog
+        open={openRangeModal}
+        onClose={() => setOpenRangeModal(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+            overflow: "hidden",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 3,
+            fontWeight: 700,
+            fontSize: "1.25rem",
+            color: "var(--primary-color)",
+            borderBottom: "1px solid #f3f4f6",
+            bgcolor: "#fafafa",
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+          }}
+        >
+          {getModalHeaderDetails().icon}
+          <span>{getModalHeaderDetails().title}</span>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, mt: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{ mb: 2, color: "#4b5563", lineHeight: 1.6 }}
+          >
+            {getModalHeaderDetails().description} Exporting a large number of records may cause browser performance issues or print preview crashes. Please select a record range slot to export (max 1,000 records per slot):
+          </Typography>
+          <Box sx={{ mb: 2 }}>
+            <Typography sx={labelSx}>
+              Record Range
+            </Typography>
+            <Select
+              id="range-slot-select"
+              value={selectedSlot ? JSON.stringify(selectedSlot) : ""}
+              onChange={(e) => {
+                try {
+                  setSelectedSlot(JSON.parse(e.target.value));
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+              fullWidth
+              sx={inputSx}
+            >
+              {generateSlots(total).map((slot, idx) => (
+                <MenuItem key={idx} value={JSON.stringify(slot)}>
+                  Records {slot.label} ({slot.limit} items)
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+
+          <Box sx={{ mt: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 1.5,
+              }}
+            >
+              <Typography sx={{ ...labelSx, mb: 0 }}>
+                Select Columns to Export
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={selectedExportFields.length === studentExportFields.length}
+                    indeterminate={
+                      selectedExportFields.length > 0 &&
+                      selectedExportFields.length < studentExportFields.length
+                    }
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedExportFields(studentExportFields.map((f) => f.key));
+                      } else {
+                        setSelectedExportFields([]);
+                      }
+                    }}
+                    size="small"
+                    sx={{
+                      color: "var(--primary-color)",
+                      "&.Mui-checked": {
+                        color: "var(--primary-color)",
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#344054" }}>
+                    Select All
+                  </Typography>
+                }
+                sx={{ mr: 0 }}
+              />
+            </Box>
+            <Grid container spacing={1}>
+              {studentExportFields.map((field) => (
+                <Grid item xs={6} key={field.key}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={selectedExportFields.includes(field.key)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedExportFields((prev) => [...prev, field.key]);
+                          } else {
+                            setSelectedExportFields((prev) =>
+                              prev.filter((k) => k !== field.key)
+                            );
+                          }
+                        }}
+                        size="small"
+                        sx={{
+                          color: "var(--primary-color)",
+                          "&.Mui-checked": {
+                            color: "var(--primary-color)",
+                          },
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography sx={{ fontSize: "12px", color: "#475467" }}>
+                        {field.label}
+                      </Typography>
+                    }
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            p: 3,
+            borderTop: "1px solid #f3f4f6",
+            bgcolor: "#fafafa",
+            gap: 1.5,
+          }}
+        >
+          <Button
+            onClick={() => setOpenRangeModal(false)}
+            sx={{
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 600,
+              color: "#4b5563",
+              border: "1px solid #e5e7eb",
+              "&:hover": {
+                bgcolor: "#f3f4f6",
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmRangeExport}
+            variant="contained"
+            className="admin-btn-theme"
+            sx={{
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 600,
+              boxShadow: "none",
+              "&:hover": {
+                boxShadow: "none",
+              },
+            }}
+          >
+            Export Now
           </Button>
         </DialogActions>
       </Dialog>

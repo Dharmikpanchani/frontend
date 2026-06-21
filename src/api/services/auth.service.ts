@@ -44,6 +44,9 @@ export const authService = {
   resendOtp: (payload: URLSearchParams) =>
     adminApiService.post<any>(Api.RESEND_OTP, payload),
 
+  getOtpStatus: (payload: URLSearchParams) =>
+    adminApiService.post<any>(Api.OTP_STATUS, payload),
+
   resetPassword: (payload: URLSearchParams) =>
     adminApiService.post<any>(Api.RESET_PASSWORD, payload),
 

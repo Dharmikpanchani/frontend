@@ -32,17 +32,22 @@ export const inputSx: SxProps<Theme> = {
         transition: "all 0.3s ease !important",
       },
       // hover
-      "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline, &:hover:not(.Mui-focused) fieldset":
+      "&:hover:not(.Mui-focused):not(.Mui-error) .MuiOutlinedInput-notchedOutline, &:hover:not(.Mui-focused):not(.Mui-error) fieldset":
         {
           borderColor: "var(--input-border, #ced4da) !important",
           opacity: 1,
         },
       // focus
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline, &.Mui-focused fieldset":
+      "&.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline, &.Mui-focused:not(.Mui-error) fieldset":
         {
           borderColor: "var(--primary-color, #002147) !important",
           borderWidth: "1px !important",
           boxShadow: "none !important",
+        },
+      // error
+      "&.Mui-error .MuiOutlinedInput-notchedOutline, &.Mui-error fieldset":
+        {
+          borderColor: "#d32f2f !important",
         },
       "&.Mui-disabled": {
         backgroundColor: "#f8f9fa !important",
@@ -104,16 +109,20 @@ export const multiInputSx: SxProps<Theme> = {
         borderWidth: "1px !important",
         transition: "all 0.3s ease !important",
       },
-      "&:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline, &:hover:not(.Mui-focused) fieldset":
+      "&:hover:not(.Mui-focused):not(.Mui-error) .MuiOutlinedInput-notchedOutline, &:hover:not(.Mui-focused):not(.Mui-error) fieldset":
         {
           borderColor: "var(--input-border, #ced4da) !important",
           opacity: 1,
         },
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline, &.Mui-focused fieldset":
+      "&.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline, &.Mui-focused:not(.Mui-error) fieldset":
         {
           borderColor: "var(--primary-color, #002147) !important",
           borderWidth: "1px !important",
           boxShadow: "none !important",
+        },
+      "&.Mui-error .MuiOutlinedInput-notchedOutline, &.Mui-error fieldset":
+        {
+          borderColor: "#d32f2f !important",
         },
       "&.Mui-disabled": {
         backgroundColor: "#f8f9fa !important",

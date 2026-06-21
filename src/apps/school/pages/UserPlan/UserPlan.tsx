@@ -129,8 +129,8 @@ export default function UserPlan() {
 
       let checkoutBase: string;
       if (window.location.hostname.includes("lvh.me")) {
-        // Local dev on lvh.me subdomain → redirect to root lvh.me (no subdomain)
-        checkoutBase = `${protocol}//lvh.me${port}`;
+        // Local dev: keep current subdomain so auth & API calls stay valid
+        checkoutBase = `${protocol}//${window.location.hostname}${port}`;
       } else if (window.location.hostname === "localhost") {
         checkoutBase = `${protocol}//localhost${port}`;
       } else {
@@ -333,7 +333,7 @@ export default function UserPlan() {
                           mt: 1,
                         }}
                       >
-                        Was ₹{offerPrice}
+                        Was ₹{price + offerPrice}
                       </Typography>
                     )}
                   </Box>

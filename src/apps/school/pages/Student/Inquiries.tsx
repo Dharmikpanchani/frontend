@@ -15,6 +15,14 @@ import {
   CircularProgress,
   MenuItem,
   Menu,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
+  Grid,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -31,6 +39,7 @@ import toast from "react-hot-toast";
 import moment from "moment";
 import Filter from "@/apps/common/filter/Filter";
 import Pagination from "@/apps/common/pagination/Pagination";
+import { labelSx, inputSx } from "@/utils/styles/commonSx";
 
 export default function Inquiries() {
 
@@ -77,6 +86,93 @@ export default function Inquiries() {
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
   const exporting = exportingFormat !== null;
 
+  const [openRangeModal, setOpenRangeModal] = useState<boolean>(false);
+  const [pendingFormat, setPendingFormat] = useState<"excel" | "pdf" | "print" | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<any>(null);
+
+  const inquiryExportFields = [
+    { key: "studentName", label: "Student Name" },
+    { key: "phoneNumber", label: "Mobile" },
+    { key: "className", label: "Class" },
+    { key: "message", label: "Message" },
+    { key: "date", label: "Date" },
+    { key: "status", label: "Status" },
+  ];
+
+  const [selectedExportFields, setSelectedExportFields] = useState<string[]>(
+    inquiryExportFields.map((f) => f.key)
+  );
+
+  const generateSlots = (totalCount: number) => {
+    if (!totalCount) return [];
+    const slots = [];
+    const slotSize = 1000;
+    const numSlots = Math.ceil(totalCount / slotSize);
+    for (let i = 0; i < numSlots; i++) {
+      const start = i * slotSize + 1;
+      const end = Math.min((i + 1) * slotSize, totalCount);
+      slots.push({
+        label: `${start} to ${end}`,
+        offset: i * slotSize,
+        limit: end - start + 1,
+        start,
+        end,
+      });
+    }
+    return slots;
+  };
+
+  const getModalHeaderDetails = () => {
+    switch (pendingFormat) {
+      case "excel":
+        return {
+          title: "Export Report to Excel",
+          icon: <ExcelIcon sx={{ color: "#12B76A", fontSize: "24px" }} />,
+          description: "Generate and download the admission inquiries report in Microsoft Excel (.xlsx) format.",
+        };
+      case "pdf":
+        return {
+          title: "Export Report to PDF",
+          icon: <PdfIcon sx={{ color: "#F04438", fontSize: "24px" }} />,
+          description: "Generate and download the admission inquiries report in PDF format.",
+        };
+      case "print":
+        return {
+          title: "Print Report View",
+          icon: <PrintIcon sx={{ color: "#667085", fontSize: "24px" }} />,
+          description: "Open the printer-friendly admission inquiries report view.",
+        };
+      default:
+        return {
+          title: "Export Report",
+          icon: <DownloadIcon sx={{ color: "var(--primary-color)", fontSize: "24px" }} />,
+          description: "Select record range slot to export.",
+        };
+    }
+  };
+
+  const handleExportClick = (format: "excel" | "pdf" | "print") => {
+    setPendingFormat(format);
+    const slots = generateSlots(total);
+    if (slots.length > 0) {
+      setSelectedSlot(slots[0]);
+    } else {
+      setSelectedSlot(null);
+    }
+    setOpenRangeModal(true);
+  };
+
+  const handleConfirmRangeExport = () => {
+    if (selectedExportFields.length === 0) {
+      toast.error("Please select at least one column to export.");
+      return;
+    }
+    setOpenRangeModal(false);
+    if (pendingFormat && selectedSlot) {
+      handleExport(pendingFormat, selectedSlot.limit, selectedSlot.offset);
+    }
+  };
+
   const fetchInquiries = async () => {
     setLoading(true);
     try {
@@ -105,14 +201,22 @@ export default function Inquiries() {
     return () => clearTimeout(timer);
   }, [page, search, filterValues, rowsPerPage]);
 
-  const handleExport = async (format: "excel" | "pdf" | "print") => {
+  const handleExport = async (
+    format: "excel" | "pdf" | "print",
+    limit?: number,
+    offset?: number
+  ) => {
     try {
       setExportingFormat(format);
       const params = {
         searchRequest: search,
         studentName: filterValues.studentName || undefined,
         date: filterValues.date ? moment(filterValues.date).format("YYYY-MM-DD") : undefined,
+        status: filterValues.status || undefined,
         format,
+        limit,
+        offset,
+        fields: selectedExportFields.join(","),
       };
 
       const response: any = await admissionService.exportInquiries(params);
@@ -209,13 +313,13 @@ export default function Inquiries() {
                 Export Report
               </Button>
               <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
-                <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
                   <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
                 </MenuItem>
-                <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
                   <PdfIcon sx={{ fontSize: "18px", color: "#F04438" }} /> Export PDF
                 </MenuItem>
-                <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                <MenuItem onClick={() => { setExportAnchorEl(null); handleExportClick("print"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
                   <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Print View
                 </MenuItem>
               </Menu>
@@ -291,6 +395,194 @@ export default function Inquiries() {
         handleReset={handleResetFilters}
         initialValues={filterValues}
       />
+
+      <Dialog
+        open={openRangeModal}
+        onClose={() => setOpenRangeModal(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+            overflow: "hidden",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 3,
+            fontWeight: 700,
+            fontSize: "1.25rem",
+            color: "var(--primary-color)",
+            borderBottom: "1px solid #f3f4f6",
+            bgcolor: "#fafafa",
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+          }}
+        >
+          {getModalHeaderDetails().icon}
+          <span>{getModalHeaderDetails().title}</span>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, mt: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{ mb: 2, color: "#4b5563", lineHeight: 1.6 }}
+          >
+            {getModalHeaderDetails().description} Exporting a large number of records may cause browser performance issues or print preview crashes. Please select a record range slot to export (max 1,000 records per slot):
+          </Typography>
+          <Box sx={{ mb: 2 }}>
+            <Typography sx={labelSx}>
+              Record Range
+            </Typography>
+            <Select
+              id="range-slot-select"
+              value={selectedSlot ? JSON.stringify(selectedSlot) : ""}
+              onChange={(e) => {
+                try {
+                  setSelectedSlot(JSON.parse(e.target.value));
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+              fullWidth
+              sx={inputSx}
+            >
+              {generateSlots(total).map((slot, idx) => (
+                <MenuItem key={idx} value={JSON.stringify(slot)}>
+                  Records {slot.label} ({slot.limit} items)
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+
+          <Box sx={{ mt: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 1.5,
+              }}
+            >
+              <Typography sx={{ ...labelSx, mb: 0 }}>
+                Select Columns to Export
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={selectedExportFields.length === inquiryExportFields.length}
+                    indeterminate={
+                      selectedExportFields.length > 0 &&
+                      selectedExportFields.length < inquiryExportFields.length
+                    }
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedExportFields(inquiryExportFields.map((f) => f.key));
+                      } else {
+                        setSelectedExportFields([]);
+                      }
+                    }}
+                    size="small"
+                    sx={{
+                      color: "var(--primary-color)",
+                      "&.Mui-checked": {
+                        color: "var(--primary-color)",
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#344054" }}>
+                    Select All
+                  </Typography>
+                }
+                sx={{ mr: 0 }}
+              />
+            </Box>
+            <Grid container spacing={1}>
+              {inquiryExportFields.map((field) => (
+                <Grid item xs={6} key={field.key}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={selectedExportFields.includes(field.key)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedExportFields((prev) => [...prev, field.key]);
+                          } else {
+                            setSelectedExportFields((prev) =>
+                              prev.filter((k) => k !== field.key)
+                            );
+                          }
+                        }}
+                        size="small"
+                        sx={{
+                          color: "var(--primary-color)",
+                          "&.Mui-checked": {
+                            color: "var(--primary-color)",
+                          },
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography sx={{ fontSize: "12px", color: "#475467" }}>
+                        {field.label}
+                      </Typography>
+                    }
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            p: 3,
+            borderTop: "1px solid #f3f4f6",
+            bgcolor: "#fafafa",
+            gap: 1.5,
+          }}
+        >
+          <Button
+            onClick={() => setOpenRangeModal(false)}
+            sx={{
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 600,
+              color: "#4b5563",
+              border: "1px solid #e5e7eb",
+              "&:hover": {
+                bgcolor: "#f3f4f6",
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmRangeExport}
+            variant="contained"
+            className="admin-btn-theme"
+            sx={{
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 600,
+              boxShadow: "none",
+              "&:hover": {
+                boxShadow: "none",
+              },
+            }}
+          >
+            Export Now
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

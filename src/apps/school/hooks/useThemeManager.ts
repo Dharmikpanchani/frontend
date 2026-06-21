@@ -24,11 +24,10 @@ export const useThemeManager = () => {
     (state: RootState) => state.SchoolReducer,
   );
 
-  // Prioritize theme from adminDetails (backend response) over redux initial state
   const theme = useMemo(() => {
     return {
-      ...reduxTheme,
       ...(adminDetails?.schoolData?.theme || {}),
+      ...reduxTheme,
     };
   }, [reduxTheme, adminDetails?.schoolData?.theme]);
 
