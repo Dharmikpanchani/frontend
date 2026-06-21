@@ -1942,7 +1942,7 @@ export default function Student() {
             </Box>
             <Grid container spacing={1}>
               {studentExportFields.map((field) => (
-                <Grid item xs={6} key={field.key}>
+                <Grid size={{ xs: 6 }} key={field.key}>
                   <FormControlLabel
                     control={
                       <Checkbox

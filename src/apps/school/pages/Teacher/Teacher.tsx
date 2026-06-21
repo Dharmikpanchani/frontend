@@ -290,7 +290,7 @@ export default function Teacher() {
   const [buttonStatusSpinner, setButtonStatusSpinner] = useState(false);
 
   const [openFilter, setOpenFilter] = useState(false);
-  const [filterValues, setFilterValues] = useState({
+  const [filterValues, setFilterValues] = useState<any>({
     departmentId: "",
     classId: "",
     sectionId: "",
@@ -2424,7 +2424,7 @@ export default function Teacher() {
             </Box>
             <Grid container spacing={1}>
               {teacherExportFields.map((field) => (
-                <Grid item xs={6} key={field.key}>
+                <Grid size={{ xs: 6 }} key={field.key}>
                   <FormControlLabel
                     control={
                       <Checkbox

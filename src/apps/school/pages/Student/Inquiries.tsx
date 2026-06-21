@@ -50,7 +50,7 @@ export default function Inquiries() {
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const [openFilter, setOpenFilter] = useState(false);
-  const [filterValues, setFilterValues] = useState({
+  const [filterValues, setFilterValues] = useState<any>({
     studentName: "",
     date: "",
   });
@@ -504,7 +504,7 @@ export default function Inquiries() {
             </Box>
             <Grid container spacing={1}>
               {inquiryExportFields.map((field) => (
-                <Grid item xs={6} key={field.key}>
+                <Grid size={{ xs: 6 }} key={field.key}>
                   <FormControlLabel
                     control={
                       <Checkbox
