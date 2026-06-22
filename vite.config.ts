@@ -16,8 +16,8 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: [
   '.lvh.me',
-  '.vidhyasetu.com',
-  '.admin.vidhyasetu.com',
+  '.vidyasetudemo.in',
+  '.admin.vidyasetudemo.in',
 ],
 
     proxy: {
