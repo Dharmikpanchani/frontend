@@ -433,7 +433,7 @@ export default function SchoolDetails() {
                   <OutlinedInput
                     fullWidth
                     disabled
-                    value={`${values.schoolCode}.lvh.me:5173`}
+                    value={`${values.schoolCode}${import.meta.env.VITE_END_WITH_DOMAIN || '.admin.vidyasetudemo.in'}`}
                     sx={{ ...inputSx, backgroundColor: "#F9FAFB" }}
                     endAdornment={
                       <InputAdornment position="end">
@@ -449,7 +449,7 @@ export default function SchoolDetails() {
                           <IconButton
                             onClick={() =>
                               handleCopy(
-                                `${values.schoolCode}.lvh.me:5173`,
+                                `${values.schoolCode}${import.meta.env.VITE_END_WITH_DOMAIN || '.admin.vidyasetudemo.in'}`,
                                 "url",
                               )
                             }
