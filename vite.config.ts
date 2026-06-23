@@ -16,8 +16,7 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: [
   '.lvh.me',
-  '.vidyasetudemo.in',
-  '.admin.vidyasetudemo.in',
+  'https://0cf9-171-61-167-248.ngrok-free.app/'
 ],
 
     proxy: {
