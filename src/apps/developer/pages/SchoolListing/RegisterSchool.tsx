@@ -334,8 +334,8 @@ export default function RegisterSchool() {
                           onChange={handleChange}
                           onBlur={handleBlur}
                           error={
-                            touched.schoolName && Boolean(errors.schoolName)
-                          }
+                             touched.schoolName && Boolean(errors.schoolName)
+                           }
                           disabled={isView}
                           slotProps={{ htmlInput: { maxLength: 120 } }}
                         />

@@ -172,6 +172,26 @@ DataService.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // 🔴 403 — Access temporarily suspended (plan violation block)
+    // When school_admin hits 15+ unauthorized plan access attempts,
+    // backend blocks them for 3 hours. Auto-logout with toaster.
+    if (error.response?.status === 403) {
+      const message: string = error.response?.data?.message ?? "";
+      const VIOLATION_BLOCK_MSG =
+        "Access temporarily suspended for 3 hours due to repeated unauthorized access attempts.";
+
+      if (message === VIOLATION_BLOCK_MSG) {
+        toasterInfo({
+          title: "⛔ Access Suspended",
+          body: message,
+        });
+        setTimeout(async () => {
+          await handleLogout();
+        }, 3000);
+        return Promise.reject(error);
+      }
+    }
+
     return Promise.reject(error);
   },
 );

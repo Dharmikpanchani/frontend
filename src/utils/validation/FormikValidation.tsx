@@ -136,6 +136,14 @@ export const schoolCodeValidation = (required = true) => {
     )
     .transform((value) => value?.trim()) // remove start/end spaces
     .matches(/^[A-Za-z]+$/, "School url name can only contain alphabets")
+    .test(
+      "not-reserved",
+      "School Url name already exists",
+      (value) => {
+        if (!value) return true;
+        return !["api", "admin"].includes(value.toLowerCase().trim());
+      }
+    )
     .min(3, "School url name must be at least 3 characters")
     .max(30, "School url name must be at most 30 characters");
   return required ? schema.required("School url name is required") : schema;

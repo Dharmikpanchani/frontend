@@ -56,12 +56,18 @@ function PermissionRoute({
     permissions,
     isAdminLogin,
     isSuperDeveloper,
+    isDeveloperAdmin,
   } = usePermissions();
 
-  if (
-    loading ||
-    (isAdminLogin && permissions.length === 0 && !isSuperDeveloper)
-  ) {
+  // Show loader only when:
+  // - Still fetching admin data (loading)
+  // - OR: developer_admin with no roles loaded yet (they need roles for permission check)
+  const isWaitingForRoles =
+    isAdminLogin &&
+    isDeveloperAdmin &&
+    permissions.length === 0;
+
+  if (loading || isWaitingForRoles) {
     return <PageLoader />;
   }
 

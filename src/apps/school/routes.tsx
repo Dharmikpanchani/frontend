@@ -85,15 +85,23 @@ function PermissionRoute({
     isAdminLogin,
     isSuperDeveloper,
     isSuperSchoolAdmin,
+    isSchoolAdmin,
+    planPermissions,
   } = usePermissions();
 
-  if (
-    loading ||
-    (isAdminLogin &&
-      permissions.length === 0 &&
-      !isSuperDeveloper &&
-      !isSuperSchoolAdmin)
-  ) {
+  // Show loader only when:
+  // - Still fetching admin data (loading)
+  // - OR: logged in as school_admin but roles not yet loaded
+  //   (super_school_admin & super_developer never need roles, skip loader for them)
+  const isWaitingForRoles =
+    isAdminLogin &&
+    !isSuperDeveloper &&
+    !isSuperSchoolAdmin &&
+    isSchoolAdmin &&
+    permissions.length === 0 &&
+    planPermissions.length > 0; // only wait if plan has permissions (real sub-admin)
+
+  if (loading || isWaitingForRoles) {
     return <PageLoader />;
   }
 

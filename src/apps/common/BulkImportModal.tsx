@@ -16,12 +16,18 @@ import {
   TableRow,
   Paper,
   Alert,
+  AlertTitle,
   IconButton,
+  Tooltip,
 } from "@mui/material";
 import {
   CloudUpload as CloudUploadIcon,
   Download as DownloadIcon,
   Close as CloseIcon,
+  InsertDriveFile as FileIcon,
+  DeleteOutline as DeleteIcon,
+  CheckCircleOutline as CheckCircleIcon,
+  ErrorOutline as ErrorIcon,
 } from "@mui/icons-material";
 import { Formik, Form } from "formik";
 import { bulkImportValidationSchema } from "@/utils/validation/FormikValidation";
@@ -60,7 +66,7 @@ export default function BulkImportModal({
     <Dialog
       open={open}
       onClose={() => !loading && onClose()}
-      maxWidth="sm"
+      maxWidth="md"
       fullWidth
       PaperProps={{
         sx: {
@@ -89,6 +95,9 @@ export default function BulkImportModal({
               }
             } else {
               setErrors(result.errors || [{ message: result.message || "Upload failed." }]);
+              if (result.message) {
+                setSuccessMessage(result.message);
+              }
             }
           } catch (err: any) {
             setErrors([{ message: err.message || "An unexpected error occurred." }]);
@@ -127,37 +136,61 @@ export default function BulkImportModal({
             <DialogContent
               dividers
               sx={{
-                p: 3,
+                p: 3.5,
                 overflowY: "auto",
-                maxHeight: "60vh",
+                maxHeight: "65vh",
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+                borderColor: "#f3f4f6",
               }}
             >
-              <Box sx={{ mb: 3 }}>
+              {/* Instructions banner */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 2,
+                  p: 2.5,
+                  borderRadius: "12px",
+                  bgcolor: "rgba(0, 33, 71, 0.03)",
+                  border: "1px solid rgba(0, 33, 71, 0.08)",
+                }}
+              >
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "var(--primary-color)", mb: 0.5, fontSize: "14px" }}>
+                    Import Instructions
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "#475467", lineHeight: 1.5, fontSize: "12.5px" }}>
+                    Download our official spreadsheet template, enter the details matching the headers, and upload it here. Supported formats are <strong>.xlsx</strong> and <strong>.csv</strong>.
+                  </Typography>
+                </Box>
                 <Button
                   variant="outlined"
-                  startIcon={<DownloadIcon />}
+                  startIcon={<DownloadIcon sx={{ fontSize: 16 }} />}
                   onClick={onDownloadTemplate}
                   sx={{
                     borderRadius: "8px",
-                    px: 3,
+                    px: 2.5,
                     py: 1,
+                    fontSize: "12.5px",
                     textTransform: "none",
-                    fontWeight: 600,
-                    color: "#344054",
-                    borderColor: "#eaecf0",
+                    fontWeight: 700,
+                    color: "var(--primary-color)",
+                    borderColor: "var(--primary-color)",
+                    flexShrink: 0,
+                    transition: "all 0.2s ease",
                     "&:hover": {
-                      bgcolor: "#f9fafb",
-                      borderColor: "#d0d5dd",
+                      bgcolor: "rgba(0, 33, 71, 0.05)",
+                      borderColor: "var(--primary-color)",
                     },
                   }}
                 >
-                  Download Template
+                  Template
                 </Button>
-                <Typography variant="body2" sx={{ mt: 1.5, color: "text.secondary", lineHeight: 1.6 }}>
-                  Please download the template, fill in your data, and upload it below. Supported formats: .xlsx, .csv
-                </Typography>
               </Box>
 
+              {/* Upload Drop Zone */}
               <Box
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
@@ -169,13 +202,18 @@ export default function BulkImportModal({
                   }
                 }}
                 sx={{
-                  border: "2px dashed #ccc",
-                  borderRadius: 2,
-                  p: 4,
+                  border: "2px dashed",
+                  borderColor: values.file ? "var(--primary-color)" : "#d0d5dd",
+                  borderRadius: "12px",
+                  p: 4.5,
                   textAlign: "center",
-                  bgcolor: "#f9fafb",
+                  bgcolor: values.file ? "rgba(0, 33, 71, 0.02)" : "#f9fafb",
                   cursor: "pointer",
-                  "&:hover": { bgcolor: "#f3f4f6" },
+                  transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                  "&:hover": {
+                    bgcolor: "rgba(0, 33, 71, 0.04)",
+                    borderColor: "var(--primary-color)",
+                  },
                 }}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -192,48 +230,219 @@ export default function BulkImportModal({
                   accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                   style={{ display: "none" }}
                 />
-                <CloudUploadIcon sx={{ fontSize: 40, color: "var(--primary-color)", mb: 1 }} />
-                {values.file ? (
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    {values.file.name}
-                  </Typography>
+                
+                {!values.file ? (
+                  <Box>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: "50%",
+                        bgcolor: "#f2f4f7",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        margin: "0 auto",
+                        mb: 2,
+                        color: "#475467",
+                      }}
+                    >
+                      <CloudUploadIcon sx={{ fontSize: 24 }} />
+                    </Box>
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: "#344054", fontSize: "14px", mb: 0.5 }}>
+                      Drag & Drop file here or <span style={{ color: "var(--primary-color)", textDecoration: "underline" }}>Click to Browse</span>
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#667085", fontSize: "12px" }}>
+                      Excel or CSV files up to 10MB
+                    </Typography>
+                  </Box>
                 ) : (
-                  <Typography variant="body1">
-                    Drag & Drop file here or <strong>Click to Browse</strong>
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      maxWidth: "400px",
+                      margin: "0 auto",
+                      p: 2,
+                      borderRadius: "8px",
+                      bgcolor: "#fff",
+                      border: "1px solid #e4e7ec",
+                      boxShadow: "0 1px 2px rgba(16, 24, 40, 0.05)",
+                    }}
+                    onClick={(e) => e.stopPropagation()} // Prevent triggering browse click
+                  >
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "8px",
+                        bgcolor: "rgba(0, 33, 71, 0.08)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--primary-color)",
+                      }}
+                    >
+                      <FileIcon sx={{ fontSize: 20 }} />
+                    </Box>
+                    <Box sx={{ flexGrow: 1, textAlign: "left", overflow: "hidden" }}>
+                      <Typography variant="body2" noWrap sx={{ fontWeight: 700, color: "#344054", fontSize: "13px" }}>
+                        {values.file.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: "#667085", fontSize: "11px" }}>
+                        {(values.file.size / 1024).toFixed(1)} KB
+                      </Typography>
+                    </Box>
+                    <Tooltip title="Remove File" arrow>
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setFieldValue("file", null);
+                          setErrors([]);
+                          setSuccessMessage(null);
+                          if (fileInputRef.current) fileInputRef.current.value = "";
+                        }}
+                        sx={{
+                          color: "#f04438",
+                          "&:hover": { bgcolor: "#fef3f2" },
+                        }}
+                      >
+                        <DeleteIcon sx={{ fontSize: 20 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 )}
               </Box>
 
               {touched.file && formikErrors.file && (
-                <Alert severity="error" sx={{ mt: 2, borderRadius: "8px" }}>
+                <Alert severity="error" icon={<ErrorIcon />} sx={{ borderRadius: "8px", fontSize: "13px" }}>
                   {formikErrors.file as string}
                 </Alert>
               )}
 
               {successMessage && (
-                <Alert severity="success" sx={{ mt: 3, borderRadius: "8px" }}>
+                <Alert
+                  severity={errors.length > 0 && errors[0]?.row !== undefined ? "warning" : "success"}
+                  icon={errors.length > 0 && errors[0]?.row !== undefined ? <ErrorIcon /> : <CheckCircleIcon />}
+                  sx={{ borderRadius: "8px", fontSize: "13px" }}
+                >
+                  <AlertTitle sx={{ fontWeight: 700 }}>
+                    {errors.length > 0 && errors[0]?.row !== undefined ? "Import Completed with Warnings" : "Success"}
+                  </AlertTitle>
                   {successMessage}
                 </Alert>
               )}
 
               {errors.length > 0 && (
-                <Box sx={{ mt: 3 }}>
-                  <Alert severity="error" sx={{ mb: 2, borderRadius: "8px" }}>
-                    Upload failed due to validation errors. Please fix them and try again.
+                <Box>
+                  <Alert severity="error" icon={<ErrorIcon />} sx={{ mb: 2, borderRadius: "8px", fontSize: "13px" }}>
+                    <AlertTitle sx={{ fontWeight: 700 }}>Import Validation Failed</AlertTitle>
+                    Upload failed due to validation errors. Please review the details below, fix the file and try again.
                   </Alert>
-                  <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 250, borderRadius: "8px" }}>
+                  
+                  <TableContainer
+                    component={Paper}
+                    variant="outlined"
+                    sx={{
+                      maxHeight: 250,
+                      borderRadius: "12px",
+                      border: "1px solid #eaecf0",
+                      boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
+                    }}
+                  >
                     <Table size="small" stickyHeader>
                       <TableHead>
                         <TableRow>
-                          <TableCell sx={{ fontWeight: 600, width: 80 }}>Row No</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>Error Message</TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              width: 80,
+                              bgcolor: "#f9fafb",
+                              color: "#475467",
+                              borderBottom: "1px solid #eaecf0",
+                              fontSize: "12px",
+                              py: 1.5,
+                            }}
+                          >
+                            Row No
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              width: 150,
+                              bgcolor: "#f9fafb",
+                              color: "#475467",
+                              borderBottom: "1px solid #eaecf0",
+                              fontSize: "12px",
+                              py: 1.5,
+                            }}
+                          >
+                            Name
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              bgcolor: "#f9fafb",
+                              color: "#475467",
+                              borderBottom: "1px solid #eaecf0",
+                              fontSize: "12px",
+                              py: 1.5,
+                            }}
+                          >
+                            Error Message
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: 700,
+                              width: 180,
+                              bgcolor: "#f9fafb",
+                              color: "#475467",
+                              borderBottom: "1px solid #eaecf0",
+                              fontSize: "12px",
+                              py: 1.5,
+                            }}
+                          >
+                            Field Value
+                          </TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {errors.map((err, idx) => (
-                          <TableRow key={idx}>
-                            <TableCell>{err.row || "-"}</TableCell>
-                            <TableCell>{err.message || JSON.stringify(err)}</TableCell>
+                          <TableRow
+                            key={idx}
+                            sx={{
+                              "&:hover": { bgcolor: "#f9fafb" },
+                              "&:last-child td": { borderBottom: 0 },
+                            }}
+                          >
+                            <TableCell sx={{ py: 1.5 }}>
+                              <Box
+                                sx={{
+                                  display: "inline-block",
+                                  px: 1,
+                                  py: 0.25,
+                                  borderRadius: "4px",
+                                  bgcolor: "#f2f4f7",
+                                  color: "#344054",
+                                  fontWeight: 700,
+                                  fontSize: "11px",
+                                  textAlign: "center",
+                                  minWidth: "24px",
+                                }}
+                              >
+                                {err.row || "-"}
+                              </Box>
+                            </TableCell>
+                            <TableCell sx={{ py: 1.5, fontSize: "12.5px", fontWeight: 600, color: "#344054" }}>
+                              {err.name || "—"}
+                            </TableCell>
+                            <TableCell sx={{ py: 1.5, color: "#b42318", fontSize: "12.5px", fontWeight: 500 }}>
+                              {err.message || JSON.stringify(err)}
+                            </TableCell>
+                            <TableCell sx={{ py: 1.5, fontSize: "12px", color: "#475467", fontFamily: "monospace", wordBreak: "break-all" }}>
+                              {err.value || "—"}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>

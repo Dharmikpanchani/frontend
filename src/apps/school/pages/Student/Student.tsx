@@ -543,12 +543,26 @@ export default function Student() {
     try {
       const response = await masterService.importStudents(file);
       handleGetData();
-      return { success: true, message: response.data.message };
+      
+      if (response?.data && response.data.failCount > 0) {
+        return {
+          success: false,
+          message: `${response.data.successCount} Students imported successfully, ${response.data.failCount} failed.`,
+          errors: response.data.failures,
+        };
+      }
+      
+      return { success: true, message: response.message || "Students imported successfully." };
     } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Failed to import students";
+      const errors = error.response?.data?.data?.failures || 
+                     error.response?.data?.data?.errors || 
+                     error.response?.data?.errors || 
+                     null;
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to import students",
-        errors: error.response?.data?.errors
+        message,
+        errors,
       };
     }
   };

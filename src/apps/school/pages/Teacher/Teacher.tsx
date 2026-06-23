@@ -619,12 +619,26 @@ export default function Teacher() {
     try {
       const response = await masterService.importTeachers(file);
       handleGetData();
-      return { success: true, message: response.data.message };
+      
+      if (response?.data && response.data.failCount > 0) {
+        return {
+          success: false,
+          message: `${response.data.successCount} Teachers imported successfully, ${response.data.failCount} failed.`,
+          errors: response.data.failures,
+        };
+      }
+      
+      return { success: true, message: response.message || "Teachers imported successfully." };
     } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Failed to import teachers";
+      const errors = error.response?.data?.data?.failures || 
+                     error.response?.data?.data?.errors || 
+                     error.response?.data?.errors || 
+                     null;
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to import teachers",
-        errors: error.response?.data?.errors
+        message,
+        errors,
       };
     }
   };
