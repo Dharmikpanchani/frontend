@@ -345,7 +345,6 @@ export default function AddEditPlan() {
                     ...new Set([
                       ...permissions,
                       ...allExp,
-                      ...planModuleGroups.flatMap((g) => getDefaultKeys(g)),
                     ]),
                   ]);
                 } else {
@@ -369,7 +368,6 @@ export default function AddEditPlan() {
                     ...new Set([
                       ...permissions,
                       ...allImp,
-                      ...planModuleGroups.flatMap((g) => getDefaultKeys(g)),
                     ]),
                   ]);
                 } else {
@@ -606,7 +604,15 @@ export default function AddEditPlan() {
                                 variant="outlined"
                                 sx={inputSx}
                                 value={values.monthlyPrice}
-                                onChange={handleChange}
+                                onChange={(e) => {
+                                  handleChange(e);
+                                  const val = e.target.value;
+                                  if (val && !isNaN(Number(val))) {
+                                    setFieldValue("monOfferPrice", Math.round(Number(val) * 0.1));
+                                  } else {
+                                    setFieldValue("monOfferPrice", "");
+                                  }
+                                }}
                                 onBlur={handleBlur}
                                 error={touched.monthlyPrice && Boolean(errors.monthlyPrice)}
                                 disabled={isView}
@@ -668,7 +674,15 @@ export default function AddEditPlan() {
                                 variant="outlined"
                                 sx={inputSx}
                                 value={values.yearlyPrice}
-                                onChange={handleChange}
+                                onChange={(e) => {
+                                  handleChange(e);
+                                  const val = e.target.value;
+                                  if (val && !isNaN(Number(val))) {
+                                    setFieldValue("yerOfferPrice", Math.round(Number(val) * 0.1));
+                                  } else {
+                                    setFieldValue("yerOfferPrice", "");
+                                  }
+                                }}
                                 onBlur={handleBlur}
                                 error={touched.yearlyPrice && Boolean(errors.yearlyPrice)}
                                 disabled={isView}

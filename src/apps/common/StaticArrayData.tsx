@@ -311,7 +311,7 @@ export const planModuleGroups: PlanModuleGroup[] = [
   {
     groupTitle: 'Admin & Roles',
     groupId: 'admin_roles',
-    price: '₹ 8',
+    price: '₹ 2',
     subModuleIds: ['role', 'admin_user'],
     hasExport: true,
     hasImport: true,
@@ -320,7 +320,7 @@ export const planModuleGroups: PlanModuleGroup[] = [
   {
     groupTitle: 'Teacher Management',
     groupId: 'teacher_mgmt',
-    price: '₹ 27',
+    price: '₹ 2',
     subModuleIds: ['teacher', 'department', 'subject', 'class', 'section'],
     hasExport: true,
     hasImport: true,
@@ -329,7 +329,7 @@ export const planModuleGroups: PlanModuleGroup[] = [
   {
     groupTitle: 'Student Management',
     groupId: 'student_mgmt',
-    price: '₹ 12',
+    price: '₹ 2',
     subModuleIds: ['student'],
     hasExport: true,
     hasImport: true,
@@ -338,7 +338,7 @@ export const planModuleGroups: PlanModuleGroup[] = [
   {
     groupTitle: 'Fee Management',
     groupId: 'fee_mgmt',
-    price: '₹ 16',
+    price: '₹ 2',
     // fee_category, fee_structure, fee_collection + school_settings payment config
     subModuleIds: ['fee_category', 'fee_structure', 'fee_collection', 'school_settings'],
     hasExport: true,
@@ -348,7 +348,7 @@ export const planModuleGroups: PlanModuleGroup[] = [
   {
     groupTitle: 'Theme & Appearance',
     groupId: 'theme_mgmt',
-    price: '₹ 5',
+    price: '₹ 2',
     subModuleIds: ['theme'],
     hasExport: false,
     hasImport: false,
@@ -357,7 +357,7 @@ export const planModuleGroups: PlanModuleGroup[] = [
   {
     groupTitle: 'School Settings',
     groupId: 'settings_mgmt',
-    price: '₹ 7',
+    price: '₹ 2',
     subModuleIds: ['school_profile'],
     hasExport: false,
     hasImport: false,
@@ -366,10 +366,10 @@ export const planModuleGroups: PlanModuleGroup[] = [
 ];
 
 /** Global Export add-on price (applies to all eligible modules) */
-export const planExportPrice = '₹ 5';
+export const planExportPrice = '₹ 2';
 
 /** Global Import add-on price (applies to all eligible modules) */
-export const planImportPrice = '₹ 5';
+export const planImportPrice = '₹ 2';
 
 
 export const schoolRoleStaticData: RoleStaticItem[] = [
@@ -650,17 +650,25 @@ export const salaryTypeOptions = [
 
 export const calculateMinMonthlyPrice = (permissions: string[]): number => {
   let total = 0;
-  planStaticData.forEach((module) => {
-    // Check if any selected permission starts with this module's mainTitleId
-    const isModuleSelected = permissions.some((p) =>
-      p.startsWith(`${module.mainTitleId}_`),
+  
+  planModuleGroups.forEach((group) => {
+    const isSelected = group.subModuleIds.some((subId) =>
+      permissions.some((p) => p.startsWith(`${subId}_`))
     );
-    if (isModuleSelected && module.price) {
-      const priceNum = parseInt(module.price.replace(/[^\d]/g, ""), 10);
-      if (!isNaN(priceNum)) {
-        total += priceNum;
-      }
+    if (isSelected) {
+      total += 2;
     }
   });
+
+  const hasExport = permissions.some((p) => p.endsWith("_export"));
+  if (hasExport) {
+    total += 2;
+  }
+
+  const hasImport = permissions.some((p) => p.endsWith("_import"));
+  if (hasImport) {
+    total += 2;
+  }
+
   return total;
 };

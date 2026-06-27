@@ -194,30 +194,34 @@ export default function PlanView() {
         : [],
     );
 
-  const isGroupDefaultChecked = (g: PlanModuleGroup) => {
+  const isGroupDefaultChecked = (g: PlanModuleGroup, permissionsList = permissions) => {
     const k = getDefaultKeys(g);
-    return k.length > 0 && k.every((x) => permissions.includes(x));
+    return k.length > 0 && k.every((x) => permissionsList.includes(x));
   };
 
-  const isGroupDefaultIndeterminate = (g: PlanModuleGroup) => {
+  const isGroupDefaultIndeterminate = (g: PlanModuleGroup, permissionsList = permissions) => {
     const k = getDefaultKeys(g);
-    const n = k.filter((x) => permissions.includes(x)).length;
+    const n = k.filter((x) => permissionsList.includes(x)).length;
     return n > 0 && n < k.length;
+  };
+
+  const isGroupExportChecked = (g: PlanModuleGroup, permissionsList = permissions) => {
+    const k = getExportKeys(g);
+    return k.length > 0 && k.every((x) => permissionsList.includes(x));
+  };
+
+  const isGroupImportChecked = (g: PlanModuleGroup, permissionsList = permissions) => {
+    const k = getImportKeys(g);
+    return k.length > 0 && k.every((x) => permissionsList.includes(x));
   };
 
   const isAllExportChecked = planModuleGroups
     .filter((g) => g.hasExport)
-    .every((g) => {
-      const k = getExportKeys(g);
-      return k.length > 0 && k.every((x) => permissions.includes(x));
-    });
+    .every((g) => isGroupExportChecked(g, permissions));
 
   const isAllImportChecked = planModuleGroups
     .filter((g) => g.hasImport)
-    .every((g) => {
-      const k = getImportKeys(g);
-      return k.length > 0 && k.every((x) => permissions.includes(x));
-    });
+    .every((g) => isGroupImportChecked(g, permissions));
 
   if (loading) return <CommonLoader />;
 
@@ -620,26 +624,7 @@ export default function PlanView() {
                   </Typography>
                 </Box>
 
-                {/* Pricing Tag in Footer */}
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: "auto" }}>
-                  <Chip
-                    label={
-                      initialValues.billingCycle === "yearly"
-                        ? `₹ ${(parseInt(group.price.replace(/[^\d]/g, ""), 10) || 0) * 2}/yr`
-                        : `${group.price}/6mo`
-                    }
-                    size="small"
-                    sx={{
-                      fontSize: "8.5px",
-                      fontWeight: 700,
-                      bgcolor: "rgba(255, 140, 0, 0.09)",
-                      color: "#c05600",
-                      border: "1px solid rgba(255, 140, 0, 0.18)",
-                      height: "16px",
-                      px: 0.1,
-                    }}
-                  />
-                </Box>
+                {/* Pricing Tag in Footer hidden for School View */}
               </Box>
             );
           })}
@@ -718,17 +703,7 @@ export default function PlanView() {
               </Typography>
             </Box>
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Chip
-                label={
-                  initialValues.billingCycle === "yearly"
-                    ? `₹ ${(parseInt(planExportPrice.replace(/[^\d]/g, ""), 10) || 0) * 2}/yr`
-                    : `${planExportPrice}/6mo`
-                }
-                size="small"
-                sx={{ fontSize: "8.5px", fontWeight: 700, bgcolor: "rgba(22, 163, 74, 0.08)", color: "#16a34a", border: "1px solid rgba(22, 163, 74, 0.2)", height: "16px", px: 0.1 }}
-              />
-            </Box>
+            {/* Pricing Hidden for School View */}
           </Box>
 
           {/* Import Add-on Card */}
@@ -779,17 +754,7 @@ export default function PlanView() {
               </Typography>
             </Box>
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Chip
-                label={
-                  initialValues.billingCycle === "yearly"
-                    ? `₹ ${(parseInt(planImportPrice.replace(/[^\d]/g, ""), 10) || 0) * 2}/yr`
-                    : `${planImportPrice}/6mo`
-                }
-                size="small"
-                sx={{ fontSize: "8.5px", fontWeight: 700, bgcolor: "rgba(37, 99, 235, 0.08)", color: "#2563eb", border: "1px solid rgba(37, 99, 235, 0.2)", height: "16px", px: 0.1 }}
-              />
-            </Box>
+            {/* Pricing Hidden for School View */}
           </Box>
         </Box>
       </Box>
@@ -833,213 +798,418 @@ export default function PlanView() {
           </IconButton>
         </DialogTitle>
         <DialogContent sx={{ py: 2 }}>
-          {futurePlan && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-              <Box
-                sx={{
-                  p: 2.5,
-                  borderRadius: "14px",
-                  bgcolor: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: "13px",
-                    color: "#64748b",
-                    mb: 0.5,
-                    fontWeight: 600,
-                  }}
-                >
-                  Plan Name
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: "18px",
-                    fontWeight: 700,
-                    color: "#0f172a",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {futurePlan.newPlanSnapshot?.planName ||
-                    futurePlan.newPlanId?.planName ||
-                    "Plan"}
-                </Typography>
-              </Box>
+          {futurePlan && (() => {
+            const futurePlanPermissions =
+              futurePlan.newPlanSnapshot?.permissions ||
+              futurePlan.newPlanId?.permissions ||
+              [];
 
-              <Box
-                sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
-              >
+            const includedGroups = planModuleGroups.filter(
+              (group) =>
+                isGroupDefaultChecked(group, futurePlanPermissions) ||
+                isGroupDefaultIndeterminate(group, futurePlanPermissions)
+            );
+
+            const isAllExportCheckedForFuture = planModuleGroups
+              .filter((g) => g.hasExport)
+              .every((g) => isGroupExportChecked(g, futurePlanPermissions));
+
+            const isAllImportCheckedForFuture = planModuleGroups
+              .filter((g) => g.hasImport)
+              .every((g) => isGroupImportChecked(g, futurePlanPermissions));
+
+            return (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
                 <Box
                   sx={{
-                    p: 2,
-                    borderRadius: "12px",
+                    p: 2.5,
+                    borderRadius: "14px",
                     bgcolor: "#f8fafc",
                     border: "1px solid #e2e8f0",
                   }}
                 >
                   <Typography
                     sx={{
-                      fontSize: "12px",
+                      fontSize: "13px",
                       color: "#64748b",
                       mb: 0.5,
                       fontWeight: 600,
                     }}
                   >
-                    Billing Cycle
+                    Plan Name
                   </Typography>
                   <Typography
                     sx={{
-                      fontSize: "15px",
+                      fontSize: "18px",
                       fontWeight: 700,
                       color: "#0f172a",
                       textTransform: "capitalize",
                     }}
                   >
-                    {futurePlan.newPlanSnapshot?.billingCycle || "Yearly"}
+                    {futurePlan.newPlanSnapshot?.planName ||
+                      futurePlan.newPlanId?.planName ||
+                      "Plan"}
                   </Typography>
                 </Box>
+
+                <Box
+                  sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
+                >
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: "12px",
+                      bgcolor: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: "12px",
+                        color: "#64748b",
+                        mb: 0.5,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Billing Cycle
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "15px",
+                        fontWeight: 700,
+                        color: "#0f172a",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {futurePlan.newPlanSnapshot?.billingCycle || "Yearly"}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: "12px",
+                      bgcolor: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: "12px",
+                        color: "#64748b",
+                        mb: 0.5,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Price
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: "15px", fontWeight: 700, color: "#0f172a" }}
+                    >
+                      ₹
+                      {futurePlan.amountPaid ||
+                        futurePlan.newPlanSnapshot?.price ||
+                        0}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
+                >
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: "12px",
+                      bgcolor: "rgba(0, 80, 157, 0.05)",
+                      border: "1px solid rgba(0, 80, 157, 0.15)",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: "12px",
+                        color: "var(--primary-color)",
+                        mb: 0.5,
+                        fontWeight: 700,
+                      }}
+                    >
+                      Booked On (Today)
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: "15px", fontWeight: 700, color: "#0f172a" }}
+                    >
+                      {moment(futurePlan.createdAt).format("MMMM DD, YYYY")}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: "12px",
+                      bgcolor: "rgba(255, 165, 0, 0.08)",
+                      border: "1px solid rgba(255, 165, 0, 0.2)",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: "12px",
+                        color: "var(--secondary-color)",
+                        mb: 0.5,
+                        fontWeight: 700,
+                      }}
+                    >
+                      Scheduled Expiry Date
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: "15px", fontWeight: 700, color: "#0f172a" }}
+                    >
+                      {(() => {
+                        const cycle =
+                          futurePlan.newPlanSnapshot?.billingCycle || "yearly";
+                        const baseDate = moment(futurePlan.createdAt);
+                        if (cycle === "monthly") baseDate.add(1, "month");
+                        else if (cycle === "6month") baseDate.add(6, "months");
+                        else if (cycle === "yearly") baseDate.add(1, "year");
+                        else baseDate.add(30, "days");
+                        return baseDate.format("MMMM DD, YYYY");
+                      })()}
+                    </Typography>
+                  </Box>
+                </Box>
+
                 <Box
                   sx={{
-                    p: 2,
-                    borderRadius: "12px",
+                    p: 2.5,
+                    borderRadius: "14px",
                     bgcolor: "#f8fafc",
                     border: "1px solid #e2e8f0",
                   }}
                 >
                   <Typography
                     sx={{
-                      fontSize: "12px",
+                      fontSize: "13px",
                       color: "#64748b",
-                      mb: 0.5,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Price
-                  </Typography>
-                  <Typography
-                    sx={{ fontSize: "15px", fontWeight: 700, color: "#0f172a" }}
-                  >
-                    ₹
-                    {futurePlan.amountPaid ||
-                      futurePlan.newPlanSnapshot?.price ||
-                      0}
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Box
-                sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
-              >
-                <Box
-                  sx={{
-                    p: 2,
-                    borderRadius: "12px",
-                    bgcolor: "rgba(0, 80, 157, 0.05)",
-                    border: "1px solid rgba(0, 80, 157, 0.15)",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "12px",
-                      color: "var(--primary-color)",
-                      mb: 0.5,
+                      mb: 1.5,
                       fontWeight: 700,
                     }}
                   >
-                    Booked On (Today)
+                    Included Modules & Features
                   </Typography>
-                  <Typography
-                    sx={{ fontSize: "15px", fontWeight: 700, color: "#0f172a" }}
-                  >
-                    {moment(futurePlan.createdAt).format("MMMM DD, YYYY")}
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    p: 2,
-                    borderRadius: "12px",
-                    bgcolor: "rgba(255, 165, 0, 0.08)",
-                    border: "1px solid rgba(255, 165, 0, 0.2)",
-                  }}
-                >
-                  <Typography
+                  <Box
                     sx={{
-                      fontSize: "12px",
-                      color: "var(--secondary-color)",
-                      mb: 0.5,
-                      fontWeight: 700,
+                      display: "grid",
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "repeat(2, 1fr)",
+                      },
+                      gap: 1.2,
+                      mb: (isAllExportCheckedForFuture || isAllImportCheckedForFuture) ? 2.5 : 0,
                     }}
                   >
-                    Scheduled Expiry Date
-                  </Typography>
-                  <Typography
-                    sx={{ fontSize: "15px", fontWeight: 700, color: "#0f172a" }}
-                  >
-                    {(() => {
-                      const cycle =
-                        futurePlan.newPlanSnapshot?.billingCycle || "yearly";
-                      const baseDate = moment(futurePlan.createdAt);
-                      if (cycle === "monthly") baseDate.add(1, "month");
-                      else if (cycle === "6month") baseDate.add(6, "months");
-                      else if (cycle === "yearly") baseDate.add(1, "year");
-                      else baseDate.add(30, "days");
-                      return baseDate.format("MMMM DD, YYYY");
-                    })()}
-                  </Typography>
-                </Box>
-              </Box>
+                    {includedGroups.map((group) => {
+                      const GroupIcon = groupIconMap[group.icon || ""] || SettingsIcon;
+                      const defChecked = isGroupDefaultChecked(group, futurePlanPermissions);
+                      const defIndet = isGroupDefaultIndeterminate(group, futurePlanPermissions);
+                      return (
+                        <Box
+                          key={group.groupId}
+                          sx={{
+                            p: 1.2,
+                            borderRadius: "8px",
+                            border: defChecked
+                              ? "2px solid var(--primary-color)"
+                              : "1px solid #e2e8f0",
+                            bgcolor: defChecked ? "rgba(0, 33, 71, 0.01)" : "white",
+                            boxShadow: defChecked
+                              ? "0 4px 8px -4px rgba(0, 33, 71, 0.08)"
+                              : "0 1px 4px rgba(0, 0, 0, 0.01)",
+                            transition: "all 0.15s ease-in-out",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                            minHeight: "95px",
+                            position: "relative",
+                          }}
+                        >
+                          <Box>
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.8 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  width: 26,
+                                  height: 26,
+                                  borderRadius: "6px",
+                                  bgcolor: defChecked ? "rgba(0, 33, 71, 0.09)" : "#f1f5f9",
+                                  color: defChecked ? "var(--primary-color)" : "#64748b",
+                                  transition: "all 0.2s",
+                                }}
+                              >
+                                <GroupIcon sx={{ fontSize: 14 }} />
+                              </Box>
+                              <BpCheckbox
+                                checked={defChecked}
+                                indeterminate={defIndet}
+                                disabled
+                                sx={{ transform: "scale(0.75)", p: 0.1 }}
+                              />
+                            </Box>
 
-              <Box
-                sx={{
-                  p: 2.5,
-                  borderRadius: "14px",
-                  bgcolor: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: "13px",
-                    color: "#64748b",
-                    mb: 1.5,
-                    fontWeight: 700,
-                  }}
-                >
-                  Included Modules & Features
-                </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                  {roleStaticData
-                    .filter((module: any) => {
-                      const perms =
-                        futurePlan.newPlanSnapshot?.permissions ||
-                        futurePlan.newPlanId?.permissions ||
-                        [];
-                      return module.subRole.some((sr: any) =>
-                        perms.includes(`${module.mainTitleId}_${sr.titleId}`),
+                            <Typography
+                              sx={{
+                                fontWeight: 700,
+                                fontSize: "12px",
+                                color: "#0f172a",
+                                mb: 0.3,
+                                lineHeight: 1.1,
+                              }}
+                            >
+                              {group.groupTitle}
+                            </Typography>
+                            <Typography
+                              sx={{
+                                fontSize: "9px",
+                                color: "#64748b",
+                                lineHeight: 1.2,
+                                mb: 1,
+                              }}
+                            >
+                              {group.subModuleIds
+                                .map((s) =>
+                                  s
+                                    .replace(/_/g, " ")
+                                    .replace(/\b\w/g, (c) => c.toUpperCase())
+                                )
+                                .join(" · ")}
+                            </Typography>
+                          </Box>
+
+                          {/* Pricing Hidden for School View */}
+                        </Box>
                       );
-                    })
-                    .map((module: any) => (
-                      <Chip
-                        key={module.mainTitleId}
-                        label={`✨ ${module.mainTitle}`}
+                    })}
+                  </Box>
+
+                  {(isAllExportCheckedForFuture || isAllImportCheckedForFuture) && (
+                    <>
+                      <Typography
                         sx={{
-                          bgcolor: "white",
-                          color: "var(--primary-color)",
-                          border: "1px solid var(--primary-color)",
                           fontWeight: 700,
-                          borderRadius: "10px",
-                          px: 1,
-                          py: 1.5,
-                          fontSize: "13px",
-                          boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                          fontSize: "12px",
+                          color: "#0f172a",
+                          mb: 1.5,
+                          mt: 2.5,
                         }}
-                      />
-                    ))}
+                      >
+                        Included Add-on Features
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: {
+                            xs: "1fr",
+                            sm: "repeat(2, 1fr)",
+                          },
+                          gap: 1.2,
+                        }}
+                      >
+                        {isAllExportCheckedForFuture && (
+                          <Box
+                            sx={{
+                              p: 1.2,
+                              borderRadius: "8px",
+                              border: "2px solid #16a34a",
+                              bgcolor: "rgba(22, 163, 74, 0.01)",
+                              boxShadow: "0 4px 8px -4px rgba(22, 163, 74, 0.08)",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "space-between",
+                              minHeight: "85px",
+                            }}
+                          >
+                            <Box>
+                              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.8 }}>
+                                <Box
+                                  sx={{
+                                    width: 26, height: 26,
+                                    borderRadius: "6px",
+                                    bgcolor: "rgba(22, 163, 74, 0.12)",
+                                    color: "#16a34a",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                  }}
+                                >
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                </Box>
+                                <BpCheckbox
+                                  checked={true}
+                                  disabled
+                                  sx={{ transform: "scale(0.75)", p: 0.1 }}
+                                />
+                              </Box>
+
+                              <Typography sx={{ fontWeight: 700, fontSize: "12px", color: "#0f172a", mb: 0.2 }}>
+                                Export
+                              </Typography>
+                              <Typography sx={{ fontSize: "9px", color: "#64748b", mb: 1 }}>
+                                Enables export/download actions across all eligible school modules.
+                              </Typography>
+                            </Box>
+
+                            {/* Pricing Hidden for School View */}
+                          </Box>
+                        )}
+
+                        {isAllImportCheckedForFuture && (
+                          <Box
+                            sx={{
+                              p: 1.2,
+                              borderRadius: "8px",
+                              border: "2px solid #2563eb",
+                              bgcolor: "rgba(37, 99, 235, 0.01)",
+                              boxShadow: "0 4px 8px -4px rgba(37, 99, 235, 0.08)",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "space-between",
+                              minHeight: "85px",
+                            }}
+                          >
+                            <Box>
+                              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.8 }}>
+                                <Box
+                                  sx={{
+                                    width: 26, height: 26,
+                                    borderRadius: "6px",
+                                    bgcolor: "rgba(37, 99, 235, 0.12)",
+                                    color: "#2563eb",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                  }}
+                                >
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 16 12 21 17 16"/><line x1="12" y1="21" x2="12" y2="9"/></svg>
+                                </Box>
+                                <BpCheckbox
+                                  checked={true}
+                                  disabled
+                                  sx={{ transform: "scale(0.75)", p: 0.1 }}
+                                />
+                              </Box>
+
+                              <Typography sx={{ fontWeight: 700, fontSize: "12px", color: "#0f172a", mb: 0.2 }}>
+                                Import
+                              </Typography>
+                              <Typography sx={{ fontSize: "9px", color: "#64748b", mb: 1 }}>
+                                Enables import/upload actions across all eligible school modules.
+                              </Typography>
+                            </Box>
+
+                            {/* Pricing Hidden for School View */}
+                          </Box>
+                        )}
+                      </Box>
+                    </>
+                  )}
                 </Box>
               </Box>
-            </Box>
-          )}
+            );
+          })()}
         </DialogContent>
         <DialogActions
           sx={{
