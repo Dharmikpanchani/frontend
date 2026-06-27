@@ -24,6 +24,20 @@ export const masterService = {
     adminApiService.delete<any>(`${Api.DEPARTMENTS}/${id}`),
   changeDepartmentStatus: (id: string) =>
     adminApiService.post<any>(`${Api.CHANGE_DEPARTMENT_STATUS}/${id}`, {}),
+  exportDepartments: (params?: any) => {
+    const format = params?.format || "excel";
+    return adminApiService.getFile<any>(`${Api.EXPORT_DEPARTMENTS}`, {
+      params,
+      responseType: format === "excel" || format === "pdf" ? "blob" : "text",
+    });
+  },
+  importDepartments: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return adminApiService.post<any>(`${Api.IMPORT_DEPARTMENTS}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 
   // Subjects
   getSubjects: (params: any) => {
@@ -57,6 +71,20 @@ export const masterService = {
     adminApiService.delete<any>(`${Api.SUBJECTS}/${id}`),
   changeSubjectStatus: (id: string) =>
     adminApiService.post<any>(`${Api.CHANGE_SUBJECT_STATUS}/${id}`, {}),
+  exportSubjects: (params?: any) => {
+    const format = params?.format || "excel";
+    return adminApiService.getFile<any>(`${Api.EXPORT_SUBJECTS}`, {
+      params,
+      responseType: format === "excel" || format === "pdf" ? "blob" : "text",
+    });
+  },
+  importSubjects: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return adminApiService.post<any>(`${Api.IMPORT_SUBJECTS}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 
   // Classes
   getClasses: (params: any) => {
@@ -88,6 +116,20 @@ export const masterService = {
     adminApiService.delete<any>(`${Api.CLASSES}/${id}`),
   changeClassStatus: (id: string) =>
     adminApiService.post<any>(`${Api.CHANGE_CLASS_STATUS}/${id}`, {}),
+  exportClasses: (params?: any) => {
+    const format = params?.format || "excel";
+    return adminApiService.getFile<any>(`${Api.EXPORT_CLASSES}`, {
+      params,
+      responseType: format === "excel" || format === "pdf" ? "blob" : "text",
+    });
+  },
+  importClasses: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return adminApiService.post<any>(`${Api.IMPORT_CLASSES}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 
   // Sections
   getSections: (params: any) => {
@@ -121,6 +163,20 @@ export const masterService = {
     adminApiService.delete<any>(`${Api.SECTIONS}/${id}`),
   changeSectionStatus: (id: string) =>
     adminApiService.post<any>(`${Api.CHANGE_SECTION_STATUS}/${id}`, {}),
+  exportSections: (params?: any) => {
+    const format = params?.format || "excel";
+    return adminApiService.getFile<any>(`${Api.EXPORT_SECTIONS}`, {
+      params,
+      responseType: format === "excel" || format === "pdf" ? "blob" : "text",
+    });
+  },
+  importSections: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return adminApiService.post<any>(`${Api.IMPORT_SECTIONS}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 
   // Teachers
   getTeachers: (params: any) => {
@@ -268,4 +324,17 @@ export const masterService = {
     }),
   generateRollNumbers: (payload: { classId: string; sectionId: string }) =>
     adminApiService.post<any>(Api.GENERATE_ROLL_NUMBERS, payload),
+
+  getImportLogs: (params: { page: number; perPage: number; importType?: string }) => {
+    let url = `${Api.IMPORT_LOGS}`;
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append("pageNumber", String(params.page));
+    if (params.perPage) queryParams.append("perPageData", String(params.perPage));
+    if (params.importType) queryParams.append("importType", params.importType);
+    const queryString = queryParams.toString();
+    if (queryString) url += `?${queryString}`;
+    return adminApiService.get<any>(url);
+  },
+  getImportLogById: (id: string) =>
+    adminApiService.get<any>(`${Api.IMPORT_LOG_DETAIL}/${id}`),
 };

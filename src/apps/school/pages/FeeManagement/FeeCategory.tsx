@@ -15,17 +15,23 @@ import {
   TableBody,
   Tooltip,
   debounce,
+  CircularProgress,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import {
   Search as SearchIcon,
   Add as AddIcon,
+  Download as DownloadIcon,
+  Print as PrintIcon,
+  FileDownload as ExcelIcon,
 } from "@mui/icons-material";
 import {
   fetchFeeCategories,
   removeFeeCategory,
 } from "@/redux/slices/feeSlice";
 import type { RootState, AppDispatch } from "@/redux/Store";
-import toast from "react-hot-toast";
+import { toasterSuccess, toasterError } from "@/utils/toaster/Toaster";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import Pagination from "@/apps/common/pagination/Pagination";
@@ -34,6 +40,7 @@ import DataNotFound from "@/apps/school/component/schoolCommon/dataNotFound/Data
 import Loader from "@/apps/common/loader/Loader";
 import PopupModal from "@/apps/school/component/schoolCommon/popUpModal/PopupModal";
 import { IOSSwitch } from "@/apps/school/component/schoolCommon/commonCssFunction/cssFunction";
+import BulkImportModal from "@/apps/common/BulkImportModal";
 
 const FeeCategory = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -60,6 +67,76 @@ const FeeCategory = () => {
   const [openStatusModal, setOpenStatusModal]   = useState(false);
   const [openDeleteModal, setOpenDeleteModal]   = useState(false);
   const [actionLoading, setActionLoading]       = useState(false);
+
+  const [openImportModal, setOpenImportModal] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleExport = async (format: "excel" | "pdf" | "html" = "excel") => {
+    try {
+      setExporting(true);
+      const { exportFeeCategories } = await import("@/api/services/fee.service");
+      const response = await exportFeeCategories({
+        search: searchValue,
+        format,
+      });
+      
+      const blob = new Blob([response.data], {
+        type: format === "excel"
+          ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          : "application/pdf",
+      });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `fee_categories_report_${Date.now()}.${format === "excel" ? "xlsx" : "pdf"}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toasterSuccess("Fee categories exported successfully");
+    } catch (error: any) {
+      toasterError(error.message || "Failed to export fee categories");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const csvContent = "data:text/csv;charset=utf-8,Category Name,Description,Mandatory,Status\nAdmission Fee,Admission and enrollment fee,Yes,Active\nTuition Fee,Monthly tuition fee,Yes,Active";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Fee_Category_Import_Template.csv");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const handleUploadFile = async (file: File) => {
+    try {
+      const { importFeeCategories } = await import("@/api/services/fee.service");
+      const response = await importFeeCategories(file);
+      loadCategories();
+      if (response?.data?.data && response.data.data.failCount > 0) {
+        return {
+          success: false,
+          message: `${response.data.data.successCount} Fee categories imported successfully, ${response.data.data.failCount} failed.`,
+          errors: response.data.data.failures,
+        };
+      }
+      return { success: true, message: response?.data?.message || "Fee categories imported successfully." };
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Failed to import fee categories";
+      const errors = error.response?.data?.data?.failures || 
+                     error.response?.data?.data?.errors || 
+                     error.response?.data?.errors || 
+                     null;
+      return {
+        success: false,
+        message,
+        errors,
+      };
+    }
+  };
 
   // ─── Fetch ──────────────────────────────────────────────────────────────────
   const loadCategories = (search?: string) => {
@@ -104,10 +181,10 @@ const FeeCategory = () => {
     try {
       const { changeFeeCategoryStatus } = await import("@/api/services/fee.service");
       await changeFeeCategoryStatus(selectedData._id, { isActive: !selectedData.isActive });
-      toast.success("Status updated successfully");
+      toasterSuccess("Status updated successfully");
       loadCategories();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update status");
+      toasterError(err?.response?.data?.message || "Failed to update status");
     } finally {
       setActionLoading(false);
       setOpenStatusModal(false);
@@ -126,10 +203,10 @@ const FeeCategory = () => {
     setActionLoading(true);
     try {
       await dispatch(removeFeeCategory(selectedData._id)).unwrap();
-      toast.success("Category deleted successfully");
+      toasterSuccess("Category deleted successfully");
       loadCategories();
     } catch (err: any) {
-      toast.error(err || "Failed to delete category");
+      toasterError(err || "Failed to delete category");
     } finally {
       setActionLoading(false);
       setOpenDeleteModal(false);
@@ -170,20 +247,73 @@ const FeeCategory = () => {
             </Box>
           </Box>
 
-          {/* Add button */}
-          {canAdd && (
-            <Box className="admin-add-user-btn-main">
+          {/* Import/Export buttons */}
+          <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            {hasPermission(schoolAdminPermission.fee_category.import) && (
+              <Button
+                className="admin-btn-theme"
+                onClick={() => setOpenImportModal(true)}
+                sx={{
+                  height: "36px !important",
+                  px: "20px !important",
+                  fontSize: "12px !important",
+                  borderRadius: "6px !important",
+                }}
+              >
+                Import
+              </Button>
+            )}
+            {canAdd && (
               <Button
                 className="admin-btn-theme"
                 onClick={() => navigate("/fee/categories/add")}
+                sx={{
+                  height: "36px !important",
+                  px: "20px !important",
+                  fontSize: "12px !important",
+                  borderRadius: "6px !important",
+                }}
               >
                 <AddIcon
-                  sx={{ color: "var(--button-text, #fff)", fontSize: "18px", mr: 1 }}
+                  sx={{
+                    color: "var(--button-text, #fff)",
+                    fontSize: "16px !important",
+                    mr: 0.5,
+                  }}
                 />
                 Add Category
               </Button>
-            </Box>
-          )}
+            )}
+            {hasPermission(schoolAdminPermission.fee_category.export) && categories?.length > 0 && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={exporting ? <CircularProgress size={14} /> : <DownloadIcon sx={{ fontSize: "16px !important" }} />}
+                  disabled={exporting}
+                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
+                  sx={{
+                    textTransform: "none",
+                    borderRadius: "6px !important",
+                    borderColor: "#eaecf0",
+                    color: "#344054",
+                    height: "36px !important",
+                    fontSize: "12px !important",
+                    ml: 1,
+                  }}
+                >
+                  Export Report
+                </Button>
+                <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                  </MenuItem>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Export PDF
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+          </Box>
         </Box>
       </Box>
 
@@ -397,6 +527,14 @@ const FeeCategory = () => {
         handleClose={() => { setOpenDeleteModal(false); setSelectedData(null); }}
         handleFunction={handleDeleteCategory}
         buttonStatusSpinner={actionLoading}
+      />
+
+      <BulkImportModal
+        open={openImportModal}
+        onClose={() => setOpenImportModal(false)}
+        title="Import Fee Categories"
+        onDownloadTemplate={handleDownloadTemplate}
+        onUpload={handleUploadFile}
       />
     </Box>
   );

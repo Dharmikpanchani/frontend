@@ -15,8 +15,17 @@ import {
   TableBody,
   Tooltip,
   debounce,
+  CircularProgress,
+  Menu,
+  MenuItem,
 } from "@mui/material";
-import { Search as SearchIcon, Add as AddIcon } from "@mui/icons-material";
+import {
+  Search as SearchIcon,
+  Add as AddIcon,
+  Download as DownloadIcon,
+  Print as PrintIcon,
+  FileDownload as ExcelIcon,
+} from "@mui/icons-material";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import { getAllRoles, deleteRole } from "@/redux/slices/roleSlice";
 import Svg from "@/assets/Svg";
@@ -26,6 +35,9 @@ import Pagination from "@/apps/common/pagination/Pagination";
 import PopupModal from "../../component/schoolCommon/popUpModal/PopupModal";
 import type { RootState } from "@/redux/Store";
 import { usePermissions } from "@/hooks/usePermissions";
+import { toasterSuccess, toasterError } from "@/utils/toaster/Toaster";
+import BulkImportModal from "@/apps/common/BulkImportModal";
+import { roleService } from "@/api/services/role.service";
 
 let initialState = {
   id: "",
@@ -58,6 +70,74 @@ export default function RoleList() {
   const handleCloseDelete = () => {
     setOpenDelete(false);
     setSelectedData(initialState);
+  };
+
+  const [openImportModal, setOpenImportModal] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleExport = async (format: "excel" | "pdf" | "html" = "excel") => {
+    try {
+      setExporting(true);
+      const response = await roleService.exportRoles({
+        searchRequest: searchNameValue,
+        format,
+      });
+      
+      const blob = new Blob([response], {
+        type: format === "excel"
+          ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          : "application/pdf",
+      });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `roles_report_${Date.now()}.${format === "excel" ? "xlsx" : "pdf"}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toasterSuccess("Roles exported successfully");
+    } catch (error: any) {
+      toasterError(error.message || "Failed to export roles");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const csvContent = "data:text/csv;charset=utf-8,Role Name,Permissions\nTeacher,schoolAdminPermission.teacher.read%,schoolAdminPermission.teacher.create\nStudent,schoolAdminPermission.student.read";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Role_Import_Template.csv");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const handleUploadFile = async (file: File) => {
+    try {
+      const response = await roleService.importRoles(file);
+      handleGetData();
+      if (response?.data && response.data.failCount > 0) {
+        return {
+          success: false,
+          message: `${response.data.successCount} Roles imported successfully, ${response.data.failCount} failed.`,
+          errors: response.data.failures,
+        };
+      }
+      return { success: true, message: response.message || "Roles imported successfully." };
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Failed to import roles";
+      const errors = error.response?.data?.data?.failures || 
+                     error.response?.data?.data?.errors || 
+                     error.response?.data?.errors || 
+                     null;
+      return {
+        success: false,
+        message,
+        errors,
+      };
+    }
   };
 
   const handleGetData = (searchQuery?: string) => {
@@ -119,26 +199,72 @@ export default function RoleList() {
               </Box>
             </Box>
           </Box>
-          {hasPermission(schoolAdminPermission.role.create) && (
-            <Box className="admin-add-user-btn-main">
+          <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            {hasPermission(schoolAdminPermission.role.import) && (
               <Button
                 className="admin-btn-theme"
-                onClick={() => {
-                  navigate("/role-list/add");
+                onClick={() => setOpenImportModal(true)}
+                sx={{
+                  height: "36px !important",
+                  px: "20px !important",
+                  fontSize: "12px !important",
+                  borderRadius: "6px !important",
+                }}
+              >
+                Import
+              </Button>
+            )}
+            {hasPermission(schoolAdminPermission.role.create) && (
+              <Button
+                className="admin-btn-theme"
+                onClick={() => navigate("/role-list/add")}
+                sx={{
+                  height: "36px !important",
+                  px: "20px !important",
+                  fontSize: "12px !important",
+                  borderRadius: "6px !important",
                 }}
               >
                 <AddIcon
-                  className="admin-plus-icon"
                   sx={{
                     color: "var(--button-text, #fff)",
-                    fontSize: "18px",
-                    mr: 1,
+                    fontSize: "16px !important",
+                    mr: 0.5,
                   }}
                 />
                 Add Roles
               </Button>
-            </Box>
-          )}
+            )}
+            {hasPermission(schoolAdminPermission.role.export) && roles?.length > 0 && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={exporting ? <CircularProgress size={14} /> : <DownloadIcon sx={{ fontSize: "16px !important" }} />}
+                  disabled={exporting}
+                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
+                  sx={{
+                    textTransform: "none",
+                    borderRadius: "6px !important",
+                    borderColor: "#eaecf0",
+                    color: "#344054",
+                    height: "36px !important",
+                    fontSize: "12px !important",
+                    ml: 1,
+                  }}
+                >
+                  Export Report
+                </Button>
+                <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                  </MenuItem>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Export PDF
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+          </Box>
         </Box>
       </Box>
 
@@ -315,6 +441,14 @@ export default function RoleList() {
         handleClose={handleCloseDelete}
         handleFunction={handleDelete}
         buttonStatusSpinner={buttonStatusSpinner}
+      />
+
+      <BulkImportModal
+        open={openImportModal}
+        onClose={() => setOpenImportModal(false)}
+        title="Import Roles"
+        onDownloadTemplate={handleDownloadTemplate}
+        onUpload={handleUploadFile}
       />
     </Box>
   );

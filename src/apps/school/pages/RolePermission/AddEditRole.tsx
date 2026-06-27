@@ -449,6 +449,13 @@ export default function AddEditRole() {
                           align="center"
                           sx={{ fontWeight: 700 }}
                         >
+                          Import
+                        </TableCell>
+                        <TableCell
+                          className="table-th"
+                          align="center"
+                          sx={{ fontWeight: 700 }}
+                        >
                           Export
                         </TableCell>
                       </TableRow>
@@ -467,7 +474,7 @@ export default function AddEditRole() {
                         <TableCell className="table-td" align="center">
                           -
                         </TableCell>
-                        {["view", "add", "edit", "delete", "status", "export"].map(
+                        {["view", "add", "edit", "delete", "status", "import", "export"].map(
                           (typeId) => (
                             <TableCell
                               key={typeId}
@@ -527,7 +534,7 @@ export default function AddEditRole() {
                               <TableCell
                                 className="table-td"
                                 align="center"
-                                colSpan={6}
+                                colSpan={7}
                               >
                                 <Typography
                                   sx={{
@@ -572,7 +579,7 @@ export default function AddEditRole() {
                               <TableCell
                                 className="table-td"
                                 align="center"
-                                colSpan={6}
+                                colSpan={7}
                               >
                                 <Typography
                                   sx={{
@@ -634,7 +641,7 @@ export default function AddEditRole() {
                                 disabled={isView}
                               />
                             </TableCell>
-                            {["view", "add", "edit", "delete", "status", "export"].map(
+                            {["view", "add", "edit", "delete", "status", "import", "export"].map(
                               (typeId) => {
                                 const subRole = module.subRole.find(
                                   (sr) =>

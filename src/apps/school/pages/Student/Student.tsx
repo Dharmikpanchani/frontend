@@ -653,22 +653,22 @@ export default function Student() {
                 />
               </Button>
             </Box>
-            {hasPermission(schoolAdminPermission.student.create) && (
-              <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1 }}>
-                {hasPermission(schoolAdminPermission.student.update) && students?.length > 0 && (
-                  <Button
-                    className="admin-btn-theme"
-                    onClick={() => setOpenRollNoModal(true)}
-                    sx={{
-                      height: "36px !important",
-                      px: "20px !important",
-                      fontSize: "12px !important",
-                      borderRadius: "6px !important",
-                    }}
-                  >
-                    Auto Roll No
-                  </Button>
-                )}
+            <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+              {hasPermission(schoolAdminPermission.student.update) && students?.length > 0 && hasPermission(schoolAdminPermission.student.create) && (
+                <Button
+                  className="admin-btn-theme"
+                  onClick={() => setOpenRollNoModal(true)}
+                  sx={{
+                    height: "36px !important",
+                    px: "20px !important",
+                    fontSize: "12px !important",
+                    borderRadius: "6px !important",
+                  }}
+                >
+                  Auto Roll No
+                </Button>
+              )}
+              {hasPermission(schoolAdminPermission.student.import) && (
                 <Button
                   className="admin-btn-theme"
                   onClick={() => setOpenImportModal(true)}
@@ -681,6 +681,8 @@ export default function Student() {
                 >
                   Import
                 </Button>
+              )}
+              {hasPermission(schoolAdminPermission.student.create) && (
                 <Button
                   className="admin-btn-theme"
                   onClick={() => {
@@ -702,9 +704,9 @@ export default function Student() {
                   />
                   Add Student
                 </Button>
-              </Box>
-            )}
-            {hasPermission(schoolAdminPermission.student.read) && students?.length > 0 && (
+              )}
+            </Box>
+            {hasPermission(schoolAdminPermission.student.export) && students?.length > 0 && (
               <>
                 <Button
                   variant="outlined"

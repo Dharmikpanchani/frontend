@@ -55,7 +55,6 @@ function PermissionRoute({
     loading,
     permissions,
     isAdminLogin,
-    isSuperDeveloper,
     isDeveloperAdmin,
   } = usePermissions();
 

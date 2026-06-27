@@ -14,7 +14,7 @@ import { getPendingAdmissionsCount } from "@/redux/slices/studentSlice";
 export default function Sidebar(props: any) {
   const location = useLocation();
   const dispatch = useDispatch<any>();
-  const { hasPermission, hasAnyPermission } = usePermissions();
+  const { hasPermission, hasAnyPermission, planPermissions } = usePermissions();
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
   );
@@ -74,6 +74,9 @@ export default function Sidebar(props: any) {
 
   const [openSettingsManagement, setOpenSettingsManagement] = useState(false);
   const handleClickSettingsManagement = () => setOpenSettingsManagement(!openSettingsManagement);
+
+  const [openImportLogs, setOpenImportLogs] = useState(false);
+  const handleClickImportLogs = () => setOpenImportLogs(!openImportLogs);
 
   // ─── Menu Data ──────────────────────────────────────────────────────────────
   const roleManagement = [
@@ -194,6 +197,72 @@ export default function Sidebar(props: any) {
     },
   ];
 
+  const importLogsManagement = [
+    {
+      title: "Teacher Logs",
+      pathName: "/import-logs/teacher",
+      icon: Svg.latestUpdate,
+      show: hasPermission(schoolAdminPermission.teacher.import),
+      menuHighlight: ["import-logs"],
+    },
+    {
+      title: "Student Logs",
+      pathName: "/import-logs/student",
+      icon: Svg.latestUpdate,
+      show: hasPermission(schoolAdminPermission.student?.import),
+      menuHighlight: ["import-logs"],
+    },
+    {
+      title: "Fee Structure Logs",
+      pathName: "/import-logs/fee_structure",
+      icon: Svg.dashboard,
+      show: hasPermission(schoolAdminPermission.fee_structure?.import),
+      menuHighlight: ["import-logs"],
+    },
+    {
+      title: "Fee Category Logs",
+      pathName: "/import-logs/fee_category",
+      icon: Svg.brand,
+      show: hasPermission(schoolAdminPermission.fee_category?.import),
+      menuHighlight: ["import-logs"],
+    },
+    {
+      title: "Class Logs",
+      pathName: "/import-logs/class",
+      icon: Svg.brand,
+      show: hasPermission(schoolAdminPermission.class.import),
+      menuHighlight: ["import-logs"],
+    },
+    {
+      title: "Section Logs",
+      pathName: "/import-logs/section",
+      icon: Svg.filter,
+      show: hasPermission(schoolAdminPermission.section.import),
+      menuHighlight: ["import-logs"],
+    },
+    {
+      title: "Department Logs",
+      pathName: "/import-logs/department",
+      icon: Svg.roleIcon,
+      show: hasPermission(schoolAdminPermission.department.import),
+      menuHighlight: ["import-logs"],
+    },
+    {
+      title: "Subject Logs",
+      pathName: "/import-logs/subject",
+      icon: Svg.latestUpdate,
+      show: hasPermission(schoolAdminPermission.subject.import),
+      menuHighlight: ["import-logs"],
+    },
+    {
+      title: "Role Logs",
+      pathName: "/import-logs/role",
+      icon: Svg.roleIcon,
+      show: hasPermission(schoolAdminPermission.role.import),
+      menuHighlight: ["import-logs"],
+    },
+  ];
+
   const cms: any = [];
 
   const checkActive = (menuItems: any[]) => {
@@ -208,6 +277,7 @@ export default function Sidebar(props: any) {
     if (checkActive(masterManagement)) setOpenMasterManagement(true);
     if (checkActive(feeManagement)) setOpenFeeManagement(true);
     if (checkActive(settingsManagement)) setOpenSettingsManagement(true);
+    if (location.pathname.startsWith("/import-logs")) setOpenImportLogs(true);
   }, [location.pathname]);
 
   // show menu with permissions
@@ -482,6 +552,45 @@ export default function Sidebar(props: any) {
                 </Box>
               </ListItem>
             )}
+
+            {/* Import Logs collapsible dropdown */}
+            {hasPermission(schoolAdminPermission.import_log.read) &&
+              planPermissions.some((p) => p.endsWith("_import")) &&
+              importLogsManagement.some((item) => item.show) && (
+                <ListItem component="div" className="admin-sidebar-listitem flex-column align-items-start">
+                  <Box className="admin-submenu-link-box w-100">
+                    <Box className="admin-sidebar-link" onClick={handleClickImportLogs}>
+                      <img src={Svg.latestUpdate} alt="Import Logs" className="admin-sidebar-icons" />
+                      <span className="admin-sidebar-link-text">Import Logs</span>
+                      {openImportLogs ? <ExpandLess className="expandless-icon" /> : <ExpandMore className="expandmore-icon" />}
+                    </Box>
+                    <Box className="admin-submenu-main">
+                      <Collapse in={openImportLogs} timeout="auto" unmountOnExit className="admin-submenu-collapse">
+                        <List component="div" disablePadding className="admin-sidebar-submenulist">
+                          {importLogsManagement.map((dt) =>
+                            dt.show ? (
+                              <ListItem className="admin-sidebar-listitem" key={dt.pathName}>
+                                <Link
+                                  to={dt?.pathName}
+                                  onClick={() => { if (window.innerWidth < 786) props?.setOpen?.(false); }}
+                                  className={
+                                    location?.pathname === dt.pathName
+                                      ? "admin-sidebar-link active"
+                                      : "admin-sidebar-link"
+                                  }
+                                >
+                                  <img src={dt?.icon} alt={dt?.title} className="admin-sidebar-icons" />
+                                  <span className="admin-sidebar-link-text">{dt?.title}</span>
+                                </Link>
+                              </ListItem>
+                            ) : null,
+                          )}
+                        </List>
+                      </Collapse>
+                    </Box>
+                  </Box>
+                </ListItem>
+              )}
 
             {/* ✅ Settings Management (School Theme + Settings) */}
             {settingsPermission && (

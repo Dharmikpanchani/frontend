@@ -4,14 +4,20 @@ import { useNavigate } from "react-router-dom";
 import {
   Box, Typography, Button, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Paper, Tooltip,
+  CircularProgress, Menu, MenuItem,
 } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
+import {
+  Add as AddIcon,
+  Download as DownloadIcon,
+  Print as PrintIcon,
+  FileDownload as ExcelIcon,
+} from "@mui/icons-material";
 import {
   fetchFeeStructures, removeFeeStructure, fetchFeeCategories,
 } from "@/redux/slices/feeSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import type { RootState, AppDispatch } from "@/redux/Store";
-import toast from "react-hot-toast";
+import { toasterSuccess, toasterError } from "@/utils/toaster/Toaster";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import Pagination from "@/apps/common/pagination/Pagination";
@@ -19,6 +25,7 @@ import Loader from "@/apps/common/loader/Loader";
 import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
 import { IOSSwitch } from "../../component/schoolCommon/commonCssFunction/cssFunction";
 import Svg from "@/assets/Svg";
+import BulkImportModal from "@/apps/common/BulkImportModal";
 
 const FeeStructure = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,6 +43,75 @@ const FeeStructure = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalDocs, setTotalDocs] = useState(0);
 
+  const [openImportModal, setOpenImportModal] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleExport = async (format: "excel" | "pdf" | "html" = "excel") => {
+    try {
+      setExporting(true);
+      const { exportFeeStructures } = await import("@/api/services/fee.service");
+      const response = await exportFeeStructures({
+        format,
+      });
+      
+      const blob = new Blob([response.data], {
+        type: format === "excel"
+          ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          : "application/pdf",
+      });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `fee_structures_report_${Date.now()}.${format === "excel" ? "xlsx" : "pdf"}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toasterSuccess("Fee structures exported successfully");
+    } catch (error: any) {
+      toasterError(error.message || "Failed to export fee structures");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const csvContent = "data:text/csv;charset=utf-8,Fee Category,Class,Amount,Description,Status\nAdmission Fee,Class 1,12000,Annual admission fee,Active\nTuition Fee,Class 1,5000,Tuition fee,Active";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Fee_Structure_Import_Template.csv");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const handleUploadFile = async (file: File) => {
+    try {
+      const { importFeeStructures } = await import("@/api/services/fee.service");
+      const response = await importFeeStructures(file);
+      loadStructures();
+      if (response?.data?.data && response.data.data.failCount > 0) {
+        return {
+          success: false,
+          message: `${response.data.data.successCount} Fee structures imported successfully, ${response.data.data.failCount} failed.`,
+          errors: response.data.data.failures,
+        };
+      }
+      return { success: true, message: response?.data?.message || "Fee structures imported successfully." };
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Failed to import fee structures";
+      const errors = error.response?.data?.data?.failures || 
+                     error.response?.data?.data?.errors || 
+                     error.response?.data?.errors || 
+                     null;
+      return {
+        success: false,
+        message,
+        errors,
+      };
+    }
+  };
+
   useEffect(() => {
     loadStructures();
     dispatch(fetchFeeCategories({ page: 1, limit: 100 }) as any);
@@ -46,7 +122,7 @@ const FeeStructure = () => {
     try {
       const res: any = await dispatch(fetchFeeStructures({ page: page + 1, limit: rowsPerPage })).unwrap();
       if (res?.data) setTotalDocs(res.data.totalDocs || res.data.length || 0);
-    } catch (err) { console.error(err); }
+    } catch (err) {}
   };
 
 
@@ -55,8 +131,8 @@ const FeeStructure = () => {
     if (window.confirm("Are you sure you want to delete this structure?")) {
       try {
         await dispatch(removeFeeStructure(id)).unwrap();
-        toast.success("Structure deleted successfully"); loadStructures();
-      } catch (err: any) { toast.error(err || "Failed to delete structure"); }
+        toasterSuccess("Structure deleted successfully"); loadStructures();
+      } catch (err: any) { toasterError(err || "Failed to delete structure"); }
     }
   };
 
@@ -64,8 +140,8 @@ const FeeStructure = () => {
     try {
       const { changeFeeStructureStatus } = await import("@/api/services/fee.service");
       await changeFeeStructureStatus(id, { isActive: !currentStatus });
-      toast.success("Status updated successfully"); loadStructures();
-    } catch (err: any) { toast.error(err?.response?.data?.message || "Failed to update status"); }
+      toasterSuccess("Status updated successfully"); loadStructures();
+    } catch (err: any) { toasterError(err?.response?.data?.message || "Failed to update status"); }
   };
 
   const getTotalAmount = (structure: any) =>
@@ -76,17 +152,74 @@ const FeeStructure = () => {
         <Typography className="admin-page-title" component="h2" variant="h2">
           Fee Structures
         </Typography>
-        {canAdd && (
-          <Box className="admin-add-user-btn-main">
-            <Button
-              className="admin-btn-theme"
-              onClick={() => navigate("/fee/structures/add")}
-              startIcon={<AddIcon />}
-            >
-              Create Structure
-            </Button>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            {hasPermission(schoolAdminPermission.fee_structure.import) && (
+              <Button
+                className="admin-btn-theme"
+                onClick={() => setOpenImportModal(true)}
+                sx={{
+                  height: "36px !important",
+                  px: "20px !important",
+                  fontSize: "12px !important",
+                  borderRadius: "6px !important",
+                }}
+              >
+                Import
+              </Button>
+            )}
+            {canAdd && (
+              <Button
+                className="admin-btn-theme"
+                onClick={() => navigate("/fee/structures/add")}
+                sx={{
+                  height: "36px !important",
+                  px: "20px !important",
+                  fontSize: "12px !important",
+                  borderRadius: "6px !important",
+                }}
+              >
+                <AddIcon
+                  sx={{
+                    color: "var(--button-text, #fff)",
+                    fontSize: "16px !important",
+                    mr: 0.5,
+                  }}
+                />
+                Create Structure
+              </Button>
+            )}
+            {hasPermission(schoolAdminPermission.fee_structure.export) && structures?.length > 0 && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={exporting ? <CircularProgress size={14} /> : <DownloadIcon sx={{ fontSize: "16px !important" }} />}
+                  disabled={exporting}
+                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
+                  sx={{
+                    textTransform: "none",
+                    borderRadius: "6px !important",
+                    borderColor: "#eaecf0",
+                    color: "#344054",
+                    height: "36px !important",
+                    fontSize: "12px !important",
+                    ml: 1,
+                  }}
+                >
+                  Export Report
+                </Button>
+                <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                  </MenuItem>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Export PDF
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
           </Box>
-        )}
+        </Box>
       </Box>
 
       <Box className="card-border common-card">
@@ -254,6 +387,13 @@ const FeeStructure = () => {
       </Box>
 
 
+      <BulkImportModal
+        open={openImportModal}
+        onClose={() => setOpenImportModal(false)}
+        title="Import Fee Structures"
+        onDownloadTemplate={handleDownloadTemplate}
+        onUpload={handleUploadFile}
+      />
     </Box>
   );
 };

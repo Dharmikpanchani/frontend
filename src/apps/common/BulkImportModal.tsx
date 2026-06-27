@@ -190,6 +190,125 @@ export default function BulkImportModal({
                 </Button>
               </Box>
 
+              {/* Template Format Preview Section */}
+              {(() => {
+                const titleLower = title.toLowerCase();
+                let preview = null;
+                if (titleLower.includes("teacher")) {
+                  preview = {
+                    headers: ["Full Name", "Email", "Phone", "Gender", "RoleName"],
+                    example: ["John Doe", "john@example.com", "1234567890", "Male", "Teacher"]
+                  };
+                } else if (titleLower.includes("student")) {
+                  preview = {
+                    headers: ["Full Name", "Email", "Phone", "Gender", "Class Name", "Section Name", "RoleName"],
+                    example: ["Alice Smith", "alice@example.com", "9876543210", "Female", "Class 1", "Section A", "Student"]
+                  };
+                } else if (titleLower.includes("fee structures") || titleLower.includes("fee structure")) {
+                  preview = {
+                    headers: ["Fee Category", "Class", "Amount", "Description", "Status"],
+                    example: ["Admission Fee", "Class 1", "12000", "Annual admission fee", "Active"]
+                  };
+                } else if (titleLower.includes("fee categories") || titleLower.includes("fee category")) {
+                  preview = {
+                    headers: ["Category Name", "Description", "Mandatory", "Status"],
+                    example: ["Admission Fee", "Admission and enrollment fee", "Yes", "Active"]
+                  };
+                } else if (titleLower.includes("subject")) {
+                  preview = {
+                    headers: ["Subject Name", "Subject Code", "Subject Type", "Class Name", "Status"],
+                    example: ["Mathematics", "MATH101", "Theory", "Class 1", "Active"]
+                  };
+                } else if (titleLower.includes("section")) {
+                  preview = {
+                    headers: ["Section Name", "Capacity", "Status"],
+                    example: ["Section A", "40", "Active"]
+                  };
+                } else if (titleLower.includes("department")) {
+                  preview = {
+                    headers: ["Department Name", "Status"],
+                    example: ["Science", "Active"]
+                  };
+                } else if (titleLower.includes("class")) {
+                  preview = {
+                    headers: ["Class Name", "Status"],
+                    example: ["Class 1", "Active"]
+                  };
+                } else if (titleLower.includes("role")) {
+                  preview = {
+                    headers: ["Role Name", "Permissions"],
+                    example: ["Teacher", "schoolAdminPermission.teacher.read, schoolAdminPermission.teacher.create"]
+                  };
+                }
+
+                if (!preview) return null;
+
+                return (
+                  <Box>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: 700,
+                        color: "var(--primary-color)",
+                        mb: 1,
+                        fontSize: "13px",
+                      }}
+                    >
+                      Template Structure Preview (Expected Format)
+                    </Typography>
+                    <TableContainer
+                      component={Paper}
+                      variant="outlined"
+                      sx={{
+                        borderRadius: "8px",
+                        border: "1px solid #eaecf0",
+                        boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
+                        overflowX: "auto",
+                      }}
+                    >
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow sx={{ bgcolor: "var(--primary-color)" }}>
+                            {preview.headers.map((h, i) => (
+                              <TableCell
+                                key={i}
+                                sx={{
+                                  fontWeight: 700,
+                                  color: "#ffffff !important",
+                                  borderBottom: "1px solid #eaecf0",
+                                  fontSize: "11px",
+                                  py: 1,
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {h}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <TableRow sx={{ "&:hover": { bgcolor: "#f9fafb" } }}>
+                            {preview.example.map((ex, i) => (
+                              <TableCell
+                                key={i}
+                                sx={{
+                                  color: "#475467",
+                                  fontSize: "11px",
+                                  py: 1.2,
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {ex}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Box>
+                );
+              })()}
+
               {/* Upload Drop Zone */}
               <Box
                 onDragOver={(e) => e.preventDefault()}

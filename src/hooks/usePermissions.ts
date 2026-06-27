@@ -67,15 +67,13 @@ export const usePermissions = () => {
 
       // 3️⃣ super_school_admin → plan-based check only
       if (isSuperSchoolAdmin) {
-        // No plan assigned (empty permissions) → owner gets full access
-        if (planPermissions.length === 0) return true;
         return planPermissions.includes(p);
       }
 
       // 4️⃣ school_admin → plan check first, then role check
       if (isSchoolSubAdmin) {
-        // If plan has permissions and this one is not included → deny
-        if (planPermissions.length > 0 && !planPermissions.includes(p)) {
+        // If plan doesn't include this permission → deny
+        if (!planPermissions.includes(p)) {
           return false;
         }
         // Role check
@@ -104,20 +102,18 @@ export const usePermissions = () => {
   const hasAllPermissions = useCallback(
     (requiredPermissions: string[]): boolean => {
       if (isSuperDeveloper) return true;
-      if (isSuperSchoolAdmin && planPermissions.length === 0) return true;
       return requiredPermissions.every((p) => checkPermission(p));
     },
-    [isSuperDeveloper, isSuperSchoolAdmin, planPermissions, checkPermission],
+    [isSuperDeveloper, checkPermission],
   );
 
   // ── Helper: ANY one permission ────────────────────────────────────────────
   const hasAnyPermission = useCallback(
     (requiredPermissions: string[]): boolean => {
       if (isSuperDeveloper) return true;
-      if (isSuperSchoolAdmin && planPermissions.length === 0) return true;
       return requiredPermissions.some((p) => checkPermission(p));
     },
-    [isSuperDeveloper, isSuperSchoolAdmin, planPermissions, checkPermission],
+    [isSuperDeveloper, checkPermission],
   );
 
   return {

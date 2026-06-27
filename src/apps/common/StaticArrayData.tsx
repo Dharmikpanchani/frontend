@@ -36,7 +36,8 @@ const rolesModule: RoleStaticItem = {
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
     { title: "Status", titleId: "status", is_show: false },
-    { title: "Export", titleId: "export", is_show: false },
+    { title: "Import", titleId: "import", is_show: true },
+    { title: "Export", titleId: "export", is_show: true },
   ],
 };
 
@@ -64,6 +65,7 @@ const teacherModule: RoleStaticItem = {
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
     { title: "Status", titleId: "status", is_show: true },
+    { title: "Import", titleId: "import", is_show: true },
     { title: "Export", titleId: "export", is_show: true },
   ],
 };
@@ -78,6 +80,7 @@ const studentModule: RoleStaticItem = {
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
     { title: "Status", titleId: "status", is_show: true },
+    { title: "Import", titleId: "import", is_show: true },
     { title: "Export", titleId: "export", is_show: true },
   ],
 };
@@ -92,6 +95,7 @@ const departmentModule: RoleStaticItem = {
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
     { title: "Status", titleId: "status", is_show: true },
+    { title: "Import", titleId: "import", is_show: true },
     { title: "Export", titleId: "export", is_show: true },
   ],
 };
@@ -106,6 +110,7 @@ const subjectModule: RoleStaticItem = {
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
     { title: "Status", titleId: "status", is_show: true },
+    { title: "Import", titleId: "import", is_show: true },
     { title: "Export", titleId: "export", is_show: true },
   ],
 };
@@ -120,6 +125,7 @@ const classModule: RoleStaticItem = {
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
     { title: "Status", titleId: "status", is_show: true },
+    { title: "Import", titleId: "import", is_show: true },
     { title: "Export", titleId: "export", is_show: true },
   ],
 };
@@ -134,6 +140,7 @@ const sectionModule: RoleStaticItem = {
     { title: "View", titleId: "view", is_show: true },
     { title: "Delete", titleId: "delete", is_show: true },
     { title: "Status", titleId: "status", is_show: true },
+    { title: "Import", titleId: "import", is_show: true },
     { title: "Export", titleId: "export", is_show: true },
   ],
 };
@@ -239,6 +246,7 @@ export const planStaticData: RoleStaticItem[] = [
       { title: 'View', titleId: 'view', is_show: true },
       { title: 'Delete', titleId: 'delete', is_show: true },
       { title: 'Status', titleId: 'status', is_show: true },
+      { title: 'Import', titleId: 'import', is_show: true },
       { title: 'Export', titleId: 'export', is_show: true },
     ],
   },
@@ -252,6 +260,7 @@ export const planStaticData: RoleStaticItem[] = [
       { title: 'View', titleId: 'view', is_show: true },
       { title: 'Delete', titleId: 'delete', is_show: true },
       { title: 'Status', titleId: 'status', is_show: true },
+      { title: 'Import', titleId: 'import', is_show: true },
       { title: 'Export', titleId: 'export', is_show: true },
     ],
   },
@@ -266,6 +275,102 @@ export const planStaticData: RoleStaticItem[] = [
     ],
   },
 ];
+
+// ─── Plan Module Groups ────────────────────────────────────────────────────────
+// Each group bundles multiple sub-modules.
+// "Select" (default) adds all non-export/import permissions.
+// Export / Import are shown as separate optional add-ons per group.
+
+export interface PlanModuleGroup {
+  /** Display label */
+  groupTitle: string;
+  /** Unique group key */
+  groupId: string;
+  /** Monthly price label for the whole group */
+  price: string;
+  /** Sub-module mainTitleIds that belong to this group */
+  subModuleIds: string[];
+  /** Whether this group supports export as an add-on */
+  hasExport: boolean;
+  /** Whether this group supports import as an add-on */
+  hasImport: boolean;
+  /** Icon name (optional, for display) */
+  icon?: string;
+}
+
+export const planModuleGroups: PlanModuleGroup[] = [
+  {
+    groupTitle: 'Dashboard',
+    groupId: 'dashboard',
+    price: '₹ 2',
+    subModuleIds: ['dashboard'],
+    hasExport: false,
+    hasImport: false,
+    icon: 'dashboard',
+  },
+  {
+    groupTitle: 'Admin & Roles',
+    groupId: 'admin_roles',
+    price: '₹ 8',
+    subModuleIds: ['role', 'admin_user'],
+    hasExport: true,
+    hasImport: true,
+    icon: 'admin',
+  },
+  {
+    groupTitle: 'Teacher Management',
+    groupId: 'teacher_mgmt',
+    price: '₹ 27',
+    subModuleIds: ['teacher', 'department', 'subject', 'class', 'section'],
+    hasExport: true,
+    hasImport: true,
+    icon: 'teacher',
+  },
+  {
+    groupTitle: 'Student Management',
+    groupId: 'student_mgmt',
+    price: '₹ 12',
+    subModuleIds: ['student'],
+    hasExport: true,
+    hasImport: true,
+    icon: 'student',
+  },
+  {
+    groupTitle: 'Fee Management',
+    groupId: 'fee_mgmt',
+    price: '₹ 16',
+    // fee_category, fee_structure, fee_collection + school_settings payment config
+    subModuleIds: ['fee_category', 'fee_structure', 'fee_collection', 'school_settings'],
+    hasExport: true,
+    hasImport: true,
+    icon: 'fee',
+  },
+  {
+    groupTitle: 'Theme & Appearance',
+    groupId: 'theme_mgmt',
+    price: '₹ 5',
+    subModuleIds: ['theme'],
+    hasExport: false,
+    hasImport: false,
+    icon: 'theme',
+  },
+  {
+    groupTitle: 'School Settings',
+    groupId: 'settings_mgmt',
+    price: '₹ 7',
+    subModuleIds: ['school_profile'],
+    hasExport: false,
+    hasImport: false,
+    icon: 'settings',
+  },
+];
+
+/** Global Export add-on price (applies to all eligible modules) */
+export const planExportPrice = '₹ 5';
+
+/** Global Import add-on price (applies to all eligible modules) */
+export const planImportPrice = '₹ 5';
+
 
 export const schoolRoleStaticData: RoleStaticItem[] = [
   dashboardModule,
@@ -299,6 +404,7 @@ export const schoolRoleStaticData: RoleStaticItem[] = [
       { title: 'View', titleId: 'view', is_show: true },
       { title: 'Delete', titleId: 'delete', is_show: true },
       { title: 'Status', titleId: 'status', is_show: true },
+      { title: 'Import', titleId: 'import', is_show: true },
       { title: 'Export', titleId: 'export', is_show: true },
     ],
   },
@@ -312,6 +418,7 @@ export const schoolRoleStaticData: RoleStaticItem[] = [
       { title: 'View', titleId: 'view', is_show: true },
       { title: 'Delete', titleId: 'delete', is_show: true },
       { title: 'Status', titleId: 'status', is_show: true },
+      { title: 'Import', titleId: 'import', is_show: true },
       { title: 'Export', titleId: 'export', is_show: true },
     ],
   },
@@ -323,6 +430,13 @@ export const schoolRoleStaticData: RoleStaticItem[] = [
       { title: 'Collect', titleId: 'collect', is_show: true },
       { title: 'View', titleId: 'view', is_show: true },
       { title: 'Export', titleId: 'export', is_show: true },
+    ],
+  },
+  {
+    mainTitle: "Import Logs",
+    mainTitleId: "import_log",
+    subRole: [
+      { title: "View", titleId: "view", is_show: true },
     ],
   },
 ];
@@ -377,6 +491,8 @@ export const schoolAdminPermission = {
     read: "role_view",
     delete: "role_delete",
     status: "role_status",
+    import: "role_import",
+    export: "role_export",
   },
   admin_user: {
     create: "admin_user_add",
@@ -399,6 +515,7 @@ export const schoolAdminPermission = {
     read: "department_view",
     delete: "department_delete",
     status: "department_status",
+    import: "department_import",
     export: "department_export",
   },
   subject: {
@@ -407,6 +524,7 @@ export const schoolAdminPermission = {
     read: "subject_view",
     delete: "subject_delete",
     status: "subject_status",
+    import: "subject_import",
     export: "subject_export",
   },
   class: {
@@ -415,6 +533,7 @@ export const schoolAdminPermission = {
     read: "class_view",
     delete: "class_delete",
     status: "class_status",
+    import: "class_import",
     export: "class_export",
   },
   section: {
@@ -423,6 +542,7 @@ export const schoolAdminPermission = {
     read: "section_view",
     delete: "section_delete",
     status: "section_status",
+    import: "section_import",
     export: "section_export",
   },
   teacher: {
@@ -431,6 +551,7 @@ export const schoolAdminPermission = {
     read: "teacher_view",
     delete: "teacher_delete",
     status: "teacher_status",
+    import: "teacher_import",
     export: "teacher_export",
   },
   student: {
@@ -439,6 +560,7 @@ export const schoolAdminPermission = {
     read: "student_view",
     delete: "student_delete",
     status: "student_status",
+    import: "student_import",
     export: "student_export",
   },
   school_settings: {
@@ -451,6 +573,7 @@ export const schoolAdminPermission = {
     read: "fee_category_view",
     delete: "fee_category_delete",
     status: "fee_category_status",
+    import: "fee_category_import",
     export: "fee_category_export",
   },
   fee_structure: {
@@ -459,6 +582,7 @@ export const schoolAdminPermission = {
     read: "fee_structure_view",
     delete: "fee_structure_delete",
     status: "fee_structure_status",
+    import: "fee_structure_import",
     export: "fee_structure_export",
   },
   fee_collection: {
@@ -466,6 +590,9 @@ export const schoolAdminPermission = {
     read: "fee_collection_view",
     export: "fee_collection_export",
     update: "fee_collection_update",
+  },
+  import_log: {
+    read: "import_log_view",
   },
 };
 

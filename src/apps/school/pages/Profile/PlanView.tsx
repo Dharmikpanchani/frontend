@@ -6,13 +6,6 @@ import {
   Typography,
   TextField,
   Button,
-  TableContainer,
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   InputAdornment,
   Dialog,
   DialogTitle,
@@ -27,8 +20,21 @@ import {
   Verified as VerifiedIcon,
   AccessTime as ExpiryIcon,
   Close as CloseIcon,
+  Dashboard as DashboardIcon,
+  AdminPanelSettings as AdminIcon,
+  School as TeacherIcon,
+  People as StudentIcon,
+  AccountBalance as FeeIcon,
+  Settings as SettingsIcon,
+  Palette as ThemeIcon,
 } from "@mui/icons-material";
-import { planStaticData as roleStaticData } from "@/apps/common/StaticArrayData";
+import {
+  planStaticData as roleStaticData,
+  planModuleGroups,
+  planExportPrice,
+  planImportPrice,
+} from "@/apps/common/StaticArrayData";
+import type { PlanModuleGroup } from "@/apps/common/StaticArrayData";
 import { subscriptionService } from "@/api/services/subscription.service";
 import { BpCheckbox } from "../../component/schoolCommon/commonCssFunction/cssFunction";
 import { CommonLoader } from "@/apps/common/loader/Loader";
@@ -36,6 +42,16 @@ import { labelSx, inputSx } from "@/utils/styles/commonSx";
 import { authService } from "@/api/services/auth.service";
 import moment from "moment";
 import { toasterError } from "@/utils/toaster/Toaster";
+
+const groupIconMap: Record<string, any> = {
+  dashboard: DashboardIcon,
+  admin: AdminIcon,
+  teacher: TeacherIcon,
+  student: StudentIcon,
+  fee: FeeIcon,
+  settings: SettingsIcon,
+  theme: ThemeIcon,
+};
 
 export default function PlanView() {
   const [loading, setLoading] = useState(true);
@@ -147,57 +163,61 @@ export default function PlanView() {
     </Box>
   );
 
-  // Filter categories for the table logic
-  const adminModuleIds = ["role", "admin_user"];
-  const masterModuleIds = [
-    "teacher",
-    "department",
-    "subject",
-    "class",
-    "section",
-  ];
+  const permissions = initialValues?.permissions || [];
 
-  const isTypeAllChecked = (typeId: string) => {
-    if (!initialValues) return false;
-    const allKeys = roleStaticData.flatMap((m: any) => {
-      let actualTypeId = typeId;
-      if (m.mainTitleId === "attendance" && typeId === "add") {
-        actualTypeId = "mark";
-      }
-      if (m.mainTitleId === "fee_collection" && typeId === "delete") {
-        actualTypeId = "collect";
-      }
-      const matchedSubRole = m.subRole.find(
-        (sr: any) => sr.titleId === actualTypeId || sr.titleId === typeId
-      );
-      return matchedSubRole
-        ? [`${m.mainTitleId}_${matchedSubRole.titleId}`]
-        : [];
+  const getGroupSubModules = (g: PlanModuleGroup) =>
+    roleStaticData.filter((m) => g.subModuleIds.includes(m.mainTitleId));
+
+  const getDefaultKeys = (g: PlanModuleGroup): string[] =>
+    getGroupSubModules(g).flatMap((m) =>
+      m.subRole
+        .filter(
+          (sr) =>
+            sr.is_show &&
+            sr.titleId !== "export" &&
+            sr.titleId !== "import",
+        )
+        .map((sr) => `${m.mainTitleId}_${sr.titleId}`),
+    );
+
+  const getExportKeys = (g: PlanModuleGroup): string[] =>
+    getGroupSubModules(g).flatMap((m) =>
+      m.subRole.some((sr) => sr.titleId === "export")
+        ? [`${m.mainTitleId}_export`]
+        : [],
+    );
+
+  const getImportKeys = (g: PlanModuleGroup): string[] =>
+    getGroupSubModules(g).flatMap((m) =>
+      m.subRole.some((sr) => sr.titleId === "import")
+        ? [`${m.mainTitleId}_import`]
+        : [],
+    );
+
+  const isGroupDefaultChecked = (g: PlanModuleGroup) => {
+    const k = getDefaultKeys(g);
+    return k.length > 0 && k.every((x) => permissions.includes(x));
+  };
+
+  const isGroupDefaultIndeterminate = (g: PlanModuleGroup) => {
+    const k = getDefaultKeys(g);
+    const n = k.filter((x) => permissions.includes(x)).length;
+    return n > 0 && n < k.length;
+  };
+
+  const isAllExportChecked = planModuleGroups
+    .filter((g) => g.hasExport)
+    .every((g) => {
+      const k = getExportKeys(g);
+      return k.length > 0 && k.every((x) => permissions.includes(x));
     });
-    return (
-      allKeys.length > 0 &&
-      allKeys.every((k) => initialValues.permissions.includes(k))
-    );
-  };
 
-  const isGroupChecked = (groupIds: string[]) => {
-    if (!initialValues) return false;
-    const groupModules = roleStaticData.filter((m) =>
-      groupIds.includes(m.mainTitleId),
-    );
-    return (
-      groupModules.length > 0 &&
-      groupModules.every((module) =>
-        module.subRole
-          .filter((sr: any) => sr.is_show)
-          .every((sr: any) =>
-            initialValues.permissions.includes(
-              `${module.mainTitleId}_${sr.titleId}`,
-            ),
-          ),
-      )
-    );
-  };
+  const isAllImportChecked = planModuleGroups
+    .filter((g) => g.hasImport)
+    .every((g) => {
+      const k = getImportKeys(g);
+      return k.length > 0 && k.every((x) => permissions.includes(x));
+    });
 
   if (loading) return <CommonLoader />;
 
@@ -505,211 +525,273 @@ export default function PlanView() {
 
         {/* 2. Permissions */}
         <SectionTitle icon={SecurityIcon} title="Included Features" />
-        <TableContainer
-          component={Paper}
-          className="table-container permission-table-container"
+        {/* Grid of Included Feature Cards */}
+        <Box
           sx={{
-            boxShadow: "none",
-            border: "1px solid #e0e0e0",
-            borderRadius: "12px",
-            mb: 4,
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+              lg: "repeat(4, 1fr)",
+            },
+            gap: 1.2,
+            mb: 2.5,
           }}
         >
-          <Table className="table">
-            <TableHead className="table-head" sx={{ bgcolor: "#F9FAFB" }}>
-              <TableRow className="table-row">
-                <TableCell className="table-th" sx={{ fontWeight: 700, py: 2 }}>
-                  Module Name
-                </TableCell>
-                <TableCell
-                  className="table-th"
-                  align="center"
-                  sx={{ fontWeight: 700 }}
-                >
-                  All
-                </TableCell>
-                <TableCell
-                  className="table-th"
-                  align="center"
-                  sx={{ fontWeight: 700 }}
-                >
-                  View
-                </TableCell>
-                <TableCell
-                  className="table-th"
-                  align="center"
-                  sx={{ fontWeight: 700 }}
-                >
-                  Add / Mark
-                </TableCell>
-                <TableCell
-                  className="table-th"
-                  align="center"
-                  sx={{ fontWeight: 700 }}
-                >
-                  Edit
-                </TableCell>
-                <TableCell
-                  className="table-th"
-                  align="center"
-                  sx={{ fontWeight: 700 }}
-                >
-                  Delete / Collect
-                </TableCell>
-                <TableCell
-                  className="table-th"
-                  align="center"
-                  sx={{ fontWeight: 700 }}
-                >
-                  Status
-                </TableCell>
-                <TableCell
-                  className="table-th"
-                  align="center"
-                  sx={{ fontWeight: 700 }}
-                >
-                  Export
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody className="table-body">
-              <TableRow
-                className="table-row all-row"
-                sx={{ bgcolor: "#fafafa" }}
+          {planModuleGroups.map((group) => {
+            const GroupIcon = groupIconMap[group.icon || ""] || SettingsIcon;
+            const defChecked = isGroupDefaultChecked(group);
+            const defIndet = isGroupDefaultIndeterminate(group);
+            return (
+              <Box
+                key={group.groupId}
+                sx={{
+                  p: 1.2,
+                  borderRadius: "8px",
+                  border: defChecked
+                    ? "2px solid var(--primary-color)"
+                    : "1px solid #e2e8f0",
+                  bgcolor: defChecked ? "rgba(0, 33, 71, 0.01)" : "white",
+                  boxShadow: defChecked
+                    ? "0 4px 8px -4px rgba(0, 33, 71, 0.08)"
+                    : "0 1px 4px rgba(0, 0, 0, 0.01)",
+                  transition: "all 0.15s ease-in-out",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  minHeight: "95px",
+                  position: "relative",
+                }}
               >
-                <TableCell className="table-td" sx={{ fontWeight: 600 }}>
-                  Apply to All Modules
-                </TableCell>
-                <TableCell className="table-td" align="center">
-                  -
-                </TableCell>
-                {["view", "add", "edit", "delete", "status", "export"].map((typeId) => (
-                  <TableCell key={typeId} className="table-td" align="center">
-                    <BpCheckbox checked={isTypeAllChecked(typeId)} disabled />
-                  </TableCell>
-                ))}
-              </TableRow>
-
-              {roleStaticData.map((module: any) => {
-                const isMaster = masterModuleIds.includes(module.mainTitleId);
-                const isAdmin = adminModuleIds.includes(module.mainTitleId);
-                const rows = [];
-
-                if (module.mainTitleId === "role")
-                  rows.push(
-                    <TableRow key="admin_hr" sx={{ bgcolor: "#f0f4f8" }}>
-                      <TableCell
-                        className="table-td"
-                        sx={{
-                          fontWeight: 700,
-                          color: "var(--primary-color)",
-                          py: 1.5,
-                        }}
-                      >
-                        Admin & Management
-                      </TableCell>
-                      <TableCell className="table-td" align="center">
-                        <BpCheckbox
-                          checked={isGroupChecked(adminModuleIds)}
-                          disabled
-                        />
-                      </TableCell>
-                      <TableCell colSpan={6} />
-                    </TableRow>,
-                  );
-                if (module.mainTitleId === "teacher")
-                  rows.push(
-                    <TableRow key="master_hr" sx={{ bgcolor: "#f0f4f8" }}>
-                      <TableCell
-                        className="table-td"
-                        sx={{
-                          fontWeight: 700,
-                          color: "var(--primary-color)",
-                          py: 1.5,
-                        }}
-                      >
-                        Teacher Master
-                      </TableCell>
-                      <TableCell className="table-td" align="center">
-                        <BpCheckbox
-                          checked={isGroupChecked(masterModuleIds)}
-                          disabled
-                        />
-                      </TableCell>
-                      <TableCell colSpan={6} />
-                    </TableRow>,
-                  );
-
-                rows.push(
-                  <TableRow
-                    key={module.mainTitleId}
-                    sx={{ "&:hover": { bgcolor: "#f5f5f5" } }}
-                  >
-                    <TableCell
-                      className="table-td"
-                      sx={{ py: 2, pl: isMaster || isAdmin ? 4 : 2 }}
+                <Box>
+                  {/* Header inside Card */}
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.8 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 26,
+                        height: 26,
+                        borderRadius: "6px",
+                        bgcolor: defChecked ? "rgba(0, 33, 71, 0.09)" : "#f1f5f9",
+                        color: defChecked ? "var(--primary-color)" : "#64748b",
+                        transition: "all 0.2s",
+                      }}
                     >
-                      {module.mainTitle}
-                    </TableCell>
-                    <TableCell className="table-td" align="center">
-                      <BpCheckbox
-                        checked={module.subRole
-                          .filter((sr: any) => sr.is_show)
-                          .every((sr: any) =>
-                            initialValues.permissions.includes(
-                              `${module.mainTitleId}_${sr.titleId}`,
-                            ),
-                          )}
-                        disabled
-                      />
-                    </TableCell>
-                    {["view", "add", "edit", "delete", "status", "export"].map(
-                      (typeId) => {
-                        let actualTypeId = typeId;
-                        if (
-                          module.mainTitleId === "attendance" &&
-                          typeId === "add"
-                        )
-                          actualTypeId = "mark";
-                        if (
-                          module.mainTitleId === "fee_collection" &&
-                          typeId === "delete"
-                        )
-                          actualTypeId = "collect";
+                      <GroupIcon sx={{ fontSize: 14 }} />
+                    </Box>
+                    <BpCheckbox
+                      checked={defChecked}
+                      indeterminate={defIndet}
+                      disabled
+                      sx={{ transform: "scale(0.75)", p: 0.1 }}
+                    />
+                  </Box>
 
-                        const subRole = module.subRole.find(
-                          (sr: any) =>
-                            sr.titleId === actualTypeId ||
-                            sr.titleId === typeId,
-                        );
-                        const key = `${module.mainTitleId}_${subRole?.titleId || typeId}`;
-                        return (
-                          <TableCell
-                            key={typeId}
-                            className="table-td"
-                            align="center"
-                          >
-                            {subRole?.is_show ? (
-                              <BpCheckbox
-                                checked={initialValues.permissions.includes(
-                                  key,
-                                )}
-                                disabled
-                              />
-                            ) : (
-                              "-"
-                            )}
-                          </TableCell>
-                        );
-                      },
-                    )}
-                  </TableRow>,
-                );
-                return rows;
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                  {/* Title & Description */}
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "12px",
+                      color: "#0f172a",
+                      mb: 0.3,
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {group.groupTitle}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "9px",
+                      color: "#64748b",
+                      lineHeight: 1.2,
+                      mb: 1,
+                    }}
+                  >
+                    {group.subModuleIds
+                      .map((s) =>
+                        s
+                          .replace(/_/g, " ")
+                          .replace(/\b\w/g, (c) => c.toUpperCase())
+                      )
+                      .join(" · ")}
+                  </Typography>
+                </Box>
+
+                {/* Pricing Tag in Footer */}
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: "auto" }}>
+                  <Chip
+                    label={
+                      initialValues.billingCycle === "yearly"
+                        ? `₹ ${(parseInt(group.price.replace(/[^\d]/g, ""), 10) || 0) * 2}/yr`
+                        : `${group.price}/6mo`
+                    }
+                    size="small"
+                    sx={{
+                      fontSize: "8.5px",
+                      fontWeight: 700,
+                      bgcolor: "rgba(255, 140, 0, 0.09)",
+                      color: "#c05600",
+                      border: "1px solid rgba(255, 140, 0, 0.18)",
+                      height: "16px",
+                      px: 0.1,
+                    }}
+                  />
+                </Box>
+              </Box>
+            );
+          })}
+        </Box>
+
+        {/* Add-on Features Section Title */}
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: "12px",
+            color: "#0f172a",
+            mb: 1,
+            mt: 2.5,
+          }}
+        >
+          Add-on Features
+        </Typography>
+
+        {/* Import / Export Add-on Cards Grid */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+            },
+            gap: 1.2,
+            mb: 2.5,
+          }}
+        >
+          {/* Export Add-on Card */}
+          <Box
+            sx={{
+              p: 1.2,
+              borderRadius: "8px",
+              border: isAllExportChecked
+                ? "2px solid #16a34a"
+                : "1px solid #e2e8f0",
+              bgcolor: isAllExportChecked ? "rgba(22, 163, 74, 0.01)" : "white",
+              boxShadow: isAllExportChecked
+                ? "0 4px 8px -4px rgba(22, 163, 74, 0.08)"
+                : "0 1px 4px rgba(0, 0, 0, 0.01)",
+              transition: "all 0.15s ease-in-out",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              minHeight: "85px",
+            }}
+          >
+            <Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.8 }}>
+                <Box
+                  sx={{
+                    width: 26, height: 26,
+                    borderRadius: "6px",
+                    bgcolor: isAllExportChecked ? "rgba(22, 163, 74, 0.12)" : "#f1f5f9",
+                    color: isAllExportChecked ? "#16a34a" : "#64748b",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </Box>
+                <BpCheckbox
+                  checked={isAllExportChecked}
+                  disabled
+                  sx={{ transform: "scale(0.75)", p: 0.1 }}
+                />
+              </Box>
+
+              <Typography sx={{ fontWeight: 700, fontSize: "12px", color: "#0f172a", mb: 0.2 }}>
+                Export
+              </Typography>
+              <Typography sx={{ fontSize: "9px", color: "#64748b", mb: 1 }}>
+                Enables export/download actions across all eligible school modules.
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Chip
+                label={
+                  initialValues.billingCycle === "yearly"
+                    ? `₹ ${(parseInt(planExportPrice.replace(/[^\d]/g, ""), 10) || 0) * 2}/yr`
+                    : `${planExportPrice}/6mo`
+                }
+                size="small"
+                sx={{ fontSize: "8.5px", fontWeight: 700, bgcolor: "rgba(22, 163, 74, 0.08)", color: "#16a34a", border: "1px solid rgba(22, 163, 74, 0.2)", height: "16px", px: 0.1 }}
+              />
+            </Box>
+          </Box>
+
+          {/* Import Add-on Card */}
+          <Box
+            sx={{
+              p: 1.2,
+              borderRadius: "8px",
+              border: isAllImportChecked
+                ? "2px solid #2563eb"
+                : "1px solid #e2e8f0",
+              bgcolor: isAllImportChecked ? "rgba(37, 99, 235, 0.01)" : "white",
+              boxShadow: isAllImportChecked
+                ? "0 4px 8px -4px rgba(37, 99, 235, 0.08)"
+                : "0 1px 4px rgba(0, 0, 0, 0.01)",
+              transition: "all 0.15s ease-in-out",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              minHeight: "85px",
+            }}
+          >
+            <Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.8 }}>
+                <Box
+                  sx={{
+                    width: 26, height: 26,
+                    borderRadius: "6px",
+                    bgcolor: isAllImportChecked ? "rgba(37, 99, 235, 0.12)" : "#f1f5f9",
+                    color: isAllImportChecked ? "#2563eb" : "#64748b",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 16 12 21 17 16"/><line x1="12" y1="21" x2="12" y2="9"/></svg>
+                </Box>
+                <BpCheckbox
+                  checked={isAllImportChecked}
+                  disabled
+                  sx={{ transform: "scale(0.75)", p: 0.1 }}
+                />
+              </Box>
+
+              <Typography sx={{ fontWeight: 700, fontSize: "12px", color: "#0f172a", mb: 0.2 }}>
+                Import
+              </Typography>
+              <Typography sx={{ fontSize: "9px", color: "#64748b", mb: 1 }}>
+                Enables import/upload actions across all eligible school modules.
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Chip
+                label={
+                  initialValues.billingCycle === "yearly"
+                    ? `₹ ${(parseInt(planImportPrice.replace(/[^\d]/g, ""), 10) || 0) * 2}/yr`
+                    : `${planImportPrice}/6mo`
+                }
+                size="small"
+                sx={{ fontSize: "8.5px", fontWeight: 700, bgcolor: "rgba(37, 99, 235, 0.08)", color: "#2563eb", border: "1px solid rgba(37, 99, 235, 0.2)", height: "16px", px: 0.1 }}
+              />
+            </Box>
+          </Box>
+        </Box>
       </Box>
 
       {/* Future Plan Modal */}

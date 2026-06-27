@@ -66,6 +66,7 @@ const FeeStructurePage = lazy(() => import("./pages/FeeManagement/FeeStructure")
 const AddEditFeeStructure = lazy(() => import("./pages/FeeManagement/AddEditFeeStructure"));
 const FeeCollectionPage = lazy(() => import("./pages/FeeManagement/FeeCollection"));
 const FeeDuesPage = lazy(() => import("./pages/FeeManagement/FeeDues"));
+const ImportLogs = lazy(() => import("./pages/Logs/ImportLogs"));
 
 /**
  * Wrapper component that reads permissions from the store (inside a component body,
@@ -586,6 +587,17 @@ export const schoolRoutes: RouteConfig[] = [
                 permission={schoolAdminPermission?.school_settings?.read}
               >
                 <SchoolSettingsPage />
+              </PermissionRoute>
+            ),
+          },
+          // Import Logs
+          {
+            path: "/import-logs/:type",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.import_log?.read}
+              >
+                <ImportLogs />
               </PermissionRoute>
             ),
           },

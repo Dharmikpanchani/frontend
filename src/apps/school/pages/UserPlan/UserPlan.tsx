@@ -266,7 +266,7 @@ export default function UserPlan() {
                 className={`toggle-tab ${billingCycle === "yearly" ? "active" : ""}`}
                 onClick={() => setBillingCycle("yearly")}
               >
-                Yearly Billing
+                1 Year
               </Box>
               <Box
                 className={`toggle-tab ${billingCycle === "6month" ? "active" : ""}`}
@@ -321,7 +321,7 @@ export default function UserPlan() {
                   <Box sx={{ mb: 4 }}>
                     <PriceTag>
                       ₹{price}
-                      <span>/{billingCycle === "6month" ? "6 mo" : "yr"}</span>
+                      <span>/{billingCycle === "6month" ? "6mon" : "1year"}</span>
                     </PriceTag>
                     {offerPrice > 0 && (
                       <Typography

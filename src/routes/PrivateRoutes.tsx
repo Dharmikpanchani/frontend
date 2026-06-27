@@ -23,12 +23,13 @@ const PrivateRoutes: React.FC = () => {
     adminDetails?.type === config.school_admin ||
     adminDetails?.type === config.super_school_admin;
   const isActivePlan = adminDetails?.schoolData?.isActivePlan;
+  const hasPlan = !!adminDetails?.schoolData?.plan?.planName;
 
   // Safeguard: Only check plan status if the profile is fully loaded and the user is a school admin
   const isPlanInactive = !!(
     isSchoolAdmin &&
     adminDetails?._id && // Ensure profile is loaded
-    isActivePlan === false
+    (isActivePlan === false || !hasPlan)
   );
 
   // If they should be on the plan page but aren't

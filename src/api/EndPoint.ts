@@ -62,6 +62,7 @@ export const Api = {
   DELETE_ROLE: `${route}/delete-role`,
   CHANGE_STATUS_ROLE: `${route}/change-role-status`,
   IMPORT_ROLES: `${route}/import-roles`,
+  EXPORT_ROLES: `${route}/export-roles`,
 
   // About Us management
   GET_ALL_ABOUT_US: `${route}/get-all-abouts`,
@@ -85,18 +86,26 @@ export const Api = {
   GET_DEPARTMENT: `${route}/get-department`,
   ADD_EDIT_DEPARTMENT: `${route}/add-edit-department`,
   CHANGE_DEPARTMENT_STATUS: `${route}/department-action-status`,
+  EXPORT_DEPARTMENTS: `${route}/export-departments`,
+  IMPORT_DEPARTMENTS: `${route}/import-departments`,
   SUBJECTS: `${route}/subjects`,
   GET_SUBJECT: `${route}/get-subject`,
   ADD_EDIT_SUBJECT: `${route}/add-edit-subject`,
   CHANGE_SUBJECT_STATUS: `${route}/subject-action-status`,
+  EXPORT_SUBJECTS: `${route}/export-subjects`,
+  IMPORT_SUBJECTS: `${route}/import-subjects`,
   CLASSES: `${route}/classes`,
   GET_CLASS: `${route}/get-class`,
   ADD_EDIT_CLASS: `${route}/add-edit-class`,
   CHANGE_CLASS_STATUS: `${route}/class-action-status`,
+  EXPORT_CLASSES: `${route}/export-classes`,
+  IMPORT_CLASSES: `${route}/import-classes`,
   SECTIONS: `${route}/sections`,
   GET_SECTION: `${route}/get-section`,
   ADD_EDIT_SECTION: `${route}/add-edit-section`,
   CHANGE_SECTION_STATUS: `${route}/section-action-status`,
+  EXPORT_SECTIONS: `${route}/export-sections`,
+  IMPORT_SECTIONS: `${route}/import-sections`,
   GET_ALL_TEACHERS: `${route}/get-all-teachers`,
   GET_TEACHER: `${route}/get-teacher`,
   EXPORT_TEACHERS: `${route}/export-teachers`,
@@ -148,20 +157,24 @@ export const Api = {
   GET_SCHOOL_SETTINGS: `${route}/school-settings`,
   UPDATE_SCHOOL_SETTINGS: `${route}/school-settings`,
 
-  // Fee Management
+  // Fee Category
   GET_ALL_FEE_CATEGORIES: `${route}/fee-categories`,
   GET_FEE_CATEGORY: `${route}/fee-categories`,
   ADD_FEE_CATEGORY: `${route}/fee-categories`,
   UPDATE_FEE_CATEGORY: `${route}/fee-categories`,
   DELETE_FEE_CATEGORY: `${route}/fee-categories`,
   CHANGE_FEE_CATEGORY_STATUS: `${route}/fee-category-action-status`, // /:id
-
+  IMPORT_FEE_CATEGORIES: `${route}/fee-categories/import`,
+  EXPORT_FEE_CATEGORIES: `${route}/fee-categories/export`,
+ 
   GET_ALL_FEE_STRUCTURES: `${route}/fee-structures`,
   GET_FEE_STRUCTURE: `${route}/fee-structures`,
   ADD_FEE_STRUCTURE: `${route}/fee-structures`,
   UPDATE_FEE_STRUCTURE: `${route}/fee-structures`,
   DELETE_FEE_STRUCTURE: `${route}/fee-structures`,
   CHANGE_FEE_STRUCTURE_STATUS: `${route}/fee-structure-action-status`, // /:id
+  IMPORT_FEE_STRUCTURES: `${route}/fee-structures/import`,
+  EXPORT_FEE_STRUCTURES: `${route}/fee-structures/export`,
 
   GET_ALL_FEE_COLLECTIONS: `${route}/fee-collections`,
   GET_FEE_COLLECTION: `${route}/fee-collections`,
@@ -197,4 +210,8 @@ export const Api = {
   CLEAR_FEE_COLLECTION: `${route}/fee-collections`, // /:id/payment-status
   GET_DEVELOPER_TRANSACTIONS: `developer/transactions`,
   EXPORT_DEVELOPER_TRANSACTIONS: `developer/transactions/export`,
+
+  // Import Logs
+  IMPORT_LOGS: `${route}/import-logs`,
+  IMPORT_LOG_DETAIL: `${route}/import-log`,
 };

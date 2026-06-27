@@ -15,11 +15,17 @@ import {
   TableBody,
   Tooltip,
   debounce,
+  CircularProgress,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import {
   Search as SearchIcon,
   Add as AddIcon,
   FilterList as FilterIcon,
+  Download as DownloadIcon,
+  Print as PrintIcon,
+  FileDownload as ExcelIcon,
 } from "@mui/icons-material";
 import {
   getSubjects,
@@ -37,6 +43,9 @@ import type { RootState } from "@/redux/Store";
 import DataNotFound from "@/apps/school/component/schoolCommon/dataNotFound/DataNotFound";
 import PopupModal from "@/apps/school/component/schoolCommon/popUpModal/PopupModal";
 import { IOSSwitch } from "@/apps/school/component/schoolCommon/commonCssFunction/cssFunction";
+import { toasterSuccess, toasterError } from "@/utils/toaster/Toaster";
+import BulkImportModal from "@/apps/common/BulkImportModal";
+import { masterService } from "@/api/services/master.service";
 
 const getAvailableYears = (): number[] => {
   const now = new Date();
@@ -73,6 +82,77 @@ export default function Subject() {
 
   const [openDelete, setOpenDelete] = useState(false);
   const [openStatusModal, setOpenStatusModal] = useState(false);
+
+  const [openImportModal, setOpenImportModal] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleExport = async (format: "excel" | "pdf" | "html" = "excel") => {
+    try {
+      setExporting(true);
+      const response = await masterService.exportSubjects({
+        searchRequest: searchNameValue,
+        departmentIds: filterValues.departmentId,
+        isActive: filterValues.isActive,
+        startYear: filterValues.startYears.length > 0 ? filterValues.startYears : undefined,
+        format,
+      });
+      
+      const blob = new Blob([response], {
+        type: format === "excel"
+          ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          : "application/pdf",
+      });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `subjects_report_${Date.now()}.${format === "excel" ? "xlsx" : "pdf"}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toasterSuccess("Subjects exported successfully");
+    } catch (error: any) {
+      toasterError(error.message || "Failed to export subjects");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const csvContent = "data:text/csv;charset=utf-8,Subject Name,Subject Code,Departments,Status\nMathematics,MATH,Computer Science,Active\nScience,SCI,Computer Science,Active";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Subject_Import_Template.csv");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const handleUploadFile = async (file: File) => {
+    try {
+      const response = await masterService.importSubjects(file);
+      handleGetData();
+      if (response?.data && response.data.failCount > 0) {
+        return {
+          success: false,
+          message: `${response.data.successCount} Subjects imported successfully, ${response.data.failCount} failed.`,
+          errors: response.data.failures,
+        };
+      }
+      return { success: true, message: response.message || "Subjects imported successfully." };
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Failed to import subjects";
+      const errors = error.response?.data?.data?.failures || 
+                     error.response?.data?.data?.errors || 
+                     error.response?.data?.errors || 
+                     null;
+      return {
+        success: false,
+        message,
+        errors,
+      };
+    }
+  };
 
   const handleOpenDelete = (data: any) => {
     setOpenDelete(true);
@@ -202,24 +282,72 @@ export default function Subject() {
               />
             </Button>
           </Box>
-          {hasPermission(schoolAdminPermission.subject.create) && (
-            <Box className="admin-add-user-btn-main">
+          <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            {hasPermission(schoolAdminPermission.subject.import) && (
+              <Button
+                className="admin-btn-theme"
+                onClick={() => setOpenImportModal(true)}
+                sx={{
+                  height: "36px !important",
+                  px: "20px !important",
+                  fontSize: "12px !important",
+                  borderRadius: "6px !important",
+                }}
+              >
+                Import
+              </Button>
+            )}
+            {hasPermission(schoolAdminPermission.subject.create) && (
               <Button
                 className="admin-btn-theme"
                 onClick={() => navigate("/master/subject/add")}
+                sx={{
+                  height: "36px !important",
+                  px: "20px !important",
+                  fontSize: "12px !important",
+                  borderRadius: "6px !important",
+                }}
               >
                 <AddIcon
-                  className="admin-plus-icon"
                   sx={{
                     color: "var(--button-text, #fff)",
-                    fontSize: "18px",
-                    mr: 1,
+                    fontSize: "16px !important",
+                    mr: 0.5,
                   }}
                 />
                 Add Subject
               </Button>
-            </Box>
-          )}
+            )}
+            {hasPermission(schoolAdminPermission.subject.export) && subjects?.length > 0 && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={exporting ? <CircularProgress size={14} /> : <DownloadIcon sx={{ fontSize: "16px !important" }} />}
+                  disabled={exporting}
+                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
+                  sx={{
+                    textTransform: "none",
+                    borderRadius: "6px !important",
+                    borderColor: "#eaecf0",
+                    color: "#344054",
+                    height: "36px !important",
+                    fontSize: "12px !important",
+                    ml: 1,
+                  }}
+                >
+                  Export Report
+                </Button>
+                <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("excel"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <ExcelIcon sx={{ fontSize: "18px", color: "#12B76A" }} /> Export Excel
+                  </MenuItem>
+                  <MenuItem onClick={() => { setExportAnchorEl(null); handleExport("pdf"); }} sx={{ gap: 1.5, fontSize: "14px" }}>
+                    <PrintIcon sx={{ fontSize: "18px", color: "#667085" }} /> Export PDF
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+          </Box>
         </Box>
       </Box>
 
@@ -553,6 +681,14 @@ export default function Subject() {
         }}
         handleFunction={handleConfirmStatusChange}
         buttonStatusSpinner={actionLoading}
+      />
+
+      <BulkImportModal
+        open={openImportModal}
+        onClose={() => setOpenImportModal(false)}
+        title="Import Subjects"
+        onDownloadTemplate={handleDownloadTemplate}
+        onUpload={handleUploadFile}
       />
     </Box>
   );

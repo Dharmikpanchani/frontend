@@ -22,4 +22,11 @@ export const roleService = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+  exportRoles: (params?: any) => {
+    const format = params?.format || "excel";
+    return adminApiService.getFile<any>(`${Api.EXPORT_ROLES}`, {
+      params,
+      responseType: format === "excel" || format === "pdf" ? "blob" : "text",
+    });
+  },
 };

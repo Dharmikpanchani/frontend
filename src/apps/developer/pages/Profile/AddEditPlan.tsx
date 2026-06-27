@@ -5,13 +5,6 @@ import {
   Typography,
   TextField,
   Button,
-  TableContainer,
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   FormHelperText,
   Breadcrumbs,
   Link,
@@ -20,6 +13,7 @@ import {
   Select,
   MenuItem,
   FormControl,
+  Chip,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -27,8 +21,21 @@ import {
   Assignment as AssignmentIcon,
   Security as SecurityIcon,
   NavigateNext as NavigateNextIcon,
+  Dashboard as DashboardIcon,
+  AdminPanelSettings as AdminIcon,
+  School as TeacherIcon,
+  People as StudentIcon,
+  AccountBalance as FeeIcon,
+  Settings as SettingsIcon,
+  Palette as ThemeIcon,
 } from "@mui/icons-material";
-import { planStaticData as roleStaticData } from "@/apps/common/StaticArrayData";
+import {
+  planStaticData as roleStaticData,
+  planModuleGroups,
+  planExportPrice,
+  planImportPrice,
+} from "@/apps/common/StaticArrayData";
+import type { PlanModuleGroup } from "@/apps/common/StaticArrayData";
 import { BpCheckbox } from "../../component/developerCommon/commonCssFunction/cssFunction";
 import { CommonLoader } from "@/apps/common/loader/Loader";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
@@ -48,11 +55,14 @@ const billingCycleOptions = [
   { label: "Yearly", value: "yearly" },
 ];
 
-const get6MonthPrice = (priceStr?: string) => {
-  if (!priceStr) return "";
-  const priceNum = parseInt(priceStr.replace(/[^\d]/g, ""), 10);
-  if (isNaN(priceNum)) return "";
-  return `₹ ${priceNum * 6}`;
+const groupIconMap: Record<string, any> = {
+  dashboard: DashboardIcon,
+  admin: AdminIcon,
+  teacher: TeacherIcon,
+  student: StudentIcon,
+  fee: FeeIcon,
+  settings: SettingsIcon,
+  theme: ThemeIcon,
 };
 
 export default function AddEditPlan() {
@@ -71,16 +81,6 @@ export default function AddEditPlan() {
   );
   const [permissionsError, setPermissionsError] = useState("");
 
-  // Filter categories for the table logic
-  const adminModuleIds = ["role", "admin_user"];
-  const masterModuleIds = [
-    "teacher",
-    "department",
-    "subject",
-    "class",
-    "section",
-  ];
-
   useEffect(() => {
     if (id) {
       dispatch(getPlanById(id) as any);
@@ -92,7 +92,7 @@ export default function AddEditPlan() {
   const initialValues = useMemo(() => {
     if (selectedPlan && id) {
       return {
-        id: id,
+        id,
         planName: selectedPlan.planName || "",
         billingCycle: selectedPlan.billingCycle || "6month",
         monthlyPrice: selectedPlan.monthlyPrice || "",
@@ -100,8 +100,14 @@ export default function AddEditPlan() {
         yearlyPrice: selectedPlan.yearlyPrice || "",
         yerOfferPrice: selectedPlan.yerOfferPrice || "",
         permissions: selectedPlan.permissions || [],
-        studentLimit: selectedPlan.studentLimit !== undefined ? selectedPlan.studentLimit : -1,
-        storageLimit: selectedPlan.storageLimit !== undefined ? selectedPlan.storageLimit : -1,
+        studentLimit:
+          selectedPlan.studentLimit !== undefined
+            ? selectedPlan.studentLimit
+            : -1,
+        storageLimit:
+          selectedPlan.storageLimit !== undefined
+            ? selectedPlan.storageLimit
+            : -1,
       };
     }
     return {
@@ -120,30 +126,24 @@ export default function AddEditPlan() {
 
   const handleSubmit = async (values: any) => {
     if (isView) return;
-
     if (!values.permissions || !values.permissions.length) {
       setPermissionsError("Please select at least one permission");
       return;
     }
-
     setPermissionsError("");
-
     const isFreePlan = values.planName?.trim().toLowerCase() === "free";
     const isSuperDeveloper =
       adminDetails?.type === "super_developer" ||
       adminDetails?.type === "super_developer_admin";
-
     if (isFreePlan && !isSuperDeveloper) {
       toast.error("Only Super Developer can create or edit a Free plan.");
       return;
     }
-
     const payload: any = {
       ...values,
       permissions: [...new Set(values.permissions)],
     };
     if (id) payload.id = id;
-
     if (isFreePlan) {
       payload.billingCycle = "6month";
       payload.monthlyPrice = 0;
@@ -151,7 +151,6 @@ export default function AddEditPlan() {
       delete payload.yearlyPrice;
       delete payload.yerOfferPrice;
     } else {
-      // Ensure we only send fields relevant to the selected billing cycle
       if (values.billingCycle === "6month") {
         delete payload.yearlyPrice;
         delete payload.yerOfferPrice;
@@ -160,11 +159,8 @@ export default function AddEditPlan() {
         delete payload.monOfferPrice;
       }
     }
-
     const res = await dispatch(addEditPlan(payload) as any);
-    if (res.meta.requestStatus === "fulfilled") {
-      navigate("/plan-list");
-    }
+    if (res.meta.requestStatus === "fulfilled") navigate("/plan-list");
   };
 
   const SectionTitle = ({
@@ -262,884 +258,776 @@ export default function AddEditPlan() {
                 handleBlur,
               } = formikProps;
 
-              // Reusable permission logic
-              const permissions = values.permissions || [];
+              const permissions: string[] = values.permissions || [];
+              const isFreePlan =
+                values.planName?.trim().toLowerCase() === "free";
 
-              const onChangeCheckBox = (key: string) => {
-                if (isView) return;
-                const lastUnderscoreIndex = key.lastIndexOf("_");
-                const moduleId = key.substring(0, lastUnderscoreIndex);
-                const typeId = key.substring(lastUnderscoreIndex + 1);
-                const viewKey = `${moduleId}_view`;
+              // ─── Permission Helpers ────────────────────────────────────────
+              const getGroupSubModules = (g: PlanModuleGroup) =>
+                roleStaticData.filter((m) => g.subModuleIds.includes(m.mainTitleId));
 
-                if (permissions.includes(key)) {
-                  let newPermissions = permissions.filter(
-                    (p: string) => p !== key,
-                  );
-                  if (typeId === "view") {
-                    newPermissions = newPermissions.filter(
-                      (p: string) => !p.startsWith(`${moduleId}_`),
-                    );
-                  }
-                  setFieldValue("permissions", newPermissions);
-                } else {
-                  let newPermissions = [...permissions, key];
-                  if (typeId !== "view") {
-                    if (!newPermissions.includes(viewKey))
-                      newPermissions.push(viewKey);
-                  }
-                  setFieldValue("permissions", [...new Set(newPermissions)]);
-                }
-              };
-
-              const checkUncheckAllType = (
-                action: "add" | "remove",
-                typeId: string,
-              ) => {
-                if (isView) return;
-                const relatedKeys = roleStaticData.flatMap((module: any) => {
-                  let actualTypeId = typeId;
-                  if (module.mainTitleId === "attendance" && typeId === "add") {
-                    actualTypeId = "mark";
-                  }
-                  if (module.mainTitleId === "fee_collection" && typeId === "delete") {
-                    actualTypeId = "collect";
-                  }
-                  const matchedSubRole = module.subRole.find(
-                    (sr: any) => sr.titleId === actualTypeId || sr.titleId === typeId
-                  );
-                  return matchedSubRole
-                    ? [`${module.mainTitleId}_${matchedSubRole.titleId}`]
-                    : [];
-                });
-
-                if (action === "add") {
-                  let newPermissions = [...permissions, ...relatedKeys];
-                  if (typeId !== "view") {
-                    const views = roleStaticData.flatMap((m: any) => {
-                      let actualTypeId = typeId;
-                      if (m.mainTitleId === "attendance" && typeId === "add") {
-                        actualTypeId = "mark";
-                      }
-                      if (m.mainTitleId === "fee_collection" && typeId === "delete") {
-                        actualTypeId = "collect";
-                      }
-                      const hasType = m.subRole.some(
-                        (sr: any) => sr.titleId === actualTypeId || sr.titleId === typeId
-                      );
-                      return hasType && m.subRole.some((sr: any) => sr.titleId === "view")
-                        ? [`${m.mainTitleId}_view`]
-                        : [];
-                    });
-                    newPermissions = [...newPermissions, ...views];
-                  }
-                  setFieldValue("permissions", [...new Set(newPermissions)]);
-                } else {
-                  let newPermissions = permissions.filter(
-                    (k: string) => !relatedKeys.includes(k),
-                  );
-                  if (typeId === "view") {
-                    const allActionKeys = roleStaticData.flatMap((m: any) =>
-                      m.subRole.map(
-                        (sr: any) => `${m.mainTitleId}_${sr.titleId}`,
-                      ),
-                    );
-                    newPermissions = newPermissions.filter(
-                      (k: string) => !allActionKeys.includes(k),
-                    );
-                  }
-                  setFieldValue("permissions", newPermissions);
-                }
-              };
-
-              const isTypeAllChecked = (typeId: string) => {
-                const allKeys = roleStaticData.flatMap((m: any) => {
-                  let actualTypeId = typeId;
-                  if (m.mainTitleId === "attendance" && typeId === "add") {
-                    actualTypeId = "mark";
-                  }
-                  if (m.mainTitleId === "fee_collection" && typeId === "delete") {
-                    actualTypeId = "collect";
-                  }
-                  const matchedSubRole = m.subRole.find(
-                    (sr: any) => sr.titleId === actualTypeId || sr.titleId === typeId
-                  );
-                  return matchedSubRole
-                    ? [`${m.mainTitleId}_${matchedSubRole.titleId}`]
-                    : [];
-                });
-                return (
-                  allKeys.length > 0 &&
-                  allKeys.every((k) => permissions.includes(k))
-                );
-              };
-
-              const isGroupChecked = (groupIds: string[]) => {
-                const groupModules = roleStaticData.filter((m) =>
-                  groupIds.includes(m.mainTitleId),
-                );
-                return (
-                  groupModules.length > 0 &&
-                  groupModules.every((module) =>
-                    module.subRole
-                      .filter((sr: any) => sr.is_show)
-                      .every((sr: any) =>
-                        permissions.includes(
-                          `${module.mainTitleId}_${sr.titleId}`,
-                        ),
-                      ),
-                  )
-                );
-              };
-
-              const checkUncheckGroup = (
-                action: "add" | "remove",
-                groupIds: string[],
-              ) => {
-                if (isView) return;
-                const groupModules = roleStaticData.filter((m) =>
-                  groupIds.includes(m.mainTitleId),
-                );
-                const allKeys = groupModules.flatMap((m) =>
+              const getDefaultKeys = (g: PlanModuleGroup): string[] =>
+                getGroupSubModules(g).flatMap((m) =>
                   m.subRole
-                    .filter((sr: any) => sr.is_show)
-                    .map((sr: any) => `${m.mainTitleId}_${sr.titleId}`),
+                    .filter(
+                      (sr) =>
+                        sr.is_show &&
+                        sr.titleId !== "export" &&
+                        sr.titleId !== "import",
+                    )
+                    .map((sr) => `${m.mainTitleId}_${sr.titleId}`),
                 );
 
-                if (action === "add") {
+              const getExportKeys = (g: PlanModuleGroup): string[] =>
+                getGroupSubModules(g).flatMap((m) =>
+                  m.subRole.some((sr) => sr.titleId === "export")
+                    ? [`${m.mainTitleId}_export`]
+                    : [],
+                );
+
+              const getImportKeys = (g: PlanModuleGroup): string[] =>
+                getGroupSubModules(g).flatMap((m) =>
+                  m.subRole.some((sr) => sr.titleId === "import")
+                    ? [`${m.mainTitleId}_import`]
+                    : [],
+                );
+
+              const isGroupDefaultChecked = (g: PlanModuleGroup) => {
+                const k = getDefaultKeys(g);
+                return k.length > 0 && k.every((x) => permissions.includes(x));
+              };
+              const isGroupDefaultIndeterminate = (g: PlanModuleGroup) => {
+                const k = getDefaultKeys(g);
+                const n = k.filter((x) => permissions.includes(x)).length;
+                return n > 0 && n < k.length;
+              };
+              const isGroupExportChecked = (g: PlanModuleGroup) => {
+                const k = getExportKeys(g);
+                return k.length > 0 && k.every((x) => permissions.includes(x));
+              };
+              const isGroupImportChecked = (g: PlanModuleGroup) => {
+                const k = getImportKeys(g);
+                return k.length > 0 && k.every((x) => permissions.includes(x));
+              };
+
+              const toggleGroupDefault = (
+                g: PlanModuleGroup,
+                checked: boolean,
+              ) => {
+                if (isView) return;
+                if (checked) {
                   setFieldValue("permissions", [
-                    ...new Set([...permissions, ...allKeys]),
+                    ...new Set([...permissions, ...getDefaultKeys(g)]),
+                  ]);
+                } else {
+                  const rem = [
+                    ...getDefaultKeys(g),
+                    ...getExportKeys(g),
+                    ...getImportKeys(g),
+                  ];
+                  setFieldValue(
+                    "permissions",
+                    permissions.filter((k) => !rem.includes(k)),
+                  );
+                }
+              };
+
+              const isAllExportChecked = planModuleGroups
+                .filter((g) => g.hasExport)
+                .every((g) => isGroupExportChecked(g));
+              const toggleAllExport = (checked: boolean) => {
+                if (isView) return;
+                const allExp = planModuleGroups
+                  .filter((g) => g.hasExport)
+                  .flatMap((g) => getExportKeys(g));
+                if (checked) {
+                  setFieldValue("permissions", [
+                    ...new Set([
+                      ...permissions,
+                      ...allExp,
+                      ...planModuleGroups.flatMap((g) => getDefaultKeys(g)),
+                    ]),
                   ]);
                 } else {
                   setFieldValue(
                     "permissions",
-                    permissions.filter((k: string) => !allKeys.includes(k)),
+                    permissions.filter((k) => !allExp.includes(k)),
                   );
                 }
               };
+
+              const isAllImportChecked = planModuleGroups
+                .filter((g) => g.hasImport)
+                .every((g) => isGroupImportChecked(g));
+              const toggleAllImport = (checked: boolean) => {
+                if (isView) return;
+                const allImp = planModuleGroups
+                  .filter((g) => g.hasImport)
+                  .flatMap((g) => getImportKeys(g));
+                if (checked) {
+                  setFieldValue("permissions", [
+                    ...new Set([
+                      ...permissions,
+                      ...allImp,
+                      ...planModuleGroups.flatMap((g) => getDefaultKeys(g)),
+                    ]),
+                  ]);
+                } else {
+                  setFieldValue(
+                    "permissions",
+                    permissions.filter((k) => !allImp.includes(k)),
+                  );
+                }
+              };
+
               return (
                 <Form>
                   <Box sx={{ maxWidth: 1100 }}>
-                    {/* 1. Plan Details */}
+                    {/* ── 1. Plan Details ── */}
                     <SectionTitle icon={AssignmentIcon} title="Plan Details" />
-                    {(() => {
-                      const isFreePlan =
-                        values.planName?.trim().toLowerCase() === "free";
-                      return (
-                        <>
+
+                    {/* Plan Name */}
+                    <Box
+                      display="grid"
+                      gridTemplateColumns="repeat(12, 1fr)"
+                      gap={{ xs: 2, sm: 3 }}
+                      sx={{ mb: 3 }}
+                    >
+                      <Box gridColumn={{ xs: "span 12" }}>
+                        <Typography sx={labelSx}>
+                          Plan Name{" "}
+                          <span style={{ color: "#ef4444", marginLeft: "2px" }}>
+                            *
+                          </span>
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          name="planName"
+                          placeholder="Enter Plan Name"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.planName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.planName && Boolean(errors.planName)}
+                          disabled={isView || isEdit}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.planName && errors.planName
+                            ? (errors.planName as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+                    </Box>
+
+                    {/* Limits */}
+                    <Box
+                      display="grid"
+                      gridTemplateColumns="repeat(12, 1fr)"
+                      gap={{ xs: 2, sm: 3 }}
+                      sx={{ mb: isFreePlan ? 6 : 3 }}
+                    >
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>
+                          Student Limit{" "}
+                          <span style={{ color: "#ef4444", marginLeft: "2px" }}>
+                            *
+                          </span>
+                        </Typography>
+                        <FormControl fullWidth>
+                          <Select
+                            value={
+                              values.studentLimit === -1
+                                ? "unlimited"
+                                : "limited"
+                            }
+                            onChange={(e) => {
+                              if (e.target.value === "unlimited")
+                                setFieldValue("studentLimit", -1);
+                              else setFieldValue("studentLimit", "");
+                            }}
+                            disabled={isView}
+                            sx={inputSx}
+                            displayEmpty
+                          >
+                            <MenuItem value="unlimited">Unlimited</MenuItem>
+                            <MenuItem value="limited">Limited</MenuItem>
+                          </Select>
+                        </FormControl>
+                        {values.studentLimit !== -1 && (
+                          <>
+                            <TextField
+                              fullWidth
+                              name="studentLimit"
+                              placeholder="Enter Student Limit"
+                              variant="outlined"
+                              sx={{ ...inputSx, mt: 1 }}
+                              value={values.studentLimit}
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                if (/^\d*$/.test(v))
+                                  setFieldValue(
+                                    "studentLimit",
+                                    v === "" ? "" : Number(v),
+                                  );
+                              }}
+                              disabled={isView}
+                            />
+                            <FormHelperText className="error-text">
+                              {touched.studentLimit && errors.studentLimit
+                                ? (errors.studentLimit as string)
+                                : ""}
+                            </FormHelperText>
+                          </>
+                        )}
+                      </Box>
+
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>
+                          Storage Limit (GB){" "}
+                          <span style={{ color: "#ef4444", marginLeft: "2px" }}>
+                            *
+                          </span>
+                        </Typography>
+                        <FormControl fullWidth>
+                          <Select
+                            value={
+                              values.storageLimit === -1
+                                ? "unlimited"
+                                : "limited"
+                            }
+                            onChange={(e) => {
+                              if (e.target.value === "unlimited")
+                                setFieldValue("storageLimit", -1);
+                              else setFieldValue("storageLimit", "");
+                            }}
+                            disabled={isView}
+                            sx={inputSx}
+                            displayEmpty
+                          >
+                            <MenuItem value="unlimited">Unlimited</MenuItem>
+                            <MenuItem value="limited">Limited</MenuItem>
+                          </Select>
+                        </FormControl>
+                        {values.storageLimit !== -1 && (
+                          <>
+                            <TextField
+                              fullWidth
+                              name="storageLimit"
+                              placeholder="Enter Storage Limit (GB)"
+                              variant="outlined"
+                              sx={{ ...inputSx, mt: 1 }}
+                              value={values.storageLimit}
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                if (/^\d*$/.test(v))
+                                  setFieldValue(
+                                    "storageLimit",
+                                    v === "" ? "" : Number(v),
+                                  );
+                              }}
+                              disabled={isView}
+                            />
+                            <FormHelperText className="error-text">
+                              {touched.storageLimit && errors.storageLimit
+                                ? (errors.storageLimit as string)
+                                : ""}
+                            </FormHelperText>
+                          </>
+                        )}
+                      </Box>
+                    </Box>
+
+                    {/* Pricing — only for non-free plans */}
+                    {!isFreePlan && (
+                      <>
+                        {/* Billing Cycle */}
+                        <Box
+                          display="grid"
+                          gridTemplateColumns="repeat(12, 1fr)"
+                          gap={{ xs: 2, sm: 3 }}
+                          sx={{ mb: 3 }}
+                        >
+                          <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                            <Typography sx={labelSx}>
+                              Billing Cycle{" "}
+                              <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
+                            </Typography>
+                            <Autocomplete
+                              options={billingCycleOptions}
+                              getOptionLabel={(o) => o.label}
+                              value={
+                                billingCycleOptions.find(
+                                  (o) => o.value === values.billingCycle,
+                                ) || null
+                              }
+                              onChange={(_, nv) =>
+                                setFieldValue("billingCycle", nv?.value || "6month")
+                              }
+                              disabled={isView}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder="Select Billing Cycle"
+                                  sx={inputSx}
+                                  error={
+                                    touched.billingCycle &&
+                                    Boolean(errors.billingCycle)
+                                  }
+                                />
+                              )}
+                            />
+                            <FormHelperText className="error-text">
+                              {touched.billingCycle && errors.billingCycle
+                                ? (errors.billingCycle as string)
+                                : ""}
+                            </FormHelperText>
+                          </Box>
+                        </Box>
+
+                        {/* 6-Month price fields */}
+                        {values.billingCycle === "6month" && (
                           <Box
                             display="grid"
                             gridTemplateColumns="repeat(12, 1fr)"
                             gap={{ xs: 2, sm: 3 }}
                             sx={{ mb: 3 }}
                           >
-                            <Box gridColumn={{ xs: "span 12", sm: "span 12" }}>
+                            <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                               <Typography sx={labelSx}>
-                                Plan Name
-                                <span
-                                  style={{
-                                    color: "#ef4444",
-                                    marginLeft: "2px",
-                                  }}
-                                >
-                                  *
-                                </span>
+                                6-Month Price{" "}
+                                <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
                               </Typography>
                               <TextField
                                 fullWidth
-                                name="planName"
-                                placeholder="Enter Plan Name"
+                                name="monthlyPrice"
+                                placeholder="Price"
                                 variant="outlined"
                                 sx={inputSx}
-                                value={values.planName}
+                                value={values.monthlyPrice}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
-                                error={
-                                  touched.planName && Boolean(errors.planName)
-                                }
-                                disabled={isView || isEdit}
-                                slotProps={{ htmlInput: { maxLength: 50 } }}
+                                error={touched.monthlyPrice && Boolean(errors.monthlyPrice)}
+                                disabled={isView}
+                                InputProps={{
+                                  startAdornment: (
+                                    <InputAdornment position="start">₹</InputAdornment>
+                                  ),
+                                }}
+                                slotProps={{ htmlInput: { maxLength: 100 } }}
                               />
                               <FormHelperText className="error-text">
-                                {touched.planName && errors.planName
-                                  ? (errors.planName as string)
+                                {touched.monthlyPrice && errors.monthlyPrice
+                                  ? (errors.monthlyPrice as string)
                                   : ""}
                               </FormHelperText>
                             </Box>
+                            <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                              <Typography sx={labelSx}>
+                                6-Month Offer Price
+                              </Typography>
+                              <TextField
+                                fullWidth
+                                name="monOfferPrice"
+                                placeholder="Offer Price"
+                                variant="outlined"
+                                sx={inputSx}
+                                value={values.monOfferPrice}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                disabled={isView}
+                                InputProps={{
+                                  startAdornment: (
+                                    <InputAdornment position="start">₹</InputAdornment>
+                                  ),
+                                }}
+                                slotProps={{ htmlInput: { maxLength: 100 } }}
+                              />
+                            </Box>
                           </Box>
+                        )}
 
+                        {/* Yearly price fields */}
+                        {values.billingCycle === "yearly" && (
                           <Box
                             display="grid"
                             gridTemplateColumns="repeat(12, 1fr)"
                             gap={{ xs: 2, sm: 3 }}
-                            sx={{ mb: isFreePlan ? 6 : 3 }}
+                            sx={{ mb: 3 }}
                           >
-                            {/* Student Limit */}
                             <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                               <Typography sx={labelSx}>
-                                Student Limit
+                                Yearly Price{" "}
                                 <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
                               </Typography>
-                              <FormControl fullWidth>
-                                <Select
-                                  value={values.studentLimit === -1 ? "unlimited" : "limited"}
-                                  onChange={(e) => {
-                                    if (e.target.value === "unlimited") {
-                                      setFieldValue("studentLimit", -1);
-                                    } else {
-                                      setFieldValue("studentLimit", "");
-                                    }
-                                  }}
-                                  disabled={isView}
-                                  sx={inputSx}
-                                  displayEmpty
-                                >
-                                  <MenuItem value="unlimited">Unlimited</MenuItem>
-                                  <MenuItem value="limited">Limited</MenuItem>
-                                </Select>
-                              </FormControl>
-                              {values.studentLimit !== -1 && (
-                                <TextField
-                                  fullWidth
-                                  type="number"
-                                  name="studentLimit"
-                                  placeholder="Enter student limit (e.g. 500)"
-                                  variant="outlined"
-                                  sx={{ ...inputSx, mt: 1.5 }}
-                                  value={values.studentLimit === "" ? "" : values.studentLimit}
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    setFieldValue("studentLimit", val === "" ? "" : Number(val));
-                                  }}
-                                  onBlur={handleBlur}
-                                  error={touched.studentLimit && Boolean(errors.studentLimit)}
-                                  disabled={isView}
-                                  slotProps={{ htmlInput: { min: 1 } }}
-                                />
-                              )}
+                              <TextField
+                                fullWidth
+                                name="yearlyPrice"
+                                placeholder="Price"
+                                variant="outlined"
+                                sx={inputSx}
+                                value={values.yearlyPrice}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                error={touched.yearlyPrice && Boolean(errors.yearlyPrice)}
+                                disabled={isView}
+                                InputProps={{
+                                  startAdornment: (
+                                    <InputAdornment position="start">₹</InputAdornment>
+                                  ),
+                                }}
+                                slotProps={{ htmlInput: { maxLength: 100 } }}
+                              />
                               <FormHelperText className="error-text">
-                                {touched.studentLimit && errors.studentLimit
-                                  ? (errors.studentLimit as string)
+                                {touched.yearlyPrice && errors.yearlyPrice
+                                  ? (errors.yearlyPrice as string)
                                   : ""}
                               </FormHelperText>
                             </Box>
-
-                            {/* Storage Limit */}
                             <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                               <Typography sx={labelSx}>
-                                Storage Limit (GB)
-                                <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
+                                Yearly Offer Price
                               </Typography>
-                              <FormControl fullWidth>
-                                <Select
-                                  value={values.storageLimit === -1 ? "unlimited" : "limited"}
-                                  onChange={(e) => {
-                                    if (e.target.value === "unlimited") {
-                                      setFieldValue("storageLimit", -1);
-                                    } else {
-                                      setFieldValue("storageLimit", "");
-                                    }
-                                  }}
-                                  disabled={isView}
-                                  sx={inputSx}
-                                  displayEmpty
-                                >
-                                  <MenuItem value="unlimited">Unlimited</MenuItem>
-                                  <MenuItem value="limited">Limited</MenuItem>
-                                </Select>
-                              </FormControl>
-                              {values.storageLimit !== -1 && (
-                                <TextField
-                                  fullWidth
-                                  type="number"
-                                  name="storageLimit"
-                                  placeholder="Enter storage limit in GB (e.g. 50)"
-                                  variant="outlined"
-                                  sx={{ ...inputSx, mt: 1.5 }}
-                                  value={values.storageLimit === "" ? "" : values.storageLimit}
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    setFieldValue("storageLimit", val === "" ? "" : Number(val));
-                                  }}
-                                  onBlur={handleBlur}
-                                  error={touched.storageLimit && Boolean(errors.storageLimit)}
-                                  disabled={isView}
-                                  slotProps={{ htmlInput: { min: 1 } }}
-                                />
-                              )}
-                              <FormHelperText className="error-text">
-                                {touched.storageLimit && errors.storageLimit
-                                  ? (errors.storageLimit as string)
-                                  : ""}
-                              </FormHelperText>
+                              <TextField
+                                fullWidth
+                                name="yerOfferPrice"
+                                placeholder="Offer Price"
+                                variant="outlined"
+                                sx={inputSx}
+                                value={values.yerOfferPrice}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                disabled={isView}
+                                InputProps={{
+                                  startAdornment: (
+                                    <InputAdornment position="start">₹</InputAdornment>
+                                  ),
+                                }}
+                                slotProps={{ htmlInput: { maxLength: 100 } }}
+                              />
                             </Box>
                           </Box>
+                        )}
+                      </>
+                    )}
 
-                          {!isFreePlan && (
-                            <Box
-                              display="grid"
-                              gridTemplateColumns="repeat(12, 1fr)"
-                              gap={{ xs: 2, sm: 3 }}
-                              sx={{ mb: 6, mt: 3 }}
-                            >
-                              <Box gridColumn={{ xs: "span 12", sm: "span 4" }}>
-                                <Typography sx={labelSx}>
-                                  Billing Cycle
-                                  <span
-                                    style={{
-                                      color: "#ef4444",
-                                      marginLeft: "2px",
-                                    }}
-                                  >
-                                    *
-                                  </span>
-                                </Typography>
-                                <Autocomplete
-                                  options={billingCycleOptions}
-                                  getOptionLabel={(o) => o.label}
-                                  value={
-                                    billingCycleOptions.find(
-                                      (o) => o.value === values.billingCycle,
-                                    ) || null
-                                  }
-                                  onChange={(_, v) => {
-                                    const newCycle = v ? v.value : "";
-                                    setFieldValue("billingCycle", newCycle);
-                                    // Clear non-relevant fields when cycle changes
-                                    if (newCycle === "6month") {
-                                      setFieldValue("yearlyPrice", "");
-                                      setFieldValue("yerOfferPrice", "");
-                                    } else if (newCycle === "yearly") {
-                                      setFieldValue("monthlyPrice", "");
-                                      setFieldValue("monOfferPrice", "");
-                                    }
-                                  }}
-                                  disabled={isView}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      placeholder="Select Cycle"
-                                      variant="outlined"
-                                      sx={inputSx}
-                                      error={
-                                        touched.billingCycle &&
-                                        Boolean(errors.billingCycle)
-                                      }
-                                    />
-                                  )}
-                                />
-                                <FormHelperText className="error-text">
-                                  {touched.billingCycle && errors.billingCycle
-                                    ? (errors.billingCycle as string)
-                                    : ""}
-                                </FormHelperText>
-                              </Box>
-
-                              {values.billingCycle === "6month" ? (
-                                <>
-                                  <Box
-                                    gridColumn={{ xs: "span 12", sm: "span 4" }}
-                                  >
-                                    <Typography sx={labelSx}>
-                                      6 Months Price
-                                      <span
-                                        style={{
-                                          color: "#ef4444",
-                                          marginLeft: "2px",
-                                        }}
-                                      >
-                                        *
-                                      </span>
-                                    </Typography>
-                                    <TextField
-                                      fullWidth
-                                      name="monthlyPrice"
-                                      placeholder="Enter 6 Months Price"
-                                      variant="outlined"
-                                      sx={inputSx}
-                                      value={values.monthlyPrice}
-                                      onChange={(e) => {
-                                        const val = e.target.value;
-                                        setFieldValue("monthlyPrice", val);
-                                        if (!isNaN(Number(val)) && val !== "") {
-                                          setFieldValue(
-                                            "monOfferPrice",
-                                            Math.round(Number(val) * 0.2),
-                                          );
-                                        }
-                                      }}
-                                      onBlur={handleBlur}
-                                      error={
-                                        touched.monthlyPrice &&
-                                        Boolean(errors.monthlyPrice)
-                                      }
-                                      disabled={isView}
-                                      InputProps={{
-                                        startAdornment: (
-                                          <InputAdornment position="start">
-                                            ₹
-                                          </InputAdornment>
-                                        ),
-                                      }}
-                                                                          />
-                                    <FormHelperText className="error-text">
-                                      {touched.monthlyPrice && errors.monthlyPrice
-                                        ? (errors.monthlyPrice as string)
-                                        : ""}
-                                    </FormHelperText>
-                                  </Box>
-                                  <Box
-                                    gridColumn={{ xs: "span 12", sm: "span 4" }}
-                                  >
-                                    <Typography sx={labelSx}>
-                                      6 Months Offer Price
-                                    </Typography>
-                                    <TextField
-                                      fullWidth
-                                      name="monOfferPrice"
-                                      placeholder="Enter 6 Months Offer Price"
-                                      variant="outlined"
-                                      sx={inputSx}
-                                      value={values.monOfferPrice}
-                                      onChange={handleChange}
-                                      onBlur={handleBlur}
-                                      error={
-                                        touched.monOfferPrice &&
-                                        Boolean(errors.monOfferPrice)
-                                      }
-                                      disabled={isView}
-                                      InputProps={{
-                                        startAdornment: (
-                                          <InputAdornment position="start">
-                                            ₹
-                                          </InputAdornment>
-                                        ),
-                                      }}
-                                      slotProps={{ htmlInput: { maxLength: 100 } }}
-                                    />
-                                    <FormHelperText className="error-text">
-                                      {touched.monOfferPrice &&
-                                      errors.monOfferPrice
-                                        ? (errors.monOfferPrice as string)
-                                        : ""}
-                                    </FormHelperText>
-                                  </Box>
-                                </>
-                              ) : (
-                                <>
-                                  <Box
-                                    gridColumn={{ xs: "span 12", sm: "span 4" }}
-                                  >
-                                    <Typography sx={labelSx}>
-                                      Yearly Price
-                                      <span
-                                        style={{
-                                          color: "#ef4444",
-                                          marginLeft: "2px",
-                                        }}
-                                      >
-                                        *
-                                      </span>
-                                    </Typography>
-                                    <TextField
-                                      fullWidth
-                                      name="yearlyPrice"
-                                      placeholder="Enter Yearly Price"
-                                      variant="outlined"
-                                      sx={inputSx}
-                                      value={values.yearlyPrice}
-                                      onChange={(e) => {
-                                        const val = e.target.value;
-                                        setFieldValue("yearlyPrice", val);
-                                        if (!isNaN(Number(val)) && val !== "") {
-                                          setFieldValue(
-                                            "yerOfferPrice",
-                                            Math.round(Number(val) * 0.2),
-                                          );
-                                        }
-                                      }}
-                                      onBlur={handleBlur}
-                                      error={
-                                        touched.yearlyPrice &&
-                                        Boolean(errors.yearlyPrice)
-                                      }
-                                      disabled={isView}
-                                      InputProps={{
-                                        startAdornment: (
-                                          <InputAdornment position="start">
-                                            ₹
-                                          </InputAdornment>
-                                        ),
-                                      }}
-                                      slotProps={{ htmlInput: { maxLength: 100 } }}
-                                    />
-                                    <FormHelperText className="error-text">
-                                      {touched.yearlyPrice && errors.yearlyPrice
-                                        ? (errors.yearlyPrice as string)
-                                        : ""}
-                                    </FormHelperText>
-                                  </Box>
-                                  <Box
-                                    gridColumn={{ xs: "span 12", sm: "span 4" }}
-                                  >
-                                    <Typography sx={labelSx}>
-                                      Yearly Offer Price
-                                    </Typography>
-                                    <TextField
-                                      fullWidth
-                                      name="yerOfferPrice"
-                                      placeholder="Enter Yearly Offer Price"
-                                      variant="outlined"
-                                      sx={inputSx}
-                                      value={values.yerOfferPrice}
-                                      onChange={handleChange}
-                                      onBlur={handleBlur}
-                                      error={
-                                        touched.yerOfferPrice &&
-                                        Boolean(errors.yerOfferPrice)
-                                      }
-                                      disabled={isView}
-                                      InputProps={{
-                                        startAdornment: (
-                                          <InputAdornment position="start">
-                                            ₹
-                                          </InputAdornment>
-                                        ),
-                                      }}
-                                      slotProps={{ htmlInput: { maxLength: 100 } }}
-                                    />
-                                    <FormHelperText className="error-text">
-                                      {touched.yerOfferPrice &&
-                                      errors.yerOfferPrice
-                                        ? (errors.yerOfferPrice as string)
-                                        : ""}
-                                    </FormHelperText>
-                                  </Box>
-                                </>
-                              )}
-                            </Box>
-                          )}
-                        </>
-                      );
-                    })()}
-
-                    {/* 3. Permissions */}
+                    {/* ── 2. Permissions Configuration ── */}
                     <SectionTitle
                       icon={SecurityIcon}
                       title="Permissions Configuration"
                     />
-                    <TableContainer
-                      component={Paper}
-                      className="table-container permission-table-container"
+                    <Box
                       sx={{
-                        boxShadow: "none",
-                        border: "1px solid #e0e0e0",
-                        borderRadius: "12px",
-                        mb: 4,
+                        display: "grid",
+                        gridTemplateColumns: {
+                          xs: "1fr",
+                          sm: "repeat(2, 1fr)",
+                          md: "repeat(3, 1fr)",
+                          lg: "repeat(4, 1fr)",
+                        },
+                        gap: 1.2,
+                        mb: 2.5,
                       }}
                     >
-                      <Table className="table">
-                        <TableHead
-                          className="table-head"
-                          sx={{ bgcolor: "#F9FAFB" }}
-                        >
-                          <TableRow className="table-row">
-                            <TableCell
-                              className="table-th"
-                              sx={{ fontWeight: 700, py: 2 }}
-                            >
-                              Module Name
-                            </TableCell>
-                            <TableCell
-                              className="table-th"
-                              align="center"
-                              sx={{ fontWeight: 700 }}
-                            >
-                              All
-                            </TableCell>
-                            <TableCell
-                              className="table-th"
-                              align="center"
-                              sx={{ fontWeight: 700 }}
-                            >
-                              View
-                            </TableCell>
-                            <TableCell
-                              className="table-th"
-                              align="center"
-                              sx={{ fontWeight: 700 }}
-                            >
-                              Add / Mark
-                            </TableCell>
-                            <TableCell
-                              className="table-th"
-                              align="center"
-                              sx={{ fontWeight: 700 }}
-                            >
-                              Edit
-                            </TableCell>
-                            <TableCell
-                              className="table-th"
-                              align="center"
-                              sx={{ fontWeight: 700 }}
-                            >
-                              Delete / Collect
-                            </TableCell>
-                            <TableCell
-                              className="table-th"
-                              align="center"
-                              sx={{ fontWeight: 700 }}
-                            >
-                              Status
-                            </TableCell>
-                            <TableCell
-                              className="table-th"
-                              align="center"
-                              sx={{ fontWeight: 700 }}
-                            >
-                              Export
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody className="table-body">
-                          <TableRow
-                            className="table-row all-row"
-                            sx={{ bgcolor: "#fafafa" }}
+                      {planModuleGroups.map((group) => {
+                        const GroupIcon = groupIconMap[group.icon || ""] || SettingsIcon;
+                        const defChecked = isGroupDefaultChecked(group);
+                        const defIndet = isGroupDefaultIndeterminate(group);
+                        return (
+                          <Box
+                            key={group.groupId}
+                            sx={{
+                              p: 1.2,
+                              borderRadius: "8px",
+                              border: defChecked
+                                ? "2px solid var(--primary-color)"
+                                : "1px solid #e2e8f0",
+                              bgcolor: defChecked ? "rgba(0, 33, 71, 0.01)" : "white",
+                              boxShadow: defChecked
+                                ? "0 4px 8px -4px rgba(0, 33, 71, 0.08)"
+                                : "0 1px 4px rgba(0, 0, 0, 0.01)",
+                              transition: "all 0.15s ease-in-out",
+                              cursor: isView ? "default" : "pointer",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "space-between",
+                              minHeight: "95px",
+                              position: "relative",
+                              "&:hover": {
+                                transform: isView ? "none" : "translateY(-1px)",
+                                borderColor: isView ? "none" : "var(--primary-color)",
+                                boxShadow: isView ? "none" : "0 6px 12px -4px rgba(0, 33, 71, 0.1)",
+                              },
+                            }}
+                            onClick={() => {
+                              if (!isView) {
+                                toggleGroupDefault(group, !defChecked);
+                              }
+                            }}
                           >
-                            <TableCell
-                              className="table-td"
-                              sx={{ fontWeight: 600 }}
-                            >
-                              Apply to All Modules
-                            </TableCell>
-                            <TableCell className="table-td" align="center">
-                              -
-                            </TableCell>
-                            {["view", "add", "edit", "delete", "status", "export"].map(
-                              (typeId) => (
-                                <TableCell
-                                  key={typeId}
-                                  className="table-td"
-                                  align="center"
-                                >
-                                  <BpCheckbox
-                                    checked={isTypeAllChecked(typeId)}
-                                    onChange={(e: any) =>
-                                      checkUncheckAllType(
-                                        e.target.checked ? "add" : "remove",
-                                        typeId,
-                                      )
-                                    }
-                                    disabled={isView}
-                                  />
-                                </TableCell>
-                              ),
-                            )}
-                          </TableRow>
-
-                          {roleStaticData.map((module: any) => {
-                            const isMaster = masterModuleIds.includes(
-                              module.mainTitleId,
-                            );
-                            const isAdmin = adminModuleIds.includes(
-                              module.mainTitleId,
-                            );
-                            const rows = [];
-
-                            if (module.mainTitleId === "role")
-                              rows.push(
-                                <TableRow
-                                  key="admin_hr"
-                                  sx={{ bgcolor: "#f0f4f8" }}
-                                >
-                                  <TableCell
-                                    className="table-td"
-                                    sx={{
-                                      fontWeight: 700,
-                                      color: "var(--primary-color)",
-                                      py: 1.5,
-                                    }}
-                                  >
-                                    Admin & Management
-                                  </TableCell>
-                                  <TableCell
-                                    className="table-td"
-                                    align="center"
-                                  >
-                                    <BpCheckbox
-                                      checked={isGroupChecked(adminModuleIds)}
-                                      onChange={(e: any) =>
-                                        checkUncheckGroup(
-                                          e.target.checked ? "add" : "remove",
-                                          adminModuleIds,
-                                        )
-                                      }
-                                      disabled={isView}
-                                    />
-                                  </TableCell>
-                                  <TableCell colSpan={6} />
-                                </TableRow>,
-                              );
-                            if (module.mainTitleId === "student")
-                              rows.push(
-                                <TableRow
-                                  key="master_hr"
-                                  sx={{ bgcolor: "#f0f4f8" }}
-                                >
-                                  <TableCell
-                                    className="table-td"
-                                    sx={{
-                                      fontWeight: 700,
-                                      color: "var(--primary-color)",
-                                      py: 1.5,
-                                    }}
-                                  >
-                                    Teacher Master
-                                  </TableCell>
-                                  <TableCell
-                                    className="table-td"
-                                    align="center"
-                                  >
-                                    <BpCheckbox
-                                      checked={isGroupChecked(masterModuleIds)}
-                                      onChange={(e: any) =>
-                                        checkUncheckGroup(
-                                          e.target.checked ? "add" : "remove",
-                                          masterModuleIds,
-                                        )
-                                      }
-                                      disabled={isView}
-                                    />
-                                  </TableCell>
-                                  <TableCell colSpan={6} />
-                                </TableRow>,
-                              );
-
-                            rows.push(
-                              <TableRow
-                                key={module.mainTitleId}
-                                sx={{ "&:hover": { bgcolor: "#f5f5f5" } }}
-                              >
-                                <TableCell
-                                  className="table-td"
+                            <Box>
+                              {/* Header inside Card */}
+                              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.8 }}>
+                                <Box
                                   sx={{
-                                    py: 2,
-                                    pl: isMaster || isAdmin ? 4 : 2,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: 26,
+                                    height: 26,
+                                    borderRadius: "6px",
+                                    bgcolor: defChecked ? "rgba(0, 33, 71, 0.09)" : "#f1f5f9",
+                                    color: defChecked ? "var(--primary-color)" : "#64748b",
+                                    transition: "all 0.2s",
                                   }}
                                 >
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: 1,
-                                    }}
-                                  >
-                                    {module.mainTitle}
-                                    {module.price && (
-                                      <Box
-                                        sx={{
-                                          fontSize: "10px",
-                                          fontWeight: 700,
-                                          bgcolor: "rgba(255, 140, 0, 0.1)",
-                                          color: "#ff8c00",
-                                          px: 0.8,
-                                          py: 0.1,
-                                          borderRadius: "4px",
-                                          border:
-                                            "1px solid rgba(255, 140, 0, 0.15)",
-                                          fontFamily: "'Inter', sans-serif",
-                                        }}
-                                      >
-                                        {get6MonthPrice(module.price)}
-                                      </Box>
-                                    )}
-                                  </Box>
-                                </TableCell>
-                                <TableCell className="table-td" align="center">
-                                  <BpCheckbox
-                                    checked={module.subRole
-                                      .filter((sr: any) => sr.is_show)
-                                      .every((sr: any) =>
-                                        permissions.includes(
-                                          `${module.mainTitleId}_${sr.titleId}`,
-                                        ),
-                                      )}
-                                    onChange={(e: any) => {
-                                      const keys = module.subRole
-                                        .filter((sr: any) => sr.is_show)
-                                        .map(
-                                          (sr: any) =>
-                                            `${module.mainTitleId}_${sr.titleId}`,
-                                        );
-                                      setFieldValue(
-                                        "permissions",
-                                        e.target.checked
-                                          ? [
-                                              ...new Set([
-                                                ...permissions,
-                                                ...keys,
-                                              ]),
-                                            ]
-                                          : permissions.filter(
-                                              (k: string) => !keys.includes(k),
-                                            ),
-                                      );
-                                    }}
-                                    disabled={isView}
-                                  />
-                                </TableCell>
-                                {[
-                                  "view",
-                                  "add",
-                                  "edit",
-                                  "delete",
-                                  "status",
-                                  "export",
-                                ].map((typeId) => {
-                                  // Handle legacy titleIds for specific modules
-                                  let actualTypeId = typeId;
-                                  if (
-                                    module.mainTitleId === "attendance" &&
-                                    typeId === "add"
-                                  )
-                                    actualTypeId = "mark";
-                                  if (
-                                    module.mainTitleId === "fee_collection" &&
-                                    typeId === "delete"
-                                  )
-                                    actualTypeId = "collect";
+                                  <GroupIcon sx={{ fontSize: 14 }} />
+                                </Box>
+                                <BpCheckbox
+                                  checked={defChecked}
+                                  indeterminate={defIndet}
+                                  onChange={(e: any) => {
+                                    e.stopPropagation();
+                                    toggleGroupDefault(group, e.target.checked);
+                                  }}
+                                  disabled={isView}
+                                  sx={{ transform: "scale(0.75)", p: 0.1 }}
+                                />
+                              </Box>
 
-                                  const subRole = module.subRole.find(
-                                    (sr: any) =>
-                                      sr.titleId === actualTypeId ||
-                                      sr.titleId === typeId,
-                                  );
-                                  const key = `${module.mainTitleId}_${subRole?.titleId || typeId}`;
-                                  return (
-                                    <TableCell
-                                      key={typeId}
-                                      className="table-td"
-                                      align="center"
-                                    >
-                                      {subRole?.is_show ? (
-                                        <BpCheckbox
-                                          checked={permissions.includes(key)}
-                                          onChange={() => onChangeCheckBox(key)}
-                                          disabled={isView}
-                                        />
-                                      ) : (
-                                        "-"
-                                      )}
-                                    </TableCell>
-                                  );
-                                })}
-                              </TableRow>,
-                            );
-                            return rows;
-                          })}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                              {/* Title & Description */}
+                              <Typography
+                                sx={{
+                                  fontWeight: 700,
+                                  fontSize: "12px",
+                                  color: "#0f172a",
+                                  mb: 0.3,
+                                  lineHeight: 1.1,
+                                }}
+                              >
+                                {group.groupTitle}
+                              </Typography>
+                              <Typography
+                                sx={{
+                                  fontSize: "9px",
+                                  color: "#64748b",
+                                  lineHeight: 1.2,
+                                  mb: 1,
+                                }}
+                              >
+                                {group.subModuleIds
+                                  .map((s) =>
+                                    s
+                                      .replace(/_/g, " ")
+                                      .replace(/\b\w/g, (c) => c.toUpperCase())
+                                  )
+                                  .join(" · ")}
+                              </Typography>
+                            </Box>
+
+                            {/* Pricing Tag in Footer */}
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: "auto" }}>
+                              <Chip
+                                label={
+                                  values.billingCycle === "yearly"
+                                    ? `₹ ${(parseInt(group.price.replace(/[^\d]/g, ""), 10) || 0) * 2}/yr`
+                                    : `${group.price}/6mo`
+                                }
+                                size="small"
+                                sx={{
+                                  fontSize: "8.5px",
+                                  fontWeight: 700,
+                                  bgcolor: "rgba(255, 140, 0, 0.09)",
+                                  color: "#c05600",
+                                  border: "1px solid rgba(255, 140, 0, 0.18)",
+                                  height: "16px",
+                                  px: 0.1,
+                                }}
+                              />
+                            </Box>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+
+                    {/* Add-on Features Section Title */}
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: "12px",
+                        color: "#0f172a",
+                        mb: 1,
+                        mt: 2.5,
+                      }}
+                    >
+                      Add-on Features
+                    </Typography>
+
+                    {/* Import / Export Add-on Cards Grid */}
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: {
+                          xs: "1fr",
+                          sm: "repeat(2, 1fr)",
+                        },
+                        gap: 1.2,
+                        mb: 2.5,
+                      }}
+                    >
+                      {/* Export Add-on Card */}
+                      <Box
+                        sx={{
+                          p: 1.2,
+                          borderRadius: "8px",
+                          border: isAllExportChecked
+                            ? "2px solid #16a34a"
+                            : "1px solid #e2e8f0",
+                          bgcolor: isAllExportChecked ? "rgba(22, 163, 74, 0.01)" : "white",
+                          boxShadow: isAllExportChecked
+                            ? "0 4px 8px -4px rgba(22, 163, 74, 0.08)"
+                            : "0 1px 4px rgba(0, 0, 0, 0.01)",
+                          transition: "all 0.15s ease-in-out",
+                          cursor: isView ? "default" : "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                          minHeight: "85px",
+                          "&:hover": {
+                            transform: isView ? "none" : "translateY(-1px)",
+                            borderColor: isView ? "none" : "#16a34a",
+                            boxShadow: isView ? "none" : "0 6px 12px -4px rgba(22, 163, 74, 0.1)",
+                          },
+                        }}
+                        onClick={() => {
+                          if (!isView) {
+                            toggleAllExport(!isAllExportChecked);
+                          }
+                        }}
+                      >
+                        <Box>
+                          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.8 }}>
+                            <Box
+                              sx={{
+                                width: 26, height: 26,
+                                borderRadius: "6px",
+                                bgcolor: isAllExportChecked ? "rgba(22, 163, 74, 0.12)" : "#f1f5f9",
+                                color: isAllExportChecked ? "#16a34a" : "#64748b",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                transition: "all 0.2s",
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            </Box>
+                            <BpCheckbox
+                              checked={isAllExportChecked}
+                              onChange={(e: any) => {
+                                e.stopPropagation();
+                                toggleAllExport(e.target.checked);
+                              }}
+                              disabled={isView}
+                              sx={{ transform: "scale(0.75)", p: 0.1 }}
+                            />
+                          </Box>
+
+                          <Typography sx={{ fontWeight: 700, fontSize: "12px", color: "#0f172a", mb: 0.2 }}>
+                            Export
+                          </Typography>
+                          <Typography sx={{ fontSize: "9px", color: "#64748b", mb: 1 }}>
+                            Enables export/download actions across all eligible school modules.
+                          </Typography>
+                        </Box>
+
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <Chip
+                            label={
+                              values.billingCycle === "yearly"
+                                ? `₹ ${(parseInt(planExportPrice.replace(/[^\d]/g, ""), 10) || 0) * 2}/yr`
+                                : `${planExportPrice}/6mo`
+                            }
+                            size="small"
+                            sx={{ fontSize: "8.5px", fontWeight: 700, bgcolor: "rgba(22, 163, 74, 0.08)", color: "#16a34a", border: "1px solid rgba(22, 163, 74, 0.2)", height: "16px", px: 0.1 }}
+                          />
+                        </Box>
+                      </Box>
+
+                      {/* Import Add-on Card */}
+                      <Box
+                        sx={{
+                          p: 1.2,
+                          borderRadius: "8px",
+                          border: isAllImportChecked
+                            ? "2px solid #2563eb"
+                            : "1px solid #e2e8f0",
+                          bgcolor: isAllImportChecked ? "rgba(37, 99, 235, 0.01)" : "white",
+                          boxShadow: isAllImportChecked
+                            ? "0 4px 8px -4px rgba(37, 99, 235, 0.08)"
+                            : "0 1px 4px rgba(0, 0, 0, 0.01)",
+                          transition: "all 0.15s ease-in-out",
+                          cursor: isView ? "default" : "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                          minHeight: "85px",
+                          "&:hover": {
+                            transform: isView ? "none" : "translateY(-1px)",
+                            borderColor: isView ? "none" : "#2563eb",
+                            boxShadow: isView ? "none" : "0 6px 12px -4px rgba(37, 99, 235, 0.1)",
+                          },
+                        }}
+                        onClick={() => {
+                          if (!isView) {
+                            toggleAllImport(!isAllImportChecked);
+                          }
+                        }}
+                      >
+                        <Box>
+                          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.8 }}>
+                            <Box
+                              sx={{
+                                width: 26, height: 26,
+                                borderRadius: "6px",
+                                bgcolor: isAllImportChecked ? "rgba(37, 99, 235, 0.12)" : "#f1f5f9",
+                                color: isAllImportChecked ? "#2563eb" : "#64748b",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                transition: "all 0.2s",
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 16 12 21 17 16"/><line x1="12" y1="21" x2="12" y2="9"/></svg>
+                            </Box>
+                            <BpCheckbox
+                              checked={isAllImportChecked}
+                              onChange={(e: any) => {
+                                e.stopPropagation();
+                                toggleAllImport(e.target.checked);
+                              }}
+                              disabled={isView}
+                              sx={{ transform: "scale(0.75)", p: 0.1 }}
+                            />
+                          </Box>
+
+                          <Typography sx={{ fontWeight: 700, fontSize: "12px", color: "#0f172a", mb: 0.2 }}>
+                            Import
+                          </Typography>
+                          <Typography sx={{ fontSize: "9px", color: "#64748b", mb: 1 }}>
+                            Enables import/upload actions across all eligible school modules.
+                          </Typography>
+                        </Box>
+
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <Chip
+                            label={
+                              values.billingCycle === "yearly"
+                                ? `₹ ${(parseInt(planImportPrice.replace(/[^\d]/g, ""), 10) || 0) * 2}/yr`
+                                : `${planImportPrice}/6mo`
+                            }
+                            size="small"
+                            sx={{ fontSize: "8.5px", fontWeight: 700, bgcolor: "rgba(37, 99, 235, 0.08)", color: "#2563eb", border: "1px solid rgba(37, 99, 235, 0.2)", height: "16px", px: 0.1 }}
+                          />
+                        </Box>
+                      </Box>
+                    </Box>
 
                     {permissionsError && (
                       <FormHelperText

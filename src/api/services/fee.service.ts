@@ -128,3 +128,35 @@ export const exportFeeCollections = async (params?: any) => {
     responseType: format === 'excel' || format === 'pdf' ? 'blob' : 'text',
   });
 };
+
+export const importFeeCategories = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return await appClient.post(Api.IMPORT_FEE_CATEGORIES, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+export const exportFeeCategories = async (params?: any) => {
+  const format = params?.format || "excel";
+  return await appClient.get(Api.EXPORT_FEE_CATEGORIES, {
+    params,
+    responseType: format === "excel" || format === "pdf" ? "blob" : "text",
+  });
+};
+
+export const importFeeStructures = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return await appClient.post(Api.IMPORT_FEE_STRUCTURES, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+export const exportFeeStructures = async (params?: any) => {
+  const format = params?.format || "excel";
+  return await appClient.get(Api.EXPORT_FEE_STRUCTURES, {
+    params,
+    responseType: format === "excel" || format === "pdf" ? "blob" : "text",
+  });
+};

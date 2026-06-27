@@ -794,8 +794,8 @@ export default function Teacher() {
                   />
                 </Button>
               </Box>
-              {hasPermission(schoolAdminPermission.teacher.create) && (
-                <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1 }}>
+              <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                {hasPermission(schoolAdminPermission.teacher.import) && (
                   <Button
                     className="admin-btn-theme"
                     onClick={() => setOpenImportModal(true)}
@@ -808,6 +808,8 @@ export default function Teacher() {
                   >
                     Import
                   </Button>
+                )}
+                {hasPermission(schoolAdminPermission.teacher.create) && (
                   <Button
                     className="admin-btn-theme"
                     onClick={() => navigate("/teacher/add")}
@@ -827,9 +829,9 @@ export default function Teacher() {
                     />
                     Add Teacher
                   </Button>
-                </Box>
-              )}
-              {hasPermission(schoolAdminPermission.teacher.read) && teachers?.length > 0 && (
+                )}
+              </Box>
+              {hasPermission(schoolAdminPermission.teacher.export) && teachers?.length > 0 && (
                 <>
                   <Button
                     variant="outlined"
