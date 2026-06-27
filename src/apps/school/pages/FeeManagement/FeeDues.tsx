@@ -326,8 +326,16 @@ const FeeDues = () => {
             <Box
               className="admin-dashboard-box common-card"
               sx={{
-                background: "linear-gradient(135deg, #FFF9E6 0%, #FFEFC6 100%) !important",
-                border: "1px solid #FFE094 !important",
+                background: "#ffffff !important",
+                border: "1px solid #e2e8f0 !important",
+                boxShadow: "0 4px 12px -2px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important",
+                transition: "all 0.2s ease-in-out",
+                cursor: "pointer",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 12px 20px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04) !important",
+                  borderColor: "#FFE094 !important",
+                }
               }}
             >
               <Box className="admin-dashboard-inner-box">
@@ -336,7 +344,7 @@ const FeeDues = () => {
                     <Typography
                       className="admin-dash-text"
                       component="p"
-                      sx={{ color: "#8C5A00 !important" }}
+                      sx={{ color: "#64748b !important", fontWeight: 600 }}
                     >
                       Total Outstanding
                     </Typography>
@@ -346,11 +354,12 @@ const FeeDues = () => {
                     variant="h1"
                     component="h1"
                     sx={{
-                      fontSize: "24px !important",
-                      fontWeight: 700,
-                      color: "#B26A00 !important",
+                      fontSize: "20px !important",
+                      fontWeight: 800,
+                      color: "#1e293b !important",
                       "&::after": {
-                        backgroundColor: "#B26A00 !important",
+                        backgroundColor: "#E69100 !important",
+                        width: "20px !important",
                       },
                     }}
                   >
@@ -358,8 +367,8 @@ const FeeDues = () => {
                   </Typography>
                 </Box>
                 <Box className="admin-dash-right">
-                  <Box className="admin-dash-icon-box" sx={{ background: "rgba(255, 168, 0, 0.15) !important" }}>
-                    <MoneyOffIcon style={{ color: "#E69100", fontSize: "24px" }} />
+                  <Box className="admin-dash-icon-box" sx={{ background: "rgba(255, 168, 0, 0.08) !important", borderRadius: "8px !important", height: "36px !important", width: "36px !important" }}>
+                    <MoneyOffIcon style={{ color: "#E69100", fontSize: "18px" }} />
                   </Box>
                 </Box>
               </Box>
@@ -371,8 +380,16 @@ const FeeDues = () => {
             <Box
               className="admin-dashboard-box common-card"
               sx={{
-                background: "linear-gradient(135deg, #F0F5FF 0%, #D6E4FF 100%) !important",
-                border: "1px solid #ADC6FF !important",
+                background: "#ffffff !important",
+                border: "1px solid #e2e8f0 !important",
+                boxShadow: "0 4px 12px -2px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important",
+                transition: "all 0.2s ease-in-out",
+                cursor: "pointer",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 12px 20px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04) !important",
+                  borderColor: "#ADC6FF !important",
+                }
               }}
             >
               <Box className="admin-dashboard-inner-box">
@@ -381,7 +398,7 @@ const FeeDues = () => {
                     <Typography
                       className="admin-dash-text"
                       component="p"
-                      sx={{ color: "#1D39C4 !important" }}
+                      sx={{ color: "#64748b !important", fontWeight: 600 }}
                     >
                       Defaulter Students
                     </Typography>
@@ -391,11 +408,12 @@ const FeeDues = () => {
                     variant="h1"
                     component="h1"
                     sx={{
-                      fontSize: "24px !important",
-                      fontWeight: 700,
-                      color: "#2F54EB !important",
+                      fontSize: "20px !important",
+                      fontWeight: 800,
+                      color: "#1e293b !important",
                       "&::after": {
                         backgroundColor: "#2F54EB !important",
+                        width: "20px !important",
                       },
                     }}
                   >
@@ -403,8 +421,8 @@ const FeeDues = () => {
                   </Typography>
                 </Box>
                 <Box className="admin-dash-right">
-                  <Box className="admin-dash-icon-box" sx={{ background: "rgba(47, 84, 235, 0.15) !important" }}>
-                    <GroupIcon style={{ color: "#2F54EB", fontSize: "24px" }} />
+                  <Box className="admin-dash-icon-box" sx={{ background: "rgba(47, 84, 235, 0.08) !important", borderRadius: "8px !important", height: "36px !important", width: "36px !important" }}>
+                    <GroupIcon style={{ color: "#2F54EB", fontSize: "18px" }} />
                   </Box>
                 </Box>
               </Box>
@@ -416,8 +434,16 @@ const FeeDues = () => {
             <Box
               className="admin-dashboard-box common-card"
               sx={{
-                background: "linear-gradient(135deg, #FFF1F0 0%, #FFD8D6 100%) !important",
-                border: "1px solid #FFA39E !important",
+                background: "#ffffff !important",
+                border: "1px solid #e2e8f0 !important",
+                boxShadow: "0 4px 12px -2px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important",
+                transition: "all 0.2s ease-in-out",
+                cursor: "pointer",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 12px 20px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04) !important",
+                  borderColor: "#FFA39E !important",
+                }
               }}
             >
               <Box className="admin-dashboard-inner-box">
@@ -426,7 +452,7 @@ const FeeDues = () => {
                     <Typography
                       className="admin-dash-text"
                       component="p"
-                      sx={{ color: "#A8071A !important" }}
+                      sx={{ color: "#64748b !important", fontWeight: 600 }}
                     >
                       Total Late Fines
                     </Typography>
@@ -436,11 +462,12 @@ const FeeDues = () => {
                     variant="h1"
                     component="h1"
                     sx={{
-                      fontSize: "24px !important",
-                      fontWeight: 700,
-                      color: "#CF1322 !important",
+                      fontSize: "20px !important",
+                      fontWeight: 800,
+                      color: "#1e293b !important",
                       "&::after": {
                         backgroundColor: "#CF1322 !important",
+                        width: "20px !important",
                       },
                     }}
                   >
@@ -448,8 +475,8 @@ const FeeDues = () => {
                   </Typography>
                 </Box>
                 <Box className="admin-dash-right">
-                  <Box className="admin-dash-icon-box" sx={{ background: "rgba(245, 34, 45, 0.15) !important" }}>
-                    <NotificationsIcon style={{ color: "#F5222D", fontSize: "24px" }} />
+                  <Box className="admin-dash-icon-box" sx={{ background: "rgba(245, 34, 45, 0.08) !important", borderRadius: "8px !important", height: "36px !important", width: "36px !important" }}>
+                    <NotificationsIcon style={{ color: "#F5222D", fontSize: "18px" }} />
                   </Box>
                 </Box>
               </Box>

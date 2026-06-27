@@ -12,7 +12,6 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Chip,
 } from "@mui/material";
 import {
   Assignment as AssignmentIcon,
@@ -31,8 +30,6 @@ import {
 import {
   planStaticData as roleStaticData,
   planModuleGroups,
-  planExportPrice,
-  planImportPrice,
 } from "@/apps/common/StaticArrayData";
 import type { PlanModuleGroup } from "@/apps/common/StaticArrayData";
 import { subscriptionService } from "@/api/services/subscription.service";
