@@ -657,7 +657,10 @@ export default function Section() {
 
       <BulkImportModal
         open={openImportModal}
-        onClose={() => setOpenImportModal(false)}
+        onClose={(imported) => {
+          setOpenImportModal(false);
+          if (imported) handleGetData();
+        }}
         title="Import Sections"
         onDownloadTemplate={handleDownloadTemplate}
         onUpload={handleUploadFile}

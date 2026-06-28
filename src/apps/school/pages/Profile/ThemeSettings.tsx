@@ -486,6 +486,15 @@ const ThemeSettings = () => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <ColorPicker
+            label="Header Text Color"
+            field="headerText"
+            value={theme.headerText}
+            onChange={handleChange}
+            disabled={!canEdit}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <ColorPicker
             label="Page Background"
             field="pageBg"
             value={theme.pageBg}

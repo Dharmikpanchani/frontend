@@ -325,12 +325,13 @@ export const masterService = {
   generateRollNumbers: (payload: { classId: string; sectionId: string }) =>
     adminApiService.post<any>(Api.GENERATE_ROLL_NUMBERS, payload),
 
-  getImportLogs: (params: { page: number; perPage: number; importType?: string }) => {
+  getImportLogs: (params: { page: number; perPage: number; importType?: string; search?: string }) => {
     let url = `${Api.IMPORT_LOGS}`;
     const queryParams = new URLSearchParams();
     if (params.page) queryParams.append("pageNumber", String(params.page));
     if (params.perPage) queryParams.append("perPageData", String(params.perPage));
     if (params.importType) queryParams.append("importType", params.importType);
+    if (params.search) queryParams.append("search", params.search);
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;
     return adminApiService.get<any>(url);

@@ -1497,7 +1497,10 @@ export default function Student() {
 
       <BulkImportModal
         open={openImportModal}
-        onClose={() => setOpenImportModal(false)}
+        onClose={(imported) => {
+          setOpenImportModal(false);
+          if (imported) handleGetData();
+        }}
         title="Import Students"
         onDownloadTemplate={handleDownloadTemplate}
         onUpload={handleUploadFile}

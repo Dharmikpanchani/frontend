@@ -547,7 +547,10 @@ export default function Department() {
 
       <BulkImportModal
         open={openImportModal}
-        onClose={() => setOpenImportModal(false)}
+        onClose={(imported) => {
+          setOpenImportModal(false);
+          if (imported) handleGetData();
+        }}
         title="Import Departments"
         onDownloadTemplate={handleDownloadTemplate}
         onUpload={handleUploadFile}

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -34,7 +34,7 @@ import { bulkImportValidationSchema } from "@/utils/validation/FormikValidation"
 
 interface BulkImportModalProps {
   open: boolean;
-  onClose: () => void;
+  onClose: (imported?: boolean) => void;
   title: string;
   onDownloadTemplate: () => void;
   onUpload: (file: File) => Promise<{ success: boolean; message?: string; errors?: any[] }>;
@@ -50,7 +50,14 @@ export default function BulkImportModal({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<any[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [hasImported, setHasImported] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setHasImported(false);
+    }
+  }, [open]);
 
   const handleClose = (resetForm: () => void) => {
     resetForm();
@@ -59,13 +66,13 @@ export default function BulkImportModal({
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-    onClose();
+    onClose(hasImported);
   };
 
   return (
     <Dialog
       open={open}
-      onClose={() => !loading && onClose()}
+      onClose={() => !loading && onClose(hasImported)}
       maxWidth="md"
       fullWidth
       PaperProps={{
@@ -87,6 +94,10 @@ export default function BulkImportModal({
 
           try {
             const result = await onUpload(values.file);
+            const isImportSuccess = result.success || !!(result.message && /imported successfully/i.test(result.message));
+            if (isImportSuccess) {
+              setHasImported(true);
+            }
             if (result.success) {
               setSuccessMessage(result.message || "Data imported successfully.");
               resetForm();

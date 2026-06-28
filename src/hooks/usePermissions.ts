@@ -65,15 +65,21 @@ export const usePermissions = () => {
         return rolePermissions.includes(p);
       }
 
+      // Check if permission is in plan (import_log_view maps dynamically to any _import permission)
+      let isPermissionInPlan = planPermissions.includes(p);
+      if (p === "import_log_view") {
+        isPermissionInPlan = planPermissions.some((perm) => perm.endsWith("_import"));
+      }
+
       // 3️⃣ super_school_admin → plan-based check only
       if (isSuperSchoolAdmin) {
-        return planPermissions.includes(p);
+        return isPermissionInPlan;
       }
 
       // 4️⃣ school_admin → plan check first, then role check
       if (isSchoolSubAdmin) {
         // If plan doesn't include this permission → deny
-        if (!planPermissions.includes(p)) {
+        if (!isPermissionInPlan) {
           return false;
         }
         // Role check

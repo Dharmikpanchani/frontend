@@ -445,7 +445,10 @@ export default function RoleList() {
 
       <BulkImportModal
         open={openImportModal}
-        onClose={() => setOpenImportModal(false)}
+        onClose={(imported) => {
+          setOpenImportModal(false);
+          if (imported) handleGetData();
+        }}
         title="Import Roles"
         onDownloadTemplate={handleDownloadTemplate}
         onUpload={handleUploadFile}

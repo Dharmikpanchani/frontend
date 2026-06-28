@@ -631,7 +631,10 @@ export default function Class() {
 
       <BulkImportModal
         open={openImportModal}
-        onClose={() => setOpenImportModal(false)}
+        onClose={(imported) => {
+          setOpenImportModal(false);
+          if (imported) handleGetData();
+        }}
         title="Import Classes"
         onDownloadTemplate={handleDownloadTemplate}
         onUpload={handleUploadFile}

@@ -2326,7 +2326,10 @@ export default function Teacher() {
 
       <BulkImportModal
         open={openImportModal}
-        onClose={() => setOpenImportModal(false)}
+        onClose={(imported) => {
+          setOpenImportModal(false);
+          if (imported) handleGetData();
+        }}
         title="Import Teachers"
         onDownloadTemplate={handleDownloadTemplate}
         onUpload={handleUploadFile}

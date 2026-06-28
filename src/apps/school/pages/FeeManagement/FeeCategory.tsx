@@ -531,7 +531,10 @@ const FeeCategory = () => {
 
       <BulkImportModal
         open={openImportModal}
-        onClose={() => setOpenImportModal(false)}
+        onClose={(imported) => {
+          setOpenImportModal(false);
+          if (imported) loadCategories();
+        }}
         title="Import Fee Categories"
         onDownloadTemplate={handleDownloadTemplate}
         onUpload={handleUploadFile}

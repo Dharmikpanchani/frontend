@@ -166,7 +166,7 @@ export default function Header(props: any) {
                       margin: 0,
                       fontWeight: "600",
                       fontSize: "14px",
-                      color: "var(--header-text, #fff)",
+                      color: "#fff",
                       letterSpacing: "0.5px",
                       fontFamily: "var(--font-family)",
                     }}
@@ -177,7 +177,7 @@ export default function Header(props: any) {
                     style={{
                       margin: 0,
                       fontSize: "11px",
-                      color: "var(--header-text, rgba(255, 255, 255, 0.6))",
+                      color: "rgba(255, 255, 255, 0.6)",
                       opacity: 0.8,
                       fontWeight: "400",
                       fontFamily: "var(--font-family)",
@@ -188,7 +188,7 @@ export default function Header(props: any) {
                 </Box>
                 <ExpandMore
                   style={{
-                    color: "var(--header-text, rgba(255,255,255,0.7))",
+                    color: "rgba(255, 255, 255, 0.7)",
                     fontSize: "20px",
                   }}
                 />

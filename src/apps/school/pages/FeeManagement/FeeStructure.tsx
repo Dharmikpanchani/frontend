@@ -389,7 +389,10 @@ const FeeStructure = () => {
 
       <BulkImportModal
         open={openImportModal}
-        onClose={() => setOpenImportModal(false)}
+        onClose={(imported) => {
+          setOpenImportModal(false);
+          if (imported) loadStructures();
+        }}
         title="Import Fee Structures"
         onDownloadTemplate={handleDownloadTemplate}
         onUpload={handleUploadFile}
