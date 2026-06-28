@@ -529,7 +529,7 @@ export default function Student() {
   };
 
   const handleDownloadTemplate = () => {
-    const csvContent = "data:text/csv;charset=utf-8,Full Name,Email,Phone,Gender,Class Name,Section Name,RoleName\nAlice Smith,alice@example.com,9876543210,Female,Class 1,Section A,Student";
+    const csvContent = "data:text/csv;charset=utf-8,Admission Number,Roll Number,Full Name,Email,Phone Number,Gender,Date of Birth,Blood Group,Father Name,Father Phone,Mother Name,Admission Date,Address,Class Name,Section Name,Role Name\nADM001,Roll 1,Alice Smith,alice@example.com,9876543210,Female,15/05/2012,O+,John Smith,9876543211,Jane Smith,10/01/2023,123 Street Name,Class 1,Section A,Student";
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
