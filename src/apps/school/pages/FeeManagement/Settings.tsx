@@ -35,7 +35,12 @@ import {
   fetchSchoolSettings,
   updateSchoolSettingsAsync,
 } from "@/redux/slices/feeSlice";
-import { linkRazorpayRoute } from "@/api/services/fee.service";
+import {
+  linkRazorpayRoute,
+  generateFeeReport,
+  generateDueReport,
+  runArchiveProcess,
+} from "@/api/services/fee.service";
 import type { RootState, AppDispatch } from "@/redux/Store";
 import toast from "react-hot-toast";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -55,6 +60,10 @@ const Settings = () => {
   const [subTabValue, setSubTabValue] = useState(0);
   const [saving, setSaving] = useState(false);
   const [linkingBankId, setLinkingBankId] = useState<string | null>(null);
+  const [reportEmail, setReportEmail] = useState("");
+  const [feeReportLoading, setFeeReportLoading] = useState(false);
+  const [dueReportLoading, setDueReportLoading] = useState(false);
+  const [archiveLoading, setArchiveLoading] = useState(false);
 
   useEffect(() => {
     dispatch(fetchSchoolSettings());
@@ -144,6 +153,45 @@ const Settings = () => {
       toast.error(err.response?.data?.message || err.message || "Failed to link Razorpay Account.");
     } finally {
       setLinkingBankId(null);
+    }
+  };
+
+  const handleQueueReport = async (type: "fee" | "due") => {
+    if (type === "fee") {
+      setFeeReportLoading(true);
+      try {
+        const response = await generateFeeReport(reportEmail ? { email: reportEmail } : {});
+        toast.success(response.data?.message || "Fee report queued successfully!");
+      } catch (err: any) {
+        toast.error(err.response?.data?.message || err.message || "Failed to queue fee report");
+      } finally {
+        setFeeReportLoading(false);
+      }
+    } else {
+      setDueReportLoading(true);
+      try {
+        const response = await generateDueReport(reportEmail ? { email: reportEmail } : {});
+        toast.success(response.data?.message || "Due report queued successfully!");
+      } catch (err: any) {
+        toast.error(err.response?.data?.message || err.message || "Failed to queue due report");
+      } finally {
+        setDueReportLoading(false);
+      }
+    }
+  };
+
+  const handleRunArchive = async () => {
+    if (!window.confirm("Are you sure you want to run the database archiving process? This will move fee records older than 3 years to the archive and drop the original tables. This action cannot be undone.")) {
+      return;
+    }
+    setArchiveLoading(true);
+    try {
+      const response = await runArchiveProcess();
+      toast.success(response.data?.message || "Archive process completed successfully!");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || "Failed to trigger archive process");
+    } finally {
+      setArchiveLoading(false);
     }
   };
 
@@ -1042,16 +1090,90 @@ const Settings = () => {
 
               {/* ——— OTHER TAB ——— */}
               {tabValue === 2 && (
-                <Box className="card-border common-card" sx={{ borderRadius: "12px", backgroundColor: "white", minHeight: "400px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2.5 }}>
-                  <Box sx={{ width: 72, height: 72, borderRadius: "16px", backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <SettingsIcon sx={{ fontSize: 36, color: "var(--primary-color, #5c1a1a)", opacity: 0.5 }} />
+                <Box className="card-border common-card" sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: "12px", backgroundColor: "white", minHeight: "400px" }}>
+                  <SectionHeader icon={ReceiptIcon} title="System & Background Reports" isFirst />
+                  <Box sx={{ mb: 5 }}>
+                    <Typography sx={{ fontSize: "13.5px", color: "text.secondary", mb: 2.5 }}>
+                      Generate comprehensive background reports. The reports will be compiled as Excel files and sent to your email.
+                    </Typography>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, alignItems: "flex-start", mb: 3 }}>
+                      <Box sx={{ minWidth: { xs: "100%", sm: "300px" } }}>
+                        <Typography sx={labelSx}>Notification Email Address</Typography>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          placeholder="Leave blank for registered admin email"
+                          value={reportEmail}
+                          onChange={(e) => setReportEmail(e.target.value)}
+                          sx={inputSx}
+                        />
+                        <FormHelperText sx={{ mt: 0.5 }}>
+                          Optional. The report download link will be emailed to this address.
+                        </FormHelperText>
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => handleQueueReport("fee")}
+                        disabled={feeReportLoading}
+                        sx={{
+                          height: "40px",
+                          borderRadius: "8px",
+                          textTransform: "none",
+                          fontWeight: 600,
+                          borderColor: "var(--primary-color)",
+                          color: "var(--primary-color)",
+                          "&:hover": {
+                            borderColor: "var(--primary-color)",
+                            backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.04)"
+                          }
+                        }}
+                      >
+                        {feeReportLoading ? <CircularProgress size={20} color="inherit" /> : "Queue Fee Report"}
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={() => handleQueueReport("due")}
+                        disabled={dueReportLoading}
+                        sx={{
+                          height: "40px",
+                          borderRadius: "8px",
+                          textTransform: "none",
+                          fontWeight: 600,
+                          borderColor: "var(--primary-color)",
+                          color: "var(--primary-color)",
+                          "&:hover": {
+                            borderColor: "var(--primary-color)",
+                            backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.04)"
+                          }
+                        }}
+                      >
+                        {dueReportLoading ? <CircularProgress size={20} color="inherit" /> : "Queue Due Report"}
+                      </Button>
+                    </Box>
                   </Box>
-                  <Typography sx={{ fontSize: "18px", fontWeight: 700, color: "#1f2937", fontFamily: "var(--font-family, 'Poppins', sans-serif)" }}>Coming Soon</Typography>
-                  <Typography sx={{ fontSize: "13.5px", color: "#667085", textAlign: "center", maxWidth: 340, lineHeight: 1.7 }}>
-                    More configuration options will be available here in a future update. Stay tuned!
-                  </Typography>
-                  <Box sx={{ mt: 1, px: 2.5, py: 1, borderRadius: "20px", backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.06)", border: "1px dashed rgba(var(--primary-color-rgb, 92, 26, 26), 0.2)" }}>
-                    <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "var(--primary-color, #5c1a1a)", letterSpacing: "0.5px" }}>UNDER DEVELOPMENT</Typography>
+
+                  <SectionHeader icon={SettingsIcon} title="Database Maintenance & Archiving" />
+                  <Box sx={{ mb: 2 }}>
+                    <Typography sx={{ fontSize: "13.5px", color: "text.secondary", mb: 2.5 }}>
+                      Trigger a manual archiving run to move fee collections older than 3 years to the archive collections. This drops active collections and keeps the main database performant.
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={handleRunArchive}
+                      disabled={archiveLoading}
+                      sx={{
+                        height: "40px",
+                        borderRadius: "8px",
+                        background: "var(--theme-gradient, var(--primary-color)) !important",
+                        textTransform: "none",
+                        fontWeight: 600,
+                        boxShadow: "none"
+                      }}
+                    >
+                      {archiveLoading ? <CircularProgress size={20} color="inherit" /> : "Run Archiving Process"}
+                    </Button>
                   </Box>
                 </Box>
               )}

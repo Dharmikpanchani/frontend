@@ -364,11 +364,20 @@ const FeeCollection = () => {
             </Box>
           </Box>
 
-          <Box className="admin-filter-btn-main">
+          <Box className="admin-filter-btn-main" sx={{ width: { xs: "100%", sm: "auto" } }}>
             <Button
               className="admin-btn-theme"
               onClick={() => setOpenFilter(true)}
-              sx={{ ml: 1, minWidth: "45px", p: "0 12px", display: "flex", alignItems: "center", gap: "8px" }}
+              sx={{
+                ml: { xs: 0, sm: 1 },
+                width: "100%",
+                minWidth: "45px",
+                p: "0 12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}
             >
               <FilterIcon sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }} />
             </Button>
@@ -381,7 +390,15 @@ const FeeCollection = () => {
                 startIcon={exporting ? <CircularProgress size={16} /> : <DownloadIcon />}
                 disabled={exporting}
                 onClick={(e) => setExportAnchorEl(e.currentTarget)}
-                sx={{ textTransform: "none", borderRadius: "8px", borderColor: "#eaecf0", color: "#344054", height: "40px", ml: 1 }}
+                sx={{
+                  textTransform: "none",
+                  borderRadius: "8px",
+                  borderColor: "#eaecf0",
+                  color: "#344054",
+                  height: "40px",
+                  ml: { xs: 0, sm: 1 },
+                  width: { xs: "100%", sm: "auto" },
+                }}
               >
                 Export Report
               </Button>
@@ -400,12 +417,13 @@ const FeeCollection = () => {
           )}
 
           {canCollect && collections.length > 0 && (
-            <Box className="admin-add-user-btn-main" sx={{ ml: 1 }}>
+            <Box className="admin-add-user-btn-main" sx={{ ml: { xs: 0, sm: 1 }, width: { xs: "100%", sm: "auto" } }}>
               <Button
                 variant="contained"
                 startIcon={<PaymentIcon />}
                 className="admin-btn-theme"
                 onClick={() => toast("Select a student from Students list to collect fee.")}
+                sx={{ width: "100%" }}
               >
                 Collect Fee
               </Button>

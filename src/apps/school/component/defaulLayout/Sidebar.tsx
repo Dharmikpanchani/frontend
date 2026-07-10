@@ -105,6 +105,13 @@ export default function Sidebar(props: any) {
       menuHighlight: ["teacher"],
     },
     {
+      title: "Teacher Assignments",
+      pathName: "/teacher/assignments",
+      icon: Svg.latestUpdate,
+      show: hasPermission(schoolAdminPermission.teacher.read),
+      menuHighlight: ["teacher", "assignments"],
+    },
+    {
       title: "Students",
       pathName: "/student",
       icon: Svg.userList,
@@ -117,6 +124,13 @@ export default function Sidebar(props: any) {
       icon: Svg.latestUpdate,
       show: hasPermission(schoolAdminPermission.student?.read),
       menuHighlight: ["student", "inquiries"],
+    },
+    {
+      title: "Student Promotion",
+      pathName: "/student/promote",
+      icon: Svg.latestUpdate,
+      show: hasPermission(schoolAdminPermission.student?.update),
+      menuHighlight: ["student", "promote"],
     },
     {
       title: "Department",
@@ -464,11 +478,20 @@ export default function Sidebar(props: any) {
                                   (() => {
                                     const path1 = location?.pathname?.split("/")[1];
                                     const path2 = location?.pathname?.split("/")[2] || "";
+                                    if (dt?.title === "Student Promotion") {
+                                      return path1 === "student" && path2 === "promote";
+                                    }
                                     if (dt?.title === "Inquiries") {
                                       return path1 === "student" && path2 === "inquiries";
                                     }
                                     if (dt?.title === "Students") {
-                                      return path1 === "student" && path2 !== "inquiries";
+                                      return path1 === "student" && path2 !== "inquiries" && path2 !== "promote";
+                                    }
+                                    if (dt?.title === "Teacher Assignments") {
+                                      return path1 === "teacher" && path2 === "assignments";
+                                    }
+                                    if (dt?.title === "Teachers") {
+                                      return path1 === "teacher" && path2 !== "assignments";
                                     }
                                     return (
                                       dt?.menuHighlight?.includes(path1) ||

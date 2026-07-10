@@ -113,6 +113,9 @@ export const Api = {
   ADD_EDIT_TEACHER: `${route}/add-edit-teacher`,
   DELETE_TEACHER: `${route}/delete-teacher`,
   CHANGE_TEACHER_STATUS: `${route}/teacher-action-status`,
+  TEACHER_ASSIGNMENTS: `${route}/teacher-assignments`,
+  TEACHER_ASSIGNMENTS_HISTORY: `${route}/teacher-assignments/history`,
+  TEACHER_ASSIGNMENTS_CLONE: `${route}/teacher-assignments/clone`,
   GET_ALL_STUDENTS: `${route}/get-all-students`,
   GET_STUDENT: `${route}/get-student`,
   EXPORT_STUDENTS: `${route}/export-students`,
@@ -122,6 +125,7 @@ export const Api = {
   CHANGE_STUDENT_STATUS: `${route}/student-action-status`,
   STUDENT_ID_CARD: `${route}/students`,
   GENERATE_ROLL_NUMBERS: `${route}/students/generate-roll-numbers`,
+  PROMOTE_STUDENTS: `${route}/students/promote`,
   // Plan management
   GET_ALL_PLANS: `${route}/get-all-plans`,
   GET_PLAN: `${route}/get-plan`,
@@ -156,6 +160,10 @@ export const Api = {
   // Settings
   GET_SCHOOL_SETTINGS: `${route}/school-settings`,
   UPDATE_SCHOOL_SETTINGS: `${route}/school-settings`,
+
+  // Academic Years
+  GET_ACADEMIC_YEARS: `${route}/academic-years`,
+  CREATE_ACADEMIC_YEAR: `${route}/academic-years`,
 
   // Fee Category
   GET_ALL_FEE_CATEGORIES: `${route}/fee-categories`,
@@ -214,4 +222,9 @@ export const Api = {
   // Import Logs
   IMPORT_LOGS: `${route}/import-logs`,
   IMPORT_LOG_DETAIL: `${route}/import-log`,
+
+  // Reports & Archive
+  GENERATE_FEE_REPORT: `${route}/reports/fee-report`,
+  GENERATE_DUE_REPORT: `${route}/reports/due-report`,
+  RUN_ARCHIVE: `${route}/archive/run`,
 };

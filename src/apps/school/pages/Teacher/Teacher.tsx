@@ -1673,7 +1673,7 @@ export default function Teacher() {
                             fullWidth
                             id="pendingSearch"
                             className="admin-form-control"
-                            placeholder="Search Name or Email"
+                            placeholder="Search"
                             onChange={(e) => {
                               setPendingSearchQuery(e.target.value);
                               setPendingPage(0);

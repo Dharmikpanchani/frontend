@@ -245,55 +245,55 @@ export default function AddEditFeeStructure() {
                               </Tooltip>
                             )}
                           </Box>
-                        <Autocomplete
-                          options={allClasses || []}
-                          getOptionLabel={(option: any) => option.name || ""}
-                          value={
-                            allClasses?.find((cls: any) => cls._id === values.classId) || null
-                          }
-                          onChange={(_, newValue: any) => {
-                            setFieldValue("classId", newValue ? newValue._id : "");
-                          }}
-                          disabled={isView}
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
-                          }
-                          clearIcon={null}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Select Class"
-                              variant="outlined"
-                              sx={inputSx}
-                              error={touched.classId && Boolean(errors.classId)}
-                            />
-                          )}
-                          sx={{
-                            "& .MuiAutocomplete-inputRoot": {
-                              paddingTop: "0 !important",
-                              paddingBottom: "0 !important",
-                              paddingLeft: "0 !important",
-                              paddingRight: "30px !important",
-                              height: "auto",
-                              minHeight: "40px",
-                              "& .MuiAutocomplete-input": {
-                                padding: "0 10px !important",
-                                height: "40px",
-                                fontFamily: "'Poppins', sans-serif !important",
-                                fontSize: "14px !important",
+                          <Autocomplete
+                            options={allClasses || []}
+                            getOptionLabel={(option: any) => option.name || ""}
+                            value={
+                              allClasses?.find((cls: any) => cls._id === values.classId) || null
+                            }
+                            onChange={(_, newValue: any) => {
+                              setFieldValue("classId", newValue ? newValue._id : "");
+                            }}
+                            disabled={isView}
+                            popupIcon={
+                              <img
+                                src={Svg.down}
+                                style={{ width: "10px" }}
+                                alt="dropdown"
+                              />
+                            }
+                            clearIcon={null}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder="Select Class"
+                                variant="outlined"
+                                sx={inputSx}
+                                error={touched.classId && Boolean(errors.classId)}
+                              />
+                            )}
+                            sx={{
+                              "& .MuiAutocomplete-inputRoot": {
+                                paddingTop: "0 !important",
+                                paddingBottom: "0 !important",
+                                paddingLeft: "0 !important",
+                                paddingRight: "30px !important",
+                                height: "auto",
+                                minHeight: "40px",
+                                "& .MuiAutocomplete-input": {
+                                  padding: "0 10px !important",
+                                  height: "40px",
+                                  fontFamily: "'Poppins', sans-serif !important",
+                                  fontSize: "14px !important",
+                                },
                               },
-                            },
-                          }}
-                        />
-                        <FormHelperText className="error-text">
-                          {touched.classId && errors.classId
-                            ? (errors.classId as string)
-                            : ""}
-                        </FormHelperText>
+                            }}
+                          />
+                          <FormHelperText className="error-text">
+                            {touched.classId && errors.classId
+                              ? (errors.classId as string)
+                              : ""}
+                          </FormHelperText>
                         </Box>
 
                         <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
@@ -313,7 +313,7 @@ export default function AddEditFeeStructure() {
                             {!isView && (
                               <Tooltip title="Refresh Categories" arrow>
                                 <IconButton
-                                  onClick={() => dispatch(fetchFeeCategories({ page: 1, limit: 100 }) as any)}
+                                  onClick={() => dispatch(fetchFeeCategories({ pageNumber: 1, perPageData: 100 }) as any)}
                                   size="small"
                                   sx={{
                                     color: "var(--primary-color)",
@@ -327,55 +327,55 @@ export default function AddEditFeeStructure() {
                               </Tooltip>
                             )}
                           </Box>
-                        <Autocomplete
-                          options={categories?.filter((c: any) => c.isActive) || []}
-                          getOptionLabel={(option: any) => option.name || ""}
-                          value={
-                            categories?.find((cat: any) => cat._id === values.feeCategoryId) || null
-                          }
-                          onChange={(_, newValue: any) => {
-                            setFieldValue("feeCategoryId", newValue ? newValue._id : "");
-                          }}
-                          disabled={isView}
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
-                          }
-                          clearIcon={null}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Select Category"
-                              variant="outlined"
-                              sx={inputSx}
-                              error={touched.feeCategoryId && Boolean(errors.feeCategoryId)}
-                            />
-                          )}
-                          sx={{
-                            "& .MuiAutocomplete-inputRoot": {
-                              paddingTop: "0 !important",
-                              paddingBottom: "0 !important",
-                              paddingLeft: "0 !important",
-                              paddingRight: "30px !important",
-                              height: "auto",
-                              minHeight: "40px",
-                              "& .MuiAutocomplete-input": {
-                                padding: "0 10px !important",
-                                height: "40px",
-                                fontFamily: "'Poppins', sans-serif !important",
-                                fontSize: "14px !important",
+                          <Autocomplete
+                            options={categories?.filter((c: any) => c.isActive) || []}
+                            getOptionLabel={(option: any) => option.name || ""}
+                            value={
+                              categories?.find((cat: any) => cat._id === values.feeCategoryId) || null
+                            }
+                            onChange={(_, newValue: any) => {
+                              setFieldValue("feeCategoryId", newValue ? newValue._id : "");
+                            }}
+                            disabled={isView}
+                            popupIcon={
+                              <img
+                                src={Svg.down}
+                                style={{ width: "10px" }}
+                                alt="dropdown"
+                              />
+                            }
+                            clearIcon={null}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                placeholder="Select Category"
+                                variant="outlined"
+                                sx={inputSx}
+                                error={touched.feeCategoryId && Boolean(errors.feeCategoryId)}
+                              />
+                            )}
+                            sx={{
+                              "& .MuiAutocomplete-inputRoot": {
+                                paddingTop: "0 !important",
+                                paddingBottom: "0 !important",
+                                paddingLeft: "0 !important",
+                                paddingRight: "30px !important",
+                                height: "auto",
+                                minHeight: "40px",
+                                "& .MuiAutocomplete-input": {
+                                  padding: "0 10px !important",
+                                  height: "40px",
+                                  fontFamily: "'Poppins', sans-serif !important",
+                                  fontSize: "14px !important",
+                                },
                               },
-                            },
-                          }}
-                        />
-                        <FormHelperText className="error-text">
-                          {touched.feeCategoryId && errors.feeCategoryId
-                            ? (errors.feeCategoryId as string)
-                            : ""}
-                        </FormHelperText>
+                            }}
+                          />
+                          <FormHelperText className="error-text">
+                            {touched.feeCategoryId && errors.feeCategoryId
+                              ? (errors.feeCategoryId as string)
+                              : ""}
+                          </FormHelperText>
                         </Box>
                       </Box>
 
@@ -526,97 +526,97 @@ export default function AddEditFeeStructure() {
                                   handleInstallmentChange(index, "dueDate", dateStr);
                                 }}
                                 disabled={isView}
-                              slotProps={{
-                                textField: {
-                                  fullWidth: true,
-                                  size: "small",
-                                  name: `installments[${index}].dueDate`,
-                                  error: instTouched?.[index]?.dueDate && Boolean(instErrors?.[index]?.dueDate),
-                                  placeholder: "Select Date",
-                                  variant: "outlined",
-                                  onClick: () => !isView && setOpenDates((prev) => ({ ...prev, [index]: true })),
-                                  onBlur: handleBlur,
-                                  disabled: isView,
-                                  sx: {
-                                    "& .MuiPickersOutlinedInput-root": {
-                                      height: "40px",
-                                      backgroundColor: isView ? "#f4f5f7 !important" : "#fff !important",
-                                      borderRadius: "var(--button-radius, 6px) !important",
-                                      "& fieldset": {
-                                        borderColor: "var(--input-border, #ced4da) !important",
+                                slotProps={{
+                                  textField: {
+                                    fullWidth: true,
+                                    size: "small",
+                                    name: `installments[${index}].dueDate`,
+                                    error: instTouched?.[index]?.dueDate && Boolean(instErrors?.[index]?.dueDate),
+                                    placeholder: "Select Date",
+                                    variant: "outlined",
+                                    onClick: () => !isView && setOpenDates((prev) => ({ ...prev, [index]: true })),
+                                    onBlur: handleBlur,
+                                    disabled: isView,
+                                    sx: {
+                                      "& .MuiPickersOutlinedInput-root": {
+                                        height: "40px",
+                                        backgroundColor: isView ? "#f4f5f7 !important" : "#fff !important",
+                                        borderRadius: "var(--button-radius, 6px) !important",
+                                        "& fieldset": {
+                                          borderColor: "var(--input-border, #ced4da) !important",
+                                        },
+                                        "&:hover:not(.Mui-focused) fieldset": {
+                                          borderColor: "var(--input-border, #ced4da) !important",
+                                        },
+                                        "&.Mui-focused:not(.Mui-error) fieldset": {
+                                          borderColor: "var(--primary-color) !important",
+                                          borderWidth: "1px !important",
+                                        },
                                       },
-                                      "&:hover:not(.Mui-focused) fieldset": {
-                                        borderColor: "var(--input-border, #ced4da) !important",
+                                      "& .MuiPickersSectionList-root": {
+                                        padding: "12px 0px",
+                                        fontSize: "12px",
                                       },
-                                      "&.Mui-focused:not(.Mui-error) fieldset": {
-                                        borderColor: "var(--primary-color) !important",
-                                        borderWidth: "1px !important",
+                                      "& .MuiPickersInputBase-sectionContent": {
+                                        fontSize: "13px",
+                                        padding: "12px 0px",
                                       },
-                                    },
-                                    "& .MuiPickersSectionList-root": {
-                                      padding: "12px 0px",
-                                      fontSize: "12px",
-                                    },
-                                    "& .MuiPickersInputBase-sectionContent": {
-                                      fontSize: "13px",
-                                      padding: "12px 0px",
-                                    },
-                                    "& .MuiOutlinedInput-input": {
-                                      padding: "0 14px !important",
-                                      fontSize: "14px !important",
-                                      fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
-                                      height: "40px",
-                                      cursor: isView ? "default" : "pointer",
+                                      "& .MuiOutlinedInput-input": {
+                                        padding: "0 14px !important",
+                                        fontSize: "14px !important",
+                                        fontFamily: "var(--font-family, 'Poppins', sans-serif) !important",
+                                        height: "40px",
+                                        cursor: isView ? "default" : "pointer",
+                                      },
                                     },
                                   },
-                                },
-                                popper: {
-                                  sx: {
-                                    "& .MuiPickersDay-root.Mui-selected": {
-                                      backgroundColor: "var(--primary-color, #002147) !important",
-                                      color: "#ffffff !important",
-                                    },
-                                    "& .MuiPickersDay-root:hover": {
-                                      backgroundColor: "rgba(var(--primary-color-rgb, 0, 33, 71), 0.1) !important",
-                                    },
-                                    "& .MuiPickersYear-yearButton.Mui-selected": {
-                                      backgroundColor: "var(--primary-color, #002147) !important",
-                                      color: "#ffffff !important",
+                                  popper: {
+                                    sx: {
+                                      "& .MuiPickersDay-root.Mui-selected": {
+                                        backgroundColor: "var(--primary-color, #002147) !important",
+                                        color: "#ffffff !important",
+                                      },
+                                      "& .MuiPickersDay-root:hover": {
+                                        backgroundColor: "rgba(var(--primary-color-rgb, 0, 33, 71), 0.1) !important",
+                                      },
+                                      "& .MuiPickersYear-yearButton.Mui-selected": {
+                                        backgroundColor: "var(--primary-color, #002147) !important",
+                                        color: "#ffffff !important",
+                                      },
                                     },
                                   },
-                                },
-                              }}
-                            />
-                            <FormHelperText className="error-text">
-                              {instTouched?.[index]?.dueDate && instErrors?.[index]?.dueDate
-                                ? instErrors[index].dueDate
-                                : ""}
-                            </FormHelperText>
-                          </Box>
-                          {values.installments.length > 1 && !isView && (
-                            <Box
-                              sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                              }}
-                            >
-                              <Box sx={{ height: "32px", mb: "6px" }} />
-                              <IconButton
-                                onClick={() => handleRemoveInstallment(index)}
+                                }}
+                              />
+                              <FormHelperText className="error-text">
+                                {instTouched?.[index]?.dueDate && instErrors?.[index]?.dueDate
+                                  ? instErrors[index].dueDate
+                                  : ""}
+                              </FormHelperText>
+                            </Box>
+                            {values.installments.length > 1 && !isView && (
+                              <Box
                                 sx={{
-                                  color: "#D92D20",
-                                  p: "8px",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
                                 }}
                               >
-                                <RemoveIcon />
-                              </IconButton>
-                              <Box sx={{ height: "19px" }} />
-                            </Box>
-                          )}
-                        </Box>
-                      );
-                    })}
+                                <Box sx={{ height: "32px", mb: "6px" }} />
+                                <IconButton
+                                  onClick={() => handleRemoveInstallment(index)}
+                                  sx={{
+                                    color: "#D92D20",
+                                    p: "8px",
+                                  }}
+                                >
+                                  <RemoveIcon />
+                                </IconButton>
+                                <Box sx={{ height: "19px" }} />
+                              </Box>
+                            )}
+                          </Box>
+                        );
+                      })}
 
                       <Box
                         sx={{

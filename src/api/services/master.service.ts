@@ -338,4 +338,16 @@ export const masterService = {
   },
   getImportLogById: (id: string) =>
     adminApiService.get<any>(`${Api.IMPORT_LOG_DETAIL}/${id}`),
+
+  promoteStudents: (payload: {
+    studentIds: string[];
+    toClassId: string;
+    toSectionId: string | null;
+    fromAcademicYearId: string;
+    toAcademicYearId: string;
+  }) => adminApiService.post<any>(Api.PROMOTE_STUDENTS, payload),
+
+  getAcademicYears: () => adminApiService.get<any>(Api.GET_ACADEMIC_YEARS),
+  createAcademicYear: (payload: { label: string; isCurrent?: boolean }) =>
+    adminApiService.post<any>(Api.CREATE_ACADEMIC_YEAR, payload),
 };

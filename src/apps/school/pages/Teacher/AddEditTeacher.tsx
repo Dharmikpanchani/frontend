@@ -55,7 +55,7 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { CommonLoader } from "@/apps/school/component/schoolCommon/loader/Loader";
 import type { RootState } from "@/redux/Store";
-import { labelSx, inputSx, multiInputSx } from "@/utils/styles/commonSx";
+import { labelSx, inputSx } from "@/utils/styles/commonSx";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import {
@@ -130,15 +130,7 @@ export default function AddEditTeacher() {
   const { allDepartments: departments } = useSelector(
     (state: RootState) => state.DepartmentReducer,
   );
-  const { allSubjects: subjects } = useSelector(
-    (state: RootState) => state.SubjectReducer,
-  );
-  const { allClasses: classes } = useSelector(
-    (state: RootState) => state.ClassReducer,
-  );
-  const { allSections: sections } = useSelector(
-    (state: RootState) => state.SectionReducer,
-  );
+
   const { allRoles } = useSelector((state: RootState) => state.RoleReducer);
   const { actionLoading, loading: teacherLoading } = useSelector(
     (state: RootState) => state.TeacherReducer,
@@ -2051,272 +2043,20 @@ export default function AddEditTeacher() {
                           </FormHelperText>
                         )}
                       </Box>
-                      <Box gridColumn="span 12">
+                      <Box gridColumn="span 12" sx={{ my: 1 }}>
                         <Box
                           sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
+                            border: "1px dashed var(--primary-color, #5c1a1a)",
+                            backgroundColor: "rgba(92, 26, 26, 0.05)",
+                            borderRadius: "8px",
+                            padding: "16px",
+                            textAlign: "center",
                           }}
                         >
-                          <Typography sx={labelSx}>
-                            Assigned Classes
-                            <span style={{ color: "#ef4444" }}>*</span>
+                          <Typography variant="body2" sx={{ color: "var(--primary-color, #5c1a1a)", fontWeight: 500 }}>
+                            ℹ️ Year-wise assignments (Classes, Sections, and Subjects) are managed under the <strong>'Teacher Assignments'</strong> section in the Sidebar.
                           </Typography>
-                          <Tooltip title="Refresh Classes" arrow>
-                            <IconButton
-                              onClick={() =>
-                                dispatch(getClasses({ type: "filter" }) as any)
-                              }
-                              size="small"
-                              sx={{
-                                mb: 0.5,
-                                color: "var(--primary-color)",
-                                "&:hover": {
-                                  backgroundColor:
-                                    "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                                },
-                              }}
-                            >
-                              <RefreshIcon sx={{ fontSize: 18 }} />
-                            </IconButton>
-                          </Tooltip>
                         </Box>
-                        <Autocomplete
-                          multiple
-                          options={classes || []}
-                          getOptionLabel={(o) => o.name || ""}
-                          value={
-                            classes?.filter((c: any) =>
-                              values.classesAssigned.includes(c._id),
-                            ) || []
-                          }
-                          onChange={(_, v) =>
-                            setFieldValue(
-                              "classesAssigned",
-                              v.map((item: any) => item._id),
-                            )
-                          }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
-                          }
-                          clearIcon={null}
-                          renderInput={(p) => (
-                            <TextField
-                              {...p}
-                              placeholder="Select Classes"
-                              variant="outlined"
-                              sx={multiInputSx}
-                              error={
-                                touched.classesAssigned &&
-                                Boolean(errors.classesAssigned)
-                              }
-                            />
-                          )}
-                          sx={{
-                            "& .MuiAutocomplete-inputRoot": {
-                              paddingTop: "0 !important",
-                              paddingBottom: "0 !important",
-                              paddingLeft: "0 !important",
-                              paddingRight: "30px !important",
-                              height: "auto",
-                              minHeight: "40px",
-                              "& .MuiAutocomplete-input": {
-                                padding: "0 10px !important",
-                                height: "40px",
-                                fontFamily: "'Poppins', sans-serif !important",
-                                fontSize: "14px !important",
-                              },
-                            },
-                          }}
-                        />
-                        {touched.classesAssigned && errors.classesAssigned && (
-                          <FormHelperText className="error-text">
-                            {errors.classesAssigned as string}
-                          </FormHelperText>
-                        )}
-                      </Box>
-                      <Box gridColumn="span 12">
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <Typography sx={labelSx}>
-                            Assigned Sections
-                            <span style={{ color: "#ef4444" }}>*</span>
-                          </Typography>
-                          <Tooltip title="Refresh Sections" arrow>
-                            <IconButton
-                              onClick={() =>
-                                dispatch(getSections({ type: "filter" }) as any)
-                              }
-                              size="small"
-                              sx={{
-                                mb: 0.5,
-                                color: "var(--primary-color)",
-                                "&:hover": {
-                                  backgroundColor:
-                                    "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                                },
-                              }}
-                            >
-                              <RefreshIcon sx={{ fontSize: 18 }} />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                        <Autocomplete
-                          multiple
-                          options={sections || []}
-                          getOptionLabel={(o: any) => o.code || ""}
-                          value={
-                            sections?.filter((s: any) =>
-                              values.sectionsAssigned.includes(s._id),
-                            ) || []
-                          }
-                          onChange={(_, v) =>
-                            setFieldValue(
-                              "sectionsAssigned",
-                              v.map((item: any) => item._id),
-                            )
-                          }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
-                          }
-                          clearIcon={null}
-                          renderInput={(p) => (
-                            <TextField
-                              {...p}
-                              placeholder="Select Sections"
-                              variant="outlined"
-                              sx={multiInputSx}
-                              error={
-                                touched.sectionsAssigned &&
-                                Boolean(errors.sectionsAssigned)
-                              }
-                            />
-                          )}
-                          sx={{
-                            "& .MuiAutocomplete-inputRoot": {
-                              paddingTop: "0 !important",
-                              paddingBottom: "0 !important",
-                              paddingLeft: "0 !important",
-                              paddingRight: "30px !important",
-                              height: "auto",
-                              minHeight: "40px",
-                              "& .MuiAutocomplete-input": {
-                                padding: "0 10px !important",
-                                height: "40px",
-                                fontFamily: "'Poppins', sans-serif !important",
-                                fontSize: "14px !important",
-                              },
-                            },
-                          }}
-                        />
-                        {touched.sectionsAssigned &&
-                          errors.sectionsAssigned && (
-                            <FormHelperText className="error-text">
-                              {errors.sectionsAssigned as string}
-                            </FormHelperText>
-                          )}
-                      </Box>
-                      <Box gridColumn="span 12">
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <Typography sx={labelSx}>
-                            Subjects Specialty
-                            <span style={{ color: "#ef4444" }}>*</span>
-                          </Typography>
-                          <Tooltip title="Refresh Subjects" arrow>
-                            <IconButton
-                              onClick={() =>
-                                dispatch(getSubjects({ type: "filter" }) as any)
-                              }
-                              size="small"
-                              sx={{
-                                mb: 0.5,
-                                color: "var(--primary-color)",
-                                "&:hover": {
-                                  backgroundColor:
-                                    "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                                },
-                              }}
-                            >
-                              <RefreshIcon sx={{ fontSize: 18 }} />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                        <Autocomplete
-                          multiple
-                          options={subjects || []}
-                          getOptionLabel={(o) => o.name || ""}
-                          value={
-                            subjects?.filter((s: any) =>
-                              values.subjects.includes(s._id),
-                            ) || []
-                          }
-                          onChange={(_, v) =>
-                            setFieldValue(
-                              "subjects",
-                              v.map((item: any) => item._id),
-                            )
-                          }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
-                          }
-                          clearIcon={null}
-                          renderInput={(p) => (
-                            <TextField
-                              {...p}
-                              placeholder="Select Subjects"
-                              variant="outlined"
-                              sx={multiInputSx}
-                              error={
-                                touched.subjects && Boolean(errors.subjects)
-                              }
-                            />
-                          )}
-                          sx={{
-                            "& .MuiAutocomplete-inputRoot": {
-                              paddingTop: "0 !important",
-                              paddingBottom: "0 !important",
-                              paddingLeft: "0 !important",
-                              paddingRight: "30px !important",
-                              height: "auto",
-                              minHeight: "40px",
-                              "& .MuiAutocomplete-input": {
-                                padding: "0 10px !important",
-                                height: "40px",
-                                fontFamily: "'Poppins', sans-serif !important",
-                                fontSize: "14px !important",
-                              },
-                            },
-                          }}
-                        />
-                        {touched.subjects && errors.subjects && (
-                          <FormHelperText className="error-text">
-                            {errors.subjects as string}
-                          </FormHelperText>
-                        )}
                       </Box>
 
                       {/* Probation Period */}

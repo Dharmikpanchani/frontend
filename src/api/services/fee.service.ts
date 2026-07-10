@@ -160,3 +160,16 @@ export const exportFeeStructures = async (params?: any) => {
     responseType: format === "excel" || format === "pdf" ? "blob" : "text",
   });
 };
+
+// --- Reports & Archive ---
+export const generateFeeReport = async (data: { email?: string }) => {
+  return await appClient.post(Api.GENERATE_FEE_REPORT, data);
+};
+
+export const generateDueReport = async (data: { email?: string }) => {
+  return await appClient.post(Api.GENERATE_DUE_REPORT, data);
+};
+
+export const runArchiveProcess = async () => {
+  return await appClient.post(Api.RUN_ARCHIVE);
+};

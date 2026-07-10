@@ -958,15 +958,9 @@ export const teacherValidationSchema = Yup.object().shape(
       .matches(englishOnlyRegex, "Designation must contain letters only")
       .required("Designation is required"),
     departmentId: Yup.string().required("Department is required"),
-    subjects: Yup.array()
-      .min(1, "At least one subject is required")
-      .required("Subjects are required"),
-    classesAssigned: Yup.array()
-      .min(1, "At least one class is required")
-      .required("Classes are required"),
-    sectionsAssigned: Yup.array()
-      .min(1, "At least one section is required")
-      .required("Sections are required"),
+    subjects: Yup.array().optional(),
+    classesAssigned: Yup.array().optional(),
+    sectionsAssigned: Yup.array().optional(),
     probationPeriod: Yup.number()
       .typeError("Probation period must be a number")
       .integer("Probation period must be an integer")
@@ -1359,3 +1353,72 @@ export const settingsValidationSchema = Yup.object().shape({
   }),
 });
 
+export const teacherAssignmentValidationSchema = Yup.object().shape({
+  subjects: Yup.array()
+    .of(Yup.string())
+    .min(1, "At least one subject specialty is required")
+    .required("Subjects are required"),
+  assignments: Yup.array().of(
+    Yup.object().shape({
+      classId: Yup.string()
+        .required("Class is required")
+        .test(
+          "no-duplicate-class-section",
+          "Duplicate: this Class & Section is already added",
+          function (classId) {
+            if (!classId) return true;
+            try {
+              const { sectionId } = this.parent;
+              // this.from[1].value = root form object {assignments, subjects, ...}
+              const rootValue = this.from?.[1]?.value;
+              const allAssignments: any[] = Array.isArray(rootValue?.assignments)
+                ? rootValue.assignments
+                : [];
+              const key = `${classId}__${sectionId || ""}`;
+              const count = allAssignments.filter(
+                (a: any) => `${a?.classId}__${a?.sectionId || ""}` === key
+              ).length;
+              return count <= 1;
+            } catch {
+              return true; // don't block on unexpected errors
+            }
+          }
+        ),
+      sectionId: Yup.string().optional().nullable(),
+      isClassTeacher: Yup.boolean().optional(),
+    })
+  )
+    .min(1, "At least one Class & Section allocation is required")
+    .required("Class & Section allocation is required"),
+  employmentType: Yup.string()
+    .oneOf(["Full-time", "Part-time", "Contract"], "Invalid employment type")
+    .required("Employment type is required"),
+  salaryForYear: Yup.number()
+    .typeError("Salary must be a number")
+    .positive("Salary must be a positive number")
+    .min(0, "Salary cannot be negative")
+    .max(99999999, "Salary must be less than 10 crores")
+    .nullable()
+    .optional(),
+  status: Yup.string()
+    .oneOf(["ACTIVE", "ON_LEAVE", "RESIGNED", "TRANSFERRED"], "Invalid status")
+    .required("Status is required"),
+  remarks: Yup.string()
+    .test(
+      "no-whitespace",
+      "Remarks cannot be empty spaces",
+      (_value, context) =>
+        typeof context.originalValue !== "string" ||
+        context.originalValue === "" ||
+        context.originalValue.trim() === context.originalValue,
+    )
+    .transform((value) => value?.trim())
+    .max(500, "Remarks must be at most 500 characters")
+    .optional()
+    .nullable(),
+});
+
+export const cloneAssignmentsValidationSchema = Yup.object().shape({
+  fromYearId: Yup.string()
+    .required("Source academic year is required"),
+});

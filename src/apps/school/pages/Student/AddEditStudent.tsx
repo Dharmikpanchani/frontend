@@ -217,6 +217,58 @@ export default function AddEditStudent() {
 
   const isReadOnly = isView || (id ? !canEdit : !canAdd);
 
+  const SectionTitle = ({
+    icon: Icon,
+    title,
+    isFirst,
+    children,
+  }: {
+    icon: any;
+    title: string;
+    isFirst?: boolean;
+    children?: React.ReactNode;
+  }) => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        mb: 3,
+        mt: isFirst ? 0 : 5,
+        pb: 1,
+        borderBottom: "1px solid #f0f0f0",
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: "8px",
+            backgroundColor: "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
+            color: "var(--primary-color, #5c1a1a)",
+          }}
+        >
+          <Icon sx={{ fontSize: 20 }} />
+        </Box>
+        <Typography
+          sx={{
+            fontSize: "17px",
+            fontWeight: 600,
+            color: "#1f2937",
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
+          {title}
+        </Typography>
+      </Box>
+      {children}
+    </Box>
+  );
+
   return (
     <Box className="admin-dashboard-content">
       {/* Breadcrumb */}
@@ -245,1047 +297,1049 @@ export default function AddEditStudent() {
         </Breadcrumbs>
       </Box>
 
-      <Formik
-        initialValues={initialValues}
-        validationSchema={studentValidationSchema}
-        enableReinitialize
-        onSubmit={handleSubmit}
+      <Box
+        className="card-border common-card"
+        sx={{
+          p: { xs: 2.5, sm: 4 },
+          borderRadius: "12px",
+          minHeight: "200px",
+          position: "relative",
+          backgroundColor: "white",
+        }}
       >
-        {({
-          values,
-          errors,
-          touched,
-          handleChange,
-          handleBlur,
-          setFieldValue,
-          isSubmitting,
-        }) => (
-          <Form>
-            {/* ── Section 1: Basic Information ── */}
-            <Box
-              className="card-border common-card"
-              sx={{ mb: 3, p: 3 }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  mb: 2.5,
-                  pb: 1.5,
-                  borderBottom: "1px solid #EAECF0",
-                }}
-              >
-                <PersonIcon
-                  sx={{ color: "var(--primary-color)", fontSize: 20 }}
-                />
-                <Typography
-                  sx={{
-                    fontSize: "15px",
-                    fontWeight: 700,
-                    color: "#101828",
-                    fontFamily: "'PlusJakartaSans-Bold', sans-serif",
-                  }}
-                >
-                  Basic Information
-                </Typography>
-              </Box>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={studentValidationSchema}
+          enableReinitialize
+          onSubmit={handleSubmit}
+        >
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleBlur,
+            setFieldValue,
+            isSubmitting,
+          }) => (
+            <Form>
+              <Box sx={{ maxWidth: 1100 }}>
+                {/* ── Section 1: Basic Information ── */}
+                <SectionTitle icon={PersonIcon} title="Basic Information" isFirst />
 
-              {/* Profile Image */}
-              <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-                <Box sx={{ position: "relative", display: "inline-block" }}>
-                  <ProfileAvatar
-                    name={values.fullName || "Student"}
-                    imageUrl={
-                      profilePreview ||
-                      (values.profileImageUrl
-                        ? values.profileImageUrl.startsWith("http")
-                          ? values.profileImageUrl
-                          : `${imageBaseUrl}/${values.profileImageUrl}`
-                        : "")
-                    }
-                    size={90}
-                  />
-                  {!isReadOnly && (
-                    <IconButton
-                      onClick={() => fileInputRef.current?.click()}
-                      sx={{
-                        position: "absolute",
-                        bottom: 0,
-                        right: 0,
-                        backgroundColor: "var(--primary-color)",
-                        color: "#fff",
-                        width: 28,
-                        height: 28,
-                        "&:hover": {
-                          backgroundColor: "var(--primary-color)",
-                          opacity: 0.9,
-                        },
-                      }}
-                      size="small"
-                    >
-                      <CameraAltIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
-                  )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/jpg,image/jpeg,image/png,image/svg+xml"
-                    hidden
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setFieldValue("profileImage", file);
-                        const reader = new FileReader();
-                        reader.onload = (ev) =>
-                          setProfilePreview(ev.target?.result as string);
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                </Box>
-              </Box>
-              {touched.profileImage && (errors.profileImage as string) && (
-                <FormHelperText
-                  error
-                  sx={{ textAlign: "center", mt: -1, mb: 1 }}
-                >
-                  {errors.profileImage as string}
-                </FormHelperText>
-              )}
-
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: {
-                    xs: "1fr",
-                    sm: "1fr 1fr",
-                    md: "1fr 1fr 1fr",
-                  },
-                  gap: 2,
-                }}
-              >
-                {/* Full Name */}
-                <Box>
-                  <Typography sx={labelSx}>
-                    Full Name <span style={{ color: "#f04438" }}>*</span>
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    id="fullName"
-                    name="fullName"
-                    placeholder="Enter full name"
-                    value={values.fullName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.fullName && Boolean(errors.fullName)}
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 60 },
-                    }}
-                  />
-                  {touched.fullName && errors.fullName && (
-                    <FormHelperText className="error-text">
-                      {errors.fullName as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Gender */}
-                <Box>
-                  <Typography sx={labelSx}>Gender</Typography>
-                  <Autocomplete
-                    options={genderOptions}
-                    getOptionLabel={(opt: any) => opt.label || opt}
-                    value={
-                      genderOptions.find(
-                        (g: any) => g.value === values.gender,
-                      ) || null
-                    }
-                    onChange={(_, newVal) =>
-                      setFieldValue(
-                        "gender",
-                        (newVal as any)?.value || "",
-                      )
-                    }
-                    disabled={isReadOnly}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Select gender"
-                        error={touched.gender && Boolean(errors.gender)}
-                        slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
-                      />
-                    )}
-                  />
-                  {touched.gender && errors.gender && (
-                    <FormHelperText className="error-text">
-                      {errors.gender as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Date of Birth */}
-                <Box>
-                  <Typography sx={labelSx}>Date of Birth</Typography>
-                  <LocalizationProvider dateAdapter={AdapterMoment}>
-                    <DatePicker
-                      open={openDOB}
-                      onOpen={() => setOpenDOB(true)}
-                      onClose={() => setOpenDOB(false)}
-                      value={values.dateOfBirth}
-                      onChange={(val) => setFieldValue("dateOfBirth", val)}
-                      disabled={isReadOnly}
-                      disableFuture
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          placeholder: "DD/MM/YYYY",
-                          onClick: () => !isReadOnly && setOpenDOB(true),
-                          error:
-                            touched.dateOfBirth && Boolean(errors.dateOfBirth),
-                          slotProps: { input: { sx: inputSx } },
-                        },
-                      }}
-                    />
-                  </LocalizationProvider>
-                  {touched.dateOfBirth && errors.dateOfBirth && (
-                    <FormHelperText className="error-text">
-                      {errors.dateOfBirth as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Blood Group */}
-                <Box>
-                  <Typography sx={labelSx}>Blood Group</Typography>
-                  <Autocomplete
-                    options={bloodGroupOptions}
-                    getOptionLabel={(opt: any) => opt.label || opt}
-                    value={
-                      bloodGroupOptions.find(
-                        (b: any) => b.value === values.bloodGroup,
-                      ) || null
-                    }
-                    onChange={(_, newVal) =>
-                      setFieldValue(
-                        "bloodGroup",
-                        (newVal as any)?.value || "",
-                      )
-                    }
-                    disabled={isReadOnly}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Select blood group"
-                        error={
-                          touched.bloodGroup && Boolean(errors.bloodGroup)
-                        }
-                        slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
-                      />
-                    )}
-                  />
-                  {touched.bloodGroup && errors.bloodGroup && (
-                    <FormHelperText className="error-text">
-                      {errors.bloodGroup as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-              </Box>
-            </Box>
-
-            {/* ── Section 2: Academic Details ── */}
-            <Box className="card-border common-card" sx={{ mb: 3, p: 3 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  mb: 2.5,
-                  pb: 1.5,
-                  borderBottom: "1px solid #EAECF0",
-                }}
-              >
-                <AcademicIcon
-                  sx={{ color: "var(--primary-color)", fontSize: 20 }}
-                />
-                <Typography
-                  sx={{
-                    fontSize: "15px",
-                    fontWeight: 700,
-                    color: "#101828",
-                    fontFamily: "'PlusJakartaSans-Bold', sans-serif",
-                  }}
-                >
-                  Academic Details
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: {
-                    xs: "1fr",
-                    sm: "1fr 1fr",
-                    md: "1fr 1fr 1fr",
-                  },
-                  gap: 2,
-                }}
-              >
-                {/* Admission Number */}
-                <Box>
-                  <Typography sx={labelSx}>
-                    Admission Number (GR Number){" "}
-                    <span style={{ color: "#f04438" }}>*</span>
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    id="admissionNumber"
-                    name="admissionNumber"
-                    placeholder="Enter admission number (GR number)"
-                    value={values.admissionNumber}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={
-                      touched.admissionNumber &&
-                      Boolean(errors.admissionNumber)
-                    }
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 30 },
-                    }}
-                  />
-                  {touched.admissionNumber && errors.admissionNumber && (
-                    <FormHelperText className="error-text">
-                      {errors.admissionNumber as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Admission Date */}
-                <Box>
-                  <Typography sx={labelSx}>
-                    Admission Date{" "}
-                    <span style={{ color: "#f04438" }}>*</span>
-                  </Typography>
-                  <LocalizationProvider dateAdapter={AdapterMoment}>
-                    <DatePicker
-                      open={openAdmissionDate}
-                      onOpen={() => setOpenAdmissionDate(true)}
-                      onClose={() => setOpenAdmissionDate(false)}
-                      value={values.admissionDate}
-                      onChange={(val) =>
-                        setFieldValue("admissionDate", val)
-                      }
-                      disabled={isReadOnly}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          placeholder: "DD/MM/YYYY",
-                          onClick: () =>
-                            !isReadOnly && setOpenAdmissionDate(true),
-                          error:
-                            touched.admissionDate &&
-                            Boolean(errors.admissionDate),
-                          slotProps: { input: { sx: inputSx } },
-                        },
-                      }}
-                    />
-                  </LocalizationProvider>
-                  {touched.admissionDate && errors.admissionDate && (
-                    <FormHelperText className="error-text">
-                      {errors.admissionDate as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Class */}
-                <Box>
-                  <Typography sx={labelSx}>
-                    Class <span style={{ color: "#f04438" }}>*</span>
-                  </Typography>
-                  <Autocomplete
-                    options={classes || []}
-                    getOptionLabel={(opt: any) => opt.name || ""}
-                    value={
-                      (classes || []).find(
-                        (c: any) => c._id === values.classId,
-                      ) || null
-                    }
-                    onChange={(_, newVal) =>
-                      setFieldValue("classId", (newVal as any)?._id || "")
-                    }
-                    disabled={isReadOnly}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Select class"
-                        error={touched.classId && Boolean(errors.classId)}
-                        slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
-                      />
-                    )}
-                  />
-                  {touched.classId && errors.classId && (
-                    <FormHelperText className="error-text">
-                      {errors.classId as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Section */}
-                <Box>
-                  <Typography sx={labelSx}>
-                    Section <span style={{ color: "#f04438" }}>*</span>
-                  </Typography>
-                  <Autocomplete
-                    options={sections || []}
-                    getOptionLabel={(opt: any) => opt.code || ""}
-                    value={
-                      (sections || []).find(
-                        (s: any) => s._id === values.sectionId,
-                      ) || null
-                    }
-                    onChange={(_, newVal) =>
-                      setFieldValue(
-                        "sectionId",
-                        (newVal as any)?._id || "",
-                      )
-                    }
-                    disabled={isReadOnly}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Select section"
-                        error={
-                          touched.sectionId && Boolean(errors.sectionId)
-                        }
-                        slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
-                      />
-                    )}
-                  />
-                  {touched.sectionId && errors.sectionId && (
-                    <FormHelperText className="error-text">
-                      {errors.sectionId as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-              </Box>
-            </Box>
-
-            {/* ── Section 3: Contact Details ── */}
-            <Box className="card-border common-card" sx={{ mb: 3, p: 3 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  mb: 2.5,
-                  pb: 1.5,
-                  borderBottom: "1px solid #EAECF0",
-                }}
-              >
-                <LocationIcon
-                  sx={{ color: "var(--primary-color)", fontSize: 20 }}
-                />
-                <Typography
-                  sx={{
-                    fontSize: "15px",
-                    fontWeight: 700,
-                    color: "#101828",
-                    fontFamily: "'PlusJakartaSans-Bold', sans-serif",
-                  }}
-                >
-                  Contact Details
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: {
-                    xs: "1fr",
-                    sm: "1fr 1fr",
-                    md: "1fr 1fr 1fr",
-                  },
-                  gap: 2,
-                }}
-              >
-                {/* Email */}
-                <Box>
-                  <Typography sx={labelSx}>
-                    Email <span style={{ color: "#f04438" }}>*</span>
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    id="email"
-                    name="email"
-                    placeholder="Enter email"
-                    value={values.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.email && Boolean(errors.email)}
-                    disabled={isReadOnly || Boolean(id)}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 70 },
-                    }}
-                  />
-                  {touched.email && errors.email && (
-                    <FormHelperText className="error-text">
-                      {errors.email as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Phone Number — Student Login Phone */}
-                <Box>
-                  <Typography sx={labelSx}>
-                    Student Login Phone <span style={{ color: "#f04438" }}>*</span>
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    placeholder="Enter student's own phone number"
-                    value={values.phoneNumber}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={
-                      touched.phoneNumber && Boolean(errors.phoneNumber)
-                    }
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 10 },
-                    }}
-                  />
-                  {touched.phoneNumber && errors.phoneNumber ? (
-                    <FormHelperText className="error-text">
-                      {errors.phoneNumber as string}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText sx={{ color: "#667085", fontSize: "11px", mt: 0.5, mx: 0 }}>
-                      Student uses this number to login to the portal
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Address */}
-                <Box sx={{ gridColumn: { xs: "1", sm: "1 / -1", md: "1 / -1" } }}>
-                  <Typography sx={labelSx}>Address</Typography>
-                  <AutoCompleteLocation
-                    setFieldValue={setFieldValue}
-                    errors={errors}
-                    touched={touched}
-                    values={values}
-                    disabled={isReadOnly}
-                    placeholder="Enter address"
-                    name="address"
-                  />
-                </Box>
-
-                {/* City */}
-                <Box>
-                  <Typography sx={labelSx}>City</Typography>
-                  <TextField
-                    fullWidth
-                    id="city"
-                    name="city"
-                    placeholder="Enter city"
-                    value={values.city}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.city && Boolean(errors.city)}
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 50 },
-                    }}
-                  />
-                  {touched.city && errors.city && (
-                    <FormHelperText className="error-text">
-                      {errors.city as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* State */}
-                <Box>
-                  <Typography sx={labelSx}>State</Typography>
-                  <TextField
-                    fullWidth
-                    id="state"
-                    name="state"
-                    placeholder="Enter state"
-                    value={values.state}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.state && Boolean(errors.state)}
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 50 },
-                    }}
-                  />
-                  {touched.state && errors.state && (
-                    <FormHelperText className="error-text">
-                      {errors.state as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Country */}
-                <Box>
-                  <Typography sx={labelSx}>Country</Typography>
-                  <TextField
-                    fullWidth
-                    id="country"
-                    name="country"
-                    placeholder="Enter country"
-                    value={values.country}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.country && Boolean(errors.country)}
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 50 },
-                    }}
-                  />
-                  {touched.country && errors.country && (
-                    <FormHelperText className="error-text">
-                      {errors.country as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Pincode */}
-                <Box>
-                  <Typography sx={labelSx}>Pincode</Typography>
-                  <TextField
-                    fullWidth
-                    id="pincode"
-                    name="pincode"
-                    placeholder="Enter pincode"
-                    value={values.pincode}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.pincode && Boolean(errors.pincode)}
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 6 },
-                    }}
-                  />
-                  {touched.pincode && errors.pincode && (
-                    <FormHelperText className="error-text">
-                      {errors.pincode as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-              </Box>
-            </Box>
-
-            {/* ── Section 4: Guardian Details ── */}
-            <Box className="card-border common-card" sx={{ mb: 3, p: 3 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  mb: 2.5,
-                  pb: 1.5,
-                  borderBottom: "1px solid #EAECF0",
-                }}
-              >
-                <GuardianIcon
-                  sx={{ color: "var(--primary-color)", fontSize: 20 }}
-                />
-                <Typography
-                  sx={{
-                    fontSize: "15px",
-                    fontWeight: 700,
-                    color: "#101828",
-                    fontFamily: "'PlusJakartaSans-Bold', sans-serif",
-                  }}
-                >
-                  Guardian Details
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: {
-                    xs: "1fr",
-                    sm: "1fr 1fr",
-                    md: "1fr 1fr 1fr",
-                  },
-                  gap: 2,
-                }}
-              >
-                {/* Father Name */}
-                <Box>
-                  <Typography sx={labelSx}>Father&apos;s Name</Typography>
-                  <TextField
-                    fullWidth
-                    id="fatherName"
-                    name="fatherName"
-                    placeholder="Enter father's name"
-                    value={values.fatherName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={
-                      touched.fatherName && Boolean(errors.fatherName)
-                    }
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 60 },
-                    }}
-                  />
-                  {touched.fatherName && errors.fatherName && (
-                    <FormHelperText className="error-text">
-                      {errors.fatherName as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Father Phone — Parent Login */}
-                <Box>
-                  <Typography sx={labelSx}>
-                    Father&apos;s Contact Phone{" "}
-                    <span style={{ color: "#667085", fontSize: "11px", fontWeight: 400 }}>
-                      (Parent Login)
-                    </span>
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    id="fatherPhone"
-                    name="fatherPhone"
-                    placeholder="Enter father's phone number"
-                    value={values.fatherPhone}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={
-                      touched.fatherPhone && Boolean(errors.fatherPhone)
-                    }
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 10 },
-                    }}
-                  />
-                  {touched.fatherPhone && errors.fatherPhone ? (
-                    <FormHelperText className="error-text">
-                      {errors.fatherPhone as string}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText sx={{ color: "#667085", fontSize: "11px", mt: 0.5, mx: 0 }}>
-                      Father can use this number to login as parent
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Mother Name */}
-                <Box>
-                  <Typography sx={labelSx}>Mother&apos;s Name</Typography>
-                  <TextField
-                    fullWidth
-                    id="motherName"
-                    name="motherName"
-                    placeholder="Enter mother's name"
-                    value={values.motherName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={
-                      touched.motherName && Boolean(errors.motherName)
-                    }
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 60 },
-                    }}
-                  />
-                  {touched.motherName && errors.motherName && (
-                    <FormHelperText className="error-text">
-                      {errors.motherName as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Mother Phone */}
-                <Box>
-                  <Typography sx={labelSx}>Mother&apos;s Phone</Typography>
-                  <TextField
-                    fullWidth
-                    id="motherPhone"
-                    name="motherPhone"
-                    placeholder="Enter mother's phone"
-                    value={values.motherPhone}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={
-                      touched.motherPhone && Boolean(errors.motherPhone)
-                    }
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 10 },
-                    }}
-                  />
-                  {touched.motherPhone && errors.motherPhone && (
-                    <FormHelperText className="error-text">
-                      {errors.motherPhone as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Guardian Name */}
-                <Box>
-                  <Typography sx={labelSx}>Guardian&apos;s Name</Typography>
-                  <TextField
-                    fullWidth
-                    id="guardianName"
-                    name="guardianName"
-                    placeholder="Enter guardian's name"
-                    value={values.guardianName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={
-                      touched.guardianName && Boolean(errors.guardianName)
-                    }
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 60 },
-                    }}
-                  />
-                  {touched.guardianName && errors.guardianName && (
-                    <FormHelperText className="error-text">
-                      {errors.guardianName as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-
-                {/* Guardian Phone */}
-                <Box>
-                  <Typography sx={labelSx}>Guardian&apos;s Phone</Typography>
-                  <TextField
-                    fullWidth
-                    id="guardianPhone"
-                    name="guardianPhone"
-                    placeholder="Enter guardian's phone"
-                    value={values.guardianPhone}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={
-                      touched.guardianPhone && Boolean(errors.guardianPhone)
-                    }
-                    disabled={isReadOnly}
-                    slotProps={{
-                      input: { sx: inputSx },
-                      htmlInput: { maxLength: 10 },
-                    }}
-                  />
-                  {touched.guardianPhone && errors.guardianPhone && (
-                    <FormHelperText className="error-text">
-                      {errors.guardianPhone as string}
-                    </FormHelperText>
-                  )}
-                </Box>
-              </Box>
-            </Box>
-
-            {/* ── Section 5: Login Credentials (Add mode only) ── */}
-            {!id && (
-              <Box className="card-border common-card" sx={{ mb: 3, p: 3 }}>
+                {/* Profile Image */}
                 <Box
                   sx={{
                     display: "flex",
+                    gap: 3,
                     alignItems: "center",
-                    gap: 1,
-                    mb: 2.5,
-                    pb: 1.5,
-                    borderBottom: "1px solid #EAECF0",
+                    mb: 3.5,
                   }}
                 >
-                  <LockIcon
-                    sx={{ color: "var(--primary-color)", fontSize: 20 }}
-                  />
-                  <Typography
-                    sx={{
-                      fontSize: "15px",
-                      fontWeight: 700,
-                      color: "#101828",
-                      fontFamily: "'PlusJakartaSans-Bold', sans-serif",
-                    }}
-                  >
-                    Login Credentials
-                  </Typography>
+                  <Box sx={{ position: "relative" }}>
+                    <Button
+                      variant="text"
+                      component="label"
+                      disabled={isReadOnly}
+                      sx={{
+                        minWidth: "90px",
+                        width: "90px",
+                        height: "90px",
+                        borderRadius: "50%",
+                        border: "1px dashed #ced4da",
+                        bgcolor: "#f8f9fa",
+                        overflow: "hidden",
+                        p: 0,
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          borderColor: "var(--primary-color)",
+                          "& .avatar-overlay": { opacity: 1 },
+                        },
+                      }}
+                    >
+                      <ProfileAvatar
+                        name={values.fullName || "Student"}
+                        imageUrl={
+                          profilePreview ||
+                          (values.profileImageUrl
+                            ? values.profileImageUrl.startsWith("http")
+                              ? values.profileImageUrl
+                              : `${imageBaseUrl}/${values.profileImageUrl}`
+                            : "")
+                        }
+                        size={90}
+                        sx={{ borderRadius: "50%" }}
+                      />
+                      {!isReadOnly && (
+                        <Box
+                          className="avatar-overlay"
+                          sx={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            bgcolor: "rgba(0,0,0,0.3)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            opacity: 0,
+                            transition: "all 0.3s ease",
+                          }}
+                        >
+                          <CameraAltIcon sx={{ color: "white", fontSize: 22 }} />
+                        </Box>
+                      )}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpg,image/jpeg,image/png,image/svg+xml"
+                        hidden
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setFieldValue("profileImage", file);
+                            const reader = new FileReader();
+                            reader.onload = (ev) =>
+                              setProfilePreview(ev.target?.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </Button>
+                    {!isReadOnly && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          bottom: 3,
+                          right: 3,
+                          backgroundColor: "var(--primary-color, #ad1e1e)",
+                          width: "24px",
+                          height: "24px",
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          border: "2px solid white",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                          pointerEvents: "none",
+                          zIndex: 2,
+                        }}
+                      >
+                        <CameraAltIcon sx={{ fontSize: 12 }} />
+                      </Box>
+                    )}
+                  </Box>
+                  <Box>
+                    <Typography sx={labelSx}>Profile Image</Typography>
+                    <Typography sx={{ fontSize: "11px", color: "#667085" }}>
+                      Max 2MB. JPG or PNG.
+                    </Typography>
+                    {touched.profileImage && errors.profileImage && (
+                      <FormHelperText error sx={{ mt: 0.5, mx: 0 }}>
+                        {errors.profileImage as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
                 </Box>
 
                 <Box
                   sx={{
                     display: "grid",
-                    gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      sm: "1fr 1fr",
+                      md: "1fr 1fr 1fr",
+                    },
                     gap: 2,
+                    mb: 4,
                   }}
                 >
-                  {/* Password */}
+                  {/* Full Name */}
                   <Box>
                     <Typography sx={labelSx}>
-                      Password <span style={{ color: "#f04438" }}>*</span>
+                      Full Name <span style={{ color: "#f04438" }}>*</span>
                     </Typography>
                     <TextField
                       fullWidth
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter password"
-                      value={values.password}
+                      id="fullName"
+                      name="fullName"
+                      placeholder="Enter full name"
+                      value={values.fullName}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      error={touched.password && Boolean(errors.password)}
+                      error={touched.fullName && Boolean(errors.fullName)}
+                      disabled={isReadOnly}
                       slotProps={{
-                        input: {
-                          sx: inputSx,
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                onClick={() =>
-                                  setShowPassword(!showPassword)
-                                }
-                                edge="end"
-                                size="small"
-                              >
-                                {showPassword ? (
-                                  <VisibilityOff sx={{ fontSize: 18 }} />
-                                ) : (
-                                  <Visibility sx={{ fontSize: 18 }} />
-                                )}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        },
-                        htmlInput: { maxLength: 16 },
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 60 },
                       }}
                     />
-                    {touched.password && errors.password && (
+                    {touched.fullName && errors.fullName && (
                       <FormHelperText className="error-text">
-                        {errors.password as string}
+                        {errors.fullName as string}
                       </FormHelperText>
                     )}
                   </Box>
 
-                  {/* Confirm Password */}
+                  {/* Gender */}
                   <Box>
-                    <Typography sx={labelSx}>
-                      Confirm Password{" "}
-                      <span style={{ color: "#f04438" }}>*</span>
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm password"
-                      value={values.confirmPassword}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={
-                        touched.confirmPassword &&
-                        Boolean(errors.confirmPassword)
+                    <Typography sx={labelSx}>Gender</Typography>
+                    <Autocomplete
+                      options={genderOptions}
+                      getOptionLabel={(opt: any) => opt.label || opt}
+                      value={
+                        genderOptions.find(
+                          (g: any) => g.value === values.gender,
+                        ) || null
                       }
-                      slotProps={{
-                        input: {
-                          sx: inputSx,
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                onClick={() =>
-                                  setShowConfirmPassword(!showConfirmPassword)
-                                }
-                                edge="end"
-                                size="small"
-                              >
-                                {showConfirmPassword ? (
-                                  <VisibilityOff sx={{ fontSize: 18 }} />
-                                ) : (
-                                  <Visibility sx={{ fontSize: 18 }} />
-                                )}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        },
-                        htmlInput: { maxLength: 16 },
-                      }}
+                      onChange={(_, newVal) =>
+                        setFieldValue(
+                          "gender",
+                          (newVal as any)?.value || "",
+                        )
+                      }
+                      disabled={isReadOnly}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select gender"
+                          error={touched.gender && Boolean(errors.gender)}
+                          slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
+                        />
+                      )}
                     />
-                    {touched.confirmPassword && errors.confirmPassword && (
+                    {touched.gender && errors.gender && (
                       <FormHelperText className="error-text">
-                        {errors.confirmPassword as string}
+                        {errors.gender as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Date of Birth */}
+                  <Box>
+                    <Typography sx={labelSx}>Date of Birth</Typography>
+                    <LocalizationProvider dateAdapter={AdapterMoment}>
+                      <DatePicker
+                        format="DD/MM/YYYY"
+                        open={openDOB}
+                        onOpen={() => setOpenDOB(true)}
+                        onClose={() => setOpenDOB(false)}
+                        value={values.dateOfBirth}
+                        onChange={(val) => setFieldValue("dateOfBirth", val)}
+                        disabled={isReadOnly}
+                        disableFuture
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            placeholder: "DD/MM/YYYY",
+                            onClick: () => !isReadOnly && setOpenDOB(true),
+                            error:
+                              touched.dateOfBirth && Boolean(errors.dateOfBirth),
+                            sx: {
+                              "& .MuiPickersOutlinedInput-root": {
+                                height: "40px",
+                                backgroundColor: "#fff !important",
+                                borderRadius:
+                                  "var(--button-radius, 6px) !important",
+                                "& fieldset": {
+                                  borderColor:
+                                    "var(--input-border, #ced4da) !important",
+                                },
+                                "&:hover:not(.Mui-focused) fieldset": {
+                                  borderColor:
+                                    "var(--input-border, #ced4da) !important",
+                                },
+                                "&.Mui-focused:not(.Mui-error) fieldset": {
+                                  borderColor:
+                                    "var(--primary-color) !important",
+                                  borderWidth: "1px !important",
+                                },
+                              },
+                              "& .MuiPickersSectionList-root": {
+                                padding: "12px 0px",
+                                fontSize: "12px",
+                              },
+                              "& .MuiPickersInputBase-sectionContent": {
+                                fontSize: "13px",
+                                padding: "12px 0px",
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </LocalizationProvider>
+                    {touched.dateOfBirth && errors.dateOfBirth && (
+                      <FormHelperText className="error-text">
+                        {errors.dateOfBirth as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Blood Group */}
+                  <Box>
+                    <Typography sx={labelSx}>Blood Group</Typography>
+                    <Autocomplete
+                      options={bloodGroupOptions}
+                      getOptionLabel={(opt: any) => opt.label || opt}
+                      value={
+                        bloodGroupOptions.find(
+                          (b: any) => b.value === values.bloodGroup,
+                        ) || null
+                      }
+                      onChange={(_, newVal) =>
+                        setFieldValue(
+                          "bloodGroup",
+                          (newVal as any)?.value || "",
+                        )
+                      }
+                      disabled={isReadOnly}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select blood group"
+                          error={
+                            touched.bloodGroup && Boolean(errors.bloodGroup)
+                          }
+                          slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
+                        />
+                      )}
+                    />
+                    {touched.bloodGroup && errors.bloodGroup && (
+                      <FormHelperText className="error-text">
+                        {errors.bloodGroup as string}
                       </FormHelperText>
                     )}
                   </Box>
                 </Box>
-              </Box>
-            )}
 
-            {/* Submit / Discard */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 2,
-                mt: 2,
-                mb: 3,
-                flexDirection: { xs: "column-reverse", sm: "row" },
-              }}
-            >
-              <Button
-                className="admin-btn-secondary"
-                variant="outlined"
-                onClick={() => navigate("/student")}
-                disabled={actionLoading || isSubmitting}
-                sx={{
-                  minWidth: { xs: "100%", sm: "130px" },
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  fontWeight: 600,
-                }}
-              >
-                Discard
-              </Button>
-              {!isView && (
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={actionLoading || isSubmitting}
-                  className="admin-btn-theme"
+                {/* ── Section 2: Academic Details ── */}
+                <SectionTitle icon={AcademicIcon} title="Academic Details" />
+
+                <Box
                   sx={{
-                    minWidth: { xs: "100%", sm: "120px" },
-                    borderRadius: "8px",
-                    textTransform: "none",
-                    fontWeight: 600,
-                    boxShadow: "none",
-                    "&:hover": { boxShadow: "none" },
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      sm: "1fr 1fr",
+                      md: "1fr 1fr 1fr",
+                    },
+                    gap: 2,
+                    mb: 4,
                   }}
                 >
-                  {actionLoading || isSubmitting
-                    ? id
-                      ? "Updating..."
-                      : "Saving..."
-                    : id
-                      ? "Update Student"
-                      : "Add Student"}
-                </Button>
-              )}
-            </Box>
-          </Form>
-        )}
-      </Formik>
+                  {/* Admission Number */}
+                  <Box>
+                    <Typography sx={labelSx}>
+                      Admission Number (GR Number){" "}
+                      <span style={{ color: "#f04438" }}>*</span>
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      id="admissionNumber"
+                      name="admissionNumber"
+                      placeholder="Enter admission number (GR number)"
+                      value={values.admissionNumber}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.admissionNumber &&
+                        Boolean(errors.admissionNumber)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 30 },
+                      }}
+                    />
+                    {touched.admissionNumber && errors.admissionNumber && (
+                      <FormHelperText className="error-text">
+                        {errors.admissionNumber as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Admission Date */}
+                  <Box>
+                    <Typography sx={labelSx}>
+                      Admission Date{" "}
+                      <span style={{ color: "#f04438" }}>*</span>
+                    </Typography>
+                    <LocalizationProvider dateAdapter={AdapterMoment}>
+                      <DatePicker
+                        format="DD/MM/YYYY"
+                        open={openAdmissionDate}
+                        onOpen={() => setOpenAdmissionDate(true)}
+                        onClose={() => setOpenAdmissionDate(false)}
+                        value={values.admissionDate}
+                        onChange={(val) =>
+                          setFieldValue("admissionDate", val)
+                        }
+                        disabled={isReadOnly}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            placeholder: "DD/MM/YYYY",
+                            onClick: () =>
+                              !isReadOnly && setOpenAdmissionDate(true),
+                            error:
+                              touched.admissionDate &&
+                              Boolean(errors.admissionDate),
+                            sx: {
+                              "& .MuiPickersOutlinedInput-root": {
+                                height: "40px",
+                                backgroundColor: "#fff !important",
+                                borderRadius:
+                                  "var(--button-radius, 6px) !important",
+                                "& fieldset": {
+                                  borderColor:
+                                    "var(--input-border, #ced4da) !important",
+                                },
+                                "&:hover:not(.Mui-focused) fieldset": {
+                                  borderColor:
+                                    "var(--input-border, #ced4da) !important",
+                                },
+                                "&.Mui-focused:not(.Mui-error) fieldset": {
+                                  borderColor:
+                                    "var(--primary-color) !important",
+                                  borderWidth: "1px !important",
+                                },
+                              },
+                              "& .MuiPickersSectionList-root": {
+                                padding: "12px 0px",
+                                fontSize: "12px",
+                              },
+                              "& .MuiPickersInputBase-sectionContent": {
+                                fontSize: "13px",
+                                padding: "12px 0px",
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </LocalizationProvider>
+                    {touched.admissionDate && errors.admissionDate && (
+                      <FormHelperText className="error-text">
+                        {errors.admissionDate as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Class */}
+                  <Box>
+                    <Typography sx={labelSx}>
+                      Class <span style={{ color: "#f04438" }}>*</span>
+                    </Typography>
+                    <Autocomplete
+                      options={classes || []}
+                      getOptionLabel={(opt: any) => opt.name || ""}
+                      value={
+                        (classes || []).find(
+                          (c: any) => c._id === values.classId,
+                        ) || null
+                      }
+                      onChange={(_, newVal) =>
+                        setFieldValue("classId", (newVal as any)?._id || "")
+                      }
+                      disabled={isReadOnly}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select class"
+                          error={touched.classId && Boolean(errors.classId)}
+                          slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
+                        />
+                      )}
+                    />
+                    {touched.classId && errors.classId && (
+                      <FormHelperText className="error-text">
+                        {errors.classId as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Section */}
+                  <Box>
+                    <Typography sx={labelSx}>
+                      Section <span style={{ color: "#f04438" }}>*</span>
+                    </Typography>
+                    <Autocomplete
+                      options={sections || []}
+                      getOptionLabel={(opt: any) => opt.code || ""}
+                      value={
+                        (sections || []).find(
+                          (s: any) => s._id === values.sectionId,
+                        ) || null
+                      }
+                      onChange={(_, newVal) =>
+                        setFieldValue(
+                          "sectionId",
+                          (newVal as any)?._id || "",
+                        )
+                      }
+                      disabled={isReadOnly}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Select section"
+                          error={
+                            touched.sectionId && Boolean(errors.sectionId)
+                          }
+                          slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
+                        />
+                      )}
+                    />
+                    {touched.sectionId && errors.sectionId && (
+                      <FormHelperText className="error-text">
+                        {errors.sectionId as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* ── Section 3: Contact Details ── */}
+                <SectionTitle icon={LocationIcon} title="Contact Details" />
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      sm: "1fr 1fr",
+                      md: "1fr 1fr 1fr",
+                    },
+                    gap: 2,
+                    mb: 4,
+                  }}
+                >
+                  {/* Email */}
+                  <Box>
+                    <Typography sx={labelSx}>
+                      Email <span style={{ color: "#f04438" }}>*</span>
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      id="email"
+                      name="email"
+                      placeholder="Enter email"
+                      value={values.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.email && Boolean(errors.email)}
+                      disabled={isReadOnly || Boolean(id)}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 70 },
+                      }}
+                    />
+                    {touched.email && errors.email && (
+                      <FormHelperText className="error-text">
+                        {errors.email as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Phone Number — Student Login Phone */}
+                  <Box>
+                    <Typography sx={labelSx}>
+                      Student Login Phone <span style={{ color: "#f04438" }}>*</span>
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      placeholder="Enter student's own phone number"
+                      value={values.phoneNumber}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.phoneNumber && Boolean(errors.phoneNumber)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 10 },
+                      }}
+                    />
+                    {touched.phoneNumber && errors.phoneNumber ? (
+                      <FormHelperText className="error-text">
+                        {errors.phoneNumber as string}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText sx={{ color: "#667085", fontSize: "11px", mt: 0.5, mx: 0 }}>
+                        Student uses this number to login to the portal
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Address */}
+                  <Box sx={{ gridColumn: { xs: "1", sm: "1 / -1", md: "1 / -1" } }}>
+                    <Typography sx={labelSx}>Address</Typography>
+                    <AutoCompleteLocation
+                      setFieldValue={setFieldValue}
+                      errors={errors}
+                      touched={touched}
+                      values={values}
+                      disabled={isReadOnly}
+                      placeholder="Enter address"
+                      name="address"
+                    />
+                  </Box>
+
+                  {/* City */}
+                  <Box>
+                    <Typography sx={labelSx}>City</Typography>
+                    <TextField
+                      fullWidth
+                      id="city"
+                      name="city"
+                      placeholder="Enter city"
+                      value={values.city}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.city && Boolean(errors.city)}
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 50 },
+                      }}
+                    />
+                    {touched.city && errors.city && (
+                      <FormHelperText className="error-text">
+                        {errors.city as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* State */}
+                  <Box>
+                    <Typography sx={labelSx}>State</Typography>
+                    <TextField
+                      fullWidth
+                      id="state"
+                      name="state"
+                      placeholder="Enter state"
+                      value={values.state}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.state && Boolean(errors.state)}
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 50 },
+                      }}
+                    />
+                    {touched.state && errors.state && (
+                      <FormHelperText className="error-text">
+                        {errors.state as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Country */}
+                  <Box>
+                    <Typography sx={labelSx}>Country</Typography>
+                    <TextField
+                      fullWidth
+                      id="country"
+                      name="country"
+                      placeholder="Enter country"
+                      value={values.country}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.country && Boolean(errors.country)}
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 50 },
+                      }}
+                    />
+                    {touched.country && errors.country && (
+                      <FormHelperText className="error-text">
+                        {errors.country as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Pincode */}
+                  <Box>
+                    <Typography sx={labelSx}>Pincode</Typography>
+                    <TextField
+                      fullWidth
+                      id="pincode"
+                      name="pincode"
+                      placeholder="Enter pincode"
+                      value={values.pincode}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={touched.pincode && Boolean(errors.pincode)}
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 6 },
+                      }}
+                    />
+                    {touched.pincode && errors.pincode && (
+                      <FormHelperText className="error-text">
+                        {errors.pincode as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* ── Section 4: Guardian Details ── */}
+                <SectionTitle icon={GuardianIcon} title="Guardian Details" />
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      sm: "1fr 1fr",
+                      md: "1fr 1fr 1fr",
+                    },
+                    gap: 2,
+                    mb: 4,
+                  }}
+                >
+                  {/* Father Name */}
+                  <Box>
+                    <Typography sx={labelSx}>Father&apos;s Name</Typography>
+                    <TextField
+                      fullWidth
+                      id="fatherName"
+                      name="fatherName"
+                      placeholder="Enter father's name"
+                      value={values.fatherName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.fatherName && Boolean(errors.fatherName)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 60 },
+                      }}
+                    />
+                    {touched.fatherName && errors.fatherName && (
+                      <FormHelperText className="error-text">
+                        {errors.fatherName as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Father Phone — Parent Login */}
+                  <Box>
+                    <Typography sx={labelSx}>
+                      Father&apos;s Contact Phone{" "}
+                      <span style={{ color: "#667085", fontSize: "11px", fontWeight: 400 }}>
+                        (Parent Login)
+                      </span>
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      id="fatherPhone"
+                      name="fatherPhone"
+                      placeholder="Enter father's phone number"
+                      value={values.fatherPhone}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.fatherPhone && Boolean(errors.fatherPhone)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 10 },
+                      }}
+                    />
+                    {touched.fatherPhone && errors.fatherPhone ? (
+                      <FormHelperText className="error-text">
+                        {errors.fatherPhone as string}
+                      </FormHelperText>
+                    ) : (
+                      <FormHelperText sx={{ color: "#667085", fontSize: "11px", mt: 0.5, mx: 0 }}>
+                        Father can use this number to login as parent
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Mother Name */}
+                  <Box>
+                    <Typography sx={labelSx}>Mother&apos;s Name</Typography>
+                    <TextField
+                      fullWidth
+                      id="motherName"
+                      name="motherName"
+                      placeholder="Enter mother's name"
+                      value={values.motherName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.motherName && Boolean(errors.motherName)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 60 },
+                      }}
+                    />
+                    {touched.motherName && errors.motherName && (
+                      <FormHelperText className="error-text">
+                        {errors.motherName as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Mother Phone */}
+                  <Box>
+                    <Typography sx={labelSx}>Mother&apos;s Phone</Typography>
+                    <TextField
+                      fullWidth
+                      id="motherPhone"
+                      name="motherPhone"
+                      placeholder="Enter mother's phone"
+                      value={values.motherPhone}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.motherPhone && Boolean(errors.motherPhone)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 10 },
+                      }}
+                    />
+                    {touched.motherPhone && errors.motherPhone && (
+                      <FormHelperText className="error-text">
+                        {errors.motherPhone as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Guardian Name */}
+                  <Box>
+                    <Typography sx={labelSx}>Guardian&apos;s Name</Typography>
+                    <TextField
+                      fullWidth
+                      id="guardianName"
+                      name="guardianName"
+                      placeholder="Enter guardian's name"
+                      value={values.guardianName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.guardianName && Boolean(errors.guardianName)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 60 },
+                      }}
+                    />
+                    {touched.guardianName && errors.guardianName && (
+                      <FormHelperText className="error-text">
+                        {errors.guardianName as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Guardian Phone */}
+                  <Box>
+                    <Typography sx={labelSx}>Guardian&apos;s Phone</Typography>
+                    <TextField
+                      fullWidth
+                      id="guardianPhone"
+                      name="guardianPhone"
+                      placeholder="Enter guardian's phone"
+                      value={values.guardianPhone}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.guardianPhone && Boolean(errors.guardianPhone)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 10 },
+                      }}
+                    />
+                    {touched.guardianPhone && errors.guardianPhone && (
+                      <FormHelperText className="error-text">
+                        {errors.guardianPhone as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* ── Section 5: Login Credentials (Add mode only) ── */}
+                {!id && (
+                  <Box sx={{ mb: 4 }}>
+                    <SectionTitle icon={LockIcon} title="Login Credentials" />
+
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                        gap: 2,
+                      }}
+                    >
+                      {/* Password */}
+                      <Box>
+                        <Typography sx={labelSx}>
+                          Password <span style={{ color: "#f04438" }}>*</span>
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          id="password"
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter password"
+                          value={values.password}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.password && Boolean(errors.password)}
+                          slotProps={{
+                            input: {
+                              sx: inputSx,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() =>
+                                      setShowPassword(!showPassword)
+                                    }
+                                    edge="end"
+                                    size="small"
+                                  >
+                                    {showPassword ? (
+                                      <VisibilityOff sx={{ fontSize: 18 }} />
+                                    ) : (
+                                      <Visibility sx={{ fontSize: 18 }} />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            },
+                            htmlInput: { maxLength: 16 },
+                          }}
+                        />
+                        {touched.password && errors.password && (
+                          <FormHelperText className="error-text">
+                            {errors.password as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Confirm Password */}
+                      <Box>
+                        <Typography sx={labelSx}>
+                          Confirm Password{" "}
+                          <span style={{ color: "#f04438" }}>*</span>
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Confirm password"
+                          value={values.confirmPassword}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={
+                            touched.confirmPassword &&
+                            Boolean(errors.confirmPassword)
+                          }
+                          slotProps={{
+                            input: {
+                              sx: inputSx,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() =>
+                                      setShowConfirmPassword(!showConfirmPassword)
+                                    }
+                                    edge="end"
+                                    size="small"
+                                  >
+                                    {showConfirmPassword ? (
+                                      <VisibilityOff sx={{ fontSize: 18 }} />
+                                    ) : (
+                                      <Visibility sx={{ fontSize: 18 }} />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            },
+                            htmlInput: { maxLength: 16 },
+                          }}
+                        />
+                        {touched.confirmPassword && errors.confirmPassword && (
+                          <FormHelperText className="error-text">
+                            {errors.confirmPassword as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Submit / Discard */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: 2,
+                    mt: 4,
+                    flexDirection: { xs: "column-reverse", sm: "row" },
+                  }}
+                >
+                  <Button
+                    className="admin-btn-secondary"
+                    variant="outlined"
+                    onClick={() => navigate("/student")}
+                    disabled={actionLoading || isSubmitting}
+                    sx={{
+                      minWidth: { xs: "100%", sm: "130px" },
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Discard
+                  </Button>
+                  {!isView && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={actionLoading || isSubmitting}
+                      className="admin-btn-theme"
+                      sx={{
+                        minWidth: { xs: "100%", sm: "120px" },
+                        borderRadius: "8px",
+                        textTransform: "none",
+                        fontWeight: 600,
+                        boxShadow: "none",
+                        "&:hover": { boxShadow: "none" },
+                      }}
+                    >
+                      {actionLoading || isSubmitting
+                        ? id
+                          ? "Updating..."
+                          : "Saving..."
+                        : id
+                          ? "Update Student"
+                          : "Add Student"}
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+            </Form>
+          )}
+        </Formik>
+      </Box>
     </Box>
   );
 }

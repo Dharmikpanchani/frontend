@@ -54,7 +54,7 @@ const FeeStructure = () => {
       const response = await exportFeeStructures({
         format,
       });
-      
+
       const blob = new Blob([response.data], {
         type: format === "excel"
           ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -100,10 +100,10 @@ const FeeStructure = () => {
       return { success: true, message: response?.data?.message || "Fee structures imported successfully." };
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || "Failed to import fee structures";
-      const errors = error.response?.data?.data?.failures || 
-                     error.response?.data?.data?.errors || 
-                     error.response?.data?.errors || 
-                     null;
+      const errors = error.response?.data?.data?.failures ||
+        error.response?.data?.data?.errors ||
+        error.response?.data?.errors ||
+        null;
       return {
         success: false,
         message,
@@ -122,7 +122,7 @@ const FeeStructure = () => {
     try {
       const res: any = await dispatch(fetchFeeStructures({ page: page + 1, limit: rowsPerPage })).unwrap();
       if (res?.data) setTotalDocs(res.data.totalDocs || res.data.length || 0);
-    } catch (err) {}
+    } catch (err) { }
   };
 
 
@@ -152,8 +152,17 @@ const FeeStructure = () => {
         <Typography className="admin-page-title" component="h2" variant="h2">
           Fee Structures
         </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%" }}>
+          <Box
+            className="admin-add-user-btn-main"
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 1,
+              alignItems: "stretch",
+              width: "100%",
+            }}
+          >
             {hasPermission(schoolAdminPermission.fee_structure.import) && (
               <Button
                 className="admin-btn-theme"
@@ -203,7 +212,8 @@ const FeeStructure = () => {
                     color: "#344054",
                     height: "36px !important",
                     fontSize: "12px !important",
-                    ml: 1,
+                    ml: { xs: 0, sm: 1 },
+                    width: { xs: "100%", sm: "auto" },
                   }}
                 >
                   Export Report
@@ -238,10 +248,10 @@ const FeeStructure = () => {
                     schoolAdminPermission.fee_structure.update,
                     schoolAdminPermission.fee_structure.delete,
                   ]) && (
-                    <TableCell align="right" className="table-th">
-                      Actions
-                    </TableCell>
-                  )}
+                      <TableCell align="right" className="table-th">
+                        Actions
+                      </TableCell>
+                    )}
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
@@ -331,41 +341,41 @@ const FeeStructure = () => {
                         schoolAdminPermission.fee_structure.update,
                         schoolAdminPermission.fee_structure.delete,
                       ]) && (
-                        <TableCell className="table-td" align="right">
-                          <Box className="admin-table-data-btn-flex" sx={{ justifyContent: "flex-end", gap: 0.5 }}>
-                            {canView && (
-                              <Tooltip title="View" arrow placement="bottom" className="admin-tooltip">
-                                <Button
-                                  className="admin-table-data-btn admin-table-view-btn"
-                                  onClick={() => navigate("/fee/structures/view", { state: { id: row._id } })}
-                                >
-                                  <img src={Svg.yellowEye} className="admin-icon" alt="View" />
-                                </Button>
-                              </Tooltip>
-                            )}
-                            {canEdit && (
-                              <Tooltip title="Edit" arrow placement="bottom">
-                                <Button
-                                  className="admin-table-data-btn admin-table-edit-btn"
-                                  onClick={() => navigate("/fee/structures/edit", { state: { id: row._id } })}
-                                >
-                                  <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
-                                </Button>
-                              </Tooltip>
-                            )}
-                            {canDelete && (
-                              <Tooltip title="Delete" arrow placement="bottom">
-                                <Button
-                                  className="admin-table-data-btn admin-table-delete-btn"
-                                  onClick={() => handleDelete(row._id)}
-                                >
-                                  <img src={Svg.trash} className="admin-icon" alt="Trash" />
-                                </Button>
-                              </Tooltip>
-                            )}
-                          </Box>
-                        </TableCell>
-                      )}
+                          <TableCell className="table-td" align="right">
+                            <Box className="admin-table-data-btn-flex" sx={{ justifyContent: "flex-end", gap: 0.5 }}>
+                              {canView && (
+                                <Tooltip title="View" arrow placement="bottom" className="admin-tooltip">
+                                  <Button
+                                    className="admin-table-data-btn admin-table-view-btn"
+                                    onClick={() => navigate("/fee/structures/view", { state: { id: row._id } })}
+                                  >
+                                    <img src={Svg.yellowEye} className="admin-icon" alt="View" />
+                                  </Button>
+                                </Tooltip>
+                              )}
+                              {canEdit && (
+                                <Tooltip title="Edit" arrow placement="bottom">
+                                  <Button
+                                    className="admin-table-data-btn admin-table-edit-btn"
+                                    onClick={() => navigate("/fee/structures/edit", { state: { id: row._id } })}
+                                  >
+                                    <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
+                                  </Button>
+                                </Tooltip>
+                              )}
+                              {canDelete && (
+                                <Tooltip title="Delete" arrow placement="bottom">
+                                  <Button
+                                    className="admin-table-data-btn admin-table-delete-btn"
+                                    onClick={() => handleDelete(row._id)}
+                                  >
+                                    <img src={Svg.trash} className="admin-icon" alt="Trash" />
+                                  </Button>
+                                </Tooltip>
+                              )}
+                            </Box>
+                          </TableCell>
+                        )}
                     </TableRow>
                   ))
                 )}

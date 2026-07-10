@@ -784,7 +784,7 @@ export default function Student() {
                     fullWidth
                     id="pendingSearch"
                     className="admin-form-control"
-                    placeholder="Search name or phone"
+                    placeholder="Search"
                     onChange={(e) => {
                       setPendingSearch(e.target.value);
                       setPendingPage(0);

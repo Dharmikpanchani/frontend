@@ -21,7 +21,7 @@ import Filter from "@/apps/common/filter/Filter";
 const FeeDues = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { hasPermission } = usePermissions();
-  
+
   const { dues = [], categories = [], loading } = useSelector((state: RootState) => state.FeeReducer);
   const { allClasses } = useSelector((state: RootState) => state.ClassReducer);
 
@@ -98,9 +98,9 @@ const FeeDues = () => {
       ];
     });
 
-    const csvContent = "data:text/csv;charset=utf-8," 
+    const csvContent = "data:text/csv;charset=utf-8,"
       + [headers.join(","), ...rows.map(e => e.map(val => `"${val}"`).join(","))].join("\n");
-    
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -273,16 +273,18 @@ const FeeDues = () => {
             </Box>
           </Box>
 
-          <Box className="admin-filter-btn-main">
+          <Box className="admin-filter-btn-main" sx={{ width: { xs: "100%", sm: "auto" } }}>
             <Button
               className="admin-btn-theme"
               onClick={() => setOpenFilter(true)}
               sx={{
-                ml: 1,
+                ml: { xs: 0, sm: 1 },
+                width: "100%",
                 minWidth: "45px",
                 p: "0 12px",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
                 gap: "8px",
               }}
             >
@@ -298,7 +300,15 @@ const FeeDues = () => {
                 variant="outlined"
                 startIcon={<DownloadIcon />}
                 onClick={(e) => setExportAnchorEl(e.currentTarget)}
-                sx={{ textTransform: "none", borderRadius: "8px", borderColor: "#eaecf0", color: "#344054", height: "40px", ml: 1 }}
+                sx={{
+                  textTransform: "none",
+                  borderRadius: "8px",
+                  borderColor: "#eaecf0",
+                  color: "#344054",
+                  height: "40px",
+                  ml: { xs: 0, sm: 1 },
+                  width: { xs: "100%", sm: "auto" },
+                }}
               >
                 Export Report
               </Button>
@@ -540,8 +550,10 @@ const FeeDues = () => {
                         <TableCell className="table-td" sx={{ color: "#B93815", fontWeight: 600 }}>₹{(row.balanceDue || 0).toLocaleString()}</TableCell>
                         <TableCell className="table-td" sx={{ color: "#D97706" }}>₹{(row.fineAmount || 0).toLocaleString()}</TableCell>
                         <TableCell className="table-td">
-                          <Box sx={{ display: "inline-flex", px: 1.5, py: 0.5, borderRadius: "16px", fontSize: "12px", fontWeight: 600,
-                            backgroundColor: row.status === "OVERDUE" ? "#FEE2E2" : "#FFF4ED", color: row.status === "OVERDUE" ? "#B91C1C" : "#B93815" }}>
+                          <Box sx={{
+                            display: "inline-flex", px: 1.5, py: 0.5, borderRadius: "16px", fontSize: "12px", fontWeight: 600,
+                            backgroundColor: row.status === "OVERDUE" ? "#FEE2E2" : "#FFF4ED", color: row.status === "OVERDUE" ? "#B91C1C" : "#B93815"
+                          }}>
                             {row.status}
                           </Box>
                         </TableCell>

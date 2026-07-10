@@ -47,26 +47,26 @@ const FeeCategory = () => {
   const { hasPermission, hasAnyPermission } = usePermissions();
   const { categories, loading } = useSelector((state: RootState) => state.FeeReducer);
 
-  const canAdd    = hasPermission(schoolAdminPermission.fee_category.create);
-  const canEdit   = hasPermission(schoolAdminPermission.fee_category.update);
+  const canAdd = hasPermission(schoolAdminPermission.fee_category.create);
+  const canEdit = hasPermission(schoolAdminPermission.fee_category.update);
   const canDelete = hasPermission(schoolAdminPermission.fee_category.delete);
   const canStatus = hasPermission(schoolAdminPermission.fee_category.status);
 
   // Pagination
-  const [currentPage, setCurrentPage]   = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage]   = useState(10);
-  const [totalDocs, setTotalDocs]       = useState(0);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalDocs, setTotalDocs] = useState(0);
 
   // Search
-  const [searchValue, setSearchValue]   = useState<string>("");
+  const [searchValue, setSearchValue] = useState<string>("");
 
   const navigate = useNavigate();
 
   // Status modal
   const [selectedData, setSelectedData] = useState<any>(null);
-  const [openStatusModal, setOpenStatusModal]   = useState(false);
-  const [openDeleteModal, setOpenDeleteModal]   = useState(false);
-  const [actionLoading, setActionLoading]       = useState(false);
+  const [openStatusModal, setOpenStatusModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const [openImportModal, setOpenImportModal] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -80,7 +80,7 @@ const FeeCategory = () => {
         search: searchValue,
         format,
       });
-      
+
       const blob = new Blob([response.data], {
         type: format === "excel"
           ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -126,10 +126,10 @@ const FeeCategory = () => {
       return { success: true, message: response?.data?.message || "Fee categories imported successfully." };
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || "Failed to import fee categories";
-      const errors = error.response?.data?.data?.failures || 
-                     error.response?.data?.data?.errors || 
-                     error.response?.data?.errors || 
-                     null;
+      const errors = error.response?.data?.data?.failures ||
+        error.response?.data?.data?.errors ||
+        error.response?.data?.errors ||
+        null;
       return {
         success: false,
         message,
@@ -248,7 +248,16 @@ const FeeCategory = () => {
           </Box>
 
           {/* Import/Export buttons */}
-          <Box className="admin-add-user-btn-main" sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <Box
+            className="admin-add-user-btn-main"
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 1,
+              alignItems: "stretch",
+              width: "100%",
+            }}
+          >
             {hasPermission(schoolAdminPermission.fee_category.import) && (
               <Button
                 className="admin-btn-theme"
@@ -298,7 +307,8 @@ const FeeCategory = () => {
                     color: "#344054",
                     height: "36px !important",
                     fontSize: "12px !important",
-                    ml: 1,
+                    ml: { xs: 0, sm: 1 },
+                    width: { xs: "100%", sm: "auto" },
                   }}
                 >
                   Export Report
@@ -346,10 +356,10 @@ const FeeCategory = () => {
                     schoolAdminPermission.fee_category.update,
                     schoolAdminPermission.fee_category.delete,
                   ]) && (
-                    <TableCell className="table-th" align="right" sx={{ fontWeight: 700 }}>
-                      Action
-                    </TableCell>
-                  )}
+                      <TableCell className="table-th" align="right" sx={{ fontWeight: 700 }}>
+                        Action
+                      </TableCell>
+                    )}
                 </TableRow>
               </TableHead>
 
@@ -450,34 +460,34 @@ const FeeCategory = () => {
                           schoolAdminPermission.fee_category.update,
                           schoolAdminPermission.fee_category.delete,
                         ]) && (
-                          <TableCell className="table-td">
-                            <Box
-                              className="admin-table-data-btn-flex"
-                              sx={{ justifyContent: "flex-end" }}
-                            >
-                              {canEdit && (
-                                <Tooltip title="Edit" arrow placement="bottom">
-                                  <Button
-                                    className="admin-table-data-btn admin-table-edit-btn"
-                                    onClick={() => navigate("/fee/categories/edit", { state: { id: row._id } })}
-                                  >
-                                    <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
-                                  </Button>
-                                </Tooltip>
-                              )}
-                              {canDelete && (
-                                <Tooltip title="Delete" arrow placement="bottom">
-                                  <Button
-                                    className="admin-table-data-btn admin-table-delete-btn"
-                                    onClick={() => handleOpenDelete(row)}
-                                  >
-                                    <img src={Svg.trash} className="admin-icon" alt="Delete" />
-                                  </Button>
-                                </Tooltip>
-                              )}
-                            </Box>
-                          </TableCell>
-                        )}
+                            <TableCell className="table-td">
+                              <Box
+                                className="admin-table-data-btn-flex"
+                                sx={{ justifyContent: "flex-end" }}
+                              >
+                                {canEdit && (
+                                  <Tooltip title="Edit" arrow placement="bottom">
+                                    <Button
+                                      className="admin-table-data-btn admin-table-edit-btn"
+                                      onClick={() => navigate("/fee/categories/edit", { state: { id: row._id } })}
+                                    >
+                                      <img src={Svg.editIcon} className="admin-icon" alt="Edit" />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                                {canDelete && (
+                                  <Tooltip title="Delete" arrow placement="bottom">
+                                    <Button
+                                      className="admin-table-data-btn admin-table-delete-btn"
+                                      onClick={() => handleOpenDelete(row)}
+                                    >
+                                      <img src={Svg.trash} className="admin-icon" alt="Delete" />
+                                    </Button>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </TableCell>
+                          )}
                       </TableRow>
                     ))
                   ) : (
