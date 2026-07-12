@@ -443,29 +443,58 @@
 }
 
 .ai-copilot-send-btn {
-  background: var(--primary-color);
+  background: var(--theme-gradient, var(--primary-color, #002147));
   color: #ffffff;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  flex-shrink: 0; /* Prevents squeezing into an oval shape */
+  padding: 0 !important; /* Reset any global button padding */
+  margin: 0 !important;  /* Reset any global button margin */
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 33, 71, 0.15);
 }
 
-.ai-copilot-send-btn:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
+.ai-copilot-send-btn svg {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Visually shift right to balance the heavier tail of the paper-plane on the left */
+  transform: translate(2px, 0px);
+}
+
+.ai-copilot-send-btn:hover:not(:disabled) {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(0, 33, 71, 0.3);
+  background: var(--primary-color, #002147);
+}
+
+.ai-copilot-send-btn:hover:not(:disabled) svg {
+  /* Micro-interaction: Paper plane tilts/flies slightly upward and forward */
+  transform: translate(3px, -2px) rotate(-10deg) scale(1.15);
+}
+
+.ai-copilot-send-btn:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 .ai-copilot-send-btn:disabled {
-  background: #e4e4e7;
+  background: #f4f4f5;
   color: #a1a1aa;
+  border: 1px solid #e4e4e7;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
+  flex-shrink: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.ai-copilot-send-btn:disabled svg {
+  transform: translate(2px, 0px); /* Keep the centered position even when disabled */
 }
 
 /* File Attachment Button */
@@ -480,6 +509,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  flex-shrink: 0; /* Prevents squeezing into an oval shape */
   transition: all 0.2s ease;
 }
 

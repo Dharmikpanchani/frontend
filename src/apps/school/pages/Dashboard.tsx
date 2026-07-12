@@ -3,9 +3,22 @@ import Svg from "../../../assets/Svg";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/Store";
+import { masterService } from "@/api/services/master.service";
+
+/** Compute current academic year label locally (April start, same logic as backend cron) */
+const getLocalAcademicYearLabel = (): string => {
+  const now = new Date();
+  const month = now.getMonth() + 1; // 1-12
+  const startYear = month >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  return `${startYear}-${startYear + 1}`;
+};
 
 export default function Dashboard() {
   const [time, setTime] = useState(new Date());
+  const [academicYearLabel, setAcademicYearLabel] = useState<string>(
+    getLocalAcademicYearLabel(),
+  );
+
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
   );
@@ -13,6 +26,19 @@ export default function Dashboard() {
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Fetch the server-confirmed current academic year
+  useEffect(() => {
+    masterService.getAcademicYears().then((res: any) => {
+      const years: any[] = res?.data || [];
+      const current = years.find((y: any) => y.isCurrent);
+      if (current?.label) {
+        setAcademicYearLabel(current.label);
+      }
+    }).catch(() => {
+      // fallback: keep locally computed label
+    });
   }, []);
 
   const formatTime = (date: Date) => {
@@ -67,10 +93,20 @@ export default function Dashboard() {
         }}
       >
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 700, mb: 1, color: "var(--button-text, #fff)" }}
+          >
             Welcome back 👋
           </Typography>
-          <Typography variant="h5" sx={{ opacity: 0.9, fontWeight: 600 }}>
+          <Typography
+            variant="h5"
+            sx={{
+              opacity: 0.9,
+              fontWeight: 600,
+              color: "var(--button-text, #fff)",
+            }}
+          >
             {adminDetails?.schoolData?.schoolName || "VidyaSetu School"} Portal
           </Typography>
           <Box
@@ -84,16 +120,25 @@ export default function Dashboard() {
               backdropFilter: "blur(5px)",
             }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              Active Academic Year: 2024-25
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 600, color: "var(--button-text, #fff)" }}
+            >
+              Active Academic Year: {academicYearLabel}
             </Typography>
           </Box>
         </Box>
         <Box sx={{ textAlign: "right", display: { xs: "none", lg: "block" } }}>
-          <Typography variant="h3" sx={{ fontWeight: 700 }}>
+          <Typography
+            variant="h3"
+            sx={{ fontWeight: 700, color: "var(--button-text, #fff)" }}
+          >
             {formatTime(time)}
           </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.8 }}>
+          <Typography
+            variant="body1"
+            sx={{ opacity: 0.8, color: "var(--button-text, #fff)" }}
+          >
             {formatDate(time)}
           </Typography>
         </Box>

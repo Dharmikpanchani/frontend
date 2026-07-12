@@ -832,7 +832,7 @@ export default function AICopilot() {
                   onClick={handleSend}
                   disabled={(!inputValue.trim() && !attachedFiles.length) || isStreaming}
                 >
-                  <SendIcon sx={{ fontSize: 16 }} />
+                  <SendIcon sx={{ fontSize: 18 }} />
                 </button>
               </div>
             </div>

@@ -45,6 +45,7 @@ export interface ThemeState {
 
   primaryColor: string;
   secondaryColor: string;
+  gradientDirection: string;
   successColor: string;
   errorColor: string;
   warningColor: string;
@@ -88,6 +89,7 @@ const defaultTheme: ThemeState = {
 
   primaryColor: "#002147",
   secondaryColor: "#00509d",
+  gradientDirection: "135deg",
   successColor: "#46c700",
   errorColor: "#ff0000",
   warningColor: "#f1b000",

@@ -32,6 +32,7 @@ export const useThemeManager = () => {
   }, [reduxTheme, adminDetails?.schoolData?.theme]);
 
   const themeVariables = useMemo(() => {
+    const gradient = `linear-gradient(${theme.gradientDirection || "135deg"}, ${theme.primaryColor} 0%, ${theme.secondaryColor || theme.primaryColor} 100%)`;
     return {
       "--border-radius": theme.borderRadius,
       "--font-family": theme.fontFamily,
@@ -49,11 +50,12 @@ export const useThemeManager = () => {
       "--text-muted": theme.textMuted,
       "--link-color": theme.linkColor,
       "--heading-color": theme.headingColor,
-      "--sidebar-bg": theme.sidebarBg,
+      // sidebar and header always use the gradient
+      "--sidebar-bg": gradient,
       "--sidebar-text": theme.sidebarText,
       "--sidebar-active-bg": theme.sidebarActiveBg,
       "--sidebar-active-text": theme.sidebarActiveText,
-      "--header-bg": theme.headerBg,
+      "--header-bg": gradient,
       "--header-text": theme.headerText,
       "--page-bg": theme.pageBg,
       "--card-bg": theme.cardBg,
@@ -62,12 +64,12 @@ export const useThemeManager = () => {
       "--input-border": theme.inputBorder,
       "--table-header-bg": theme.tableHeaderBg,
       "--table-row-hover": theme.tableRowHover,
-      "--button-bg": theme.buttonBg,
+      "--button-bg": gradient,
       "--button-text": theme.buttonText,
       "--button-radius": theme.buttonRadius,
       "--button-border": theme.buttonBorder,
-      "--button-hover-bg": theme.buttonHoverBg,
-      "--theme-gradient": `linear-gradient(45deg, ${theme.primaryColor} 30%, ${theme.secondaryColor || theme.primaryColor} 90%)`,
+      "--button-hover-bg": gradient,
+      "--theme-gradient": gradient,
       "--card-shadow":
         theme.cardShadow === "yes"
           ? "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
@@ -92,7 +94,7 @@ export const useThemeManager = () => {
     });
 
     // Apply classes to body
-    const isCustomTheme = theme.primaryColor !== "#5c1a1a";
+    const isCustomTheme = true;
     document.body.classList.add("portal-school", ...themeClasses);
     if (isCustomTheme) {
       document.body.classList.add("is-custom-theme");
