@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
+import { usePermissions } from "@/hooks/usePermissions";
 import {
   Box,
   Typography,
@@ -57,14 +58,58 @@ export default function AddEditRole() {
   const [permissions, setPermissions] = useState<string[]>([]);
   const [permissionsError, setPermissionsError] = useState("");
   const [buttonSpinner, setButtonSpinner] = useState(false);
-  const adminModuleIds = ["role", "admin_user"];
-  const masterModuleIds = [
+  const adminModuleIds = useMemo(() => ["role", "admin_user"], []);
+  const masterModuleIds = useMemo(() => [
     "teacher",
     "department",
     "subject",
     "class",
     "section",
-  ];
+  ], []);
+
+  const { planPermissions, isSuperDeveloper } = usePermissions();
+
+  const ALWAYS_ALLOWED = useMemo(() => [
+    'school_profile_view',
+    'school_profile_edit',
+    'plan_view',
+    'school_settings_view',
+    'school_settings_edit',
+  ], []);
+
+  const isPermissionAllowed = useCallback((permissionKey: string) => {
+    if (isSuperDeveloper) return true;
+    if (ALWAYS_ALLOWED.includes(permissionKey)) return true;
+    if (permissionKey === "import_log_view") {
+      return planPermissions.some((p) => p.endsWith("_import"));
+    }
+    return planPermissions.includes(permissionKey);
+  }, [planPermissions, isSuperDeveloper, ALWAYS_ALLOWED]);
+
+  const allowedModules = useMemo(() => {
+    return roleStaticData.filter((module) =>
+      module.subRole.some(
+        (sr) => sr.is_show && isPermissionAllowed(`${module.mainTitleId}_${sr.titleId}`)
+      )
+    );
+  }, [planPermissions, isSuperDeveloper, isPermissionAllowed]);
+
+  const hasImportCapability = useMemo(() => {
+    if (isSuperDeveloper) return true;
+    return planPermissions.some((p) => p.endsWith("_import"));
+  }, [planPermissions, isSuperDeveloper]);
+
+  const hasExportCapability = useMemo(() => {
+    if (isSuperDeveloper) return true;
+    return planPermissions.some((p) => p.endsWith("_export"));
+  }, [planPermissions, isSuperDeveloper]);
+
+  const columns = useMemo(() => {
+    const cols = ["view", "add", "edit", "delete", "status"];
+    if (hasImportCapability) cols.push("import");
+    if (hasExportCapability) cols.push("export");
+    return cols;
+  }, [hasImportCapability, hasExportCapability]);
 
   useEffect(() => {
     if (id) {
@@ -138,8 +183,8 @@ export default function AddEditRole() {
     if (permissions.includes(key)) {
       // Unchecking
       let newPermissions = permissions.filter((p) => p !== key);
-      // If unchecking 'view', also uncheck everything else for this module
-      if (typeId === "view") {
+      // If unchecking 'view' or 'use', also uncheck everything else for this module
+      if (typeId === "view" || typeId === "use") {
         newPermissions = newPermissions.filter(
           (p) => !p.startsWith(`${moduleId}_`),
         );
@@ -148,8 +193,8 @@ export default function AddEditRole() {
     } else {
       // Checking
       let newPermissions = [...permissions, key];
-      // If checking anything other than 'view', also check 'view'
-      if (typeId !== "view") {
+      // If checking anything other than 'view'/'use', also check 'view' (except for ai_copilot which has no view)
+      if (typeId !== "view" && typeId !== "use" && moduleId !== "ai_copilot") {
         if (!newPermissions.includes(viewKey)) {
           newPermissions.push(viewKey);
         }
@@ -167,10 +212,12 @@ export default function AddEditRole() {
           const matchedSubRole = module.subRole.find(
             (sr: any) =>
               sr.titleId === typeId ||
-              (typeId === "add" && sr.titleId === "collect"),
+              (typeId === "add" && sr.titleId === "collect") ||
+              (typeId === "view" && sr.titleId === "use"),
           );
-          return matchedSubRole
-            ? [`${module.mainTitleId}_${matchedSubRole.titleId}`]
+          const key = matchedSubRole ? `${module.mainTitleId}_${matchedSubRole.titleId}` : "";
+          return matchedSubRole && isPermissionAllowed(key)
+            ? [key]
             : [];
         }),
       ),
@@ -184,10 +231,13 @@ export default function AddEditRole() {
           const matchedSubRole = module.subRole.find(
             (sr: any) =>
               sr.titleId === typeId ||
-              (typeId === "add" && sr.titleId === "collect"),
+              (typeId === "add" && sr.titleId === "collect") ||
+              (typeId === "view" && sr.titleId === "use"),
           );
-          return matchedSubRole && module.subRole.some((sr: any) => sr.titleId === "view")
-            ? [`${module.mainTitleId}_view`]
+          const key = matchedSubRole ? `${module.mainTitleId}_${matchedSubRole.titleId}` : "";
+          const viewKey = `${module.mainTitleId}_view`;
+          return matchedSubRole && isPermissionAllowed(key) && module.subRole.some((sr: any) => sr.titleId === "view") && isPermissionAllowed(viewKey)
+            ? [viewKey]
             : [];
         });
         newPermissions = [...newPermissions, ...correspondingViewKeys];
@@ -217,10 +267,12 @@ export default function AddEditRole() {
           const matchedSubRole = module.subRole.find(
             (sr: any) =>
               sr.titleId === typeId ||
-              (typeId === "add" && sr.titleId === "collect"),
+              (typeId === "add" && sr.titleId === "collect") ||
+              (typeId === "view" && sr.titleId === "use"),
           );
-          return matchedSubRole
-            ? [`${module.mainTitleId}_${matchedSubRole.titleId}`]
+          const key = matchedSubRole ? `${module.mainTitleId}_${matchedSubRole.titleId}` : "";
+          return matchedSubRole && isPermissionAllowed(key)
+            ? [key]
             : [];
         }),
       ),
@@ -233,7 +285,7 @@ export default function AddEditRole() {
 
   const isModuleAllChecked = (module: any) => {
     const keys = module.subRole
-      .filter((sr: any) => sr.is_show)
+      .filter((sr: any) => sr.is_show && isPermissionAllowed(`${module.mainTitleId}_${sr.titleId}`))
       .map((sr: any) => `${module.mainTitleId}_${sr.titleId}`);
     return (
       keys.length > 0 && keys.every((k: string) => permissions.includes(k))
@@ -246,7 +298,7 @@ export default function AddEditRole() {
     );
     const allKeys = masterModules.flatMap((m) =>
       m.subRole
-        .filter((sr) => sr.is_show)
+        .filter((sr) => sr.is_show && isPermissionAllowed(`${m.mainTitleId}_${sr.titleId}`))
         .map((sr) => `${m.mainTitleId}_${sr.titleId}`),
     );
     return allKeys.length > 0 && allKeys.every((k) => permissions.includes(k));
@@ -259,7 +311,7 @@ export default function AddEditRole() {
     );
     const allKeys = masterModules.flatMap((m) =>
       m.subRole
-        .filter((sr) => sr.is_show)
+        .filter((sr) => sr.is_show && isPermissionAllowed(`${m.mainTitleId}_${sr.titleId}`))
         .map((sr) => `${m.mainTitleId}_${sr.titleId}`),
     );
 
@@ -276,7 +328,7 @@ export default function AddEditRole() {
     );
     const allKeys = adminModules.flatMap((m) =>
       m.subRole
-        .filter((sr) => sr.is_show)
+        .filter((sr) => sr.is_show && isPermissionAllowed(`${m.mainTitleId}_${sr.titleId}`))
         .map((sr) => `${m.mainTitleId}_${sr.titleId}`),
     );
     return allKeys.length > 0 && allKeys.every((k) => permissions.includes(k));
@@ -289,7 +341,7 @@ export default function AddEditRole() {
     );
     const allKeys = adminModules.flatMap((m) =>
       m.subRole
-        .filter((sr) => sr.is_show)
+        .filter((sr) => sr.is_show && isPermissionAllowed(`${m.mainTitleId}_${sr.titleId}`))
         .map((sr) => `${m.mainTitleId}_${sr.titleId}`),
     );
 
@@ -444,20 +496,24 @@ export default function AddEditRole() {
                         >
                           Status
                         </TableCell>
-                        <TableCell
-                          className="table-th"
-                          align="center"
-                          sx={{ fontWeight: 700 }}
-                        >
-                          Import
-                        </TableCell>
-                        <TableCell
-                          className="table-th"
-                          align="center"
-                          sx={{ fontWeight: 700 }}
-                        >
-                          Export
-                        </TableCell>
+                        {hasImportCapability && (
+                          <TableCell
+                            className="table-th"
+                            align="center"
+                            sx={{ fontWeight: 700 }}
+                          >
+                            Import
+                          </TableCell>
+                        )}
+                        {hasExportCapability && (
+                          <TableCell
+                            className="table-th"
+                            align="center"
+                            sx={{ fontWeight: 700 }}
+                          >
+                            Export
+                          </TableCell>
+                        )}
                       </TableRow>
                     </TableHead>
                     <TableBody className="table-body">
@@ -474,7 +530,7 @@ export default function AddEditRole() {
                         <TableCell className="table-td" align="center">
                           -
                         </TableCell>
-                        {["view", "add", "edit", "delete", "status", "import", "export"].map(
+                        {columns.map(
                           (typeId) => (
                             <TableCell
                               key={typeId}
@@ -496,7 +552,7 @@ export default function AddEditRole() {
                         )}
                       </TableRow>
 
-                      {roleStaticData.map((module) => {
+                      {allowedModules.map((module, index) => {
                         const isMaster = masterModuleIds.includes(
                           module.mainTitleId,
                         );
@@ -505,8 +561,16 @@ export default function AddEditRole() {
                         );
                         const rows = [];
 
+                        // Find the first index of admin/master modules in allowedModules to render header once
+                        const firstAdminIndex = allowedModules.findIndex((m) =>
+                          adminModuleIds.includes(m.mainTitleId)
+                        );
+                        const firstMasterIndex = allowedModules.findIndex((m) =>
+                          masterModuleIds.includes(m.mainTitleId)
+                        );
+
                         // Admin Module Header
-                        if (module.mainTitleId === "role") {
+                        if (index === firstAdminIndex) {
                           rows.push(
                             <TableRow
                               key="admin_module_header"
@@ -534,7 +598,7 @@ export default function AddEditRole() {
                               <TableCell
                                 className="table-td"
                                 align="center"
-                                colSpan={7}
+                                colSpan={5 + (hasImportCapability ? 1 : 0) + (hasExportCapability ? 1 : 0)}
                               >
                                 <Typography
                                   sx={{
@@ -551,7 +615,7 @@ export default function AddEditRole() {
                         }
 
                         // Student Master Header
-                        if (module.mainTitleId === "teacher") {
+                        if (index === firstMasterIndex) {
                           rows.push(
                             <TableRow
                               key="student_master_header"
@@ -579,7 +643,7 @@ export default function AddEditRole() {
                               <TableCell
                                 className="table-td"
                                 align="center"
-                                colSpan={7}
+                                colSpan={5 + (hasImportCapability ? 1 : 0) + (hasExportCapability ? 1 : 0)}
                               >
                                 <Typography
                                   sx={{
@@ -623,7 +687,7 @@ export default function AddEditRole() {
                                 checked={isModuleAllChecked(module)}
                                 onChange={(e: any) => {
                                   const keys = module.subRole
-                                    .filter((sr) => sr.is_show)
+                                    .filter((sr) => sr.is_show && isPermissionAllowed(`${module.mainTitleId}_${sr.titleId}`))
                                     .map(
                                       (sr) =>
                                         `${module.mainTitleId}_${sr.titleId}`,
@@ -641,21 +705,23 @@ export default function AddEditRole() {
                                 disabled={isView}
                               />
                             </TableCell>
-                            {["view", "add", "edit", "delete", "status", "import", "export"].map(
+                            {columns.map(
                               (typeId) => {
                                 const subRole = module.subRole.find(
                                   (sr) =>
                                     sr.titleId === typeId ||
-                                    (typeId === "add" && sr.titleId === "collect"),
+                                    (typeId === "add" && sr.titleId === "collect") ||
+                                    (typeId === "view" && sr.titleId === "use"),
                                 );
                                 const key = `${module.mainTitleId}_${subRole?.titleId || typeId}`;
+                                const isAllowed = subRole?.is_show && isPermissionAllowed(key);
                                 return (
                                   <TableCell
                                     key={typeId}
                                     className="table-td"
                                     align="center"
                                   >
-                                    {subRole?.is_show ? (
+                                    {isAllowed ? (
                                       <BpCheckbox
                                         checked={permissions.includes(key)}
                                         onChange={() => onChangeCheckBox(key)}

@@ -29,7 +29,10 @@ export const usePermissions = () => {
     adminDetails?.type === config.super_school_admin;
 
   const isSchoolSubAdmin =
-    adminDetails?.type === config.school_admin;
+    !!adminDetails?.type &&
+    !isSuperDeveloper &&
+    !isDeveloperAdmin &&
+    !isSuperSchoolAdmin;
 
   const isSchoolAdmin = isSuperSchoolAdmin || isSchoolSubAdmin;
   const isDeveloper = isSuperDeveloper || isDeveloperAdmin;

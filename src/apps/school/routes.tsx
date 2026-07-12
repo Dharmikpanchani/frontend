@@ -156,6 +156,10 @@ export const schoolRoutes: RouteConfig[] = [
             element: <Profile />,
           },
           {
+            path: "/teacher/profile",
+            element: <Profile />,
+          },
+          {
             path: "/theme-settings",
             element: (
               <PermissionRoute permission={schoolAdminPermission?.theme?.update}>

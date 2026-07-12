@@ -767,7 +767,7 @@ export default function AddEditTeacher() {
                             )}
                             <input
                               hidden
-                              accept="image/*"
+                              accept=".jpg,.jpeg,.png,.svg"
                               type="file"
                               onChange={(e) =>
                                 setFieldValue(
@@ -933,7 +933,10 @@ export default function AddEditTeacher() {
                       <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                         <Typography sx={labelSx}>
                           Date of Birth
-                          <span style={{ color: "#ef4444" }}>*</span>
+                          <span style={{ color: "#ef4444", marginRight: "4px" }}>*</span>
+                          <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "normal" }}>
+                            (Age 18 to 70 only)
+                          </span>
                         </Typography>
                         <LocalizationProvider dateAdapter={AdapterMoment}>
                           <DatePicker
@@ -955,6 +958,9 @@ export default function AddEditTeacher() {
                                 error:
                                   touched.dateOfBirth &&
                                   Boolean(errors.dateOfBirth),
+                                inputProps: {
+                                  readOnly: true,
+                                },
                                 sx: {
                                   "& .MuiPickersOutlinedInput-root": {
                                     height: "40px",

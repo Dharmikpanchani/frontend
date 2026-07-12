@@ -210,11 +210,17 @@ export default function PromoteStudents() {
                       label="Academic Year *"
                       sx={inputSx}
                     >
-                      {academicYears.map((y) => (
-                        <MenuItem key={y._id} value={y._id}>
-                          {y.label} {y.isCurrent ? "(Current)" : ""}
+                      {academicYears && academicYears.length > 0 ? (
+                        academicYears.map((y) => (
+                          <MenuItem key={y._id} value={y._id}>
+                            {y.label} {y.isCurrent ? "(Current)" : ""}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled value="">
+                          No academic years found
                         </MenuItem>
-                      ))}
+                      )}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -229,11 +235,17 @@ export default function PromoteStudents() {
                       label="Class *"
                       sx={inputSx}
                     >
-                      {(allClasses || []).map((c) => (
-                        <MenuItem key={c._id} value={c._id}>
-                          {c.name}
+                      {allClasses && allClasses.length > 0 ? (
+                        allClasses.map((c) => (
+                          <MenuItem key={c._id} value={c._id}>
+                            {c.name}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled value="">
+                          No classes found
                         </MenuItem>
-                      ))}
+                      )}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -302,11 +314,17 @@ export default function PromoteStudents() {
                       label="Academic Year *"
                       sx={inputSx}
                     >
-                      {academicYears.map((y) => (
-                        <MenuItem key={y._id} value={y._id}>
-                          {y.label} {y.isCurrent ? "(Current)" : ""}
+                      {academicYears && academicYears.length > 0 ? (
+                        academicYears.map((y) => (
+                          <MenuItem key={y._id} value={y._id}>
+                            {y.label} {y.isCurrent ? "(Current)" : ""}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled value="">
+                          No academic years found
                         </MenuItem>
-                      ))}
+                      )}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -321,11 +339,17 @@ export default function PromoteStudents() {
                       label="Class *"
                       sx={inputSx}
                     >
-                      {(allClasses || []).map((c) => (
-                        <MenuItem key={c._id} value={c._id}>
-                          {c.name}
+                      {allClasses && allClasses.length > 0 ? (
+                        allClasses.map((c) => (
+                          <MenuItem key={c._id} value={c._id}>
+                            {c.name}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled value="">
+                          No classes found
                         </MenuItem>
-                      ))}
+                      )}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -435,7 +459,7 @@ export default function PromoteStudents() {
             </TableContainer>
           ) : (
             <Box py={8}>
-              <DataNotFound text="No students found. Select filters above and click Fetch Students." />
+              <DataNotFound isTable={false} text="No students found. Select filters above and click Fetch Students." />
             </Box>
           )}
         </CardContent>

@@ -214,6 +214,13 @@ export const developerRoleStaticData: RoleStaticItem[] = [
   transactionModule,
 ];
 
+const aiCopilotModule: RoleStaticItem = {
+  mainTitle: "AI Copilot",
+  mainTitleId: "ai_copilot",
+  price: "₹ 5",
+  subRole: [{ title: "Use", titleId: "use", is_show: true }],
+};
+
 export const planStaticData: RoleStaticItem[] = [
   dashboardModule,
   rolesModule,
@@ -226,6 +233,7 @@ export const planStaticData: RoleStaticItem[] = [
   sectionModule,
   themeModule,
   schoolProfileModule,
+  aiCopilotModule,
   {
     mainTitle: 'School Settings',
     mainTitleId: 'school_settings',
@@ -363,6 +371,15 @@ export const planModuleGroups: PlanModuleGroup[] = [
     hasImport: false,
     icon: 'settings',
   },
+  {
+    groupTitle: 'AI Copilot',
+    groupId: 'ai_copilot',
+    price: '₹ 5',
+    subModuleIds: ['ai_copilot'],
+    hasExport: false,
+    hasImport: false,
+    icon: 'ai_copilot',
+  },
 ];
 
 /** Global Export add-on price (applies to all eligible modules) */
@@ -439,6 +456,7 @@ export const schoolRoleStaticData: RoleStaticItem[] = [
       { title: "View", titleId: "view", is_show: true },
     ],
   },
+  aiCopilotModule,
 ];
 
 export const developerPermission = {
@@ -593,6 +611,9 @@ export const schoolAdminPermission = {
   },
   import_log: {
     read: "import_log_view",
+  },
+  ai_copilot: {
+    use: "ai_copilot_use",
   },
 };
 

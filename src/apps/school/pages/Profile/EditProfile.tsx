@@ -234,7 +234,7 @@ export default function EditProfile() {
                         />
                         <input
                           hidden
-                          accept="image/*"
+                          accept=".jpg,.jpeg,.png,.svg"
                           type="file"
                           onChange={async (e) => {
                             const file = e.currentTarget.files?.[0];

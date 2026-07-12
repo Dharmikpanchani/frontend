@@ -314,6 +314,17 @@ export const dobValidation = (required = true) => {
   );
 };
 
+export const studentDobValidation = (required = true) => {
+  return dateValidation(required, "Date of birth is required").test(
+    "future-check",
+    "Date of birth cannot be in the future",
+    (value) => {
+      if (value === null || value === undefined) return true;
+      return moment(value).isBefore(moment());
+    },
+  );
+};
+
 export const joiningDateValidation = (required = true) => {
   return dateValidation(required, "Joining date is required").test(
     "future-check",
@@ -839,7 +850,7 @@ export const studentValidationSchema = Yup.object().shape({
   // Basic Info
   fullName: fullNameValidation("Full name", true),
   gender: Yup.string().optional(),
-  dateOfBirth: dobValidation(false),
+  dateOfBirth: studentDobValidation(false),
   bloodGroup: Yup.string().optional(),
   profileImage: imageValidation("Profile Image", false).nullable(),
   // Academic

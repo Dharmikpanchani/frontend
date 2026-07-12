@@ -1237,7 +1237,7 @@ export default function RegisterSchool() {
                               })}
                               <input
                                 hidden
-                                accept="image/*"
+                                accept=".jpg,.jpeg,.png,.svg"
                                 type="file"
                                 disabled={isView}
                                 onChange={(
@@ -1330,7 +1330,11 @@ export default function RegisterSchool() {
                             >
                               {values.bannerUrl ? (
                                 <img
-                                  src={values.bannerUrl}
+                                  src={
+                                    values.bannerUrl.startsWith("blob:") || values.bannerUrl.startsWith("http")
+                                      ? values.bannerUrl
+                                      : `${import.meta.env.VITE_BASE_URL_IMAGE}/${values.bannerUrl}`
+                                  }
                                   style={{
                                     width: "100%",
                                     height: "100%",
@@ -1357,7 +1361,7 @@ export default function RegisterSchool() {
                               )}
                               <input
                                 hidden
-                                accept="image/*"
+                                accept=".jpg,.jpeg,.png,.svg"
                                 type="file"
                                 disabled={isView}
                                 onChange={(
@@ -1451,7 +1455,7 @@ export default function RegisterSchool() {
                               })}
                               <input
                                 hidden
-                                accept="image/*"
+                                accept=".jpg,.jpeg,.png,.svg"
                                 type="file"
                                 disabled={isView}
                                 onChange={(

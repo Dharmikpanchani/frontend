@@ -1380,11 +1380,10 @@ export default function Student() {
                                         placement="bottom"
                                       >
                                         <Button
-                                          className="admin-table-data-btn"
+                                          className="admin-table-data-btn admin-table-idcard-btn"
                                           onClick={() => handleIdCard(data?._id)}
-                                          style={{ color: "#7c3aed" }}
                                         >
-                                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 9h4M14 12h4M14 15h2"/></svg>
+                                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="admin-idcard-icon"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 9h4M14 12h4M14 15h2"/></svg>
                                         </Button>
                                       </Tooltip>
                                     )}
@@ -1507,97 +1506,239 @@ export default function Student() {
       />
 
       {/* Review Admission Modal */}
+      {/* Review Admission Modal */}
       <Dialog
         open={!!reviewModal}
         onClose={() => !actionLoading && setReviewModal(null)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ sx: { borderRadius: "var(--border-radius, 12px)" } }}
+        PaperProps={{ sx: { borderRadius: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.08)" } }}
       >
-        <DialogTitle sx={{ pb: 1, fontWeight: 700, fontSize: 16, color: "#101828" }}>
-          Review Admission Application
+        <DialogTitle sx={{ p: 2.5, pb: 2, display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9" }}>
+          <Typography sx={{ fontWeight: 700, fontSize: "18px", color: "#0f172a" }}>
+            Review Admission Application
+          </Typography>
+          <IconButton onClick={() => !actionLoading && setReviewModal(null)} size="small" sx={{ color: "#94a3b8" }}>
+            <CloseIcon sx={{ fontSize: 20 }} />
+          </IconButton>
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent sx={{ p: 3, backgroundColor: "#f8fafc" }}>
           {reviewModal && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {/* Student info */}
-              <Box sx={{ background: "#f9fafb", borderRadius: "8px", p: 2 }}>
-                <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#101828" }}>{reviewModal.fullName}</Typography>
-                <Typography sx={{ fontSize: 13, color: "#667085" }}>{reviewModal.phoneNumber} {reviewModal.email && `· ${reviewModal.email}`}</Typography>
-                {reviewModal.classId?.name && (
-                  <Chip icon={<SchoolIcon sx={{ fontSize: 13 }} />} label={`Class: ${reviewModal.classId.name}`} size="small"
-                    sx={{ mt: 1, height: 22, fontSize: 11, backgroundColor: "#f0f7ff", color: "#1565c0", border: "1px solid #bae7ff" }} />
-                )}
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              {/* Student info main card */}
+              <Box sx={{ 
+                background: "#ffffff", 
+                borderRadius: "12px", 
+                p: 2.5, 
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+              }}>
+                <Typography sx={{ fontSize: "18px", fontWeight: 800, color: "#0f172a", mb: 0.5 }}>
+                  {reviewModal.fullName}
+                </Typography>
+                
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 2 }}>
+                  {reviewModal.phoneNumber && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "#64748b", fontSize: "13px" }}>
+                      <PhoneIcon sx={{ fontSize: 15 }} />
+                      {reviewModal.phoneNumber}
+                    </Box>
+                  )}
+                  {reviewModal.email && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "#64748b", fontSize: "13px" }}>
+                      <EmailIcon sx={{ fontSize: 15 }} />
+                      {reviewModal.email}
+                    </Box>
+                  )}
+                </Box>
+
+                <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+                  {reviewModal.classId?.name && (
+                    <Chip 
+                      icon={<SchoolIcon sx={{ fontSize: "14px !important", color: "#1e40af !important" }} />} 
+                      label={`Class: ${reviewModal.classId.name}`} 
+                      size="small"
+                      sx={{ 
+                        fontSize: "12px", 
+                        fontWeight: 600,
+                        backgroundColor: "#eff6ff", 
+                        color: "#1e40af", 
+                        border: "1px solid #bfdbfe",
+                        borderRadius: "6px",
+                        py: 1.5
+                      }} 
+                    />
+                  )}
+                  {reviewModal.percentage != null && (
+                    <Chip 
+                      label={`${reviewModal.percentage}%`} 
+                      size="small"
+                      sx={{ 
+                        fontSize: "12px", 
+                        fontWeight: 700, 
+                        backgroundColor: "#f0fdf4", 
+                        color: "#166534", 
+                        border: "1px solid #bbf7d0",
+                        borderRadius: "6px",
+                        py: 1.5
+                      }} 
+                    />
+                  )}
+                </Box>
+
                 {(reviewModal.previousClass || reviewModal.previousSchool) && (
-                  <Typography sx={{ fontSize: 12, color: "#374151", mt: 1 }}>
-                    Previous: {[reviewModal.previousClass, reviewModal.previousSchool].filter(Boolean).join(" · ")}
-                  </Typography>
+                  <Box sx={{ borderTop: "1px solid #f1f5f9", pt: 1.5, mt: 1.5 }}>
+                    <Typography sx={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.5px", mb: 0.5 }}>
+                      Previous Education
+                    </Typography>
+                    <Typography sx={{ fontSize: "13px", color: "#334155", fontWeight: 500 }}>
+                      {[reviewModal.previousClass, reviewModal.previousSchool].filter(Boolean).join(" at ")}
+                    </Typography>
+                  </Box>
                 )}
-                {reviewModal.percentage != null && (
-                  <Chip label={`${reviewModal.percentage}%`} size="small"
-                    sx={{ mt: 0.5, height: 18, fontSize: 10, fontWeight: 700, backgroundColor: "#f0fdf4", color: "#16a34a", border: "1px solid #86efac" }} />
-                )}
+
                 {reviewModal.resultDocument && (
-                  <Box sx={{ mt: 1 }}>
-                    <Typography sx={{ fontSize: 12, color: "#667085" }}>Result Document: </Typography>
-                    <a href={`${import.meta.env.VITE_BASE_URL_IMAGE}/${reviewModal.resultDocument}`} target="_blank" rel="noreferrer"
-                      style={{ fontSize: 12, color: "var(--primary-color)" }}>
-                      View Document
-                    </a>
+                  <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<PdfIcon sx={{ fontSize: 16 }} />}
+                      href={`${import.meta.env.VITE_BASE_URL_IMAGE}/${reviewModal.resultDocument}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      sx={{
+                        textTransform: "none",
+                        borderColor: "#cbd5e1",
+                        color: "#475569",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        backgroundColor: "#f8fafc",
+                        "&:hover": {
+                          borderColor: "var(--primary-color)",
+                          color: "var(--primary-color)",
+                          backgroundColor: "#f0fdfa"
+                        }
+                      }}
+                    >
+                      View Marksheet/Result
+                    </Button>
                   </Box>
                 )}
               </Box>
 
-              {/* Guardian */}
+              {/* Guardian info card */}
               {(reviewModal.fatherName || reviewModal.motherName) && (
-                <Box>
-                  <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#667085", mb: 0.5 }}>GUARDIAN</Typography>
-                  {reviewModal.fatherName && <Typography sx={{ fontSize: 13, color: "#374151" }}>Father: {reviewModal.fatherName} {reviewModal.fatherPhone && `(${reviewModal.fatherPhone})`}</Typography>}
-                  {reviewModal.motherName && <Typography sx={{ fontSize: 13, color: "#374151" }}>Mother: {reviewModal.motherName} {reviewModal.motherPhone && `(${reviewModal.motherPhone})`}</Typography>}
+                <Box sx={{ 
+                  background: "#ffffff", 
+                  borderRadius: "12px", 
+                  p: 2.5, 
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                }}>
+                  <Typography sx={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.5px", mb: 2 }}>
+                    Guardian Details
+                  </Typography>
+                  
+                  <Grid container spacing={2}>
+                    {reviewModal.fatherName && (
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: "12px", color: "#94a3b8", mb: 0.2 }}>Father</Typography>
+                        <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#334155" }}>{reviewModal.fatherName}</Typography>
+                        {reviewModal.fatherPhone && (
+                          <Typography sx={{ fontSize: "12px", color: "#64748b", display: "flex", alignItems: "center", gap: 0.5, mt: 0.2 }}>
+                            <PhoneIcon sx={{ fontSize: 12 }} /> {reviewModal.fatherPhone}
+                          </Typography>
+                        )}
+                      </Grid>
+                    )}
+                    {reviewModal.motherName && (
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: "12px", color: "#94a3b8", mb: 0.2 }}>Mother</Typography>
+                        <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#334155" }}>{reviewModal.motherName}</Typography>
+                        {reviewModal.motherPhone && (
+                          <Typography sx={{ fontSize: "12px", color: "#64748b", display: "flex", alignItems: "center", gap: 0.5, mt: 0.2 }}>
+                            <PhoneIcon sx={{ fontSize: 12 }} /> {reviewModal.motherPhone}
+                          </Typography>
+                        )}
+                      </Grid>
+                    )}
+                  </Grid>
                 </Box>
               )}
 
-              {/* Custom admission number */}
+              {/* GR Number Field */}
               <Box>
-                <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#667085", mb: 0.5 }}>
-                  ADMISSION NUMBER (GR NUMBER) (optional — auto-generated if blank)
+                <Typography sx={labelSx}>
+                  Admission Number (GR Number) <Typography component="span" sx={{ fontSize: "11px", color: "#94a3b8", textTransform: "none", fontWeight: 400 }}>(optional — auto-generated if blank)</Typography>
                 </Typography>
                 <TextField
                   value={admissionNumberOverride}
                   onChange={(e) => setAdmissionNumberOverride(e.target.value)}
                   placeholder="e.g. GR-2024-001"
-                  fullWidth size="small"
+                  fullWidth 
+                  size="small"
+                  sx={inputSx}
                 />
               </Box>
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2, gap: 1 }}>
+        <DialogActions sx={{ px: 3, py: 2, display: "flex", justifyContent: "space-between", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
           <Button
             onClick={() => setReviewModal(null)}
             disabled={actionLoading}
-            sx={{ color: "#667085", textTransform: "none" }}
+            className="admin-btn-secondary"
+            sx={{ px: 3, minWidth: "100px", textTransform: "none", borderRadius: "8px", fontWeight: 600 }}
           >
             Cancel
           </Button>
-          <Button
-            onClick={() => setRejectModalOpen(true)}
-            disabled={actionLoading}
-            variant="outlined"
-            sx={{ borderColor: "#dc2626", color: "#dc2626", textTransform: "none" }}
-            startIcon={<RejectedIcon sx={{ fontSize: 16 }} />}
-          >
-            Reject
-          </Button>
-          <Button
-            onClick={() => handleAdmissionAction("approved")}
-            disabled={actionLoading}
-            variant="contained"
-            sx={{ background: "#16a34a", textTransform: "none", "&:hover": { background: "#15803d" } }}
-            startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <ApprovedIcon sx={{ fontSize: 16 }} />}
-          >
-            {actionLoading ? "Processing..." : "Approve"}
-          </Button>
+          <Box sx={{ display: "flex", gap: 1.5 }}>
+            <Button
+              onClick={() => setRejectModalOpen(true)}
+              disabled={actionLoading}
+              variant="outlined"
+              sx={{ 
+                borderColor: "#ef4444", 
+                color: "#ef4444", 
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "14px",
+                borderRadius: "8px",
+                px: 3,
+                py: 1,
+                "&:hover": { 
+                  borderColor: "#dc2626", 
+                  backgroundColor: "#fef2f2" 
+                } 
+              }}
+              startIcon={<RejectedIcon sx={{ fontSize: 16 }} />}
+            >
+              Reject
+            </Button>
+            <Button
+              onClick={() => handleAdmissionAction("approved")}
+              disabled={actionLoading}
+              variant="contained"
+              sx={{ 
+                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", 
+                textTransform: "none", 
+                fontWeight: 600,
+                fontSize: "14px",
+                borderRadius: "8px",
+                px: 3.5,
+                py: 1,
+                boxShadow: "0 4px 10px rgba(16, 185, 129, 0.2)",
+                "&:hover": { 
+                  background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                  boxShadow: "0 4px 14px rgba(5, 150, 105, 0.3)"
+                } 
+              }}
+              startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <ApprovedIcon sx={{ fontSize: 16 }} />}
+            >
+              {actionLoading ? "Processing..." : "Approve"}
+            </Button>
+          </Box>
         </DialogActions>
       </Dialog>
 
@@ -1607,29 +1748,87 @@ export default function Student() {
         onClose={() => !actionLoading && setRejectModalOpen(false)}
         maxWidth="xs"
         fullWidth
-        PaperProps={{ sx: { borderRadius: "var(--border-radius, 12px)" } }}
+        PaperProps={{ sx: { borderRadius: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.08)" } }}
       >
-        <DialogTitle sx={{ fontWeight: 700, fontSize: 15 }}>Rejection Reason</DialogTitle>
-        <DialogContent>
-          <Typography sx={{ fontSize: 13, color: "#667085", mb: 1.5 }}>
+        <DialogTitle sx={{ p: 2.5, pb: 2, display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9" }}>
+          <Typography sx={{ fontWeight: 700, fontSize: "16px", color: "#0f172a" }}>
+            Rejection Reason
+          </Typography>
+          <IconButton onClick={() => !actionLoading && setRejectModalOpen(false)} size="small" sx={{ color: "#94a3b8" }}>
+            <CloseIcon sx={{ fontSize: 20 }} />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, backgroundColor: "#ffffff" }}>
+          <Typography sx={{ fontSize: "13px", color: "#64748b", mb: 2, lineHeight: 1.5 }}>
             Please provide a reason for rejecting this application. The student will be able to see this.
           </Typography>
           <TextField
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
-            multiline rows={3} fullWidth
+            multiline 
+            rows={3} 
+            fullWidth
             placeholder="Enter rejection reason..."
+            sx={{
+              ...inputSx,
+              height: "auto",
+              "& .MuiOutlinedInput-root, & .MuiOutlinedInput-root.MuiInputBase-root": {
+                height: "auto !important",
+                minHeight: "80px",
+                py: 1.5,
+                px: 1.5,
+                "& .MuiOutlinedInput-notchedOutline, & fieldset": {
+                  borderColor: "var(--input-border, #ced4da) !important",
+                  borderWidth: "1px !important",
+                  transition: "all 0.3s ease !important",
+                },
+                "&:hover:not(.Mui-focused):not(.Mui-error) .MuiOutlinedInput-notchedOutline, &:hover:not(.Mui-focused):not(.Mui-error) fieldset": {
+                  borderColor: "var(--input-border, #ced4da) !important",
+                },
+                "&.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline, &.Mui-focused:not(.Mui-error) fieldset": {
+                  borderColor: "var(--primary-color, #002147) !important",
+                  borderWidth: "1px !important",
+                }
+              },
+              "& .MuiOutlinedInput-input": {
+                height: "auto !important",
+                padding: "0 !important",
+              }
+            }}
           />
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setRejectModalOpen(false)} disabled={actionLoading} sx={{ color: "#667085", textTransform: "none" }}>
+        <DialogActions sx={{ px: 3, py: 2, display: "flex", justifyContent: "space-between", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff" }}>
+          <Button 
+            onClick={() => setRejectModalOpen(false)} 
+            disabled={actionLoading} 
+            className="admin-btn-secondary"
+            sx={{ px: 3, minWidth: "100px", textTransform: "none", borderRadius: "8px", fontWeight: 600 }}
+          >
             Cancel
           </Button>
           <Button
             onClick={() => handleAdmissionAction("rejected")}
             disabled={actionLoading || !rejectReason.trim()}
             variant="contained"
-            sx={{ background: "#dc2626", textTransform: "none", "&:hover": { background: "#b91c1c" } }}
+            sx={{ 
+              background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)", 
+              textTransform: "none", 
+              fontWeight: 600,
+              fontSize: "14px",
+              borderRadius: "8px",
+              px: 3,
+              py: 1,
+              boxShadow: "0 4px 10px rgba(239, 68, 68, 0.2)",
+              "&:hover": { 
+                background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
+                boxShadow: "0 4px 14px rgba(220, 38, 38, 0.3)"
+              },
+              "&.Mui-disabled": {
+                background: "#f1f5f9",
+                color: "#cbd5e1",
+                boxShadow: "none"
+              }
+            }}
             startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <RejectedIcon sx={{ fontSize: 16 }} />}
           >
             {actionLoading ? "Rejecting..." : "Confirm Reject"}

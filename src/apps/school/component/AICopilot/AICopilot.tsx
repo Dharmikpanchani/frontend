@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import toast from "react-hot-toast";
 import {
   SmartToy as BotIcon,
   Close as CloseIcon,
@@ -9,6 +10,7 @@ import {
   InsertDriveFile as FileIcon,
   Edit as EditIcon,
   Check as CheckIcon,
+  PictureAsPdf as PdfIcon,
 } from "@mui/icons-material";
 import {
   getSessions,
@@ -18,8 +20,20 @@ import {
   streamChat,
   type ChatSessionItem,
   type ChatMessageItem,
+  type FileAttachment,
 } from "@/api/services/copilot.service";
 import "./AICopilot.css";
+
+interface AttachedFile {
+  file: File;
+  previewUrl: string; // blob URL for images, "" for PDFs
+}
+
+interface MessageFile {
+  name: string;
+  url: string; // blob URL or "" for historical
+  type: string; // mimeType
+}
 
 interface Message {
   id: string;
@@ -27,7 +41,7 @@ interface Message {
   text: string;
   time: string;
   streaming?: boolean;
-  file?: { name: string; url: string; type: string };
+  files?: MessageFile[];
 }
 
 // Group sessions by relative date label
@@ -64,6 +78,18 @@ function formatTime(isoString: string): string {
   return new Date(isoString).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+function fileToBase64(file: File): Promise<FileAttachment> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      const base64 = dataUrl.split(",")[1];
+      resolve({ name: file.name, mimeType: file.type || "application/octet-stream", data: base64 });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function AICopilot() {
   const [isOpen, setIsOpen] = useState(false);
   const [sessions, setSessions] = useState<ChatSessionItem[]>([]);
@@ -76,6 +102,132 @@ export default function AICopilot() {
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const [isResizing, setIsResizing] = useState(false);
   const dialogueRef = useRef<HTMLDivElement>(null);
+
+  const [position, setPosition] = useState({
+    x: window.innerWidth - 84,
+    y: window.innerHeight - 84,
+  });
+  const [isDraggingTrigger, setIsDraggingTrigger] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const triggerOffsetRef = useRef({ x: 0, y: 0 });
+  const hasMovedRef = useRef(false);
+
+  // Initialize position once on mount
+  useEffect(() => {
+    setPosition({
+      x: window.innerWidth - 84,
+      y: window.innerHeight - 84,
+    });
+  }, []);
+
+  const handleTriggerMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    setIsDraggingTrigger(true);
+    hasMovedRef.current = false;
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    triggerOffsetRef.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+  };
+
+  const handleTriggerMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDraggingTrigger) return;
+      const dx = Math.abs(e.clientX - dragStartRef.current.x);
+      const dy = Math.abs(e.clientY - dragStartRef.current.y);
+      if (dx > 4 || dy > 4) {
+        hasMovedRef.current = true;
+      }
+      let newX = e.clientX - triggerOffsetRef.current.x;
+      let newY = e.clientY - triggerOffsetRef.current.y;
+      newX = Math.max(16, Math.min(newX, window.innerWidth - 76));
+      newY = Math.max(16, Math.min(newY, window.innerHeight - 76));
+      setPosition({ x: newX, y: newY });
+    },
+    [isDraggingTrigger]
+  );
+
+  const handleTriggerMouseUp = useCallback(() => {
+    if (!isDraggingTrigger) return;
+    setIsDraggingTrigger(false);
+    if (!hasMovedRef.current) {
+      setIsOpen((prev) => !prev);
+    }
+  }, [isDraggingTrigger]);
+
+  useEffect(() => {
+    if (isDraggingTrigger) {
+      window.addEventListener("mousemove", handleTriggerMouseMove);
+      window.addEventListener("mouseup", handleTriggerMouseUp);
+    } else {
+      window.removeEventListener("mousemove", handleTriggerMouseMove);
+      window.removeEventListener("mouseup", handleTriggerMouseUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleTriggerMouseMove);
+      window.removeEventListener("mouseup", handleTriggerMouseUp);
+    };
+  }, [isDraggingTrigger, handleTriggerMouseMove, handleTriggerMouseUp]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setPosition((prev) => {
+        const newX = Math.max(16, Math.min(prev.x, window.innerWidth - 76));
+        const newY = Math.max(16, Math.min(prev.y, window.innerHeight - 76));
+        return { x: newX, y: newY };
+      });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const getDialogueStyle = () => {
+    if (!isOpen) return { display: "none" };
+    if (window.innerWidth <= 768) {
+      return {
+        position: "fixed" as const,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100%",
+        height: "100%",
+        maxWidth: "100%",
+        maxHeight: "100%",
+        borderRadius: 0,
+        opacity: 1,
+        transform: "none",
+        pointerEvents: "all" as const,
+      };
+    }
+
+    const buttonWidth = 60;
+    const buttonHeight = 60;
+    const spacing = 16;
+    const isRightHalf = position.x > window.innerWidth / 2;
+
+    const style: React.CSSProperties = {
+      position: "fixed",
+      bottom: `${window.innerHeight - position.y - buttonHeight}px`,
+      top: "auto",
+      zIndex: 9998,
+      opacity: 1,
+      transform: "none",
+      pointerEvents: "all",
+    };
+
+    if (isRightHalf) {
+      style.right = `${window.innerWidth - position.x + spacing}px`;
+      style.left = "auto";
+    } else {
+      style.left = `${position.x + buttonWidth + spacing}px`;
+      style.right = "auto";
+    }
+
+    return style;
+  };
 
   const startResizing = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -111,9 +263,10 @@ export default function AICopilot() {
       window.removeEventListener("mouseup", stopResizing);
     };
   }, [isResizing, resize, stopResizing]);
+
   const [inputValue, setInputValue] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const [attachedFile, setAttachedFile] = useState<{ name: string; url: string; type: string } | null>(null);
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
 
@@ -162,6 +315,7 @@ export default function AICopilot() {
           role: m.role,
           text: m.content,
           time: formatTime(m.createdAt),
+          files: m.attachments?.map((a) => ({ name: a.name, url: "", type: a.mimeType })) ?? [],
         }))
       );
     } catch {
@@ -234,47 +388,88 @@ export default function AICopilot() {
     }
   };
 
+  // ── File attach ────────────────────────────────────────────────────────────
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files ?? []);
+    if (!selected.length) return;
+
+    if (attachedFiles.length + selected.length > 5) {
+      toast.error("મહત્તમ 5 ફાઇલો જ અપલોડ કરી શકાય છે (Maximum 5 files can be uploaded)");
+      const allowedCount = 5 - attachedFiles.length;
+      if (allowedCount <= 0) {
+        e.target.value = "";
+        return;
+      }
+      selected.splice(allowedCount);
+    }
+
+    const newFiles: AttachedFile[] = selected.map((f) => ({
+      file: f,
+      previewUrl: f.type.startsWith("image/") ? URL.createObjectURL(f) : "",
+    }));
+    setAttachedFiles((prev) => [...prev, ...newFiles]);
+    e.target.value = "";
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setAttachedFiles((prev) => {
+      const item = prev[index];
+      if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
   // ── Send message ───────────────────────────────────────────────────────────
-  const handleSend = useCallback(() => {
-    if ((!inputValue.trim() && !attachedFile) || isStreaming) return;
+  const handleSend = useCallback(async () => {
+    if ((!inputValue.trim() && !attachedFiles.length) || isStreaming) return;
 
     const userText = inputValue.trim();
-    const file = attachedFile;
+    const filesToSend = attachedFiles;
     setInputValue("");
-    setAttachedFile(null);
+    setAttachedFiles([]);
     setIsStreaming(true);
+
+    // Convert files to base64 for Gemini
+    const filePayload: FileAttachment[] = await Promise.all(
+      filesToSend.map(({ file }) => fileToBase64(file))
+    );
+
+    // Build display files for the message bubble
+    const displayFiles: MessageFile[] = filesToSend.map(({ file, previewUrl }) => ({
+      name: file.name,
+      url: previewUrl,
+      type: file.type,
+    }));
 
     const timestamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const tempUserId = `u_${Date.now()}`;
     const tempAiId = `ai_${Date.now()}`;
 
-    // Add user message immediately
+    // Add user and empty streaming AI messages atomically
+    streamingIdRef.current = tempAiId;
     setMessages((prev) => [
       ...prev,
       {
         id: tempUserId,
         role: "user",
-        text: userText || (file ? `📎 ${file.name}` : ""),
+        text: userText,
         time: timestamp,
-        file: file ?? undefined,
+        files: displayFiles,
       },
-    ]);
-
-    // Add empty streaming AI message
-    streamingIdRef.current = tempAiId;
-    setMessages((prev) => [
-      ...prev,
       { id: tempAiId, role: "model", text: "", time: timestamp, streaming: true },
     ]);
 
     let currentSessionId = activeSessionId;
 
     const abort = streamChat(
-      { sessionId: currentSessionId ?? undefined, message: userText },
+      {
+        sessionId: currentSessionId ?? undefined,
+        message: userText,
+        files: filePayload.length ? filePayload : undefined,
+      },
       (event) => {
         switch (event.type) {
           case "session":
-            // New session was created
             currentSessionId = event.sessionId!;
             setActiveSessionId(event.sessionId!);
             break;
@@ -290,7 +485,6 @@ export default function AICopilot() {
             break;
 
           case "aiMessageId":
-            // Replace temp id with real DB id
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === streamingIdRef.current
@@ -302,12 +496,10 @@ export default function AICopilot() {
             break;
 
           case "title":
-            // Update session title in sidebar
             setSessions((prev) => {
               const updated = prev.map((s) =>
                 s._id === currentSessionId ? { ...s, title: event.title! } : s
               );
-              // If session was brand new (not in list yet), add it
               if (!updated.find((s) => s._id === currentSessionId)) {
                 updated.unshift({
                   _id: currentSessionId!,
@@ -341,6 +533,7 @@ export default function AICopilot() {
 
           case "error":
             setIsStreaming(false);
+            toast.error(event.message ?? "AI error");
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === streamingIdRef.current
@@ -353,11 +546,11 @@ export default function AICopilot() {
       },
       () => {
         setIsStreaming(false);
-        // Reload sessions to get updated list with new session
         loadSessions();
       },
       (err) => {
         setIsStreaming(false);
+        toast.error(`AI Error: ${err}`);
         setMessages((prev) =>
           prev.map((m) =>
             m.id === streamingIdRef.current
@@ -369,7 +562,7 @@ export default function AICopilot() {
     );
 
     abortRef.current = abort;
-  }, [inputValue, attachedFile, isStreaming, activeSessionId]);
+  }, [inputValue, attachedFiles, isStreaming, activeSessionId]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -378,48 +571,41 @@ export default function AICopilot() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setAttachedFile({
-      name: file.name,
-      url: file.type.startsWith("image/") ? URL.createObjectURL(file) : "",
-      type: file.type,
-    });
-    e.target.value = "";
-  };
-
-  const handleRemoveFile = () => {
-    if (attachedFile?.url) URL.revokeObjectURL(attachedFile.url);
-    setAttachedFile(null);
-  };
-
   // ── Derived state ──────────────────────────────────────────────────────────
   const groupedSessions = groupByDate(sessions);
   const activeSession = sessions.find((s) => s._id === activeSessionId);
   const displayMessages = messages.length > 0
     ? messages
-    : [{ id: "welcome", role: "model" as const, text: "નમસ્તે! હું તમારી શાળાનો AI મદદનીશ છું. આજે હું તમને કઈ રીતે મદદ કરી શકું?", time: "" }];
+    : [{ id: "welcome", role: "model" as const, text: "નમસ્તે! હું તમારી શાળાનો AI મદદનીશ છું. આજે હું તમને કઈ રીતે મદદ કરી શકું?", time: "", files: [] }];
 
   return (
     <>
       {/* Floating Action Trigger Button */}
       <div
         className="ai-copilot-trigger"
-        onClick={() => setIsOpen(!isOpen)}
+        onMouseDown={handleTriggerMouseDown}
+        style={{
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          bottom: "auto",
+          right: "auto",
+          cursor: isDraggingTrigger ? "grabbing" : "grab",
+          touchAction: "none",
+        }}
         title="AI Copilot"
       >
         {isOpen ? <CloseIcon /> : <BotIcon />}
       </div>
 
       {/* ChatGPT Style Dialogue Modal */}
-      <div 
+      <div
         ref={dialogueRef}
         className={`ai-copilot-dialog ${isOpen ? "open" : ""}`}
+        style={getDialogueStyle()}
       >
 
         {/* Left Sidebar - Chat Sessions List */}
-        <div 
+        <div
           className="ai-copilot-sidebar"
           style={{ width: `${sidebarWidth}px` }}
         >
@@ -536,10 +722,10 @@ export default function AICopilot() {
                   <div className="ai-copilot-avatar">
                     {msg.role === "user"
                       ? schoolLogo
-                        ? <img 
-                            src={schoolLogo.startsWith("http") || schoolLogo.startsWith("blob") ? schoolLogo : `${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolLogo}`} 
-                            alt="School" 
-                            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} 
+                        ? <img
+                            src={schoolLogo.startsWith("http") || schoolLogo.startsWith("blob") ? schoolLogo : `${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolLogo}`}
+                            alt="School"
+                            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
                           />
                         : "AD"
                       : <BotIcon sx={{ fontSize: 18 }} />
@@ -558,16 +744,24 @@ export default function AICopilot() {
                           <div className="ai-copilot-dot" />
                         </div>
                       )}
-                      {msg.file && (
-                        <div className="ai-copilot-message-attachment">
-                          {msg.file.type.startsWith("image/") ? (
-                            <img src={msg.file.url} alt="attached" />
-                          ) : (
-                            <div className="ai-copilot-message-attachment-file">
-                              <FileIcon sx={{ fontSize: 16, color: "inherit" }} />
-                              <span className="ai-copilot-preview-name">{msg.file.name}</span>
+                      {/* Multiple file attachments in message bubble */}
+                      {msg.files && msg.files.length > 0 && (
+                        <div className="ai-copilot-message-attachments">
+                          {msg.files.map((f, idx) => (
+                            <div key={idx} className="ai-copilot-message-attachment">
+                              {f.type.startsWith("image/") && f.url ? (
+                                <img src={f.url} alt={f.name} />
+                              ) : (
+                                <div className="ai-copilot-message-attachment-file">
+                                  {f.type === "application/pdf"
+                                    ? <PdfIcon sx={{ fontSize: 16, color: "inherit" }} />
+                                    : <FileIcon sx={{ fontSize: 16, color: "inherit" }} />
+                                  }
+                                  <span className="ai-copilot-preview-name">{f.name}</span>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          ))}
                         </div>
                       )}
                     </div>
@@ -581,23 +775,6 @@ export default function AICopilot() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Attachment Preview */}
-          {attachedFile && (
-            <div className="ai-copilot-attachment-preview">
-              <div className="ai-copilot-preview-item">
-                {attachedFile.type.startsWith("image/") ? (
-                  <img src={attachedFile.url} className="ai-copilot-preview-image" alt="preview" />
-                ) : (
-                  <FileIcon sx={{ fontSize: 16, color: "var(--primary-color)" }} />
-                )}
-                <span className="ai-copilot-preview-name">{attachedFile.name}</span>
-                <span className="ai-copilot-preview-remove" onClick={handleRemoveFile}>
-                  <CloseIcon sx={{ fontSize: 12 }} />
-                </span>
-              </div>
-            </div>
-          )}
-
           {/* Input Area */}
           <div className="ai-copilot-input-area">
             <input
@@ -605,34 +782,60 @@ export default function AICopilot() {
               ref={fileInputRef}
               style={{ display: "none" }}
               onChange={handleFileChange}
+              multiple
+              accept="*"
             />
-            <button
-              className="ai-copilot-attachment-btn"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isStreaming}
-              title="Attach File"
-            >
-              <AttachFileIcon sx={{ fontSize: 18 }} />
-            </button>
+            
+            <div className="ai-copilot-input-container">
+              {/* Attachment Preview Area nested inside the input card, above text input */}
+              {attachedFiles.length > 0 && (
+                <div className="ai-copilot-attachment-preview">
+                  {attachedFiles.map((af, idx) => (
+                    <div key={idx} className="ai-copilot-preview-item">
+                      {af.previewUrl ? (
+                        <img src={af.previewUrl} className="ai-copilot-preview-image" alt="preview" />
+                      ) : (
+                        <FileIcon sx={{ fontSize: 16, color: "var(--primary-color)" }} />
+                      )}
+                      <span className="ai-copilot-preview-name">{af.file.name}</span>
+                      <span className="ai-copilot-preview-remove" onClick={() => handleRemoveFile(idx)}>
+                        <CloseIcon sx={{ fontSize: 12 }} />
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-            <div className="ai-copilot-input-wrapper">
-              <input
-                type="text"
-                className="ai-copilot-input"
-                placeholder="AI મદદનીશને પૂછો..."
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyPress}
-                disabled={isStreaming}
-              />
+              {/* Input Row */}
+              <div className="ai-copilot-input-row">
+                <button
+                  className="ai-copilot-attachment-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isStreaming}
+                  title="Attach files (Max 5)"
+                >
+                  <AttachFileIcon sx={{ fontSize: 18 }} />
+                </button>
+
+                <input
+                  type="text"
+                  className="ai-copilot-input"
+                  placeholder="AI મદદનીશને પૂછો..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  disabled={isStreaming}
+                />
+
+                <button
+                  className="ai-copilot-send-btn"
+                  onClick={handleSend}
+                  disabled={(!inputValue.trim() && !attachedFiles.length) || isStreaming}
+                >
+                  <SendIcon sx={{ fontSize: 16 }} />
+                </button>
+              </div>
             </div>
-            <button
-              className="ai-copilot-send-btn"
-              onClick={handleSend}
-              disabled={(!inputValue.trim() && !attachedFile) || isStreaming}
-            >
-              <SendIcon sx={{ fontSize: 16 }} />
-            </button>
           </div>
 
         </div>

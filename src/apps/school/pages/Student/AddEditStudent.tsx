@@ -137,7 +137,7 @@ export default function AddEditStudent() {
 
     if (hasFile) {
       const formData = new FormData();
-      if (values.id) formData.append("id", values.id);
+      if (id) formData.append("id", id);
       formData.append("fullName", values.fullName);
       formData.append("email", values.email);
       formData.append("phoneNumber", values.phoneNumber);
@@ -173,7 +173,7 @@ export default function AddEditStudent() {
       payload = formData;
     } else {
       payload = {
-        ...(values.id ? { id: values.id } : {}),
+        ...(id ? { id } : {}),
         fullName: values.fullName,
         email: values.email,
         phoneNumber: values.phoneNumber,
@@ -537,6 +537,9 @@ export default function AddEditStudent() {
                             onClick: () => !isReadOnly && setOpenDOB(true),
                             error:
                               touched.dateOfBirth && Boolean(errors.dateOfBirth),
+                            inputProps: {
+                              readOnly: true,
+                            },
                             sx: {
                               "& .MuiPickersOutlinedInput-root": {
                                 height: "40px",
@@ -827,7 +830,7 @@ export default function AddEditStudent() {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       error={touched.email && Boolean(errors.email)}
-                      disabled={isReadOnly || Boolean(id)}
+                      disabled={isReadOnly}
                       slotProps={{
                         input: { sx: inputSx },
                         htmlInput: { maxLength: 70 },

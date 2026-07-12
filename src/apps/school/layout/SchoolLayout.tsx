@@ -9,9 +9,11 @@ import { getProfileAdmin } from "@/redux/slices/authSlice";
 import type { RootState } from "@/redux/Store";
 import { useThemeManager } from "../hooks/useThemeManager";
 import AICopilot from "../component/AICopilot/AICopilot";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export default function SchoolLayout() {
   const dispatch = useDispatch();
+  const { hasPermission } = usePermissions();
   const [open, setOpen] = useState(true);
   const { themeStyle, themeClasses } = useThemeManager();
   const location = useLocation();
@@ -74,7 +76,7 @@ export default function SchoolLayout() {
           </Box>
         </Box>
       </Box>
-      <AICopilot />
+      {hasPermission("ai_copilot_use") && <AICopilot />}
     </div>
   );
 }

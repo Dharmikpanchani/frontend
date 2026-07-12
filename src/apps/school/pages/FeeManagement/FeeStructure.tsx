@@ -152,15 +152,13 @@ const FeeStructure = () => {
         <Typography className="admin-page-title" component="h2" variant="h2">
           Fee Structures
         </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%" }}>
+        <Box className="admin-flex-end">
           <Box
             className="admin-add-user-btn-main"
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
               gap: 1,
-              alignItems: "stretch",
-              width: "100%",
+              alignItems: "center",
             }}
           >
             {hasPermission(schoolAdminPermission.fee_structure.import) && (

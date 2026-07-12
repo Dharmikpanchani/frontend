@@ -21,7 +21,14 @@ export interface ChatMessageItem {
   _id: string;
   role: "user" | "model";
   content: string;
+  attachments?: Array<{ name: string; mimeType: string }>;
   createdAt: string;
+}
+
+export interface FileAttachment {
+  name: string;
+  mimeType: string;
+  data: string; // base64
 }
 
 export interface SSEEvent {
@@ -80,7 +87,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
 // ── SSE streaming chat ────────────────────────────────────────────────────────
 
 const doSSERequest = async (
-  params: { sessionId?: string; message: string },
+  params: { sessionId?: string; message: string; files?: FileAttachment[] },
   token: string,
   ctrl: AbortController,
   onEvent: (event: SSEEvent) => void,
@@ -155,7 +162,7 @@ const doSSERequest = async (
 };
 
 export const streamChat = (
-  params: { sessionId?: string; message: string },
+  params: { sessionId?: string; message: string; files?: FileAttachment[] },
   onEvent: (event: SSEEvent) => void,
   onComplete: () => void,
   onError: (err: string) => void

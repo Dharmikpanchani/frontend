@@ -47,7 +47,7 @@
   z-index: 9999;
   border: 2px solid rgba(255, 255, 255, 0.25);
   animation: floatAnimation 3.5s ease-in-out infinite, pulseGlow 2.5s infinite;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
@@ -85,7 +85,7 @@
   opacity: 0;
   transform: translateY(20px) scale(0.95);
   pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .ai-copilot-dialog.open {
@@ -404,23 +404,29 @@
   border-top: 1px solid var(--card-border, rgba(0, 0, 0, 0.08));
   background: var(--card-bg, #ffffff);
   display: flex;
-  gap: 10px;
-  align-items: center;
+  flex-direction: column;
 }
 
-.ai-copilot-input-wrapper {
-  flex: 1;
-  position: relative;
+.ai-copilot-input-container {
   display: flex;
+  flex-direction: column;
   background: var(--input-bg, #f4f4f5);
   border: 1px solid var(--input-border, rgba(0, 0, 0, 0.08));
-  border-radius: 24px;
-  padding: 4px 16px;
+  border-radius: 20px;
+  padding: 8px 14px;
   transition: border-color 0.2s ease;
+  width: 100%;
 }
 
-.ai-copilot-input-wrapper:focus-within {
+.ai-copilot-input-container:focus-within {
   border-color: var(--primary-color);
+}
+
+.ai-copilot-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
 }
 
 .ai-copilot-input {
@@ -448,8 +454,6 @@
   justify-content: center;
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease;
-  align-self: flex-end;
-  margin-bottom: 3px;
 }
 
 .ai-copilot-send-btn:hover {
@@ -477,8 +481,6 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  align-self: flex-end;
-  margin-bottom: 1px;
 }
 
 .ai-copilot-attachment-btn:hover {
@@ -491,14 +493,16 @@
   cursor: not-allowed;
 }
 
-/* Attachment Preview Container Above Input */
 .ai-copilot-attachment-preview {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  padding: 8px 16px;
-  background: rgba(var(--primary-color-rgb), 0.02);
-  border-top: 1px solid var(--card-border, rgba(0, 0, 0, 0.05));
+  padding: 4px 0 10px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  max-height: 120px;
+  overflow-y: auto;
+  margin-bottom: 8px;
 }
 
 .ai-copilot-preview-item {
@@ -508,9 +512,9 @@
   gap: 8px;
   background: var(--card-bg, #ffffff);
   border: 1px solid var(--card-border, rgba(0, 0, 0, 0.1));
-  padding: 6px 12px 6px 8px;
+  padding: 4px 8px;
   border-radius: 8px;
-  max-width: 250px;
+  max-width: 220px;
 }
 
 .ai-copilot-preview-image {
@@ -541,12 +545,19 @@
   color: var(--error-color, #ef4444);
 }
 
+/* Multiple file attachments wrapper in message bubble */
+.ai-copilot-message-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
 /* Message Attachment Render in Bubble */
 .ai-copilot-message-attachment {
-  margin-top: 8px;
   border-radius: 8px;
   overflow: hidden;
-  max-width: 220px;
+  max-width: 200px;
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 

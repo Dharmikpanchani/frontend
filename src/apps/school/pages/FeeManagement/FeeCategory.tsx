@@ -252,10 +252,8 @@ const FeeCategory = () => {
             className="admin-add-user-btn-main"
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
               gap: 1,
-              alignItems: "stretch",
-              width: "100%",
+              alignItems: "center",
             }}
           >
             {hasPermission(schoolAdminPermission.fee_category.import) && (

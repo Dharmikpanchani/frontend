@@ -28,6 +28,7 @@ import {
   AccountBalance as FeeIcon,
   Settings as SettingsIcon,
   Palette as ThemeIcon,
+  SmartToy as BotIcon,
 } from "@mui/icons-material";
 import {
   planStaticData as roleStaticData,
@@ -63,6 +64,7 @@ const groupIconMap: Record<string, any> = {
   fee: FeeIcon,
   settings: SettingsIcon,
   theme: ThemeIcon,
+  ai_copilot: BotIcon,
 };
 
 export default function AddEditPlan() {

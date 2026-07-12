@@ -5,6 +5,7 @@ interface DataNotFoundProps {
   image?: string;
   text?: string;
   colSpan?: number;
+  isTable?: boolean;
 }
 
 const SchoolEmptyStateSvg = () => (
@@ -92,55 +93,67 @@ function DataNotFound({
   image,
   text = "No Data Found",
   colSpan = 12,
+  isTable = true,
 }: DataNotFoundProps) {
-  return (
-    <TableRow>
-      <TableCell
-        className="table-not-found-td"
-        colSpan={colSpan}
-        sx={{ borderBottom: "none !important" }}
-      >
+  const content = (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 2,
+        width: "100%",
+        textAlign: "center",
+      }}
+    >
+      {image ? (
         <Box
+          component="img"
+          src={image}
+          alt="Not Found"
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            py: 2,
             width: "100%",
+            maxWidth: "310px",
+            height: "auto",
+            mb: 1,
+            opacity: 0.9,
           }}
-        >
-          {image ? (
-            <Box
-              component="img"
-              src={image}
-              alt="Not Found"
-              sx={{
-                width: "100%",
-                maxWidth: "310px",
-                height: "auto",
-                mb: 1,
-                opacity: 0.9,
-              }}
-            />
-          ) : (
-            <Box sx={{ mb: 1, display: "flex", justifyContent: "center" }}>
-              <SchoolEmptyStateSvg />
-            </Box>
-          )}
-          <Typography
-            sx={{
-              fontSize: "18px",
-              fontWeight: 600,
-              color: "#9ca3af",
-              fontFamily: "'Poppins', sans-serif",
-            }}
-          >
-            {text}
-          </Typography>
+        />
+      ) : (
+        <Box sx={{ mb: 1, display: "flex", justifyContent: "center" }}>
+          <SchoolEmptyStateSvg />
         </Box>
-      </TableCell>
-    </TableRow>
+      )}
+      <Typography
+        sx={{
+          fontSize: "18px",
+          fontWeight: 600,
+          color: "#9ca3af",
+          fontFamily: "'Poppins', sans-serif",
+          textAlign: "center",
+        }}
+      >
+        {text}
+      </Typography>
+    </Box>
   );
+
+  if (isTable) {
+    return (
+      <TableRow>
+        <TableCell
+          className="table-not-found-td"
+          colSpan={colSpan}
+          align="center"
+          sx={{ borderBottom: "none !important", textAlign: "center" }}
+        >
+          {content}
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  return content;
 }
 export default React.memo(DataNotFound);

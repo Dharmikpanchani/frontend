@@ -2830,6 +2830,24 @@ img[alt] {
   filter: brightness(0) invert(1) !important;
 }
 
+.admin-table-data-btn-flex .admin-table-idcard-btn {
+  background-color: #F5F3FF !important;
+  border: 1px solid #7C3AED !important;
+}
+
+.admin-table-data-btn-flex .admin-table-idcard-btn .admin-idcard-icon {
+  color: #7C3AED !important;
+  transition: color 0.3s ease;
+}
+
+.admin-table-data-btn-flex .admin-table-idcard-btn:hover {
+  background-color: #7C3AED !important;
+}
+
+.admin-table-data-btn-flex .admin-table-idcard-btn:hover .admin-idcard-icon {
+  color: #FFFFFF !important;
+}
+
 .admin-table-data-btn-flex .admin-table-delete-btn {
   background-color: #FEF2F2 !important;
   border: 1px solid #EF4444 !important;
