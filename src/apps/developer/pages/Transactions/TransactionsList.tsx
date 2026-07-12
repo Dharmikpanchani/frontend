@@ -1082,7 +1082,12 @@ export default function TransactionsList() {
                   </Box>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#111827" }}>
-                      Step 2: Commission Calculation (30% split)
+                      {(() => {
+                        const base = selectedTransaction.amount || 0;
+                        const commission = selectedTransaction.commissionAmount || selectedTransaction.referralAmount || 0;
+                        const pct = base > 0 ? Math.round((commission / base) * 100) : 0;
+                        return `Step 2: Commission Calculation (${pct}% referral / ${100 - pct}% platform)`;
+                      })()}
                     </Typography>
                     {selectedTransaction.referralId ? (
                       <Box sx={{ mt: 0.5 }}>

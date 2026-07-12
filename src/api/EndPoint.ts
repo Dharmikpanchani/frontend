@@ -227,6 +227,8 @@ export const Api = {
   GENERATE_FEE_REPORT: `${route}/reports/fee-report`,
   GENERATE_DUE_REPORT: `${route}/reports/due-report`,
   RUN_ARCHIVE: `${route}/archive/run`,
+  GET_ARCHIVES: `${route}/archive/list`,
+  GET_ARCHIVE_RECORDS: `${route}/archive/records`,
 
   // AI Copilot
   COPILOT_CHAT: `${route}/copilot/chat`,

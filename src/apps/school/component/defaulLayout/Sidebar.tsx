@@ -209,6 +209,13 @@ export default function Sidebar(props: any) {
       show: hasPermission(schoolAdminPermission.school_settings?.read),
       menuHighlight: ["settings"],
     },
+    {
+      title: "Database Archive",
+      pathName: "/database-archive",
+      icon: Svg.settings,
+      show: hasPermission(schoolAdminPermission.school_settings?.read),
+      menuHighlight: ["database-archive"],
+    },
   ];
 
   const importLogsManagement = [

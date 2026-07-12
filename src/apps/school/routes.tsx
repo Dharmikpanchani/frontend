@@ -69,6 +69,7 @@ const AddEditFeeStructure = lazy(() => import("./pages/FeeManagement/AddEditFeeS
 const FeeCollectionPage = lazy(() => import("./pages/FeeManagement/FeeCollection"));
 const FeeDuesPage = lazy(() => import("./pages/FeeManagement/FeeDues"));
 const ImportLogs = lazy(() => import("./pages/Logs/ImportLogs"));
+const DatabaseArchive = lazy(() => import("./pages/FeeManagement/DatabaseArchive"));
 
 /**
  * Wrapper component that reads permissions from the store (inside a component body,
@@ -623,6 +624,16 @@ export const schoolRoutes: RouteConfig[] = [
                 permission={schoolAdminPermission?.school_settings?.read}
               >
                 <SchoolSettingsPage />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/database-archive",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.school_settings?.read}
+              >
+                <DatabaseArchive />
               </PermissionRoute>
             ),
           },

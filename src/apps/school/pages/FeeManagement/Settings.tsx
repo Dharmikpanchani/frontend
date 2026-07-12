@@ -21,7 +21,9 @@ import {
   Checkbox,
   FormHelperText,
   IconButton,
+  Modal,
 } from "@mui/material";
+import Svg from "@/assets/Svg";
 import {
   Settings as SettingsIcon,
   Receipt as ReceiptIcon,
@@ -64,6 +66,7 @@ const Settings = () => {
   const [feeReportLoading, setFeeReportLoading] = useState(false);
   const [dueReportLoading, setDueReportLoading] = useState(false);
   const [archiveLoading, setArchiveLoading] = useState(false);
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchSchoolSettings());
@@ -180,10 +183,12 @@ const Settings = () => {
     }
   };
 
-  const handleRunArchive = async () => {
-    if (!window.confirm("Are you sure you want to run the database archiving process? This will move fee records older than 3 years to the archive and drop the original tables. This action cannot be undone.")) {
-      return;
-    }
+  const handleRunArchive = () => {
+    setIsArchiveDialogOpen(true);
+  };
+
+  const handleConfirmArchive = async () => {
+    setIsArchiveDialogOpen(false);
     setArchiveLoading(true);
     try {
       const response = await runArchiveProcess();
@@ -1181,6 +1186,77 @@ const Settings = () => {
           )}
         </Formik>
       )}
+
+      {/* 📦 Confirmation Dialog for Archive Process using global Delete Modal styling */}
+      <Modal
+        open={isArchiveDialogOpen}
+        onClose={() => setIsArchiveDialogOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        className="admin-modal"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            outline: "none",
+          }}
+          className="admin-delete-modal-inner-main admin-modal-inner"
+        >
+          <Box className="modal-body">
+            <Box className="admin-modal-hgt-scroll cus-scrollbar">
+              <Box className="admin-modal-circle-main">
+                <img
+                  src={Svg.closeCircle}
+                  className="admin-user-circle-img"
+                  alt="Close"
+                />
+              </Box>
+              <Typography
+                className="admin-delete-modal-title"
+                component="h2"
+                variant="h2"
+              >
+                Are you sure?
+              </Typography>
+              <Typography
+                className="admin-delete-modal-para admin-common-para"
+                component="p"
+                sx={{ mb: 1 }}
+              >
+                Do you really want to run the database archiving process? This will move fee records older than 3 years to the archive and drop the original tables.
+              </Typography>
+              <Typography
+                className="admin-delete-modal-para admin-common-para"
+                component="p"
+                sx={{ color: "#e11d48", fontWeight: 600 }}
+              >
+                This action is irreversible and cannot be undone!
+              </Typography>
+            </Box>
+            <Box className="admin-delete-modal-btn-flex border-btn-main btn-main">
+              <Button
+                className="admin-modal-cancel-btn border-btn"
+                onClick={() => setIsArchiveDialogOpen(false)}
+                disabled={archiveLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="admin-modal-delete-btn btn delete-action"
+                onClick={handleConfirmArchive}
+                disabled={archiveLoading}
+              >
+                {archiveLoading ? <CircularProgress size={20} color="inherit" /> : "Yes, Run Archive"}
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 };

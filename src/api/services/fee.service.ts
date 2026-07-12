@@ -173,3 +173,19 @@ export const generateDueReport = async (data: { email?: string }) => {
 export const runArchiveProcess = async () => {
   return await appClient.post(Api.RUN_ARCHIVE);
 };
+
+export const getArchivesList = async () => {
+  return await appClient.get(Api.GET_ARCHIVES);
+};
+
+export const getArchivedRecords = async (
+  yearLabel: string,
+  page: number,
+  limit: number,
+  search?: string,
+) => {
+  const query = `?yearLabel=${yearLabel}&page=${page}&limit=${limit}${
+    search ? `&search=${encodeURIComponent(search)}` : ""
+  }`;
+  return await appClient.get(`${Api.GET_ARCHIVE_RECORDS}${query}`);
+};
