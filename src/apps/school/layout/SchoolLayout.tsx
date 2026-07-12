@@ -8,6 +8,7 @@ import PageLoader from "../../common/loader/PageLoader";
 import { getProfileAdmin } from "@/redux/slices/authSlice";
 import type { RootState } from "@/redux/Store";
 import { useThemeManager } from "../hooks/useThemeManager";
+import AICopilot from "../component/AICopilot/AICopilot";
 
 export default function SchoolLayout() {
   const dispatch = useDispatch();
@@ -73,6 +74,7 @@ export default function SchoolLayout() {
           </Box>
         </Box>
       </Box>
+      <AICopilot />
     </div>
   );
 }

@@ -157,7 +157,11 @@ export const schoolRoutes: RouteConfig[] = [
           },
           {
             path: "/theme-settings",
-            element: <ThemeSettings />,
+            element: (
+              <PermissionRoute permission={schoolAdminPermission?.theme?.update}>
+                <ThemeSettings />
+              </PermissionRoute>
+            ),
           },
           {
             path: "/user-plan",
@@ -533,6 +537,16 @@ export const schoolRoutes: RouteConfig[] = [
             element: (
               <PermissionRoute
                 permission={schoolAdminPermission?.fee_category?.update}
+              >
+                <AddEditFeeCategory />
+              </PermissionRoute>
+            ),
+          },
+          {
+            path: "/fee/categories/view",
+            element: (
+              <PermissionRoute
+                permission={schoolAdminPermission?.fee_category?.read}
               >
                 <AddEditFeeCategory />
               </PermissionRoute>

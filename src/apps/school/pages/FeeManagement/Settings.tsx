@@ -827,7 +827,7 @@ const Settings = () => {
                                               <input
                                                 type="file"
                                                 hidden
-                                                accept="image/*"
+                                                accept=".jpg,.jpeg,.png,.svg"
                                                 disabled={!canEdit}
                                                 onChange={(e) => {
                                                   const file = e.target.files?.[0];
