@@ -130,6 +130,16 @@ function App() {
   if (isSubdomain?.isSubdomain && (schoolLoading || isRedirecting)) {
     return (
       <ThemeProvider theme={theme}>
+        <Toaster
+          reverseOrder={false}
+          containerStyle={{ zIndex: 999999 }}
+          toastOptions={{
+            duration: 3000,
+            style: {
+              maxWidth: "unset",
+            },
+          }}
+        />
         {!loadingTimeout ? (
           <PageLoader />
         ) : (
