@@ -10,7 +10,13 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-# *.local — kept off so .env.local is tracked for local dev
+
+# env files — never commit secrets
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
 
 # Editor directories and files
 .vscode/*
