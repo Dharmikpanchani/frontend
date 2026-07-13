@@ -12,6 +12,7 @@ import {
   TableCell,
   TableBody,
   Tooltip,
+  debounce,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -33,7 +34,6 @@ import DataNotFound from "@/apps/school/component/schoolCommon/dataNotFound/Data
 import Loader from "@/apps/common/loader/Loader";
 import PopupModal from "@/apps/school/component/schoolCommon/popUpModal/PopupModal";
 import moment from "moment";
-import { debounce } from "lodash-es";
 
 const DatabaseArchive = () => {
   const { hasPermission } = usePermissions();
