@@ -11,7 +11,6 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  CircularProgress,
   Tooltip,
 } from "@mui/material";
 import {
@@ -30,7 +29,6 @@ import { toasterSuccess, toasterError } from "@/utils/toaster/Toaster";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import Pagination from "@/apps/common/pagination/Pagination";
-import Svg from "@/assets/Svg";
 import DataNotFound from "@/apps/school/component/schoolCommon/dataNotFound/DataNotFound";
 import Loader from "@/apps/common/loader/Loader";
 import PopupModal from "@/apps/school/component/schoolCommon/popUpModal/PopupModal";
