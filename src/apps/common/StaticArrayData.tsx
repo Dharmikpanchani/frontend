@@ -630,7 +630,7 @@ export const schoolTypeOptions = [
   { label: "Primary", value: "Primary" },
   { label: "Secondary", value: "Secondary" },
   { label: "Higher Secondary", value: "Higher Secondary" },
-  { label: "Junior College", value: "Junior College" },
+  // { label: "Junior College", value: "Junior College" },
   { label: "Other", value: "Other" },
 ];
 
@@ -671,7 +671,7 @@ export const salaryTypeOptions = [
 
 export const calculateMinMonthlyPrice = (permissions: string[]): number => {
   let total = 0;
-  
+
   planModuleGroups.forEach((group) => {
     const isSelected = group.subModuleIds.some((subId) =>
       permissions.some((p) => p.startsWith(`${subId}_`))

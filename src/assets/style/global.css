@@ -1674,6 +1674,12 @@ img[alt] {
   overflow: hidden;
 }
 
+.admin-dashboard-banner h3,
+.admin-dashboard-banner h4,
+.admin-dashboard-banner h5 {
+  color: #ffffff !important;
+}
+
 .portal-school.is-custom-theme .admin-dashboard-banner {
   background: var(--theme-gradient, var(--primary-color)) !important;
   box-shadow: 0 10px 30px rgba(var(--primary-color-rgb, 148, 47, 21), 0.3) !important;
@@ -5131,4 +5137,22 @@ span.admin-sidebar-link-text {
   padding: 8px 0 !important;
   margin-bottom: 10px !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 💻 Developer Sidebar Active Item Style Override */
+.developer-layout .admin-sidebar-link.active {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%) !important;
+  border-left: 4px solid #60a5fa !important; /* Brighter soft-blue accent line */
+  border-radius: 4px 8px 8px 4px !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+.developer-layout .admin-sidebar-link.active .admin-sidebar-icons {
+  filter: brightness(0) invert(1) !important; /* Make active icon pop out in pure white */
+  opacity: 1 !important;
+}
+
+.developer-layout .admin-sidebar-link.active .admin-sidebar-link-text {
+  font-weight: 700 !important;
 }

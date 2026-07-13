@@ -211,13 +211,8 @@ export const masterService = {
     if (params.email)
       queryParams.append("email", params.email);
     if (params.type) queryParams.append("type", params.type);
-    if (params.startYear) {
-      if (Array.isArray(params.startYear)) {
-        params.startYear.forEach((y: any) => queryParams.append("startYear", String(y)));
-      } else {
-        queryParams.append("startYear", String(params.startYear));
-      }
-    }
+    if (params.academicYearId)
+      queryParams.append("academicYearId", params.academicYearId);
 
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;
@@ -277,6 +272,8 @@ export const masterService = {
     if (params.email)
       queryParams.append("email", params.email);
     if (params.type) queryParams.append("type", params.type);
+    if (params.academicYearId)
+      queryParams.append("academicYearId", params.academicYearId);
 
     const queryString = queryParams.toString();
     if (queryString) url += `?${queryString}`;

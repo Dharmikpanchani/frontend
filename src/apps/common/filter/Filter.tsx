@@ -560,12 +560,29 @@ const Filter: React.FC<FilterProps> = ({
 
             <Box className="admin-filter-footer">
               <Button
+                variant="outlined"
                 className="admin-btn-secondary"
                 onClick={() => {
                   resetForm();
                   handleReset();
                 }}
-                sx={{ px: 3, minWidth: "100px" }}
+                sx={{
+                  px: 3,
+                  minWidth: "100px",
+                  height: "36px !important",
+                  borderRadius: "8px !important",
+                  textTransform: "none !important",
+                  fontWeight: "600 !important",
+                  fontSize: "13px !important",
+                  border: "2px solid var(--primary-color, #002147) !important",
+                  color: "var(--primary-color, #002147) !important",
+                  backgroundColor: "transparent !important",
+                  boxShadow: "none !important",
+                  "&:hover": {
+                    border: "2px solid var(--primary-color, #002147) !important",
+                    backgroundColor: "rgba(var(--primary-color-rgb, 0, 33, 71), 0.05) !important",
+                  }
+                }}
               >
                 Reset
               </Button>

@@ -1,23 +1,23 @@
-import { Box, Typography, Tooltip } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Tooltip,
+  FormControl,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import Svg from "../../../assets/Svg";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/redux/Store";
 import { masterService } from "@/api/services/master.service";
-
-/** Compute current academic year label locally (April start, same logic as backend cron) */
-const getLocalAcademicYearLabel = (): string => {
-  const now = new Date();
-  const month = now.getMonth() + 1; // 1-12
-  const startYear = month >= 3 ? now.getFullYear() : now.getFullYear() - 1;
-  return `${startYear}-${startYear + 1}`;
-};
+import { setViewingYear } from "@/redux/slices/academicYearSlice";
 
 export default function Dashboard() {
+  const dispatch = useDispatch();
   const [time, setTime] = useState(new Date());
-  const [academicYearLabel, setAcademicYearLabel] = useState<string>(
-    getLocalAcademicYearLabel(),
-  );
+  const [allYears, setAllYears] = useState<any[]>([]);
+  const [selectedYear, setSelectedYear] = useState<any>(null);
 
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
@@ -28,17 +28,13 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch the server-confirmed current academic year
   useEffect(() => {
     masterService.getAcademicYears().then((res: any) => {
       const years: any[] = res?.data || [];
-      const current = years.find((y: any) => y.isCurrent);
-      if (current?.label) {
-        setAcademicYearLabel(current.label);
-      }
-    }).catch(() => {
-      // fallback: keep locally computed label
-    });
+      setAllYears(years);
+      const current = years.find((y: any) => y.isCurrent) || years[0];
+      if (current) setSelectedYear(current);
+    }).catch(() => {});
   }, []);
 
   const formatTime = (date: Date) => {
@@ -60,26 +56,10 @@ export default function Dashboard() {
   };
 
   const cards = [
-    {
-      title: "Total Students",
-      value: "1,240",
-      icon: Svg.userList,
-    },
-    {
-      title: "Total Teachers",
-      value: "86",
-      icon: Svg.userList,
-    },
-    {
-      title: "Attendance Rate",
-      value: "94%",
-      icon: Svg.dashboard,
-    },
-    {
-      title: "Active Programs",
-      value: "12",
-      icon: Svg.cms,
-    },
+    { title: "Total Students", value: "—", icon: Svg.userList },
+    { title: "Total Teachers", value: "—", icon: Svg.userList },
+    { title: "Attendance Rate", value: "94%", icon: Svg.dashboard },
+    { title: "Active Programs", value: "12", icon: Svg.cms },
   ];
 
   return (
@@ -95,50 +75,82 @@ export default function Dashboard() {
         <Box>
           <Typography
             variant="h4"
-            sx={{ fontWeight: 700, mb: 1, color: "var(--button-text, #fff)" }}
+            sx={{ fontWeight: 700, mb: 1, color: "#fff" }}
           >
             Welcome back 👋
           </Typography>
           <Typography
             variant="h5"
-            sx={{
-              opacity: 0.9,
-              fontWeight: 600,
-              color: "var(--button-text, #fff)",
-            }}
+            sx={{ opacity: 0.9, fontWeight: 600, color: "#fff" }}
           >
             {adminDetails?.schoolData?.schoolName || "VidyaSetu School"} Portal
           </Typography>
-          <Box
-            sx={{
-              mt: 1.5,
-              display: "inline-block",
-              px: 2,
-              py: 0.5,
-              borderRadius: "8px",
-              background: "rgba(255,255,255,0.15)",
-              backdropFilter: "blur(5px)",
-            }}
-          >
+
+          {/* Academic Year Selector */}
+          <Box sx={{ mt: 1.5, display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
             <Typography
               variant="body2"
-              sx={{ fontWeight: 600, color: "var(--button-text, #fff)" }}
+              sx={{ fontWeight: 600, color: "#fff", opacity: 0.9 }}
             >
-              Active Academic Year: {academicYearLabel}
+              Academic Year:
             </Typography>
+            {allYears.length > 0 ? (
+              <FormControl size="small">
+                <Select
+                  value={selectedYear?._id || ""}
+                  onChange={(e) => {
+                    const yr = allYears.find((y) => y._id === e.target.value);
+                    setSelectedYear(yr || null);
+                    if (yr) {
+                      dispatch(setViewingYear({
+                        _id: yr._id,
+                        label: yr.label,
+                        startYear: yr.startYear,
+                        endYear: yr.endYear,
+                      }));
+                    }
+                  }}
+                  sx={{
+                    color: "#fff",
+                    fontWeight: 600,
+                    fontSize: "0.875rem",
+                    background: "rgba(255,255,255,0.15)",
+                    backdropFilter: "blur(5px)",
+                    borderRadius: "8px",
+                    minWidth: 140,
+                    ".MuiOutlinedInput-notchedOutline": { border: "1px solid rgba(255,255,255,0.4)" },
+                    "&:hover .MuiOutlinedInput-notchedOutline": { border: "1px solid rgba(255,255,255,0.8)" },
+                    ".MuiSvgIcon-root": { color: "#fff" },
+                  }}
+                >
+                  {allYears.map((year) => (
+                    <MenuItem key={year._id} value={year._id}>
+                      {year.label}
+                      {!year.isCurrent ? " 🗄" : ""}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <Box
+                sx={{
+                  px: 2, py: 0.5, borderRadius: "8px",
+                  background: "rgba(255,255,255,0.15)", backdropFilter: "blur(5px)",
+                }}
+              >
+                <Typography variant="body2" sx={{ fontWeight: 600, color: "#fff" }}>
+                  Loading...
+                </Typography>
+              </Box>
+            )}
           </Box>
         </Box>
+
         <Box sx={{ textAlign: "right", display: { xs: "none", lg: "block" } }}>
-          <Typography
-            variant="h3"
-            sx={{ fontWeight: 700, color: "var(--button-text, #fff)" }}
-          >
+          <Typography variant="h3" sx={{ fontWeight: 700, color: "#fff" }}>
             {formatTime(time)}
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{ opacity: 0.8, color: "var(--button-text, #fff)" }}
-          >
+          <Typography variant="body1" sx={{ opacity: 0.8, color: "#fff" }}>
             {formatDate(time)}
           </Typography>
         </Box>
@@ -153,12 +165,7 @@ export default function Dashboard() {
               >
                 <Box className="admin-dashboard-inner-box">
                   <Box className="admin-dash-left">
-                    <Tooltip
-                      title={card.title}
-                      arrow
-                      placement="bottom"
-                      className="admin-tooltip"
-                    >
+                    <Tooltip title={card.title} arrow placement="bottom" className="admin-tooltip">
                       <Typography className="admin-dash-text" component="p">
                         {card.title}
                       </Typography>
@@ -173,10 +180,7 @@ export default function Dashboard() {
                     </Typography>
                   </Box>
                   <Box className="admin-dash-right">
-                    <Box
-                      className="admin-dash-icon-box"
-                      sx={{ background: "rgba(255,255,255,0.1)" }}
-                    >
+                    <Box className="admin-dash-icon-box" sx={{ background: "rgba(255,255,255,0.1)" }}>
                       <img
                         src={card.icon}
                         className="admin-dash-icons"
@@ -192,30 +196,19 @@ export default function Dashboard() {
         </Box>
       </Box>
 
-      {/* placeholder for upcoming analytical sections */}
       <Box sx={{ mt: 5 }}>
         <Box className="table-title-main" sx={{ mb: 3 }}>
           <Typography variant="h5" className="table-title-name">
             Recent Activity
           </Typography>
         </Box>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" },
-            gap: 3,
-          }}
-        >
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: 3 }}>
           <Box
             className="common-card"
             sx={{
-              p: 4,
-              minHeight: "300px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#fff",
-              border: "1px solid #edf2f7",
+              p: 4, minHeight: "300px", display: "flex",
+              alignItems: "center", justifyContent: "center",
+              background: "#fff", border: "1px solid #edf2f7",
             }}
           >
             <Typography color="textSecondary">
@@ -225,13 +218,9 @@ export default function Dashboard() {
           <Box
             className="common-card"
             sx={{
-              p: 4,
-              minHeight: "300px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#fff",
-              border: "1px solid #edf2f7",
+              p: 4, minHeight: "300px", display: "flex",
+              alignItems: "center", justifyContent: "center",
+              background: "#fff", border: "1px solid #edf2f7",
             }}
           >
             <Typography color="textSecondary">

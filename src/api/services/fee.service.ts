@@ -174,8 +174,8 @@ export const runArchiveProcess = async () => {
   return await appClient.post(Api.RUN_ARCHIVE);
 };
 
-export const getArchivesList = async () => {
-  return await appClient.get(Api.GET_ARCHIVES);
+export const getArchivesList = async (params?: any) => {
+  return await appClient.get(Api.GET_ARCHIVES, { params });
 };
 
 export const getArchivedRecords = async (
@@ -183,9 +183,13 @@ export const getArchivedRecords = async (
   page: number,
   limit: number,
   search?: string,
+  status?: string,
+  paymentMethod?: string,
 ) => {
   const query = `?yearLabel=${yearLabel}&page=${page}&limit=${limit}${
     search ? `&search=${encodeURIComponent(search)}` : ""
+  }${status ? `&status=${status}` : ""}${
+    paymentMethod ? `&paymentMethod=${paymentMethod}` : ""
   }`;
   return await appClient.get(`${Api.GET_ARCHIVE_RECORDS}${query}`);
 };

@@ -75,7 +75,7 @@ export default function DeveloperLayout() {
 
   return (
     <div>
-      <Box className="admin-dashboard-main">
+      <Box className="admin-dashboard-main developer-layout">
         <Box
           className={`admin-dashboard-left-main ${open ? "active" : "admin-sidebar-deactive"}`}
         >

@@ -306,9 +306,11 @@ export default function Student() {
     (state: RootState) => state.SectionReducer,
   );
 
+  const { viewingYearId } = useSelector((state: RootState) => state.AcademicYearReducer);
+
   const handleGetData = (searchQuery?: string, filters?: any) => {
     const activeFilters = filters || filterValues;
-    const { startYears, ...restFilters } = activeFilters;
+    const { startYears: _unused, ...restFilters } = activeFilters;
 
     dispatch(
       getStudents({
@@ -316,7 +318,7 @@ export default function Student() {
         perPage: rowsPerPage > 0 ? rowsPerPage : 10,
         search: searchQuery?.trim() ?? searchNameValue.trim(),
         ...restFilters,
-        startYear: startYears && startYears.length > 0 ? startYears : undefined,
+        ...(viewingYearId ? { academicYearId: viewingYearId } : {}),
       }) as any,
     );
   };
@@ -402,18 +404,6 @@ export default function Student() {
         { label: "Active", value: "true" },
         { label: "Inactive", value: "false" },
       ],
-    },
-    {
-      type: "multiSearchSelect",
-      name: "startYears",
-      label: "Academic Year",
-      placeholder: "Select Academic Years",
-      options: getAvailableYears().map((y) => ({
-        label: `${y}-${y + 1}`,
-        value: y,
-      })),
-      getOptionLabel: (option: any) => option.label || "",
-      getOptionValue: (option: any) => option.value,
     },
   ];
 

@@ -1077,16 +1077,17 @@ export default function SchoolDetails() {
                     <Button
                       type="submit"
                       variant="contained"
-                      startIcon={buttonSpinner ? <Spinner /> : <SaveIcon />}
+                      startIcon={buttonSpinner ? null : <SaveIcon />}
                       disabled={buttonSpinner}
                       sx={{
                         textTransform: "none",
                         borderRadius: "8px",
                         backgroundColor: "var(--primary-color)",
                         "&:hover": { backgroundColor: "var(--primary-color)", opacity: 0.9 },
+                        minWidth: buttonSpinner ? "135px" : "auto",
                       }}
                     >
-                      {buttonSpinner ? "Saving..." : "Save Changes"}
+                      {buttonSpinner ? <Spinner /> : "Save Changes"}
                     </Button>
                   </Box>
                 </Box>

@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik, Form } from "formik";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -54,6 +55,7 @@ import { settingsValidationSchema } from "@/utils/validation/FormikValidation";
 
 const Settings = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { hasPermission } = usePermissions();
   const { settings, loading } = useSelector((state: RootState) => state.FeeReducer);
 
@@ -66,7 +68,6 @@ const Settings = () => {
   const [feeReportLoading, setFeeReportLoading] = useState(false);
   const [dueReportLoading, setDueReportLoading] = useState(false);
   const [archiveLoading, setArchiveLoading] = useState(false);
-  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchSchoolSettings());
@@ -183,22 +184,6 @@ const Settings = () => {
     }
   };
 
-  const handleRunArchive = () => {
-    setIsArchiveDialogOpen(true);
-  };
-
-  const handleConfirmArchive = async () => {
-    setIsArchiveDialogOpen(false);
-    setArchiveLoading(true);
-    try {
-      const response = await runArchiveProcess();
-      toast.success(response.data?.message || "Archive process completed successfully!");
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || err.message || "Failed to trigger archive process");
-    } finally {
-      setArchiveLoading(false);
-    }
-  };
 
   const handleSave = async (values: any) => {
     if (!canEdit) return;
@@ -1161,23 +1146,26 @@ const Settings = () => {
 
                   <SectionHeader icon={SettingsIcon} title="Database Maintenance & Archiving" />
                   <Box sx={{ mb: 2 }}>
-                    <Typography sx={{ fontSize: "13.5px", color: "text.secondary", mb: 2.5 }}>
-                      Trigger a manual archiving run to move fee collections older than 3 years to the archive collections. This drops active collections and keeps the main database performant.
+                    <Typography sx={{ fontSize: "13.5px", color: "text.secondary", mb: 2 }}>
+                      Archiving runs automatically every June 1st at 2:00 AM.
                     </Typography>
                     <Button
-                      variant="contained"
-                      onClick={handleRunArchive}
-                      disabled={archiveLoading}
+                      variant="outlined"
+                      onClick={() => navigate("/database-archive")}
                       sx={{
                         height: "40px",
                         borderRadius: "8px",
-                        background: "var(--theme-gradient, var(--primary-color)) !important",
                         textTransform: "none",
                         fontWeight: 600,
-                        boxShadow: "none"
+                        borderColor: "var(--primary-color)",
+                        color: "var(--primary-color)",
+                        "&:hover": {
+                          borderColor: "var(--primary-color)",
+                          backgroundColor: "rgba(var(--primary-color-rgb, 0, 33, 71), 0.04)"
+                        }
                       }}
                     >
-                      {archiveLoading ? <CircularProgress size={20} color="inherit" /> : "Run Archiving Process"}
+                      View Archive History
                     </Button>
                   </Box>
                 </Box>
@@ -1186,77 +1174,6 @@ const Settings = () => {
           )}
         </Formik>
       )}
-
-      {/* 📦 Confirmation Dialog for Archive Process using global Delete Modal styling */}
-      <Modal
-        open={isArchiveDialogOpen}
-        onClose={() => setIsArchiveDialogOpen(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        className="admin-modal"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            outline: "none",
-          }}
-          className="admin-delete-modal-inner-main admin-modal-inner"
-        >
-          <Box className="modal-body">
-            <Box className="admin-modal-hgt-scroll cus-scrollbar">
-              <Box className="admin-modal-circle-main">
-                <img
-                  src={Svg.closeCircle}
-                  className="admin-user-circle-img"
-                  alt="Close"
-                />
-              </Box>
-              <Typography
-                className="admin-delete-modal-title"
-                component="h2"
-                variant="h2"
-              >
-                Are you sure?
-              </Typography>
-              <Typography
-                className="admin-delete-modal-para admin-common-para"
-                component="p"
-                sx={{ mb: 1 }}
-              >
-                Do you really want to run the database archiving process? This will move fee records older than 3 years to the archive and drop the original tables.
-              </Typography>
-              <Typography
-                className="admin-delete-modal-para admin-common-para"
-                component="p"
-                sx={{ color: "#e11d48", fontWeight: 600 }}
-              >
-                This action is irreversible and cannot be undone!
-              </Typography>
-            </Box>
-            <Box className="admin-delete-modal-btn-flex border-btn-main btn-main">
-              <Button
-                className="admin-modal-cancel-btn border-btn"
-                onClick={() => setIsArchiveDialogOpen(false)}
-                disabled={archiveLoading}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="admin-modal-delete-btn btn delete-action"
-                onClick={handleConfirmArchive}
-                disabled={archiveLoading}
-              >
-                {archiveLoading ? <CircularProgress size={20} color="inherit" /> : "Yes, Run Archive"}
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Modal>
     </Box>
   );
 };
