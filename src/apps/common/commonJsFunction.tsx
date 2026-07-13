@@ -61,8 +61,14 @@ export const getSubdomain = (): SubdomainResult => {
   }
 
   if (host.endsWith(baseDomainWithDot)) {
-    const subdomain = host.replace(baseDomainWithDot, "");
+    let subdomain = host.replace(baseDomainWithDot, "");
     if (subdomain && subdomain !== "") {
+      if (subdomain.endsWith(".admin")) {
+        subdomain = subdomain.replace(".admin", "");
+      }
+      if (subdomain.endsWith(".admn")) {
+        subdomain = subdomain.replace(".admn", "");
+      }
       return { isSubdomain: true, name: subdomain };
     }
   }

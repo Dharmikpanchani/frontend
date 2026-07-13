@@ -286,6 +286,9 @@ export default function AddEditTeacher() {
       previousDesignation: teacherData?.previousDesignation || "",
       previousDuration: teacherData?.previousDuration || "",
       previousLeavingReason: teacherData?.previousLeavingReason || "",
+      trainingDetails: teacherData?.trainingDetails || "",
+      udiseTeacherNumber: teacherData?.udiseTeacherNumber || "",
+      ctsNumber: teacherData?.ctsNumber || "",
       // Salary
       employmentType: teacherData?.employmentType || "",
       salary: teacherData?.salary || "",
@@ -393,6 +396,11 @@ export default function AddEditTeacher() {
       formData.append("previousDesignation", values.previousDesignation);
       formData.append("previousDuration", values.previousDuration);
       formData.append("previousLeavingReason", values.previousLeavingReason);
+      formData.append("trainingDetails", values.trainingDetails);
+      if (values.udiseTeacherNumber)
+        formData.append("udiseTeacherNumber", values.udiseTeacherNumber);
+      if (values.ctsNumber)
+        formData.append("ctsNumber", values.ctsNumber);
 
       // Arrays
       values.subjects.forEach((id: string) =>
@@ -2255,6 +2263,69 @@ export default function AddEditTeacher() {
                         {touched.previousLeavingReason && errors.previousLeavingReason && (
                           <FormHelperText className="error-text">
                             {errors.previousLeavingReason as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* Training Details */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Training Details</Typography>
+                        <TextField
+                          fullWidth
+                          name="trainingDetails"
+                          placeholder="e.g. TET/B.Ed training, workshops attended"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.trainingDetails}
+                          onChange={handleChange}
+                          error={touched.trainingDetails && Boolean(errors.trainingDetails)}
+                          slotProps={{ htmlInput: { maxLength: 200 } }}
+                        />
+                        {touched.trainingDetails && errors.trainingDetails && (
+                          <FormHelperText className="error-text">
+                            {errors.trainingDetails as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* UDISE Teacher Number */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>UDISE Teacher Number (Optional)</Typography>
+                        <TextField
+                          fullWidth
+                          name="udiseTeacherNumber"
+                          placeholder="e.g. UDISE12345"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.udiseTeacherNumber}
+                          onChange={handleChange}
+                          error={touched.udiseTeacherNumber && Boolean(errors.udiseTeacherNumber)}
+                          slotProps={{ htmlInput: { maxLength: 30 } }}
+                        />
+                        {touched.udiseTeacherNumber && errors.udiseTeacherNumber && (
+                          <FormHelperText className="error-text">
+                            {errors.udiseTeacherNumber as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
+                      {/* CTS Number */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>CTS Number (If Required)</Typography>
+                        <TextField
+                          fullWidth
+                          name="ctsNumber"
+                          placeholder="e.g. CTS12345"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.ctsNumber}
+                          onChange={handleChange}
+                          error={touched.ctsNumber && Boolean(errors.ctsNumber)}
+                          slotProps={{ htmlInput: { maxLength: 30 } }}
+                        />
+                        {touched.ctsNumber && errors.ctsNumber && (
+                          <FormHelperText className="error-text">
+                            {errors.ctsNumber as string}
                           </FormHelperText>
                         )}
                       </Box>

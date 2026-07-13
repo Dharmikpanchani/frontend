@@ -17,10 +17,12 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
   Person as PersonIcon,
   School as AcademicIcon,
+  HistoryEdu as OldSchoolIcon,
   LocationOn as LocationIcon,
   FamilyRestroom as GuardianIcon,
   Lock as LockIcon,
   CameraAlt as CameraAltIcon,
+  Close as CloseIcon,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
@@ -108,6 +110,12 @@ export default function AddEditStudent() {
         : null,
       classId: studentData?.classId?._id || studentData?.classId || "",
       sectionId: studentData?.sectionId?._id || studentData?.sectionId || "",
+      // Old School Details
+      previousSchool: studentData?.previousSchool || "",
+      previousClass: studentData?.previousClass || "",
+      percentage: studentData?.percentage ?? "",
+      resultDocument: null as File | null,
+      resultDocumentUrl: studentData?.resultDocument || "",
       // Contact
       email: studentData?.email || "",
       phoneNumber: studentData?.phoneNumber || "",
@@ -131,7 +139,9 @@ export default function AddEditStudent() {
   );
 
   const handleSubmit = async (values: any) => {
-    const hasFile = values.profileImage instanceof File;
+    const hasFile =
+      values.profileImage instanceof File ||
+      values.resultDocument instanceof File;
 
     let payload: any;
 
@@ -153,6 +163,14 @@ export default function AddEditStudent() {
         );
       formData.append("classId", values.classId);
       formData.append("sectionId", values.sectionId);
+      if (values.previousSchool)
+        formData.append("previousSchool", values.previousSchool);
+      if (values.previousClass)
+        formData.append("previousClass", values.previousClass);
+      if (values.percentage !== "" && values.percentage !== null)
+        formData.append("percentage", values.percentage);
+      if (values.resultDocument instanceof File)
+        formData.append("resultDocument", values.resultDocument);
       if (values.address) formData.append("address", values.address);
       if (values.city) formData.append("city", values.city);
       if (values.state) formData.append("state", values.state);
@@ -188,6 +206,15 @@ export default function AddEditStudent() {
           : {}),
         classId: values.classId,
         sectionId: values.sectionId,
+        ...(values.previousSchool
+          ? { previousSchool: values.previousSchool }
+          : {}),
+        ...(values.previousClass
+          ? { previousClass: values.previousClass }
+          : {}),
+        ...(values.percentage !== "" && values.percentage !== null
+          ? { percentage: values.percentage }
+          : {}),
         ...(values.address ? { address: values.address } : {}),
         ...(values.city ? { city: values.city } : {}),
         ...(values.state ? { state: values.state } : {}),
@@ -796,6 +823,199 @@ export default function AddEditStudent() {
                     {touched.sectionId && errors.sectionId && (
                       <FormHelperText className="error-text">
                         {errors.sectionId as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* ── Section: Old School Details ── */}
+                <SectionTitle icon={OldSchoolIcon} title="Old School Details" />
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      sm: "1fr 1fr",
+                      md: "1fr 1fr 1fr",
+                    },
+                    gap: 2,
+                    mb: 4,
+                  }}
+                >
+                  {/* Previous School */}
+                  <Box>
+                    <Typography sx={labelSx}>Previous School</Typography>
+                    <TextField
+                      fullWidth
+                      id="previousSchool"
+                      name="previousSchool"
+                      placeholder="Previous school name"
+                      value={values.previousSchool}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.previousSchool && Boolean(errors.previousSchool)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 100 },
+                      }}
+                    />
+                    {touched.previousSchool && errors.previousSchool && (
+                      <FormHelperText className="error-text">
+                        {errors.previousSchool as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Previous Class */}
+                  <Box>
+                    <Typography sx={labelSx}>Previous Class</Typography>
+                    <TextField
+                      fullWidth
+                      id="previousClass"
+                      name="previousClass"
+                      placeholder="e.g. Class 9"
+                      value={values.previousClass}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.previousClass && Boolean(errors.previousClass)
+                      }
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { maxLength: 50 },
+                      }}
+                    />
+                    {touched.previousClass && errors.previousClass && (
+                      <FormHelperText className="error-text">
+                        {errors.previousClass as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Percentage */}
+                  <Box>
+                    <Typography sx={labelSx}>Percentage (%)</Typography>
+                    <TextField
+                      fullWidth
+                      id="percentage"
+                      name="percentage"
+                      type="number"
+                      placeholder="e.g. 85"
+                      value={values.percentage}
+                      onChange={(e) => {
+                        let val = e.target.value;
+                        if (val !== "") {
+                          const num = Math.min(100, Math.max(0, Number(val)));
+                          val = String(num);
+                        }
+                        setFieldValue("percentage", val);
+                      }}
+                      onBlur={handleBlur}
+                      error={touched.percentage && Boolean(errors.percentage)}
+                      disabled={isReadOnly}
+                      slotProps={{
+                        input: { sx: inputSx },
+                        htmlInput: { min: 0, max: 100 },
+                      }}
+                    />
+                    {touched.percentage && errors.percentage && (
+                      <FormHelperText className="error-text">
+                        {errors.percentage as string}
+                      </FormHelperText>
+                    )}
+                  </Box>
+
+                  {/* Result Document */}
+                  <Box gridColumn={{ xs: "span 1", sm: "span 2", md: "span 3" }}>
+                    <Typography sx={labelSx}>
+                      Result Document (Optional)
+                    </Typography>
+                    <Box
+                      sx={{
+                        border: "1px dashed #ced4da",
+                        borderRadius: "8px",
+                        p: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        backgroundColor: "#f9fafb",
+                        position: "relative",
+                      }}
+                    >
+                      <Button
+                        variant="outlined"
+                        component="label"
+                        size="small"
+                        disabled={isReadOnly}
+                        sx={{ textTransform: "none", borderRadius: "6px" }}
+                      >
+                        Choose File
+                        <input
+                          hidden
+                          type="file"
+                          disabled={isReadOnly}
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            const files = e.target.files;
+                            if (files && files.length > 0) {
+                              setFieldValue("resultDocument", files[0]);
+                            }
+                          }}
+                        />
+                      </Button>
+                      <Typography sx={{ fontSize: "13px", color: "#6b7280" }}>
+                        {values.resultDocument ? (
+                          values.resultDocument.name
+                        ) : values.resultDocumentUrl ? (
+                          <Link
+                            href={`${imageBaseUrl}/${values.resultDocumentUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                              color: "var(--primary-color)",
+                              textDecoration: "underline",
+                              cursor: "pointer",
+                              fontWeight: 500,
+                            }}
+                          >
+                            View Current Document
+                          </Link>
+                        ) : (
+                          "No file chosen (PDF, JPG, PNG)"
+                        )}
+                      </Typography>
+                      {(values.resultDocument || values.resultDocumentUrl) &&
+                        !isReadOnly && (
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setFieldValue("resultDocument", null);
+                              setFieldValue("resultDocumentUrl", "");
+                            }}
+                            sx={{
+                              position: "absolute",
+                              top: -10,
+                              right: -10,
+                              p: "2px",
+                              bgcolor: "#ef4444",
+                              color: "white",
+                              boxShadow: 2,
+                              zIndex: 10,
+                              "&:hover": { bgcolor: "#dc2626" },
+                            }}
+                          >
+                            <CloseIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        )}
+                    </Box>
+                    {touched.resultDocument && errors.resultDocument && (
+                      <FormHelperText className="error-text">
+                        {errors.resultDocument as string}
                       </FormHelperText>
                     )}
                   </Box>
