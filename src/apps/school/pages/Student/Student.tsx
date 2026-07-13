@@ -86,17 +86,6 @@ interface SectionItem {
   classId?: string | { _id: string };
 }
 
-const getAvailableYears = (): number[] => {
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  const currentYear = month >= 3 ? now.getFullYear() : now.getFullYear() - 1;
-  const years: number[] = [];
-  for (let y = 2020; y <= currentYear; y++) {
-    years.push(y);
-  }
-  return years.reverse();
-};
-
 export default function Student() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -1632,6 +1621,7 @@ export default function Student() {
                   
                   <Grid container spacing={2}>
                     {reviewModal.fatherName && (
+                      // @ts-ignore
                       <Grid item xs={12} sm={6}>
                         <Typography sx={{ fontSize: "12px", color: "#94a3b8", mb: 0.2 }}>Father</Typography>
                         <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#334155" }}>{reviewModal.fatherName}</Typography>
@@ -1643,6 +1633,7 @@ export default function Student() {
                       </Grid>
                     )}
                     {reviewModal.motherName && (
+                      // @ts-ignore
                       <Grid item xs={12} sm={6}>
                         <Typography sx={{ fontSize: "12px", color: "#94a3b8", mb: 0.2 }}>Mother</Typography>
                         <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#334155" }}>{reviewModal.motherName}</Typography>

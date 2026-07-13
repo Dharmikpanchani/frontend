@@ -11,10 +11,10 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  CircularProgress,
   Tooltip,
   Tabs,
   Tab,
+  debounce,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -24,6 +24,7 @@ import {
   Visibility as VisibilityIcon,
   FilterList as FilterIcon,
 } from "@mui/icons-material";
+import type { FilterField } from "@/apps/common/filter/Filter";
 import {
   getArchivesList,
   getArchivedRecords,
@@ -33,13 +34,11 @@ import { toasterSuccess, toasterError } from "@/utils/toaster/Toaster";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import Pagination from "@/apps/common/pagination/Pagination";
-import Svg from "@/assets/Svg";
 import DataNotFound from "@/apps/school/component/schoolCommon/dataNotFound/DataNotFound";
 import Loader from "@/apps/common/loader/Loader";
 import PopupModal from "@/apps/school/component/schoolCommon/popUpModal/PopupModal";
 import Filter from "@/apps/common/filter/Filter";
 import moment from "moment";
-import { debounce } from "lodash-es";
 
 const DatabaseArchive = () => {
   const { hasPermission } = usePermissions();
@@ -89,7 +88,7 @@ const DatabaseArchive = () => {
     yearLabel: "",
   });
 
-  const getFilterFields = () => {
+  const getFilterFields = (): FilterField[] => {
     if (selectedYear) {
       // Explore view: Archived Fee Records filters
       return [
@@ -301,7 +300,7 @@ const DatabaseArchive = () => {
                 setSelectedYear(null);
                 setSearchValue("");
                 setCurrentPage(0);
-                setFilterValues({ status: "", paymentMethod: "" });
+                setFilterValues({ status: "", paymentMethod: "", yearLabel: "" });
               }}
               sx={{
                 minWidth: "auto",
@@ -412,7 +411,7 @@ const DatabaseArchive = () => {
           <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
             <Tabs
               value={activeTab}
-              onChange={(e, val) => setActiveTab(val)}
+              onChange={(_e, val) => setActiveTab(val)}
               aria-label="archive categories tabs"
               sx={{
                 ".MuiTab-root": {
@@ -488,7 +487,7 @@ const DatabaseArchive = () => {
                                     setSelectedYear(row.yearLabel);
                                     setCurrentPage(0);
                                     setSearchValue("");
-                                    setFilterValues({ status: "", paymentMethod: "" });
+                                    setFilterValues({ status: "", paymentMethod: "", yearLabel: "" });
                                   }}
                                   sx={{
                                     height: "30px !important",

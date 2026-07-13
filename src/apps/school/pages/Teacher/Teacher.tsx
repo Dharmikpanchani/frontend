@@ -82,17 +82,6 @@ import toast from "react-hot-toast";
 import { Formik, Form } from "formik";
 import { documentRejectionValidationSchema } from "@/utils/validation/FormikValidation";
 
-const getAvailableYears = (): number[] => {
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  const currentYear = month >= 3 ? now.getFullYear() : now.getFullYear() - 1;
-  const years: number[] = [];
-  for (let y = 2020; y <= currentYear; y++) {
-    years.push(y);
-  }
-  return years.reverse();
-};
-
 export default function Teacher() {
   const dispatch = useDispatch();
   const navigate = useNavigate();

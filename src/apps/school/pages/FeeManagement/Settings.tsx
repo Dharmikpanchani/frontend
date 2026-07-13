@@ -22,9 +22,7 @@ import {
   Checkbox,
   FormHelperText,
   IconButton,
-  Modal,
 } from "@mui/material";
-import Svg from "@/assets/Svg";
 import {
   Settings as SettingsIcon,
   Receipt as ReceiptIcon,
@@ -42,7 +40,6 @@ import {
   linkRazorpayRoute,
   generateFeeReport,
   generateDueReport,
-  runArchiveProcess,
 } from "@/api/services/fee.service";
 import type { RootState, AppDispatch } from "@/redux/Store";
 import toast from "react-hot-toast";
@@ -67,7 +64,6 @@ const Settings = () => {
   const [reportEmail, setReportEmail] = useState("");
   const [feeReportLoading, setFeeReportLoading] = useState(false);
   const [dueReportLoading, setDueReportLoading] = useState(false);
-  const [archiveLoading, setArchiveLoading] = useState(false);
 
   useEffect(() => {
     dispatch(fetchSchoolSettings());

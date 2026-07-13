@@ -869,6 +869,17 @@ export const studentValidationSchema = Yup.object().shape({
   admissionDate: dateValidation(true, "Admission date is required"),
   classId: Yup.string().required("Class is required"),
   sectionId: Yup.string().required("Section is required"),
+  // Old School Details
+  previousSchool: genericStringValidation("Previous school", 3, 100, false),
+  previousClass: genericStringValidation("Previous class", 1, 50, false),
+  percentage: Yup.number()
+    .min(1, "Percentage must be between 1 and 100")
+    .max(100, "Percentage must be between 1 and 100")
+    .nullable()
+    .transform((value, originalValue) =>
+      originalValue === "" ? null : value,
+    ),
+  resultDocument: fileValidation("Result Document", false).nullable(),
   // Contact
   email: emailValidation(true),
   phoneNumber: phoneNumberValidation(true),
@@ -957,6 +968,9 @@ export const teacherValidationSchema = Yup.object().shape(
       .required("Experience is required"),
     qualification: genericStringValidation("Qualification", 2, 100, false),
     specialization: genericStringValidation("Specialization", 2, 100, false),
+    trainingDetails: genericStringValidation("Training Details", 2, 200, false),
+    udiseTeacherNumber: genericStringValidation("UDISE Teacher Number", 2, 30, false),
+    ctsNumber: genericStringValidation("CTS Number", 2, 30, false),
     designation: Yup.string()
       .test(
         "no-whitespace",

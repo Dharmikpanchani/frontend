@@ -136,7 +136,6 @@ export const getSchoolLogo = createAsyncThunk(
       const res: any = await schoolService.getSchoolImageByCode(payload);
       if (res.status === 200 || res.status === 201) return res.data;
       const message = res?.message || "Failed to fetch school logo";
-      toast.error(message);
       return rejectWithValue(message);
     } catch (err: any) {
       const errorMessage =
@@ -145,7 +144,6 @@ export const getSchoolLogo = createAsyncThunk(
           : err.response?.data?.message ||
             err.message ||
             "Failed to fetch school logo";
-      toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
   },

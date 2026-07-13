@@ -190,6 +190,7 @@ const ThemeSettings = () => {
           secondaryColor: suggested.secondary,
           textPrimary: suggested.textPrimary,
           textSecondary: suggested.textSecondary,
+          // @ts-ignore
           headingColor: suggested.headingColor || suggested.primary,
           linkColor: suggested.linkColor,
           buttonText: suggested.buttonText,

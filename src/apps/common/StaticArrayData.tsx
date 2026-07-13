@@ -627,11 +627,10 @@ export const boardOptions = [
 ];
 
 export const schoolTypeOptions = [
-  { label: "Primary", value: "Primary" },
-  { label: "Secondary", value: "Secondary" },
-  { label: "Higher Secondary", value: "Higher Secondary" },
-  // { label: "Junior College", value: "Junior College" },
-  { label: "Other", value: "Other" },
+  { label: "Nursery (Class 1–5)", value: "Nursery (Class 1–5)" },
+  { label: "Upper Primary (Class 6–8)", value: "Upper Primary (Class 6–8)" },
+  { label: "Secondary (Class 9–10)", value: "Secondary (Class 9–10)" },
+  { label: "Higher Secondary (Class 11–12)", value: "Higher Secondary (Class 11–12)" },
 ];
 
 export const mediumOptions = [
