@@ -13,6 +13,7 @@ import {
   InputAdornment,
   IconButton,
   Autocomplete,
+  Tooltip,
 } from "@mui/material";
 import {
   Visibility,
@@ -22,6 +23,8 @@ import {
   Description as LegalIcon,
   Image as BrandingIcon,
   Close as CloseIcon,
+  ContentCopy as CopyIcon,
+  Check as CheckIcon,
 } from "@mui/icons-material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -67,6 +70,18 @@ export default function RegisterSchool() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [openDatePicker, setOpenDatePicker] = useState(false);
+  const [copiedType, setCopiedType] = useState<"admin" | "user" | null>(null);
+
+  const handleCopyUrl = (text: string, type: "admin" | "user") => {
+    navigator.clipboard.writeText(text);
+    setCopiedType(type);
+    setTimeout(() => setCopiedType(null), 2000);
+  };
+
+  const domainSuffix = useMemo(() => {
+    const rawDomain = import.meta.env.VITE_END_WITH_DOMAIN || ".vidyasetudemo.com";
+    return rawDomain.startsWith(".") ? rawDomain : `.${rawDomain}`;
+  }, []);
 
   useEffect(() => {
     // Fetch school by ID if needed (for edit/view)
@@ -380,6 +395,87 @@ export default function RegisterSchool() {
                             : ""}
                         </FormHelperText>
                       </Box>
+
+                      {/* URL Previews */}
+                      {values.schoolCode && (
+                        <>
+                          {/* Admin URL */}
+                          <Box gridColumn={{ xs: "span 12", sm: "span 6" }} sx={{ mt: 0.5 }}>
+                            <Typography sx={labelSx}>Admin URL</Typography>
+                            <TextField
+                              fullWidth
+                              disabled
+                              value={`${values.schoolCode.toLowerCase()}.admin${domainSuffix}`}
+                              variant="outlined"
+                              sx={{
+                                ...inputSx,
+                                "& .MuiInputBase-input.Mui-disabled": {
+                                  color: "var(--primary-color)",
+                                  fontWeight: 600,
+                                  fontFamily: "'Courier New', Courier, monospace",
+                                  WebkitTextFillColor: "var(--primary-color)",
+                                }
+                              }}
+                              slotProps={{
+                                input: {
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      <Tooltip title={copiedType === "admin" ? "Copied!" : "Copy Admin URL"} arrow>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => handleCopyUrl(`${values.schoolCode.toLowerCase()}.admin${domainSuffix}`, "admin")}
+                                          edge="end"
+                                          sx={{ color: "var(--primary-color)" }}
+                                        >
+                                          {copiedType === "admin" ? <CheckIcon sx={{ fontSize: 18 }} /> : <CopyIcon sx={{ fontSize: 18 }} />}
+                                        </IconButton>
+                                      </Tooltip>
+                                    </InputAdornment>
+                                  )
+                                }
+                              }}
+                            />
+                          </Box>
+
+                          {/* User URL */}
+                          <Box gridColumn={{ xs: "span 12", sm: "span 6" }} sx={{ mt: 0.5 }}>
+                            <Typography sx={labelSx}>User URL</Typography>
+                            <TextField
+                              fullWidth
+                              disabled
+                              value={`${values.schoolCode.toLowerCase()}${domainSuffix}`}
+                              variant="outlined"
+                              sx={{
+                                ...inputSx,
+                                "& .MuiInputBase-input.Mui-disabled": {
+                                  color: "var(--primary-color)",
+                                  fontWeight: 600,
+                                  fontFamily: "'Courier New', Courier, monospace",
+                                  WebkitTextFillColor: "var(--primary-color)",
+                                }
+                              }}
+                              slotProps={{
+                                input: {
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      <Tooltip title={copiedType === "user" ? "Copied!" : "Copy User URL"} arrow>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => handleCopyUrl(`${values.schoolCode.toLowerCase()}${domainSuffix}`, "user")}
+                                          edge="end"
+                                          sx={{ color: "var(--primary-color)" }}
+                                        >
+                                          {copiedType === "user" ? <CheckIcon sx={{ fontSize: 18 }} /> : <CopyIcon sx={{ fontSize: 18 }} />}
+                                        </IconButton>
+                                      </Tooltip>
+                                    </InputAdornment>
+                                  )
+                                }
+                              }}
+                            />
+                          </Box>
+                        </>
+                      )}
 
                       {/* Owner Name */}
                       <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
@@ -851,6 +947,7 @@ export default function RegisterSchool() {
                           touched={touched}
                           errors={errors}
                           disabled={isView}
+                          fieldNames={{ pincode: "zipCode" }}
                         />
                       </Box>
 

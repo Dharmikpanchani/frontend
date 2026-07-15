@@ -735,6 +735,7 @@ export default function SchoolDetails() {
                         setFieldValue={setFieldValue}
                         touched={touched}
                         errors={errors}
+                        fieldNames={{ pincode: "zipCode" }}
                       />
                     </Box>
 

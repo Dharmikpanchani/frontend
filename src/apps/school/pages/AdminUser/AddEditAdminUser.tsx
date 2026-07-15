@@ -476,13 +476,6 @@ export default function AddEditAdminUser() {
                             );
                           }}
                           disabled={isView}
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
-                          }
                           clearIcon={null}
                           renderInput={(params) => (
                             <TextField

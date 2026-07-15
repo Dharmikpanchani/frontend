@@ -83,24 +83,30 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
   );
 
   useEffect(() => {
-    if (
-      !autocompleteService.current &&
-      typeof window !== "undefined" &&
-      window.google
-    ) {
-      autocompleteService.current =
-        new window.google.maps.places.AutocompleteService();
-    }
-    if (
-      !placeService.current &&
-      typeof window !== "undefined" &&
-      window.google
-    ) {
-      // Need a dummy div for PlacesService
-      const dummyDiv = document.createElement("div");
-      placeService.current = new window.google.maps.places.PlacesService(
-        dummyDiv,
-      );
+    const initServices = () => {
+      if (!autocompleteService.current && window.google?.maps?.places) {
+        autocompleteService.current =
+          new window.google.maps.places.AutocompleteService();
+      }
+      if (!placeService.current && window.google?.maps?.places) {
+        const dummyDiv = document.createElement("div");
+        placeService.current = new window.google.maps.places.PlacesService(
+          dummyDiv,
+        );
+      }
+    };
+
+    initServices();
+
+    // Google Maps loads async — retry until ready
+    if (!window.google?.maps?.places) {
+      const interval = setInterval(() => {
+        if (window.google?.maps?.places) {
+          initServices();
+          clearInterval(interval);
+        }
+      }, 200);
+      return () => clearInterval(interval);
     }
   }, []);
 
@@ -192,6 +198,7 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
                   place
                 ) {
                   const components = place.address_components || [];
+                  console.log("[AutoCompleteLocation] address_components:", components);
                   const locality = components.find((ele) =>
                     ele.types.includes("locality"),
                   );
@@ -210,17 +217,55 @@ const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
                     ele.types.includes("postal_code"),
                   );
 
+                  // Regex fallback for 6-digit PIN in formatted_address
+                  const pinFromFormatted =
+                    /\b\d{6}\b/.exec(place.formatted_address || "")?.[0] || "";
+                  const pincodeValue = zipCode?.long_name || pinFromFormatted;
+
+                  console.log("[AutoCompleteLocation] extracted =>", {
+                    city: locality?.long_name || sublocality?.long_name || "",
+                    state: state?.long_name || "",
+                    country: country?.long_name || "India",
+                    pincode: pincodeValue,
+                    pincodeFieldKey: fields.pincode,
+                    formatted_address: place.formatted_address,
+                  });
+
                   setFieldValue(
                     fields.city,
                     locality?.long_name || sublocality?.long_name || "",
                   );
                   setFieldValue(fields.state, state?.long_name || "");
                   setFieldValue(fields.country, country?.long_name || "India");
-                  setFieldValue(fields.pincode, zipCode?.long_name || "");
 
                   if (place.geometry?.location) {
                     setFieldValue(fields.latitude, place.geometry.location.lat());
                     setFieldValue(fields.longitude, place.geometry.location.lng());
+                  }
+
+                  if (pincodeValue) {
+                    setFieldValue(fields.pincode, pincodeValue);
+                  } else if (place.geometry?.location) {
+                    // City-level results don't include postal_code — use Geocoder
+                    // reverse lookup with lat/lng to find the PIN code
+                    const geocoder = new window.google.maps.Geocoder();
+                    geocoder.geocode(
+                      { location: place.geometry.location },
+                      (geoResults, geoStatus) => {
+                        if (geoStatus === "OK" && geoResults) {
+                          for (const result of geoResults) {
+                            const pinComponent = result.address_components?.find(
+                              (c) => c.types.includes("postal_code"),
+                            );
+                            if (pinComponent) {
+                              console.log("[AutoCompleteLocation] pincode from geocoder:", pinComponent.long_name);
+                              setFieldValue(fields.pincode, pinComponent.long_name);
+                              break;
+                            }
+                          }
+                        }
+                      },
+                    );
                   }
                 }
               });

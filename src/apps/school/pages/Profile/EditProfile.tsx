@@ -437,6 +437,7 @@ export default function EditProfile() {
                               setFieldValue={setFieldValue}
                               touched={touched}
                               errors={errors}
+                              fieldNames={{ pincode: "zipCode" }}
                             />
                           </Box>
                         </Box>

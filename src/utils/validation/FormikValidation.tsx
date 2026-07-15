@@ -52,6 +52,11 @@ export const emailValidation = (required = true) => {
         return username.length >= 3;
       },
     )
+    .test("no-yopmail", "Yopmail emails are not allowed", (value) => {
+      if (!value) return true;
+      const domain = value.split("@")[1]?.toLowerCase();
+      return domain !== "yopmail.com";
+    })
     .max(70, "Email must be at most 70 characters")
     .matches(emailRegex, "Please enter a valid email");
   return required ? schema.required("Email is required") : schema;
