@@ -82,6 +82,7 @@ const employmentTypeOptions = [
 export default function TeacherAssignment() {
   const dispatch = useDispatch();
   const [assignments, setAssignments] = useState<any[]>([]);
+  const [isArchivedYear, setIsArchivedYear] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
   const [historyTeacher, setHistoryTeacher] = useState<any>(null);
@@ -110,9 +111,10 @@ export default function TeacherAssignment() {
     setLoading(true);
     try {
       const response = await teacherAssignmentService.getAssignments();
-      // backend returns { status, message, data } — no "success" field
+      // backend returns { status, message, data: { assignments, isArchived } }
       if (response?.status === 200) {
-        setAssignments((response?.data as any[]) || []);
+        setAssignments((response?.data?.assignments as any[]) || []);
+        setIsArchivedYear(!!response?.data?.isArchived);
       }
     } catch (err: any) {
       toast.error(err?.message || "Failed to load assignments");
@@ -243,8 +245,15 @@ export default function TeacherAssignment() {
     <Box className="admin-dashboard-content">
       {/* Header with Search and Actions */}
       <Box className="admin-user-list-flex admin-page-title-main">
-        <Typography className="admin-page-title" component="h2" variant="h2">
+        <Typography className="admin-page-title" component="h2" variant="h2" sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           Teacher Assignments
+          {isArchivedYear && (
+            <Chip
+              label="📦 Archived Year — read-only"
+              size="small"
+              sx={{ backgroundColor: "#FEF3C7", color: "#92400E", fontWeight: 600 }}
+            />
+          )}
         </Typography>
         <Box className="admin-flex-end">
           <Box className="admin-search-main">
@@ -1024,8 +1033,15 @@ export default function TeacherAssignment() {
                     H
                   </Box>
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1e293b" }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1e293b", display: "flex", alignItems: "center", gap: 1 }}>
                       Academic Year: {item.academicYearId?.label || "Unknown"}
+                      {item.isArchived && (
+                        <Chip
+                          label="📦 Archived"
+                          size="small"
+                          sx={{ backgroundColor: "#FEF3C7", color: "#92400E", fontWeight: 600, height: 20, fontSize: 11 }}
+                        />
+                      )}
                     </Typography>
                     <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 0.5 }}>
                       <Typography variant="body2" sx={{ color: "#475569" }}>

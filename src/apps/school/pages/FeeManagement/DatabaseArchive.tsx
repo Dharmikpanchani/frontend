@@ -52,7 +52,11 @@ const DatabaseArchive = () => {
   const getFilteredArchives = () => {
     switch (activeTab) {
       case 0:
-        return archives.filter((a) => a.collectionName && a.collectionName.startsWith("feecollections"));
+        return archives.filter(
+          (a) =>
+            a.collectionName === "FeeCollection" ||
+            (a.collectionName && a.collectionName.startsWith("feecollections"))
+        );
       case 1:
         return archives.filter((a) => a.collectionName === "StudentEnrollment");
       case 2:
@@ -237,10 +241,14 @@ const DatabaseArchive = () => {
       const res: any = await runArchiveProcess();
       const result = res?.data?.data;
       if (result?.success) {
-        toasterSuccess(`Archiving successful for year ${result?.yearLabel}!`);
+        toasterSuccess(
+          `Archiving successful — fee year ${result?.feeYearLabel}, academic year ${result?.academicYearLabel}!`
+        );
         loadArchives();
       } else {
-        toasterError(result?.error || "Archiving run failed.");
+        toasterError(
+          result?.errors?.[0] || result?.error || "Archiving run completed with errors — check logs."
+        );
       }
     } catch (err: any) {
       toasterError(err?.response?.data?.message || "Failed to run archiving process");
@@ -401,8 +409,11 @@ const DatabaseArchive = () => {
                 Archiving Information
               </Typography>
               <Typography sx={{ fontSize: "13px", color: "#0c4a6e" }}>
-                Fee collection tables older than 3 years are automatically compiled into single archive collections.
-                The original collections are dropped to optimize database execution speed. You can search and view all archived records below.
+                Fee collection records are automatically archived after their retention window (financial records are kept
+                longer than academic/operational records — see your school's archive settings) into single archive
+                collections. The original collections are dropped to optimize database performance. This now runs
+                automatically every month as well as on-demand via "Run Archive Job" below. You can search and view all
+                archived records here.
               </Typography>
             </Box>
           </Box>
@@ -623,7 +634,7 @@ const DatabaseArchive = () => {
       <PopupModal
         type="delete"
         buttonText="Yes, Run Archive"
-        module="Do you really want to run the database archiving process? This will move fee records older than 3 years to the archive and drop the original tables. This action is irreversible!"
+        module="Do you really want to run the database archiving process? This will move fee, enrollment, assignment, and fee structure records past their retention window into the archive, and drop the original tables for that period. This action is irreversible!"
         open={showConfirmModal}
         handleClose={() => setShowConfirmModal(false)}
         handleFunction={handleRunArchive}
