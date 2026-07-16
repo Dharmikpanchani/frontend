@@ -705,15 +705,17 @@ const FeeCollection = () => {
               className="admin-btn-theme"
               disabled={exportFormik.isSubmitting || exporting}
               startIcon={
-                exportFormik.isSubmitting || exporting ? (
-                  <CircularProgress size={14} color="inherit" />
-                ) : (
+                !(exportFormik.isSubmitting || exporting) ? (
                   <DownloadIcon fontSize="small" />
-                )
+                ) : null
               }
               sx={{ textTransform: "none", borderRadius: "8px", background: "var(--primary-color) !important" }}
             >
-              {exportFormik.isSubmitting || exporting ? "Exporting..." : `Export ${pendingExportFormat?.toUpperCase()}`}
+              {exportFormik.isSubmitting || exporting ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                `Export ${pendingExportFormat?.toUpperCase()}`
+              )}
             </Button>
           </DialogActions>
         </form>

@@ -4866,8 +4866,8 @@ span.admin-sidebar-link-text {
   justify-content: center !important;
   gap: 8px !important;
   background: transparent !important;
-  color: var(--button-bg, #ff4500) !important;
-  border: 2px solid var(--button-bg, #ff4500) !important;
+  color: var(--primary-color, #002147) !important;
+  border: 2px solid var(--primary-color, #002147) !important;
   border-radius: var(--button-radius, 8px) !important;
   font-weight: 600 !important;
   text-transform: none !important;
@@ -4878,9 +4878,9 @@ span.admin-sidebar-link-text {
 }
 
 .admin-btn-secondary:hover {
-  background: var(--button-bg, rgba(255, 69, 0, 0.05)) !important;
-  border-color: var(--button-bg, #b22222) !important;
-  color: var(--button-text, #ffffff) !important;
+  background: rgba(0, 33, 71, 0.05) !important;
+  border-color: var(--primary-color, #002147) !important;
+  color: var(--primary-color, #002147) !important;
   transform: translateY(-1px) !important;
 }
 

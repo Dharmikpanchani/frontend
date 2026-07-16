@@ -36,14 +36,15 @@ export const useColorExtractor = () => {
             if (VITE_END_WITH_DOMAIN && host.endsWith(VITE_END_WITH_DOMAIN)) {
               return VITE_SUB_DOMAIN;
             }
-            return VITE_BASE_URL || "http://localhost:3032/api";
+            return VITE_BASE_URL || "http://localhost:3032";
           };
 
-          const baseUrl = getBaseURL();
+          const baseUrl = getBaseURL().replace(/\/+$/, "");
           const targetUrl = `${baseUrl}/images/proxy?url=${encodeURIComponent(imageUrl)}`;
           img.src = targetUrl.includes("?") ? `${targetUrl}&_t=${Date.now()}` : `${targetUrl}?_t=${Date.now()}`;
 
           img.onload = () => {
+            try {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
             if (!ctx) {
@@ -127,6 +128,10 @@ export const useColorExtractor = () => {
               cardBg: "#FFFFFF",
               success: true,
             });
+            } catch {
+              setExtracting(false);
+              resolve(null);
+            }
           };
 
           img.onerror = () => {

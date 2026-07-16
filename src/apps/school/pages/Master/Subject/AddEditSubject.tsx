@@ -42,7 +42,7 @@ export default function AddEditSubject() {
   const isView = pathname.endsWith("/view");
   const isEdit = !!id && pathname.endsWith("/edit");
 
-  const { departments } = useSelector(
+  const { allDepartments: departments } = useSelector(
     (state: RootState) => state.DepartmentReducer,
   );
   const { actionLoading, loading, selectedSubject } = useSelector(

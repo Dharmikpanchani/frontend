@@ -113,7 +113,7 @@ DataService.interceptors.response.use(
         isRefreshing = true;
         try {
           const res: any = await axios.post(
-            `${getBaseURL()}/${Api.REFRESH_TOKEN}`,
+            `${getBaseURL().replace(/\/+$/, "")}/${Api.REFRESH_TOKEN}`,
             {},
             { withCredentials: true },
           );

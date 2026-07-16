@@ -12,6 +12,7 @@ import {
   Autocomplete,
   InputAdornment,
   IconButton,
+  Tooltip,
 } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
@@ -25,6 +26,7 @@ import {
   Close as CloseIcon,
   Visibility,
   VisibilityOff,
+  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import { Formik, Form } from "formik";
 import { studentValidationSchema } from "@/utils/validation/FormikValidation";
@@ -32,6 +34,7 @@ import { addEditStudent, getStudentById } from "@/redux/slices/studentSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import { getSections } from "@/redux/slices/sectionSlice";
 import { CommonLoader } from "@/apps/common/loader/Loader";
+import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import AutoCompleteLocation from "@/apps/common/AutoCompleteLocation";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
@@ -139,98 +142,59 @@ export default function AddEditStudent() {
   );
 
   const handleSubmit = async (values: any) => {
-    const hasFile =
-      values.profileImage instanceof File ||
-      values.resultDocument instanceof File;
+    const formData = new FormData();
+    if (id) formData.append("id", id);
+    formData.append("fullName", values.fullName);
+    formData.append("email", values.email);
+    formData.append("phoneNumber", values.phoneNumber);
+    if (values.gender) formData.append("gender", values.gender);
+    if (values.bloodGroup) formData.append("bloodGroup", values.bloodGroup);
+    if (values.dateOfBirth)
+      formData.append("dateOfBirth", moment(values.dateOfBirth).toISOString());
+    formData.append("admissionNumber", values.admissionNumber);
+    if (values.admissionDate)
+      formData.append(
+        "admissionDate",
+        moment(values.admissionDate).toISOString(),
+      );
+    formData.append("classId", values.classId);
+    formData.append("sectionId", values.sectionId);
+    if (values.previousSchool)
+      formData.append("previousSchool", values.previousSchool);
+    if (values.previousClass)
+      formData.append("previousClass", values.previousClass);
+    if (values.percentage !== "" && values.percentage !== null)
+      formData.append("percentage", values.percentage);
+    if (values.address) formData.append("address", values.address);
+    if (values.city) formData.append("city", values.city);
+    if (values.state) formData.append("state", values.state);
+    if (values.country) formData.append("country", values.country);
+    if (values.pincode) formData.append("pincode", values.pincode);
+    if (values.fatherName) formData.append("fatherName", values.fatherName);
+    if (values.fatherPhone)
+      formData.append("fatherPhone", values.fatherPhone);
+    if (values.motherName) formData.append("motherName", values.motherName);
+    if (values.motherPhone)
+      formData.append("motherPhone", values.motherPhone);
+    if (values.guardianName)
+      formData.append("guardianName", values.guardianName);
+    if (values.guardianPhone)
+      formData.append("guardianPhone", values.guardianPhone);
+    if (!id && values.password) formData.append("password", values.password);
 
-    let payload: any;
-
-    if (hasFile) {
-      const formData = new FormData();
-      if (id) formData.append("id", id);
-      formData.append("fullName", values.fullName);
-      formData.append("email", values.email);
-      formData.append("phoneNumber", values.phoneNumber);
-      if (values.gender) formData.append("gender", values.gender);
-      if (values.bloodGroup) formData.append("bloodGroup", values.bloodGroup);
-      if (values.dateOfBirth)
-        formData.append("dateOfBirth", moment(values.dateOfBirth).toISOString());
-      formData.append("admissionNumber", values.admissionNumber);
-      if (values.admissionDate)
-        formData.append(
-          "admissionDate",
-          moment(values.admissionDate).toISOString(),
-        );
-      formData.append("classId", values.classId);
-      formData.append("sectionId", values.sectionId);
-      if (values.previousSchool)
-        formData.append("previousSchool", values.previousSchool);
-      if (values.previousClass)
-        formData.append("previousClass", values.previousClass);
-      if (values.percentage !== "" && values.percentage !== null)
-        formData.append("percentage", values.percentage);
-      if (values.resultDocument instanceof File)
-        formData.append("resultDocument", values.resultDocument);
-      if (values.address) formData.append("address", values.address);
-      if (values.city) formData.append("city", values.city);
-      if (values.state) formData.append("state", values.state);
-      if (values.country) formData.append("country", values.country);
-      if (values.pincode) formData.append("pincode", values.pincode);
-      if (values.fatherName) formData.append("fatherName", values.fatherName);
-      if (values.fatherPhone)
-        formData.append("fatherPhone", values.fatherPhone);
-      if (values.motherName) formData.append("motherName", values.motherName);
-      if (values.motherPhone)
-        formData.append("motherPhone", values.motherPhone);
-      if (values.guardianName)
-        formData.append("guardianName", values.guardianName);
-      if (values.guardianPhone)
-        formData.append("guardianPhone", values.guardianPhone);
-      if (!id && values.password) formData.append("password", values.password);
+    if (values.profileImage) {
       formData.append("profileImage", values.profileImage);
-      payload = formData;
-    } else {
-      payload = {
-        ...(id ? { id } : {}),
-        fullName: values.fullName,
-        email: values.email,
-        phoneNumber: values.phoneNumber,
-        ...(values.gender ? { gender: values.gender } : {}),
-        ...(values.bloodGroup ? { bloodGroup: values.bloodGroup } : {}),
-        ...(values.dateOfBirth
-          ? { dateOfBirth: moment(values.dateOfBirth).toISOString() }
-          : {}),
-        admissionNumber: values.admissionNumber,
-        ...(values.admissionDate
-          ? { admissionDate: moment(values.admissionDate).toISOString() }
-          : {}),
-        classId: values.classId,
-        sectionId: values.sectionId,
-        ...(values.previousSchool
-          ? { previousSchool: values.previousSchool }
-          : {}),
-        ...(values.previousClass
-          ? { previousClass: values.previousClass }
-          : {}),
-        ...(values.percentage !== "" && values.percentage !== null
-          ? { percentage: values.percentage }
-          : {}),
-        ...(values.address ? { address: values.address } : {}),
-        ...(values.city ? { city: values.city } : {}),
-        ...(values.state ? { state: values.state } : {}),
-        ...(values.country ? { country: values.country } : {}),
-        ...(values.pincode ? { pincode: values.pincode } : {}),
-        ...(values.fatherName ? { fatherName: values.fatherName } : {}),
-        ...(values.fatherPhone ? { fatherPhone: values.fatherPhone } : {}),
-        ...(values.motherName ? { motherName: values.motherName } : {}),
-        ...(values.motherPhone ? { motherPhone: values.motherPhone } : {}),
-        ...(values.guardianName ? { guardianName: values.guardianName } : {}),
-        ...(values.guardianPhone
-          ? { guardianPhone: values.guardianPhone }
-          : {}),
-        ...(!id && values.password ? { password: values.password } : {}),
-      };
+    } else if (values.profileImageUrl) {
+      formData.append("profileImage", values.profileImageUrl);
     }
+
+    if (values.resultDocument) {
+      formData.append("resultDocument", values.resultDocument);
+    } else if (values.resultDocumentUrl) {
+      formData.append("resultDocument", values.resultDocumentUrl);
+    }
+
+    const payload = formData;
 
     const result = await dispatch(addEditStudent(payload) as any);
     if (addEditStudent.fulfilled.match(result)) {
@@ -756,10 +720,31 @@ export default function AddEditStudent() {
                     )}
                   </Box>
 
-                  {/* Class */}
+                   {/* Class */}
                   <Box>
                     <Typography sx={labelSx}>
                       Class <span style={{ color: "#f04438" }}>*</span>
+                      {!isReadOnly && (
+                        <Tooltip title="Refresh Classes" arrow>
+                          <IconButton
+                            onClick={() =>
+                              dispatch(getClasses({ type: "filter" }) as any)
+                            }
+                            size="small"
+                            sx={{
+                              color: "var(--primary-color)",
+                              p: 0,
+                              ml: 1,
+                              "&:hover": {
+                                backgroundColor:
+                                  "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
+                              },
+                            }}
+                          >
+                            <RefreshIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </Typography>
                     <Autocomplete
                       options={classes || []}
@@ -793,6 +778,27 @@ export default function AddEditStudent() {
                   <Box>
                     <Typography sx={labelSx}>
                       Section <span style={{ color: "#f04438" }}>*</span>
+                      {!isReadOnly && (
+                        <Tooltip title="Refresh Sections" arrow>
+                          <IconButton
+                            onClick={() =>
+                              dispatch(getSections({ type: "filter" }) as any)
+                            }
+                            size="small"
+                            sx={{
+                              color: "var(--primary-color)",
+                              p: 0,
+                              ml: 1,
+                              "&:hover": {
+                                backgroundColor:
+                                  "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
+                              },
+                            }}
+                          >
+                            <RefreshIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </Typography>
                     <Autocomplete
                       options={sections || []}
@@ -1110,104 +1116,118 @@ export default function AddEditStudent() {
                     />
                   </Box>
 
-                  {/* City */}
-                  <Box>
-                    <Typography sx={labelSx}>City</Typography>
-                    <TextField
-                      fullWidth
-                      id="city"
-                      name="city"
-                      placeholder="Enter city"
-                      value={values.city}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.city && Boolean(errors.city)}
-                      disabled={isReadOnly}
-                      slotProps={{
-                        input: { sx: inputSx },
-                        htmlInput: { maxLength: 50 },
-                      }}
-                    />
-                    {touched.city && errors.city && (
-                      <FormHelperText className="error-text">
-                        {errors.city as string}
-                      </FormHelperText>
-                    )}
-                  </Box>
+                   {/* Address Details Grid Container */}
+                  <Box
+                    sx={{
+                      gridColumn: "1 / -1",
+                      display: "grid",
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "1fr 1fr",
+                        md: "1fr 1fr 1fr 1fr",
+                      },
+                      gap: 2,
+                    }}
+                  >
+                    {/* City */}
+                    <Box>
+                      <Typography sx={labelSx}>City</Typography>
+                      <TextField
+                        fullWidth
+                        id="city"
+                        name="city"
+                        placeholder="Enter city"
+                        value={values.city}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={touched.city && Boolean(errors.city)}
+                        disabled={isReadOnly}
+                        slotProps={{
+                          input: { sx: inputSx },
+                          htmlInput: { maxLength: 50 },
+                        }}
+                      />
+                      {touched.city && errors.city && (
+                        <FormHelperText className="error-text">
+                          {errors.city as string}
+                        </FormHelperText>
+                      )}
+                    </Box>
 
-                  {/* State */}
-                  <Box>
-                    <Typography sx={labelSx}>State</Typography>
-                    <TextField
-                      fullWidth
-                      id="state"
-                      name="state"
-                      placeholder="Enter state"
-                      value={values.state}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.state && Boolean(errors.state)}
-                      disabled={isReadOnly}
-                      slotProps={{
-                        input: { sx: inputSx },
-                        htmlInput: { maxLength: 50 },
-                      }}
-                    />
-                    {touched.state && errors.state && (
-                      <FormHelperText className="error-text">
-                        {errors.state as string}
-                      </FormHelperText>
-                    )}
-                  </Box>
+                    {/* State */}
+                    <Box>
+                      <Typography sx={labelSx}>State</Typography>
+                      <TextField
+                        fullWidth
+                        id="state"
+                        name="state"
+                        placeholder="Enter state"
+                        value={values.state}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={touched.state && Boolean(errors.state)}
+                        disabled={isReadOnly}
+                        slotProps={{
+                          input: { sx: inputSx },
+                          htmlInput: { maxLength: 50 },
+                        }}
+                      />
+                      {touched.state && errors.state && (
+                        <FormHelperText className="error-text">
+                          {errors.state as string}
+                        </FormHelperText>
+                      )}
+                    </Box>
 
-                  {/* Country */}
-                  <Box>
-                    <Typography sx={labelSx}>Country</Typography>
-                    <TextField
-                      fullWidth
-                      id="country"
-                      name="country"
-                      placeholder="Enter country"
-                      value={values.country}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.country && Boolean(errors.country)}
-                      disabled={isReadOnly}
-                      slotProps={{
-                        input: { sx: inputSx },
-                        htmlInput: { maxLength: 50 },
-                      }}
-                    />
-                    {touched.country && errors.country && (
-                      <FormHelperText className="error-text">
-                        {errors.country as string}
-                      </FormHelperText>
-                    )}
-                  </Box>
+                    {/* Country */}
+                    <Box>
+                      <Typography sx={labelSx}>Country</Typography>
+                      <TextField
+                        fullWidth
+                        id="country"
+                        name="country"
+                        placeholder="Enter country"
+                        value={values.country}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={touched.country && Boolean(errors.country)}
+                        disabled={isReadOnly}
+                        slotProps={{
+                          input: { sx: inputSx },
+                          htmlInput: { maxLength: 50 },
+                        }}
+                      />
+                      {touched.country && errors.country && (
+                        <FormHelperText className="error-text">
+                          {errors.country as string}
+                        </FormHelperText>
+                      )}
+                    </Box>
 
-                  {/* Pincode */}
-                  <Box>
-                    <Typography sx={labelSx}>Pincode</Typography>
-                    <TextField
-                      fullWidth
-                      id="pincode"
-                      name="pincode"
-                      placeholder="Enter pincode"
-                      value={values.pincode}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={touched.pincode && Boolean(errors.pincode)}
-                      disabled={isReadOnly}
-                      slotProps={{
-                        input: { sx: inputSx },
-                        htmlInput: { maxLength: 6 },
-                      }}
-                    />
-                    {touched.pincode && errors.pincode && (
-                      <FormHelperText className="error-text">
-                        {errors.pincode as string}
-                      </FormHelperText>
-                    )}
+                    {/* Pincode */}
+                    <Box>
+                      <Typography sx={labelSx}>Pincode</Typography>
+                      <TextField
+                        fullWidth
+                        id="pincode"
+                        name="pincode"
+                        placeholder="Enter pincode"
+                        value={values.pincode}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={touched.pincode && Boolean(errors.pincode)}
+                        disabled={isReadOnly}
+                        slotProps={{
+                          input: { sx: inputSx },
+                          htmlInput: { maxLength: 6 },
+                        }}
+                      />
+                      {touched.pincode && errors.pincode && (
+                        <FormHelperText className="error-text">
+                          {errors.pincode as string}
+                        </FormHelperText>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
 
@@ -1548,13 +1568,13 @@ export default function AddEditStudent() {
                         "&:hover": { boxShadow: "none" },
                       }}
                     >
-                      {actionLoading || isSubmitting
-                        ? id
-                          ? "Updating..."
-                          : "Saving..."
-                        : id
-                          ? "Update Student"
-                          : "Add Student"}
+                      {actionLoading || isSubmitting ? (
+                        <Spinner />
+                      ) : id ? (
+                        "Update Student"
+                      ) : (
+                        "Add Student"
+                      )}
                     </Button>
                   )}
                 </Box>

@@ -64,7 +64,7 @@ export default function Subject() {
   const { subjects, total, loading, actionLoading } = useSelector(
     (state: RootState) => state.SubjectReducer,
   );
-  const { departments } = useSelector(
+  const { allDepartments: departments } = useSelector(
     (state: RootState) => state.DepartmentReducer,
   );
   const { hasPermission, hasAnyPermission } = usePermissions();

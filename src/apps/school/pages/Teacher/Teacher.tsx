@@ -2265,7 +2265,7 @@ export default function Teacher() {
                     "&:hover": { backgroundColor: "#B42318" },
                   }}
                 >
-                  {verifying ? "Rejecting..." : "Reject Document"}
+                  {verifying ? <CircularProgress size={20} color="inherit" /> : "Reject Document"}
                 </Button>
               </DialogActions>
             </Form>

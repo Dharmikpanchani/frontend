@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Button, Grid, Card, Container } from "@mui/material";
+import { Box, Typography, Button, Grid, Card, Container, CircularProgress } from "@mui/material";
 import {
   CheckCircle as CheckIcon,
   NorthEast as ExternalIcon,
@@ -372,7 +372,7 @@ export default function UserPlan() {
                     }}
                   >
                     {paymentLoading ? (
-                      "Processing..."
+                      <CircularProgress size={20} color="inherit" />
                     ) : (
                       <>
                         Select Plan{" "}

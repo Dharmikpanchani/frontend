@@ -66,7 +66,7 @@ export const renameSession = (
 
 const refreshAccessToken = async (): Promise<string | null> => {
   try {
-    const res = await fetch(`${getBaseURL()}/${Api.REFRESH_TOKEN}`, {
+    const res = await fetch(`${getBaseURL().replace(/\/+$/, "")}/${Api.REFRESH_TOKEN}`, {
       method: "POST",
       credentials: "include",
     });
@@ -96,7 +96,7 @@ const doSSERequest = async (
   isRetry = false
 ) => {
   try {
-    const response = await fetch(`${getBaseURL()}/${Api.COPILOT_CHAT}`, {
+    const response = await fetch(`${getBaseURL().replace(/\/+$/, "")}/${Api.COPILOT_CHAT}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

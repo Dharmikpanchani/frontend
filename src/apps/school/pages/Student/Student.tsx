@@ -1715,9 +1715,9 @@ export default function Student() {
                   boxShadow: "0 4px 14px rgba(5, 150, 105, 0.3)"
                 } 
               }}
-              startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <ApprovedIcon sx={{ fontSize: 16 }} />}
+              startIcon={!actionLoading ? <ApprovedIcon sx={{ fontSize: 16 }} /> : null}
             >
-              {actionLoading ? "Processing..." : "Approve"}
+              {actionLoading ? <CircularProgress size={20} color="inherit" /> : "Approve"}
             </Button>
           </Box>
         </DialogActions>
@@ -1810,9 +1810,9 @@ export default function Student() {
                 boxShadow: "none"
               }
             }}
-            startIcon={actionLoading ? <CircularProgress size={14} color="inherit" /> : <RejectedIcon sx={{ fontSize: 16 }} />}
+            startIcon={!actionLoading ? <RejectedIcon sx={{ fontSize: 16 }} /> : null}
           >
-            {actionLoading ? "Rejecting..." : "Confirm Reject"}
+            {actionLoading ? <CircularProgress size={20} color="inherit" /> : "Confirm Reject"}
           </Button>
         </DialogActions>
       </Dialog>

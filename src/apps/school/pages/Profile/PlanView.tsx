@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import {
   Assignment as AssignmentIcon,
@@ -1250,7 +1251,7 @@ export default function PlanView() {
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
             }}
           >
-            {actionLoading ? "Activating..." : "Activate Instantly"}
+            {actionLoading ? <CircularProgress size={20} color="inherit" /> : "Activate Instantly"}
           </Button>
         </DialogActions>
       </Dialog>
