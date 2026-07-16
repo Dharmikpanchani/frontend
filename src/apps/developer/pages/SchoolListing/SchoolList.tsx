@@ -419,11 +419,12 @@ export default function SchoolList() {
                           >
                             <Avatar
                               src={`${import.meta.env.VITE_BASE_URL_IMAGE}/${data?.logo}`}
-                              variant="circular"
+                              variant="rounded"
                               sx={{
                                 width: 45,
                                 height: 45,
                                 border: "1px solid #ddd",
+                                borderRadius: "10px",
                               }}
                             >
                               {data?.schoolName?.[0]}

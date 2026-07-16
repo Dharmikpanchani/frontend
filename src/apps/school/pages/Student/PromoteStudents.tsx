@@ -265,7 +265,7 @@ export default function PromoteStudents() {
                         .filter((s) => (typeof s.classId === "object" ? s.classId?._id === fromClassId : s.classId === fromClassId))
                         .map((s) => (
                           <MenuItem key={s._id} value={s._id}>
-                            {s.name}
+                            {s.code || s.name}
                           </MenuItem>
                         ))}
                     </Select>
@@ -297,7 +297,7 @@ export default function PromoteStudents() {
           <Card sx={{ height: "100%", boxShadow: "0px 1px 3px rgba(16, 24, 40, 0.1)" }}>
             <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
               <Box display="flex" alignItems="center" gap={1}>
-                <SchoolIcon sx={{ color: "#12B76A" }} />
+                <SchoolIcon sx={{ color: "var(--primary-color)" }} />
                 <Typography variant="subtitle1" fontWeight="bold">
                   Promote To (Destination)
                 </Typography>
@@ -369,7 +369,7 @@ export default function PromoteStudents() {
                         .filter((s) => (typeof s.classId === "object" ? s.classId?._id === toClassId : s.classId === toClassId))
                         .map((s) => (
                           <MenuItem key={s._id} value={s._id}>
-                            {s.name}
+                            {s.code || s.name}
                           </MenuItem>
                         ))}
                     </Select>
@@ -449,7 +449,7 @@ export default function PromoteStudents() {
                         <TableCell>{student.rollNumber || "—"}</TableCell>
                         <TableCell>{student.fullName}</TableCell>
                         <TableCell>
-                          {student.classId?.name || "—"} {student.sectionId?.name || ""}
+                          {student.classId?.name || "—"} {student.sectionId?.code || student.sectionId?.name || ""}
                         </TableCell>
                       </TableRow>
                     );
@@ -487,7 +487,7 @@ export default function PromoteStudents() {
               </Typography>
               {toSectionId && (
                 <Typography variant="body2">
-                  <strong>Section:</strong> {allSections.find((s) => s._id === toSectionId)?.name}
+                  <strong>Section:</strong> {allSections.find((s) => s._id === toSectionId)?.code || allSections.find((s) => s._id === toSectionId)?.name}
                 </Typography>
               )}
             </Box>

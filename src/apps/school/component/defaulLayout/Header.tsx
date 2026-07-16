@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Box, Button, Typography, Menu, MenuItem } from "@mui/material";
+import { Box, Button, Typography, Menu, MenuItem, FormControl, Select } from "@mui/material";
 import {
   ExpandMore,
   Settings as SettingsIcon,
@@ -9,6 +9,9 @@ import {
 } from "@mui/icons-material";
 import { authService } from "@/api/services/auth.service";
 import { logoutAdmin } from "@/redux/slices/authSlice";
+import { masterService } from "@/api/services/master.service";
+import { setViewingYear } from "@/redux/slices/academicYearSlice";
+import { inputSx } from "@/utils/styles/commonSx";
 import Svg from "@/assets/Svg";
 import type { RootState } from "@/redux/Store";
 
@@ -21,9 +24,35 @@ export default function Header(props: any) {
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
   );
+  const { viewingYearId } = useSelector(
+    (state: RootState) => state.AcademicYearReducer,
+  );
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [imageError, setImageError] = useState(false);
+  const [allYears, setAllYears] = useState<any[]>([]);
+
+  useEffect(() => {
+    masterService.getAcademicYears().then((res: any) => {
+      const years: any[] = res?.data || [];
+      const unique = years.filter(
+        (yr: any, i: number, arr: any[]) => arr.findIndex((y: any) => y._id === yr._id) === i
+      );
+      setAllYears(unique);
+      if (!viewingYearId) {
+        const current = unique.find((y: any) => y.isCurrent) || unique[0];
+        if (current) {
+          dispatch(setViewingYear({
+            _id: current._id,
+            label: current.label,
+            startYear: current.startYear,
+            endYear: current.endYear,
+          }));
+        }
+      }
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -94,6 +123,57 @@ export default function Header(props: any) {
           )}
         </Box>
         <Box className="admin-header-right" sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          {allYears.length > 0 && (
+            <FormControl size="small" sx={{ minWidth: 140, mr: 1.5 }}>
+              <Select
+                value={viewingYearId || ""}
+                onChange={(e) => {
+                  const yr = allYears.find((y) => y._id === e.target.value);
+                  if (yr) {
+                    dispatch(
+                      setViewingYear({
+                        _id: yr._id,
+                        label: yr.label,
+                        startYear: yr.startYear,
+                        endYear: yr.endYear,
+                      }),
+                    );
+                  }
+                }}
+                displayEmpty
+                sx={{
+                  height: "40px",
+                  borderRadius: "var(--button-radius, 6px) !important",
+                  background: "linear-gradient(135deg, #ffffff 20%, #e2e8f0 100%) !important",
+                  "&.MuiOutlinedInput-root, & .MuiOutlinedInput-root, & .MuiInputBase-root": {
+                    background: "linear-gradient(135deg, #ffffff 20%, #e2e8f0 100%) !important",
+                    borderRadius: "var(--button-radius, 6px) !important",
+                  },
+                  "& .MuiSelect-select": {
+                    color: "#111827",
+                    fontWeight: 600,
+                    fontSize: "0.875rem",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline, & fieldset": {
+                    borderColor: "var(--input-border, #ced4da) !important",
+                    borderWidth: "1px !important",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline, &:hover fieldset": {
+                    borderColor: "var(--primary-color, #002147) !important",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline, &.Mui-focused fieldset": {
+                    borderColor: "var(--primary-color, #002147) !important",
+                  },
+                }}
+              >
+                {allYears.map((yr: any) => (
+                  <MenuItem key={yr._id} value={yr._id} sx={{ fontSize: "14px" }}>
+                    {yr.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
 
           <Box className="admin-header-drop-main">
             <Button

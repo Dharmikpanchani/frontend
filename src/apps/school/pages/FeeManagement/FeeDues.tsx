@@ -330,166 +330,226 @@ const FeeDues = () => {
 
       {/* Summary Stats Cards - premium theme wise */}
       <Box className="admin-dashboad-row" sx={{ mb: 4 }}>
-        <Box className="admin-dash-card-row" sx={{ gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" } }}>
+        <Box className="admin-dash-card-row" sx={{ gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" }, gap: 2.5 }}>
           {/* Card 1 */}
           <Box className="grid-column">
             <Box
-              className="admin-dashboard-box common-card"
+              className="common-card"
               sx={{
                 background: "#ffffff !important",
-                border: "1px solid #e2e8f0 !important",
-                boxShadow: "0 4px 12px -2px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important",
+                border: "1px solid rgba(47, 84, 235, 0.15) !important",
+                borderTop: "3px solid #2f54eb !important",
+                borderRadius: "12px !important",
+                boxShadow: "0 4px 18px rgba(0, 0, 0, 0.03) !important",
                 transition: "all 0.2s ease-in-out",
+                p: "12px 18px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                minHeight: "100px",
                 cursor: "pointer",
                 "&:hover": {
                   transform: "translateY(-2px)",
-                  boxShadow: "0 12px 20px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04) !important",
-                  borderColor: "#FFE094 !important",
+                  boxShadow: "0 10px 20px rgba(47, 84, 235, 0.06) !important",
+                  borderColor: "rgba(47, 84, 235, 0.25) !important",
                 }
               }}
             >
-              <Box className="admin-dashboard-inner-box">
-                <Box className="admin-dash-left">
-                  <Tooltip title="Total Outstanding" arrow placement="bottom" className="admin-tooltip">
-                    <Typography
-                      className="admin-dash-text"
-                      component="p"
-                      sx={{ color: "#64748b !important", fontWeight: 600 }}
-                    >
-                      Total Outstanding
-                    </Typography>
-                  </Tooltip>
-                  <Typography
-                    className="admin-dash-price"
-                    variant="h1"
-                    component="h1"
-                    sx={{
-                      fontSize: "20px !important",
-                      fontWeight: 800,
-                      color: "#1e293b !important",
-                      "&::after": {
-                        backgroundColor: "#E69100 !important",
-                        width: "20px !important",
-                      },
-                    }}
-                  >
-                    ₹{totalOutstandingAmount.toLocaleString("en-IN")}
-                  </Typography>
-                </Box>
-                <Box className="admin-dash-right">
-                  <Box className="admin-dash-icon-box" sx={{ background: "rgba(255, 168, 0, 0.08) !important", borderRadius: "8px !important", height: "36px !important", width: "36px !important" }}>
-                    <MoneyOffIcon style={{ color: "#E69100", fontSize: "18px" }} />
-                  </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                <Typography
+                  sx={{
+                    color: "#475569",
+                    fontWeight: 700,
+                    fontSize: "10px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.3px"
+                  }}
+                >
+                  Total Outstanding
+                </Typography>
+                <Box
+                  sx={{
+                    background: "rgba(47, 84, 235, 0.08)",
+                    borderRadius: "50%",
+                    height: "28px",
+                    width: "28px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <MoneyOffIcon style={{ color: "#2f54eb", fontSize: "15px" }} />
                 </Box>
               </Box>
+              <Typography
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: 800,
+                  color: "#0f172a",
+                  mb: 0.5,
+                  lineHeight: 1.2
+                }}
+              >
+                ₹{totalOutstandingAmount.toLocaleString("en-IN")}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "11px",
+                  fontWeight: 500,
+                  color: "#64748b"
+                }}
+              >
+                Across all classes
+              </Typography>
             </Box>
           </Box>
 
           {/* Card 2 */}
           <Box className="grid-column">
             <Box
-              className="admin-dashboard-box common-card"
+              className="common-card"
               sx={{
                 background: "#ffffff !important",
-                border: "1px solid #e2e8f0 !important",
-                boxShadow: "0 4px 12px -2px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important",
+                border: "1px solid rgba(245, 158, 11, 0.15) !important",
+                borderTop: "3px solid #f59e0b !important",
+                borderRadius: "12px !important",
+                boxShadow: "0 4px 18px rgba(0, 0, 0, 0.03) !important",
                 transition: "all 0.2s ease-in-out",
+                p: "12px 18px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                minHeight: "100px",
                 cursor: "pointer",
                 "&:hover": {
                   transform: "translateY(-2px)",
-                  boxShadow: "0 12px 20px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04) !important",
-                  borderColor: "#ADC6FF !important",
+                  boxShadow: "0 10px 20px rgba(245, 158, 11, 0.06) !important",
+                  borderColor: "rgba(245, 158, 11, 0.25) !important",
                 }
               }}
             >
-              <Box className="admin-dashboard-inner-box">
-                <Box className="admin-dash-left">
-                  <Tooltip title="Defaulter Students" arrow placement="bottom" className="admin-tooltip">
-                    <Typography
-                      className="admin-dash-text"
-                      component="p"
-                      sx={{ color: "#64748b !important", fontWeight: 600 }}
-                    >
-                      Defaulter Students
-                    </Typography>
-                  </Tooltip>
-                  <Typography
-                    className="admin-dash-price"
-                    variant="h1"
-                    component="h1"
-                    sx={{
-                      fontSize: "20px !important",
-                      fontWeight: 800,
-                      color: "#1e293b !important",
-                      "&::after": {
-                        backgroundColor: "#2F54EB !important",
-                        width: "20px !important",
-                      },
-                    }}
-                  >
-                    {uniqueStudentsCount}
-                  </Typography>
-                </Box>
-                <Box className="admin-dash-right">
-                  <Box className="admin-dash-icon-box" sx={{ background: "rgba(47, 84, 235, 0.08) !important", borderRadius: "8px !important", height: "36px !important", width: "36px !important" }}>
-                    <GroupIcon style={{ color: "#2F54EB", fontSize: "18px" }} />
-                  </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                <Typography
+                  sx={{
+                    color: "#475569",
+                    fontWeight: 700,
+                    fontSize: "10px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.3px"
+                  }}
+                >
+                  Defaulter Students
+                </Typography>
+                <Box
+                  sx={{
+                    background: "rgba(245, 158, 11, 0.08)",
+                    borderRadius: "50%",
+                    height: "28px",
+                    width: "28px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <GroupIcon style={{ color: "#f59e0b", fontSize: "15px" }} />
                 </Box>
               </Box>
+              <Typography
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: 800,
+                  color: "#0f172a",
+                  mb: 0.5,
+                  lineHeight: 1.2
+                }}
+              >
+                {uniqueStudentsCount}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "11px",
+                  fontWeight: 500,
+                  color: "#64748b"
+                }}
+              >
+                Active records
+              </Typography>
             </Box>
           </Box>
 
           {/* Card 3 */}
           <Box className="grid-column">
             <Box
-              className="admin-dashboard-box common-card"
+              className="common-card"
               sx={{
                 background: "#ffffff !important",
-                border: "1px solid #e2e8f0 !important",
-                boxShadow: "0 4px 12px -2px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important",
+                border: "1px solid rgba(239, 68, 68, 0.15) !important",
+                borderTop: "3px solid #ef4444 !important",
+                borderRadius: "12px !important",
+                boxShadow: "0 4px 18px rgba(0, 0, 0, 0.03) !important",
                 transition: "all 0.2s ease-in-out",
+                p: "12px 18px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                minHeight: "100px",
                 cursor: "pointer",
                 "&:hover": {
                   transform: "translateY(-2px)",
-                  boxShadow: "0 12px 20px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04) !important",
-                  borderColor: "#FFA39E !important",
+                  boxShadow: "0 10px 20px rgba(239, 68, 68, 0.06) !important",
+                  borderColor: "rgba(239, 68, 68, 0.25) !important",
                 }
               }}
             >
-              <Box className="admin-dashboard-inner-box">
-                <Box className="admin-dash-left">
-                  <Tooltip title="Total Late Fines" arrow placement="bottom" className="admin-tooltip">
-                    <Typography
-                      className="admin-dash-text"
-                      component="p"
-                      sx={{ color: "#64748b !important", fontWeight: 600 }}
-                    >
-                      Total Late Fines
-                    </Typography>
-                  </Tooltip>
-                  <Typography
-                    className="admin-dash-price"
-                    variant="h1"
-                    component="h1"
-                    sx={{
-                      fontSize: "20px !important",
-                      fontWeight: 800,
-                      color: "#1e293b !important",
-                      "&::after": {
-                        backgroundColor: "#CF1322 !important",
-                        width: "20px !important",
-                      },
-                    }}
-                  >
-                    ₹{totalFineAmount.toLocaleString("en-IN")}
-                  </Typography>
-                </Box>
-                <Box className="admin-dash-right">
-                  <Box className="admin-dash-icon-box" sx={{ background: "rgba(245, 34, 45, 0.08) !important", borderRadius: "8px !important", height: "36px !important", width: "36px !important" }}>
-                    <NotificationsIcon style={{ color: "#F5222D", fontSize: "18px" }} />
-                  </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                <Typography
+                  sx={{
+                    color: "#475569",
+                    fontWeight: 700,
+                    fontSize: "10px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.3px"
+                  }}
+                >
+                  Total Late Fines
+                </Typography>
+                <Box
+                  sx={{
+                    background: "rgba(239, 68, 68, 0.08)",
+                    borderRadius: "50%",
+                    height: "28px",
+                    width: "28px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <NotificationsIcon style={{ color: "#ef4444", fontSize: "15px" }} />
                 </Box>
               </Box>
+              <Typography
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: 800,
+                  color: "#0f172a",
+                  mb: 0.5,
+                  lineHeight: 1.2
+                }}
+              >
+                ₹{totalFineAmount.toLocaleString("en-IN")}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "11px",
+                  fontWeight: 500,
+                  color: "#64748b"
+                }}
+              >
+                Accumulated charges
+              </Typography>
             </Box>
           </Box>
         </Box>

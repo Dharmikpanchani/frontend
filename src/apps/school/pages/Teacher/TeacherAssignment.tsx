@@ -576,13 +576,6 @@ export default function TeacherAssignment() {
                           }
                         }
                       }}
-                      popupIcon={
-                        <img
-                          src={Svg.down}
-                          style={{ width: "10px" }}
-                          alt="dropdown"
-                        />
-                      }
                       clearIcon={null}
                       renderInput={(params) => (
                         <TextField
@@ -831,13 +824,6 @@ export default function TeacherAssignment() {
                           }
                         }
                       }}
-                      popupIcon={
-                        <img
-                          src={Svg.down}
-                          style={{ width: "10px" }}
-                          alt="dropdown"
-                        />
-                      }
                       clearIcon={null}
                       renderInput={(params) => (
                         <TextField

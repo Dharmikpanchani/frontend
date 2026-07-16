@@ -98,32 +98,11 @@ export default function Sidebar(props: any) {
 
   const masterManagement = [
     {
-      title: "Teachers",
-      pathName: "/teacher",
-      icon: Svg.userList,
-      show: hasPermission(schoolAdminPermission.teacher.read),
-      menuHighlight: ["teacher"],
-    },
-    {
-      title: "Teacher Assignments",
-      pathName: "/teacher/assignments",
-      icon: Svg.latestUpdate,
-      show: hasPermission(schoolAdminPermission.teacher.read),
-      menuHighlight: ["teacher", "assignments"],
-    },
-    {
       title: "Students",
       pathName: "/student",
       icon: Svg.userList,
       show: hasPermission(schoolAdminPermission.student?.read),
       menuHighlight: ["student"],
-    },
-    {
-      title: "Inquiries",
-      pathName: "/student/inquiries",
-      icon: Svg.latestUpdate,
-      show: hasPermission(schoolAdminPermission.student?.read),
-      menuHighlight: ["student", "inquiries"],
     },
     {
       title: "Student Promotion",
@@ -159,6 +138,27 @@ export default function Sidebar(props: any) {
       icon: Svg.filter,
       show: hasPermission(schoolAdminPermission.section.read),
       menuHighlight: ["section"],
+    },
+    {
+      title: "Teachers",
+      pathName: "/teacher",
+      icon: Svg.userList,
+      show: hasPermission(schoolAdminPermission.teacher.read),
+      menuHighlight: ["teacher"],
+    },
+    {
+      title: "Teacher Assignments",
+      pathName: "/teacher/assignments",
+      icon: Svg.latestUpdate,
+      show: hasPermission(schoolAdminPermission.teacher.read),
+      menuHighlight: ["teacher", "assignments"],
+    },
+    {
+      title: "Inquiries",
+      pathName: "/student/inquiries",
+      icon: Svg.latestUpdate,
+      show: hasPermission(schoolAdminPermission.student?.read),
+      menuHighlight: ["student", "inquiries"],
     },
   ];
 

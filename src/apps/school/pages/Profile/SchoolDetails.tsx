@@ -222,6 +222,9 @@ export default function SchoolDetails() {
       panNumber: d.panNumber || "",
       tanNumber: d.tanNumber || "",
       gstNumber: d.gstNumber || "",
+      principalName: d.principalName || "",
+      udiseCode: d.udiseCode || "",
+      ctsNumber: d.ctsNumber || "",
       logoUrl: d.logo ? `${imageBaseUrl}/${d.logo}` : "",
       bannerUrl: d.banner ? `${imageBaseUrl}/${d.banner}` : "",
       affiliationCertificateUrl: d.affiliationCertificate
@@ -264,6 +267,9 @@ export default function SchoolDetails() {
       panNumber: d.panNumber || "",
       tanNumber: d.tanNumber || "",
       gstNumber: d.gstNumber || "",
+      principalName: d.principalName || "",
+      udiseCode: d.udiseCode || "",
+      ctsNumber: d.ctsNumber || "",
       logo: null as File | null,
       logoUrl: d.logo || "",
       banner: null as File | null,
@@ -307,6 +313,9 @@ export default function SchoolDetails() {
       formData.append("panNumber", values.panNumber || "");
       formData.append("tanNumber", values.tanNumber || "");
       formData.append("gstNumber", values.gstNumber || "");
+      if (values.principalName !== undefined) formData.append("principalName", values.principalName);
+      if (values.udiseCode !== undefined) formData.append("udiseCode", values.udiseCode);
+      if (values.ctsNumber !== undefined) formData.append("ctsNumber", values.ctsNumber);
       if (values.logo) formData.append("logo", values.logo);
       if (values.banner) formData.append("banner", values.banner);
       if (values.affiliationCertificate)
@@ -337,7 +346,8 @@ export default function SchoolDetails() {
     viewData.address || viewData.city || viewData.state || viewData.zipCode || viewData.country;
   const hasLegal =
     viewData.registrationNumber || viewData.panNumber || viewData.tanNumber ||
-    viewData.gstNumber || viewData.affiliationCertificateUrl;
+    viewData.gstNumber || viewData.affiliationCertificateUrl ||
+    viewData.principalName || viewData.udiseCode || viewData.ctsNumber;
   const hasBranding = viewData.bannerUrl || viewData.authorizedSignatureUrl;
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -507,6 +517,21 @@ export default function SchoolDetails() {
                       />
                       <FormHelperText className="error-text">
                         {touched.ownerName && errors.ownerName ? (errors.ownerName as string) : ""}
+                      </FormHelperText>
+                    </Box>
+
+                    {/* Principal Name */}
+                    <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                      <Typography sx={labelSx}>Principal Name</Typography>
+                      <TextField
+                        fullWidth name="principalName" placeholder="Principal's full name"
+                        variant="outlined" sx={inputSx} value={values.principalName}
+                        onChange={handleChange} onBlur={handleBlur}
+                        error={touched.principalName && Boolean(errors.principalName)}
+                        slotProps={{ htmlInput: { maxLength: 100 } }}
+                      />
+                      <FormHelperText className="error-text">
+                        {touched.principalName && errors.principalName ? (errors.principalName as string) : ""}
                       </FormHelperText>
                     </Box>
 
@@ -876,6 +901,38 @@ export default function SchoolDetails() {
                       </FormHelperText>
                     </Box>
 
+
+
+                    {/* UDISE Code */}
+                    <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                      <Typography sx={labelSx}>UDISE Code</Typography>
+                      <TextField
+                        fullWidth name="udiseCode" placeholder="e.g. 27120100501"
+                        variant="outlined" sx={inputSx} value={values.udiseCode}
+                        onChange={handleChange} onBlur={handleBlur}
+                        error={touched.udiseCode && Boolean(errors.udiseCode)}
+                        slotProps={{ htmlInput: { maxLength: 50 } }}
+                      />
+                      <FormHelperText className="error-text">
+                        {touched.udiseCode && errors.udiseCode ? (errors.udiseCode as string) : ""}
+                      </FormHelperText>
+                    </Box>
+
+                    {/* CTS Number */}
+                    <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                      <Typography sx={labelSx}>CTS Number</Typography>
+                      <TextField
+                        fullWidth name="ctsNumber" placeholder="e.g. CTS12345"
+                        variant="outlined" sx={inputSx} value={values.ctsNumber}
+                        onChange={handleChange} onBlur={handleBlur}
+                        error={touched.ctsNumber && Boolean(errors.ctsNumber)}
+                        slotProps={{ htmlInput: { maxLength: 50 } }}
+                      />
+                      <FormHelperText className="error-text">
+                        {touched.ctsNumber && errors.ctsNumber ? (errors.ctsNumber as string) : ""}
+                      </FormHelperText>
+                    </Box>
+
                     {/* Affiliation Certificate */}
                     <Box gridColumn="span 12">
                       <Typography sx={labelSx}>Affiliation Certificate</Typography>
@@ -1187,6 +1244,7 @@ export default function SchoolDetails() {
         >
           <ViewField label="School Name" value={viewData.schoolName} />
           <ViewField label="Owner Name" value={viewData.ownerName} />
+          <ViewField label="Principal Name" value={viewData.principalName} />
           <ViewField label="Trust / Society Name" value={viewData.trustName} />
           <ViewField label="School Gender Type" value={viewData.schoolGenderType} />
           <ViewField label="Established Year" value={viewData.establishedYear} />
@@ -1286,6 +1344,8 @@ export default function SchoolDetails() {
               <ViewField label="PAN Number" value={viewData.panNumber} />
               <ViewField label="TAN Number" value={viewData.tanNumber} />
               <ViewField label="GST Number" value={viewData.gstNumber} />
+              <ViewField label="UDISE Code" value={viewData.udiseCode} />
+              <ViewField label="CTS Number" value={viewData.ctsNumber} />
               {viewData.affiliationCertificateUrl && (
                 <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                   <Typography sx={labelSx}>Affiliation Certificate</Typography>

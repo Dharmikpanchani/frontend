@@ -137,6 +137,9 @@ export default function RegisterSchool() {
       websiteUrl: isEdit || isView ? selectedSchool?.websiteUrl || "" : "",
       tanNumber: isEdit || isView ? selectedSchool?.tanNumber || "" : "",
       gstNumber: isEdit || isView ? selectedSchool?.gstNumber || "" : "",
+      principalName: isEdit || isView ? selectedSchool?.principalName || "" : "",
+      udiseCode: isEdit || isView ? selectedSchool?.udiseCode || "" : "",
+      ctsNumber: isEdit || isView ? selectedSchool?.ctsNumber || "" : "",
       authorizedSignature: null,
       authorizedSignatureUrl: isEdit || isView ? selectedSchool?.authorizedSignature || "" : "",
     }),
@@ -196,6 +199,9 @@ export default function RegisterSchool() {
     formData.append("websiteUrl", values.websiteUrl);
     formData.append("tanNumber", values.tanNumber);
     formData.append("gstNumber", values.gstNumber);
+    if (values.principalName) formData.append("principalName", values.principalName);
+    if (values.udiseCode) formData.append("udiseCode", values.udiseCode);
+    if (values.ctsNumber) formData.append("ctsNumber", values.ctsNumber);
     if (values.authorizedSignature) {
       formData.append("authorizedSignature", values.authorizedSignature);
     }
@@ -501,6 +507,29 @@ export default function RegisterSchool() {
                         <FormHelperText className="error-text">
                           {touched.ownerName && errors.ownerName
                             ? (errors.ownerName as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+                      {/* Principal Name */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Principal Name</Typography>
+                        <TextField
+                          fullWidth
+                          name="principalName"
+                          placeholder="Principal's full name"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.principalName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.principalName && Boolean(errors.principalName)}
+                          disabled={isView}
+                          slotProps={{ htmlInput: { maxLength: 100 } }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.principalName && errors.principalName
+                            ? (errors.principalName as string)
                             : ""}
                         </FormHelperText>
                       </Box>
@@ -1175,6 +1204,52 @@ export default function RegisterSchool() {
                         <FormHelperText className="error-text">
                           {touched.gstNumber && errors.gstNumber
                             ? (errors.gstNumber as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+
+
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>UDISE Code</Typography>
+                        <TextField
+                          fullWidth
+                          name="udiseCode"
+                          placeholder="e.g. 27120100501"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.udiseCode}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.udiseCode && Boolean(errors.udiseCode)}
+                          disabled={isView}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.udiseCode && errors.udiseCode
+                            ? (errors.udiseCode as string)
+                            : ""}
+                        </FormHelperText>
+                      </Box>
+
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>CTS Number</Typography>
+                        <TextField
+                          fullWidth
+                          name="ctsNumber"
+                          placeholder="e.g. CTS12345"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.ctsNumber}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.ctsNumber && Boolean(errors.ctsNumber)}
+                          disabled={isView}
+                          slotProps={{ htmlInput: { maxLength: 50 } }}
+                        />
+                        <FormHelperText className="error-text">
+                          {touched.ctsNumber && errors.ctsNumber
+                            ? (errors.ctsNumber as string)
                             : ""}
                         </FormHelperText>
                       </Box>

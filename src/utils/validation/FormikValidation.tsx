@@ -680,6 +680,9 @@ export const schoolValidationSchema = Yup.object({
   panNumber: panValidation(false),
   tanNumber: Yup.string().matches(/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/, "Please enter a valid 10-character TAN (e.g. ABCD12345E)").optional().nullable(),
   gstNumber: gstValidation(false),
+  principalName: Yup.string().max(100, "Principal name must be at most 100 characters").optional(),
+  udiseCode: Yup.string().max(50, "UDISE code must be at most 50 characters").optional(),
+  ctsNumber: Yup.string().max(50, "CTS number must be at most 50 characters").optional(),
   affiliationCertificate: fileValidation("Affiliation certificate", false),
   affiliationCertificateUrl: Yup.string().optional(),
   // Branding
@@ -719,6 +722,9 @@ export const schoolProfileUpdateValidationSchema = Yup.object({
   panNumber: panValidation(false),
   tanNumber: Yup.string().matches(/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/, "Please enter a valid 10-character TAN (e.g. ABCD12345E)").optional().nullable(),
   gstNumber: gstValidation(false),
+  principalName: Yup.string().max(100, "Principal name must be at most 100 characters").optional(),
+  udiseCode: Yup.string().max(50, "UDISE code must be at most 50 characters").optional(),
+  ctsNumber: Yup.string().max(50, "CTS number must be at most 50 characters").optional(),
   logo: imageValidation("School logo", false, 200, 200).nullable(),
   banner: imageValidation("School banner", false, 1200, 400).nullable(),
   affiliationCertificate: fileValidation("Affiliation certificate", false),
@@ -974,6 +980,13 @@ export const teacherValidationSchema = Yup.object().shape(
     qualification: genericStringValidation("Qualification", 2, 100, false),
     specialization: genericStringValidation("Specialization", 2, 100, false),
     trainingDetails: genericStringValidation("Training Details", 2, 200, false),
+    trainingPeriod: Yup.number()
+      .typeError("Training period must be a number")
+      .integer("Training period must be a whole number")
+      .min(0, "Cannot be negative")
+      .max(999, "Must be under 999")
+      .optional()
+      .nullable(),
     udiseTeacherNumber: genericStringValidation("UDISE Teacher Number", 2, 30, false),
     ctsNumber: genericStringValidation("CTS Number", 2, 30, false),
     designation: Yup.string()

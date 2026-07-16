@@ -86,64 +86,7 @@ export default function Dashboard() {
             {adminDetails?.schoolData?.schoolName || "Vidyasetu School"} Portal
           </Typography>
 
-          {/* Academic Year Selector */}
-          <Box sx={{ mt: 1.5, display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 600, color: "#fff", opacity: 0.9 }}
-            >
-              Academic Year:
-            </Typography>
-            {allYears.length > 0 ? (
-              <FormControl size="small">
-                <Select
-                  value={selectedYear?._id || ""}
-                  onChange={(e) => {
-                    const yr = allYears.find((y) => y._id === e.target.value);
-                    setSelectedYear(yr || null);
-                    if (yr) {
-                      dispatch(setViewingYear({
-                        _id: yr._id,
-                        label: yr.label,
-                        startYear: yr.startYear,
-                        endYear: yr.endYear,
-                      }));
-                    }
-                  }}
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 600,
-                    fontSize: "0.875rem",
-                    background: "rgba(255,255,255,0.15)",
-                    backdropFilter: "blur(5px)",
-                    borderRadius: "8px",
-                    minWidth: 140,
-                    ".MuiOutlinedInput-notchedOutline": { border: "1px solid rgba(255,255,255,0.4)" },
-                    "&:hover .MuiOutlinedInput-notchedOutline": { border: "1px solid rgba(255,255,255,0.8)" },
-                    ".MuiSvgIcon-root": { color: "#fff" },
-                  }}
-                >
-                  {allYears.map((year) => (
-                    <MenuItem key={year._id} value={year._id}>
-                      {year.label}
-                      {!year.isCurrent ? " 🗄" : ""}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ) : (
-              <Box
-                sx={{
-                  px: 2, py: 0.5, borderRadius: "8px",
-                  background: "rgba(255,255,255,0.15)", backdropFilter: "blur(5px)",
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 600, color: "#fff" }}>
-                  Loading...
-                </Typography>
-              </Box>
-            )}
-          </Box>
+
         </Box>
 
         <Box sx={{ textAlign: "right", display: { xs: "none", lg: "block" } }}>

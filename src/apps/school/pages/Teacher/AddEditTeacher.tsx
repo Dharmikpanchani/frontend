@@ -29,7 +29,9 @@ import {
   Delete as DeleteIcon,
   CameraAlt as CameraAltIcon,
   Refresh as RefreshIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
+import { renderSingleImage } from "@/apps/common/uploadImageAndVideo";
 import { InputAdornment, IconButton } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -287,6 +289,7 @@ export default function AddEditTeacher() {
       previousDuration: teacherData?.previousDuration || "",
       previousLeavingReason: teacherData?.previousLeavingReason || "",
       trainingDetails: teacherData?.trainingDetails || "",
+      trainingPeriod: teacherData?.trainingPeriod !== undefined && teacherData?.trainingPeriod !== null ? teacherData.trainingPeriod : "",
       udiseTeacherNumber: teacherData?.udiseTeacherNumber || "",
       ctsNumber: teacherData?.ctsNumber || "",
       // Salary
@@ -397,6 +400,8 @@ export default function AddEditTeacher() {
       formData.append("previousDuration", values.previousDuration);
       formData.append("previousLeavingReason", values.previousLeavingReason);
       formData.append("trainingDetails", values.trainingDetails);
+      if (values.trainingPeriod !== undefined && values.trainingPeriod !== null && values.trainingPeriod !== "")
+        formData.append("trainingPeriod", values.trainingPeriod.toString());
       if (values.udiseTeacherNumber)
         formData.append("udiseTeacherNumber", values.udiseTeacherNumber);
       if (values.ctsNumber)
@@ -716,106 +721,75 @@ export default function AddEditTeacher() {
                         sx={{
                           display: "flex",
                           gap: 3,
-                          alignItems: "center",
+                          alignItems: "flex-start",
                           mb: 1,
                         }}
                       >
                         <Box sx={{ position: "relative" }}>
                           <Button
-                            variant="text"
+                            variant="outlined"
                             component="label"
+                            disabled={isView}
                             sx={{
                               minWidth: "100px",
                               width: "100px",
                               height: "100px",
-                              borderRadius: "50%",
+                              borderRadius: "12px",
                               border: "1px dashed #ced4da",
-                              bgcolor: "#f8f9fa",
-                              overflow: "hidden",
+                              bgcolor: "transparent",
                               p: 0,
-                              transition: "all 0.3s ease",
-                              "&:hover": {
-                                borderColor: "var(--primary-color)",
-                                "& .avatar-overlay": { opacity: 1 },
-                              },
+                              overflow: "hidden",
+                              flexShrink: 0,
+                              "&:hover": { bgcolor: "transparent" },
+                              cursor: isView ? "default" : "pointer",
                             }}
                           >
-                            <ProfileAvatar
-                              name={values.fullName || "T"}
-                              imageUrl={
-                                values.profileImage instanceof File
-                                  ? URL.createObjectURL(values.profileImage)
-                                  : values.profileImageUrl ||
-                                    values.profileImage
-                              }
-                              size={100}
-                              sx={{ borderRadius: "50%" }}
-                            />
-                            {!isView && (
-                              <Box
-                                className="avatar-overlay"
-                                sx={{
-                                  position: "absolute",
-                                  top: 0,
-                                  left: 0,
-                                  width: "100%",
-                                  height: "100%",
-                                  bgcolor: "rgba(0,0,0,0.3)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  opacity: 0,
-                                  transition: "all 0.3s ease",
-                                }}
-                              >
-                                <CameraAltIcon
-                                  sx={{ color: "white", fontSize: 24 }}
-                                />
-                              </Box>
-                            )}
+                            {renderSingleImage({
+                              profile: values.profileImage,
+                              imageUrl: values.profileImageUrl,
+                            })}
                             <input
                               hidden
                               accept=".jpg,.jpeg,.png,.svg"
                               type="file"
-                              onChange={(e) =>
-                                setFieldValue(
-                                  "profileImage",
-                                  e.target.files?.[0],
-                                )
-                              }
+                              disabled={isView}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                const files = e.target.files;
+                                if (files && files.length > 0) {
+                                  setFieldValue("profileImage", files[0]);
+                                }
+                              }}
                             />
                           </Button>
-                          {!isView && (
-                            <Box
+                          {(values.profileImage || values.profileImageUrl) && !isView && (
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setFieldValue("profileImage", null);
+                                setFieldValue("profileImageUrl", "");
+                              }}
                               sx={{
                                 position: "absolute",
-                                bottom: 5,
-                                right: 5,
-                                backgroundColor:
-                                  "var(--primary-color, #ad1e1e)",
-                                width: "28px",
-                                height: "28px",
-                                borderRadius: "50%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
+                                top: -8,
+                                right: -8,
+                                p: "2px",
+                                bgcolor: "#ef4444",
                                 color: "white",
-                                border: "2px solid white",
-                                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                                pointerEvents: "none",
-                                zIndex: 2,
+                                boxShadow: 2,
+                                zIndex: 10,
+                                "&:hover": { bgcolor: "#dc2626" },
                               }}
                             >
-                              <CameraAltIcon sx={{ fontSize: 14 }} />
-                            </Box>
+                              <CloseIcon sx={{ fontSize: 14 }} />
+                            </IconButton>
                           )}
                         </Box>
-                        <Box>
+                        <Box sx={{ pt: 1 }}>
                           <Typography sx={labelSx}>Profile Image</Typography>
-                          <Typography
-                            sx={{ fontSize: "11px", color: "#667085" }}
-                          >
-                            Max 2MB. JPG or PNG.
+                          <Typography sx={{ fontSize: "11px", color: "#667085", mt: 0.5 }}>
+                            <strong>Recommended:</strong> 200x200px (1:1 Ratio).
+                            <br />
+                            Max 2MB. JPG, PNG, SVG.
                           </Typography>
                         </Box>
                       </Box>
@@ -854,13 +828,6 @@ export default function AddEditTeacher() {
                           }
                           onChange={(_, v) =>
                             setFieldValue("gender", v?.value || "")
-                          }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
                           }
                           clearIcon={null}
                           renderInput={(p) => (
@@ -902,13 +869,6 @@ export default function AddEditTeacher() {
                           }
                           onChange={(_, v) =>
                             setFieldValue("bloodGroup", v?.value || "")
-                          }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
                           }
                           clearIcon={null}
                           renderInput={(p) => (
@@ -1112,13 +1072,6 @@ export default function AddEditTeacher() {
                           onChange={(_, v) =>
                             setFieldValue("maritalStatus", v?.value || "")
                           }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
-                          }
                           clearIcon={null}
                           renderInput={(p) => (
                             <TextField
@@ -1168,13 +1121,6 @@ export default function AddEditTeacher() {
                           }
                           onChange={(_, v) =>
                             setFieldValue("socialCategory", v?.value || "")
-                          }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
                           }
                           clearIcon={null}
                           renderInput={(p) => (
@@ -1412,13 +1358,6 @@ export default function AddEditTeacher() {
                             );
                           }}
                           disabled={isView}
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
-                          }
                           clearIcon={null}
                           renderInput={(params) => (
                             <TextField
@@ -2014,13 +1953,6 @@ export default function AddEditTeacher() {
                           onChange={(_, v) =>
                             setFieldValue("departmentId", v?._id || "")
                           }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
-                          }
                           clearIcon={null}
                           renderInput={(p) => (
                             <TextField
@@ -2288,6 +2220,30 @@ export default function AddEditTeacher() {
                         )}
                       </Box>
 
+                      {/* Training Period */}
+                      <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
+                        <Typography sx={labelSx}>Training Period (months)</Typography>
+                        <TextField
+                          fullWidth
+                          name="trainingPeriod"
+                          placeholder="e.g. 6"
+                          variant="outlined"
+                          sx={inputSx}
+                          value={values.trainingPeriod}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9]/g, "");
+                            setFieldValue("trainingPeriod", val === "" ? "" : Number(val));
+                          }}
+                          error={touched.trainingPeriod && Boolean(errors.trainingPeriod)}
+                          slotProps={{ htmlInput: { maxLength: 3, inputMode: "numeric" } }}
+                        />
+                        {touched.trainingPeriod && errors.trainingPeriod && (
+                          <FormHelperText className="error-text">
+                            {errors.trainingPeriod as string}
+                          </FormHelperText>
+                        )}
+                      </Box>
+
                       {/* UDISE Teacher Number */}
                       <Box gridColumn={{ xs: "span 12", sm: "span 6" }}>
                         <Typography sx={labelSx}>UDISE Teacher Number (Optional)</Typography>
@@ -2356,13 +2312,6 @@ export default function AddEditTeacher() {
                           }
                           onChange={(_, v) =>
                             setFieldValue("employmentType", v?.value || "")
-                          }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
                           }
                           clearIcon={null}
                           renderInput={(p) => (
@@ -2436,13 +2385,6 @@ export default function AddEditTeacher() {
                           }
                           onChange={(_, v) =>
                             setFieldValue("salaryType", v?.value || "")
-                          }
-                          popupIcon={
-                            <img
-                              src={Svg.down}
-                              style={{ width: "10px" }}
-                              alt="dropdown"
-                            />
                           }
                           clearIcon={null}
                           renderInput={(p) => (

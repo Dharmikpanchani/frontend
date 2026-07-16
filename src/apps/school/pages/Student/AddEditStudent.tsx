@@ -35,6 +35,7 @@ import { getClasses } from "@/redux/slices/classSlice";
 import { getSections } from "@/redux/slices/sectionSlice";
 import { CommonLoader } from "@/apps/common/loader/Loader";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
+import { renderSingleImage } from "@/apps/common/uploadImageAndVideo";
 import AutoCompleteLocation from "@/apps/common/AutoCompleteLocation";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
@@ -323,109 +324,75 @@ export default function AddEditStudent() {
                   sx={{
                     display: "flex",
                     gap: 3,
-                    alignItems: "center",
+                    alignItems: "flex-start",
                     mb: 3.5,
                   }}
                 >
                   <Box sx={{ position: "relative" }}>
                     <Button
-                      variant="text"
+                      variant="outlined"
                       component="label"
                       disabled={isReadOnly}
                       sx={{
-                        minWidth: "90px",
-                        width: "90px",
-                        height: "90px",
-                        borderRadius: "50%",
+                        minWidth: "100px",
+                        width: "100px",
+                        height: "100px",
+                        borderRadius: "12px",
                         border: "1px dashed #ced4da",
-                        bgcolor: "#f8f9fa",
-                        overflow: "hidden",
+                        bgcolor: "transparent",
                         p: 0,
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          borderColor: "var(--primary-color)",
-                          "& .avatar-overlay": { opacity: 1 },
-                        },
+                        overflow: "hidden",
+                        flexShrink: 0,
+                        "&:hover": { bgcolor: "transparent" },
+                        cursor: isReadOnly ? "default" : "pointer",
                       }}
                     >
-                      <ProfileAvatar
-                        name={values.fullName || "Student"}
-                        imageUrl={
-                          profilePreview ||
-                          (values.profileImageUrl
-                            ? values.profileImageUrl.startsWith("http")
-                              ? values.profileImageUrl
-                              : `${imageBaseUrl}/${values.profileImageUrl}`
-                            : "")
-                        }
-                        size={90}
-                        sx={{ borderRadius: "50%" }}
-                      />
-                      {!isReadOnly && (
-                        <Box
-                          className="avatar-overlay"
-                          sx={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            bgcolor: "rgba(0,0,0,0.3)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            opacity: 0,
-                            transition: "all 0.3s ease",
-                          }}
-                        >
-                          <CameraAltIcon sx={{ color: "white", fontSize: 22 }} />
-                        </Box>
-                      )}
+                      {renderSingleImage({
+                        profile: values.profileImage,
+                        imageUrl: values.profileImageUrl,
+                      })}
                       <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/jpg,image/jpeg,image/png,image/svg+xml"
                         hidden
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setFieldValue("profileImage", file);
-                            const reader = new FileReader();
-                            reader.onload = (ev) =>
-                              setProfilePreview(ev.target?.result as string);
-                            reader.readAsDataURL(file);
+                        accept=".jpg,.jpeg,.png,.svg"
+                        type="file"
+                        disabled={isReadOnly}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const files = e.target.files;
+                          if (files && files.length > 0) {
+                            setFieldValue("profileImage", files[0]);
                           }
                         }}
                       />
                     </Button>
-                    {!isReadOnly && (
-                      <Box
+                    {(values.profileImage || values.profileImageUrl) && !isReadOnly && (
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setFieldValue("profileImage", null);
+                          setFieldValue("profileImageUrl", "");
+                        }}
                         sx={{
                           position: "absolute",
-                          bottom: 3,
-                          right: 3,
-                          backgroundColor: "var(--primary-color, #ad1e1e)",
-                          width: "24px",
-                          height: "24px",
-                          borderRadius: "50%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
+                          top: -8,
+                          right: -8,
+                          p: "2px",
+                          bgcolor: "#ef4444",
                           color: "white",
-                          border: "2px solid white",
-                          boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                          pointerEvents: "none",
-                          zIndex: 2,
+                          boxShadow: 2,
+                          zIndex: 10,
+                          "&:hover": { bgcolor: "#dc2626" },
                         }}
                       >
-                        <CameraAltIcon sx={{ fontSize: 12 }} />
-                      </Box>
+                        <CloseIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
                     )}
                   </Box>
-                  <Box>
+                  <Box sx={{ pt: 1 }}>
                     <Typography sx={labelSx}>Profile Image</Typography>
-                    <Typography sx={{ fontSize: "11px", color: "#667085" }}>
-                      Max 2MB. JPG or PNG.
+                    <Typography sx={{ fontSize: "11px", color: "#667085", mt: 0.5 }}>
+                      <strong>Recommended:</strong> 200x200px (1:1 Ratio).
+                      <br />
+                      Max 2MB. JPG, PNG, SVG.
                     </Typography>
                     {touched.profileImage && errors.profileImage && (
                       <FormHelperText error sx={{ mt: 0.5, mx: 0 }}>
@@ -1085,7 +1052,7 @@ export default function AddEditStudent() {
                       error={
                         touched.phoneNumber && Boolean(errors.phoneNumber)
                       }
-                      disabled={isReadOnly}
+                      disabled={isReadOnly || !!id}
                       slotProps={{
                         input: { sx: inputSx },
                         htmlInput: { maxLength: 10 },
@@ -1097,7 +1064,7 @@ export default function AddEditStudent() {
                       </FormHelperText>
                     ) : (
                       <FormHelperText sx={{ color: "#667085", fontSize: "11px", mt: 0.5, mx: 0 }}>
-                        Student uses this number to login to the portal
+                        {id ? "Phone number cannot be changed after registration" : "Student uses this number to login to the portal"}
                       </FormHelperText>
                     )}
                   </Box>

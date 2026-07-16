@@ -255,13 +255,6 @@ export default function AddEditFeeStructure() {
                               setFieldValue("classId", newValue ? newValue._id : "");
                             }}
                             disabled={isView}
-                            popupIcon={
-                              <img
-                                src={Svg.down}
-                                style={{ width: "10px" }}
-                                alt="dropdown"
-                              />
-                            }
                             clearIcon={null}
                             renderInput={(params) => (
                               <TextField
@@ -337,13 +330,6 @@ export default function AddEditFeeStructure() {
                               setFieldValue("feeCategoryId", newValue ? newValue._id : "");
                             }}
                             disabled={isView}
-                            popupIcon={
-                              <img
-                                src={Svg.down}
-                                style={{ width: "10px" }}
-                                alt="dropdown"
-                              />
-                            }
                             clearIcon={null}
                             renderInput={(params) => (
                               <TextField

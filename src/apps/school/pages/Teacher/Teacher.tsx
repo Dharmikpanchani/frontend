@@ -565,8 +565,7 @@ export default function Teacher() {
         link.href = url;
         link.setAttribute(
           "download",
-          `Teachers Report_${moment().format("DD-MM-YY")}.${
-            format === "excel" ? "xlsx" : "html"
+          `Teachers Report_${moment().format("DD-MM-YY")}.${format === "excel" ? "xlsx" : "html"
           }`
         );
         document.body.appendChild(link);
@@ -598,7 +597,7 @@ export default function Teacher() {
     try {
       const response = await masterService.importTeachers(file);
       handleGetData();
-      
+
       if (response?.data && response.data.failCount > 0) {
         return {
           success: false,
@@ -606,14 +605,14 @@ export default function Teacher() {
           errors: response.data.failures,
         };
       }
-      
+
       return { success: true, message: response.message || "Teachers imported successfully." };
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || "Failed to import teachers";
-      const errors = error.response?.data?.data?.failures || 
-                     error.response?.data?.data?.errors || 
-                     error.response?.data?.errors || 
-                     null;
+      const errors = error.response?.data?.data?.failures ||
+        error.response?.data?.data?.errors ||
+        error.response?.data?.errors ||
+        null;
       return {
         success: false,
         message,

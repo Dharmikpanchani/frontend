@@ -5,6 +5,7 @@ interface ProfileAvatarProps {
   name: string;
   imageUrl?: string;
   size?: number | string;
+  variant?: "circular" | "rounded" | "square";
   sx?: any;
 }
 
@@ -12,6 +13,7 @@ export default function ProfileAvatar({
   name,
   imageUrl,
   size = 40,
+  variant = "rounded",
   sx,
 }: ProfileAvatarProps) {
   const initials = getInitials(name);
@@ -26,14 +28,16 @@ export default function ProfileAvatar({
   return (
     <Avatar
       src={src}
+      variant={variant}
       sx={{
         width: size,
         height: size,
-        bgcolor: bgColor,
+        bgcolor: src ? "#ffffff" : bgColor,
         color: "var(--primary-color)", // Using primary color for text on light background
         fontSize: typeof size === "number" ? size * 0.4 : "inherit",
         fontWeight: 600,
         border: "1px solid #f0f0f0",
+        borderRadius: variant === "circular" ? "50%" : "10px",
         ...sx,
       }}
     >
