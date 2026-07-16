@@ -1,5 +1,6 @@
 {
-  "name": "my-app",
+  "name": "vidyasetu-frontend",
+  "description": "Vidyasetu — Developer & School Admin panel (React)",
   "private": true,
   "version": "0.0.0",
   "type": "module",
