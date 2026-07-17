@@ -40,7 +40,7 @@ export const useColorExtractor = () => {
           };
 
           const baseUrl = getBaseURL().replace(/\/+$/, "");
-          const targetUrl = `${baseUrl}/images/proxy?url=${encodeURIComponent(imageUrl)}`;
+          const targetUrl = `${baseUrl}/v1/images/proxy?url=${encodeURIComponent(imageUrl)}`;
           img.src = targetUrl.includes("?") ? `${targetUrl}&_t=${Date.now()}` : `${targetUrl}?_t=${Date.now()}`;
 
           img.onload = () => {
