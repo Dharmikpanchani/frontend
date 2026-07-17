@@ -22,7 +22,6 @@ import {
   LocationOn as LocationIcon,
   FamilyRestroom as GuardianIcon,
   Lock as LockIcon,
-  CameraAlt as CameraAltIcon,
   Close as CloseIcon,
   Visibility,
   VisibilityOff,
@@ -45,7 +44,6 @@ import { labelSx, inputSx } from "@/utils/styles/commonSx";
 import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import { bloodGroupOptions, genderOptions } from "@/apps/common/StaticArrayData";
-import ProfileAvatar from "@/apps/common/ProfileAvatar";
 
 export default function AddEditStudent() {
   const location = useLocation();
@@ -74,8 +72,6 @@ export default function AddEditStudent() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [studentData, setStudentData] = useState<any>(null);
-  const [profilePreview, setProfilePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const imageBaseUrl = import.meta.env.VITE_BASE_URL_IMAGE || "";
 

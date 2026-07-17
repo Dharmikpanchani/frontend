@@ -11,7 +11,6 @@ import { authService } from "@/api/services/auth.service";
 import { logoutAdmin } from "@/redux/slices/authSlice";
 import { masterService } from "@/api/services/master.service";
 import { setViewingYear } from "@/redux/slices/academicYearSlice";
-import { inputSx } from "@/utils/styles/commonSx";
 import Svg from "@/assets/Svg";
 import type { RootState } from "@/redux/Store";
 

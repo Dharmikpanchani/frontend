@@ -13,7 +13,6 @@ import {
   Tooltip,
   Autocomplete,
 } from "@mui/material";
-import Svg from "@/assets/Svg";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import {

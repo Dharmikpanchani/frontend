@@ -2,22 +2,14 @@ import {
   Box,
   Typography,
   Tooltip,
-  FormControl,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import Svg from "../../../assets/Svg";
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/Store";
-import { masterService } from "@/api/services/master.service";
-import { setViewingYear } from "@/redux/slices/academicYearSlice";
 
 export default function Dashboard() {
-  const dispatch = useDispatch();
   const [time, setTime] = useState(new Date());
-  const [allYears, setAllYears] = useState<any[]>([]);
-  const [selectedYear, setSelectedYear] = useState<any>(null);
 
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
@@ -26,15 +18,6 @@ export default function Dashboard() {
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    masterService.getAcademicYears().then((res: any) => {
-      const years: any[] = res?.data || [];
-      setAllYears(years);
-      const current = years.find((y: any) => y.isCurrent) || years[0];
-      if (current) setSelectedYear(current);
-    }).catch(() => {});
   }, []);
 
   const formatTime = (date: Date) => {

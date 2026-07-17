@@ -21,7 +21,6 @@ import { getClasses } from "@/redux/slices/classSlice";
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
-import Svg from "@/assets/Svg";
 import {
   AddCircleOutline as AddIcon,
   Edit as EditIcon,

@@ -14,7 +14,6 @@ import {
   Tooltip,
   Chip,
 } from "@mui/material";
-import ProfileAvatar from "@/apps/common/ProfileAvatar";
 import {
   Person as PersonIcon,
   Work as AcademicIcon,
@@ -27,7 +26,6 @@ import {
   AddCircleOutline as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  CameraAlt as CameraAltIcon,
   Refresh as RefreshIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
@@ -43,7 +41,6 @@ import { getSubjects } from "@/redux/slices/subjectSlice";
 import { getClasses } from "@/redux/slices/classSlice";
 import { getSections } from "@/redux/slices/sectionSlice";
 import { getAllRolesSimple } from "@/redux/slices/roleSlice";
-import Svg from "@/assets/Svg";
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
