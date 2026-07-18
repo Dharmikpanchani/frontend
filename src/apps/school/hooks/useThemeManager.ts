@@ -103,28 +103,55 @@ export const useThemeManager = () => {
     }
 
     // Update Title and Favicon based on school details
-    const favicon = document.querySelector(
-      "link[rel*='icon']",
-    ) as HTMLLinkElement;
     const schoolName =
       adminDetails?.schoolData?.schoolName || selectedSchool?.schoolName;
-
-    // Store original title and favicon to restore on unmount
-    const originalTitle = document.title;
 
     if (schoolName) {
       document.title = `${schoolName} | ${adminDetails?.isLogin ? "Admin" : "Login"}`;
     }
 
-    const setRoundedFavicon = (url: string) => {
-      const drawFavicon = (imgSrc: string, withCors: boolean) => {
-        const img = new Image();
-        if (withCors) {
-          img.crossOrigin = "anonymous";
-        }
-        img.src = imgSrc;
+    const updateFaviconLinks = (href: string) => {
+      let faviconLinks = document.querySelectorAll("link[rel*='icon']");
+      if (faviconLinks.length === 0) {
+        const link = document.createElement("link");
+        link.rel = "shortcut icon";
+        document.head.appendChild(link);
+        faviconLinks = document.querySelectorAll("link[rel*='icon']");
+      }
+      faviconLinks.forEach((link: any) => {
+        link.href = href;
+      });
+    };
 
-        img.onload = () => {
+    const getFullImageUrl = (path?: string | null) => {
+      if (!path) return "";
+      if (
+        path.startsWith("http://") ||
+        path.startsWith("https://") ||
+        path.startsWith("data:") ||
+        path.startsWith("blob:")
+      ) {
+        return path;
+      }
+      const baseUrl = (import.meta.env.VITE_BASE_URL_IMAGE || "").replace(
+        /\/+$/,
+        "",
+      );
+      const cleanPath = path.replace(/^\/+/, "");
+      return baseUrl ? `${baseUrl}/${cleanPath}` : `/${cleanPath}`;
+    };
+
+    const setRoundedFavicon = (url: string) => {
+      // Step 1: Immediately set direct URL so favicon displays without waiting or CORS issues
+      updateFaviconLinks(url);
+
+      // Step 2: Try creating rounded icon canvas enhancement if possible
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = url;
+
+      img.onload = () => {
+        try {
           const canvas = document.createElement("canvas");
           const size = 128;
           canvas.width = size;
@@ -154,43 +181,26 @@ export const useThemeManager = () => {
             const y = (size - img.height * scale) / 2;
             ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
 
-            try {
-              const dataUrl = canvas.toDataURL("image/png");
-              const faviconLinks =
-                document.querySelectorAll("link[rel*='icon']");
-              faviconLinks.forEach((link: any) => {
-                link.href = dataUrl;
-              });
-            } catch (_err) {
-              if (withCors) {
-                // CORS blocked — retry WITHOUT crossOrigin (no rounding but image shows)
-                drawFavicon(imgSrc, false);
-              }
-            }
+            const dataUrl = canvas.toDataURL("image/png");
+            updateFaviconLinks(dataUrl);
           }
-        };
-
-        img.onerror = () => {
-          if (withCors) {
-            // Image failed with CORS header — retry without it
-            drawFavicon(imgSrc, false);
-          }
-        };
+        } catch (_err) {
+          // Direct URL was already set in step 1
+        }
       };
-
-      drawFavicon(url, true);
     };
 
-    const schoolLogoUrl = adminDetails?.schoolData?.logo || schoolLogo;
+    const rawSchoolLogo =
+      adminDetails?.schoolData?.logo ||
+      adminDetails?.schoolData?.schoolLogo ||
+      selectedSchool?.logo ||
+      selectedSchool?.schoolLogo ||
+      schoolLogo;
 
-    if (favicon) {
-      if (schoolLogoUrl) {
-        setRoundedFavicon(
-          `${import.meta.env.VITE_BASE_URL_IMAGE}/${schoolLogoUrl}`,
-        );
-      } else {
-        setRoundedFavicon(Png.logoImg);
-      }
+    if (rawSchoolLogo) {
+      setRoundedFavicon(getFullImageUrl(rawSchoolLogo));
+    } else {
+      setRoundedFavicon(Png.logoImg);
     }
 
     return () => {
@@ -203,13 +213,6 @@ export const useThemeManager = () => {
         "is-custom-theme",
         ...themeClasses,
       );
-
-      // Restore original title and favicon
-      document.title = originalTitle;
-      const faviconLinks = document.querySelectorAll("link[rel*='icon']");
-      faviconLinks.forEach((link: any) => {
-        link.href = "/src/assets/images/svg/logo.svg";
-      });
     };
   }, [themeVariables, themeClasses, adminDetails, schoolLogo, selectedSchool]);
 
