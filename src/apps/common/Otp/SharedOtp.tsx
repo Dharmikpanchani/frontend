@@ -72,9 +72,9 @@ export default function SharedOtp({
     if (onGetStatus) {
       onGetStatus()
         .then((remaining) => startOtpTimer(remaining))
-        .catch(() => startOtpTimer(120));
+        .catch(() => startOtpTimer(300));
     } else {
-      startOtpTimer(120);
+      startOtpTimer(300);
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -92,7 +92,7 @@ export default function SharedOtp({
   const handleResendClick = async (setFieldValue: any) => {
     const success = await onResend(setFieldValue);
     if (success) {
-      startOtpTimer(120);
+      startOtpTimer(300);
     }
   };
 
