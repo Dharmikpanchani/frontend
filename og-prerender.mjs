@@ -106,10 +106,10 @@ const server = http.createServer(async (req, res) => {
       // Bare admin.vidyasetudemo.in — no school, return generic OG
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(buildHtml({
-        schoolName : 'Vidyasetu Admin',
+        schoolName : 'VidyaSetu Admin',
         ogImage    : FALLBACK_LOGO,
         pageUrl,
-        description: 'Manage your school with ease using Vidyasetu.',
+        description: 'Manage your school with ease using VidyaSetu.',
       }));
       return;
     }
