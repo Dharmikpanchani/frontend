@@ -72,9 +72,9 @@ export default function SharedOtp({
     if (onGetStatus) {
       onGetStatus()
         .then((remaining) => startOtpTimer(remaining))
-        .catch(() => startOtpTimer(300));
+        .catch(() => startOtpTimer(120));
     } else {
-      startOtpTimer(300);
+      startOtpTimer(120);
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
