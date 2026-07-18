@@ -66,7 +66,7 @@ export default function Dashboard() {
             variant="h5"
             sx={{ opacity: 0.9, fontWeight: 600, color: "#fff" }}
           >
-            {adminDetails?.schoolData?.schoolName || "Vidyasetu School"} Portal
+            {adminDetails?.schoolData?.schoolName || "VidyaSetu School"} Portal
           </Typography>
 
 

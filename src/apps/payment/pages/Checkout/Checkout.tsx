@@ -121,7 +121,7 @@ export default function Checkout() {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
-        name: "Vidyasetu",
+        name: "VidyaSetu",
         description: `${planData?.planName} Plan Upgrade`,
         order_id: order.id,
         handler: async function (response: any) {

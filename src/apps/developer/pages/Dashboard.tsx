@@ -85,7 +85,7 @@ export default function Dashboard() {
             Admin Dashboard
           </Typography>
           <Typography variant="body1" sx={{ mt: 1, opacity: 0.8 }}>
-            Vidyasetu Platform
+            VidyaSetu Platform
           </Typography>
         </Box>
         <Box sx={{ textAlign: "right", display: { xs: "none", md: "block" } }}>
