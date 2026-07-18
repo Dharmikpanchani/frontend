@@ -5,7 +5,7 @@ import { store } from "./redux/Store";
 import { Provider } from "react-redux";
 
 const root = ReactDOM.createRoot(
-  document.getElementById("dm_01") as HTMLElement,
+  document.getElementById("lhn_v1") as HTMLElement,
 );
 root.render(
   <React.StrictMode>
