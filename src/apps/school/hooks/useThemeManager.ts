@@ -66,7 +66,7 @@ export const useThemeManager = () => {
       "--table-row-hover": theme.tableRowHover,
       "--button-bg": gradient,
       "--button-text": theme.buttonText,
-      "--button-radius": theme.buttonRadius,
+      "--button-radius": "6px",
       "--button-border": theme.buttonBorder,
       "--button-hover-bg": gradient,
       "--theme-gradient": gradient,

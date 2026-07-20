@@ -7,14 +7,28 @@ import SharedOtp from "@/apps/common/Otp/SharedOtp";
 import type { OtpNumberInterface } from "@/types/interfaces/LoginInterface";
 import { authService } from "@/api/services/auth.service";
 
+const SESSION_KEY = "dev_login_otp_email";
+
 export default function LoginOtp() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const { email } = location.state || {}; // Developer app doesn't usually have subdomain in login
+  const stateEmail = (location.state as { email?: string } | null)?.email;
+
+  // Persist email in sessionStorage so it survives a page refresh.
+  // On a real fresh visit (no state, no session key) we redirect immediately.
+  useEffect(() => {
+    if (stateEmail) {
+      sessionStorage.setItem(SESSION_KEY, stateEmail);
+    }
+  }, [stateEmail]);
+
+  const email = stateEmail || sessionStorage.getItem(SESSION_KEY) || "";
+
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
+  // If there is no email from any source, redirect to login page
   useEffect(() => {
     if (!email) {
       navigate("/", { replace: true });
@@ -37,6 +51,8 @@ export default function LoginOtp() {
           toasterError("Invalid verification response");
           return;
         }
+        // Clean up persisted email after successful login
+        sessionStorage.removeItem(SESSION_KEY);
         navigate("/dashboard", { replace: true });
       }
     } catch (error: any) {

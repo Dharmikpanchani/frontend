@@ -32,7 +32,7 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: "var(--button-radius, 5px)",
+          borderRadius: "var(--button-radius, 6px)",
         },
         containedPrimary: {
           background: "var(--theme-gradient, var(--button-bg, #002147))",

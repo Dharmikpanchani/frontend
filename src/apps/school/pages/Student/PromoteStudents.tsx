@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
   Typography,
@@ -25,6 +24,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  FormHelperText,
 } from "@mui/material";
 import {
   School as SchoolIcon,
@@ -32,24 +32,17 @@ import {
   CheckCircle as PromoteIcon,
 } from "@mui/icons-material";
 import { masterService } from "@/api/services/master.service";
+import AsyncPaginatedSelect from "@/apps/common/filter/AsyncPaginatedSelect";
 import toast from "react-hot-toast";
-import { getClasses } from "@/redux/slices/classSlice";
-import { getSections } from "@/redux/slices/sectionSlice";
 import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
 import Loader from "@/apps/common/loader/Loader";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
-import type { RootState, AppDispatch } from "@/redux/Store";
 
 export default function PromoteStudents() {
-  const dispatch = useDispatch<AppDispatch>();
-
-  const { allClasses } = useSelector((state: RootState) => state.ClassReducer);
-  const { allSections } = useSelector((state: RootState) => state.SectionReducer);
-
   // Lists
   const [academicYears, setAcademicYears] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
-  const [loadingYears, setLoadingYears] = useState(false);
+  const [_loadingYears, setLoadingYears] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [promoting, setPromoting] = useState(false);
 
@@ -61,24 +54,57 @@ export default function PromoteStudents() {
   const [toYearId, setToYearId] = useState("");
   const [toClassId, setToClassId] = useState("");
   const [toSectionId, setToSectionId] = useState("");
+  // Full option objects for the two fields shown in the confirmation dialog —
+  // needed now that Class/Section are fetched on demand (paginated) instead
+  // of kept whole in Redux.
+  const [toClassOption, setToClassOption] = useState<any>(null);
+  const [toSectionOption, setToSectionOption] = useState<any>(null);
+
+  // Form errors
+  const [fromYearError, setFromYearError] = useState("");
+  const [fromClassError, setFromClassError] = useState("");
+  const [toYearError, setToYearError] = useState("");
+  const [toClassError, setToClassError] = useState("");
 
   // Selected students mapping
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  // Fetch initial setup
+  const fetchClassPage = async (page: number, search: string) => {
+    const res: any = await masterService.getClasses({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
+
+  const fetchSectionPage = async (page: number, search: string, classId?: string) => {
+    const res: any = await masterService.getSections({ page, perPage: 25, search, classId, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
+
   useEffect(() => {
-    dispatch(getClasses({ type: "filter" }));
-    dispatch(getSections({ type: "filter" }));
     fetchAcademicYears();
-  }, [dispatch]);
+  }, []);
 
   const fetchAcademicYears = async () => {
     setLoadingYears(true);
     try {
       const res = await masterService.getAcademicYears();
       if (res.status === 200) {
-        setAcademicYears(res.data || []);
+        const years = res.data || [];
+        setAcademicYears(years);
+        if (years.length > 0) {
+          const current = years.find((y: any) => y.isCurrent) || years[0];
+          if (current) {
+            setFromYearId(current._id);
+            const fromStart = Number(current.startYear || (current.label || "").split("-")[0]);
+            const validNextYear = years.find((y: any) => {
+              const yStart = Number(y.startYear || (y.label || "").split("-")[0]);
+              return yStart > fromStart;
+            });
+            if (validNextYear) {
+              setToYearId(validNextYear._id);
+            }
+          }
+        }
       }
     } catch (err: any) {
       toast.error(err?.message || "Failed to load academic years");
@@ -87,11 +113,40 @@ export default function PromoteStudents() {
     }
   };
 
-  const handleFetchStudents = async () => {
-    if (!fromYearId || !fromClassId) {
-      toast.error("Please select both Year and Class to filter students");
-      return;
+  const handleFromYearSelect = (selectedId: string) => {
+    setFromYearId(selectedId);
+    const selectedFrom = academicYears.find((y) => y._id === selectedId);
+    const fromStart = selectedFrom ? Number(selectedFrom.startYear || (selectedFrom.label || "").split("-")[0]) : 0;
+
+    const validNextYear = academicYears.find((y) => {
+      const yStart = Number(y.startYear || (y.label || "").split("-")[0]);
+      return yStart > fromStart;
+    });
+
+    if (validNextYear) {
+      setToYearId(validNextYear._id);
+    } else {
+      setToYearId("");
     }
+  };
+
+  const handleFetchStudents = async () => {
+    let hasError = false;
+    if (!fromYearId) {
+      setFromYearError("Please select Academic Year");
+      hasError = true;
+    } else {
+      setFromYearError("");
+    }
+
+    if (!fromClassId) {
+      setFromClassError("Please select Class");
+      hasError = true;
+    } else {
+      setFromClassError("");
+    }
+
+    if (hasError) return;
 
     const selectedYear = academicYears.find((y) => y._id === fromYearId);
     if (!selectedYear) return;
@@ -104,7 +159,7 @@ export default function PromoteStudents() {
       const res = await masterService.getStudents({
         classId: fromClassId,
         sectionId: fromSectionId || undefined,
-        startYear: selectedYear.startYear,
+        academicYearId: fromYearId,
         perPage: 500, // Fetch all in one go for promotion select
       });
 
@@ -137,10 +192,24 @@ export default function PromoteStudents() {
       toast.error("Please select at least one student to promote");
       return;
     }
-    if (!toYearId || !toClassId) {
-      toast.error("Please select target Academic Year and Class");
-      return;
+
+    let hasError = false;
+    if (!toYearId) {
+      setToYearError("Please select target Academic Year");
+      hasError = true;
+    } else {
+      setToYearError("");
     }
+
+    if (!toClassId) {
+      setToClassError("Please select target Class");
+      hasError = true;
+    } else {
+      setToClassError("");
+    }
+
+    if (hasError) return;
+
     if (fromYearId === toYearId && fromClassId === toClassId && fromSectionId === toSectionId) {
       toast.error("Target class/section and year cannot be identical to source");
       return;
@@ -201,13 +270,17 @@ export default function PromoteStudents() {
 
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small" error={Boolean(fromYearError)}>
                     <InputLabel id="from-year-label" sx={labelSx}>Academic Year *</InputLabel>
                     <Select
                       labelId="from-year-label"
                       value={fromYearId}
-                      onChange={(e) => setFromYearId(e.target.value)}
+                      onChange={(e) => {
+                        handleFromYearSelect(e.target.value);
+                        setFromYearError("");
+                      }}
                       label="Academic Year *"
+                      error={Boolean(fromYearError)}
                       sx={inputSx}
                     >
                       {academicYears && academicYears.length > 0 ? (
@@ -222,71 +295,63 @@ export default function PromoteStudents() {
                         </MenuItem>
                       )}
                     </Select>
+                    {fromYearError && <FormHelperText sx={{ color: "#d32f2f" }}>{fromYearError}</FormHelperText>}
                   </FormControl>
                 </Grid>
 
                 <Grid size={{ xs: 6 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel id="from-class-label" sx={labelSx}>Class *</InputLabel>
-                    <Select
-                      labelId="from-class-label"
-                      value={fromClassId}
-                      onChange={(e) => setFromClassId(e.target.value)}
-                      label="Class *"
-                      sx={inputSx}
-                    >
-                      {allClasses && allClasses.length > 0 ? (
-                        allClasses.map((c) => (
-                          <MenuItem key={c._id} value={c._id}>
-                            {c.name}
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled value="">
-                          No classes found
-                        </MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
+                  <Typography sx={labelSx}>Class *</Typography>
+                  <AsyncPaginatedSelect
+                    fetchPage={fetchClassPage}
+                    value={fromClassId}
+                    onChange={(val) => { setFromClassId(val); setFromSectionId(""); setFromClassError(""); }}
+                    getOptionLabel={(o: any) => o.name || ""}
+                    getOptionValue={(o: any) => o._id}
+                    placeholder="Select Class"
+                  />
+                  {fromClassError && <FormHelperText sx={{ color: "#d32f2f", mt: 0.5 }}>{fromClassError}</FormHelperText>}
                 </Grid>
 
                 <Grid size={{ xs: 6 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel id="from-section-label" sx={labelSx}>Section</InputLabel>
-                    <Select
-                      labelId="from-section-label"
-                      value={fromSectionId}
-                      onChange={(e) => setFromSectionId(e.target.value)}
-                      label="Section"
-                      sx={inputSx}
-                    >
-                      <MenuItem value="">All Sections</MenuItem>
-                      {(allSections || [])
-                        .filter((s) => (typeof s.classId === "object" ? s.classId?._id === fromClassId : s.classId === fromClassId))
-                        .map((s) => (
-                          <MenuItem key={s._id} value={s._id}>
-                            {s.code || s.name}
-                          </MenuItem>
-                        ))}
-                    </Select>
-                  </FormControl>
+                  <Typography sx={labelSx}>Section</Typography>
+                  <AsyncPaginatedSelect
+                    key={`from-section-${fromClassId || "none"}`}
+                    fetchPage={(page, search) => fetchSectionPage(page, search, fromClassId)}
+                    value={fromSectionId}
+                    onChange={(val) => setFromSectionId(val)}
+                    getOptionLabel={(o: any) => o.code || o.name || ""}
+                    getOptionValue={(o: any) => o._id}
+                    placeholder="All Sections"
+                    disabled={!fromClassId}
+                  />
                 </Grid>
               </Grid>
 
               <Button
                 variant="contained"
                 onClick={handleFetchStudents}
-                disabled={loadingStudents || loadingYears}
-                startIcon={loadingStudents ? <CircularProgress size={20} color="inherit" /> : <FilterIcon />}
+                disabled={loadingStudents}
                 sx={{
                   backgroundColor: "var(--primary-color)",
                   textTransform: "none",
                   fontWeight: "bold",
                   alignSelf: "flex-start",
+                  minWidth: "150px",
+                  height: "38px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                   "&:hover": { backgroundColor: "var(--primary-hover)" },
                 }}
               >
-                Fetch Students
+                {loadingStudents ? (
+                  <CircularProgress size={20} sx={{ color: "#ffffff" }} />
+                ) : (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <FilterIcon sx={{ fontSize: "18px" }} />
+                    <span>Fetch Students</span>
+                  </Box>
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -305,75 +370,66 @@ export default function PromoteStudents() {
 
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12 }}>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small" error={Boolean(toYearError)}>
                     <InputLabel id="to-year-label" sx={labelSx}>Academic Year *</InputLabel>
                     <Select
                       labelId="to-year-label"
                       value={toYearId}
-                      onChange={(e) => setToYearId(e.target.value)}
+                      onChange={(e) => { setToYearId(e.target.value); setToYearError(""); }}
                       label="Academic Year *"
+                      error={Boolean(toYearError)}
                       sx={inputSx}
                     >
                       {academicYears && academicYears.length > 0 ? (
-                        academicYears.map((y) => (
-                          <MenuItem key={y._id} value={y._id}>
-                            {y.label} {y.isCurrent ? "(Current)" : ""}
-                          </MenuItem>
-                        ))
+                        academicYears.map((y) => {
+                          const selectedFrom = academicYears.find((yr) => yr._id === fromYearId);
+                          const fromStart = selectedFrom ? Number(selectedFrom.startYear || (selectedFrom.label || "").split("-")[0]) : 0;
+                          const yStart = Number(y.startYear || (y.label || "").split("-")[0]);
+                          const isDisabled = fromStart ? yStart <= fromStart : false;
+
+                          return (
+                            <MenuItem key={y._id} value={y._id} disabled={isDisabled}>
+                              {y.label} {y.isCurrent ? "(Current)" : ""} {isDisabled ? "(Must be future year)" : ""}
+                            </MenuItem>
+                          );
+                        })
                       ) : (
                         <MenuItem disabled value="">
                           No academic years found
                         </MenuItem>
                       )}
                     </Select>
+                    {toYearError && <FormHelperText sx={{ color: "#d32f2f" }}>{toYearError}</FormHelperText>}
                   </FormControl>
                 </Grid>
 
                 <Grid size={{ xs: 6 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel id="to-class-label" sx={labelSx}>Class *</InputLabel>
-                    <Select
-                      labelId="to-class-label"
-                      value={toClassId}
-                      onChange={(e) => setToClassId(e.target.value)}
-                      label="Class *"
-                      sx={inputSx}
-                    >
-                      {allClasses && allClasses.length > 0 ? (
-                        allClasses.map((c) => (
-                          <MenuItem key={c._id} value={c._id}>
-                            {c.name}
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled value="">
-                          No classes found
-                        </MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
+                  <Typography sx={labelSx}>Class *</Typography>
+                  <AsyncPaginatedSelect
+                    fetchPage={fetchClassPage}
+                    value={toClassId}
+                    onChange={(val) => { setToClassId(val); setToSectionId(""); setToSectionOption(null); setToClassError(""); }}
+                    onOptionSelect={(opt) => setToClassOption(opt)}
+                    getOptionLabel={(o: any) => o.name || ""}
+                    getOptionValue={(o: any) => o._id}
+                    placeholder="Select Class"
+                  />
+                  {toClassError && <FormHelperText sx={{ color: "#d32f2f", mt: 0.5 }}>{toClassError}</FormHelperText>}
                 </Grid>
 
                 <Grid size={{ xs: 6 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel id="to-section-label" sx={labelSx}>Section</InputLabel>
-                    <Select
-                      labelId="to-section-label"
-                      value={toSectionId}
-                      onChange={(e) => setToSectionId(e.target.value)}
-                      label="Section"
-                      sx={inputSx}
-                    >
-                      <MenuItem value="">None / To Assign Later</MenuItem>
-                      {(allSections || [])
-                        .filter((s) => (typeof s.classId === "object" ? s.classId?._id === toClassId : s.classId === toClassId))
-                        .map((s) => (
-                          <MenuItem key={s._id} value={s._id}>
-                            {s.code || s.name}
-                          </MenuItem>
-                        ))}
-                    </Select>
-                  </FormControl>
+                  <Typography sx={labelSx}>Section</Typography>
+                  <AsyncPaginatedSelect
+                    key={`to-section-${toClassId || "none"}`}
+                    fetchPage={(page, search) => fetchSectionPage(page, search, toClassId)}
+                    value={toSectionId}
+                    onChange={(val) => setToSectionId(val)}
+                    onOptionSelect={(opt) => setToSectionOption(opt)}
+                    getOptionLabel={(o: any) => o.code || o.name || ""}
+                    getOptionValue={(o: any) => o._id}
+                    placeholder="None / To Assign Later"
+                    disabled={!toClassId}
+                  />
                 </Grid>
               </Grid>
 
@@ -381,16 +437,27 @@ export default function PromoteStudents() {
                 variant="contained"
                 onClick={handlePromoteClick}
                 disabled={promoting}
-                startIcon={promoting ? <CircularProgress size={20} color="inherit" /> : <PromoteIcon />}
                 sx={{
                   backgroundColor: "#12B76A",
                   textTransform: "none",
                   fontWeight: "bold",
                   alignSelf: "flex-start",
+                  minWidth: "220px",
+                  height: "38px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                   "&:hover": { backgroundColor: "#0e9153" },
                 }}
               >
-                Promote Selected Students
+                {promoting ? (
+                  <CircularProgress size={20} sx={{ color: "#ffffff" }} />
+                ) : (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <PromoteIcon sx={{ fontSize: "18px" }} />
+                    <span>Promote Selected Students</span>
+                  </Box>
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -483,11 +550,11 @@ export default function PromoteStudents() {
                 <strong>Academic Year:</strong> {academicYears.find((y) => y._id === toYearId)?.label}
               </Typography>
               <Typography variant="body2">
-                <strong>Class:</strong> {allClasses.find((c) => c._id === toClassId)?.name}
+                <strong>Class:</strong> {toClassOption?.name}
               </Typography>
               {toSectionId && (
                 <Typography variant="body2">
-                  <strong>Section:</strong> {allSections.find((s) => s._id === toSectionId)?.code || allSections.find((s) => s._id === toSectionId)?.name}
+                  <strong>Section:</strong> {toSectionOption?.code || toSectionOption?.name}
                 </Typography>
               )}
             </Box>

@@ -19,7 +19,6 @@ export interface ThemeState {
 
   buttonBg: string;
   buttonText: string;
-  buttonRadius: string;
   buttonBorder: string;
   buttonHoverBg: string;
 
@@ -63,7 +62,6 @@ const defaultTheme: ThemeState = {
 
   buttonBg: "#002147",
   buttonText: "#ffffff",
-  buttonRadius: "8px",
   buttonBorder: "none",
   buttonHoverBg: "#00509d",
 

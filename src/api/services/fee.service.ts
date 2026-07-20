@@ -14,9 +14,24 @@ export const linkRazorpayRoute = async (bankAccountId: string) => {
   return await appClient.post(`${Api.UPDATE_SCHOOL_SETTINGS}/link-razorpay/${bankAccountId}`);
 };
 
+// Backend list endpoints (via the shared queryBuilder) expect `pageNumber` /
+// `perPageData`, not `page` / `limit` — translate here so every caller can
+// keep using the natural `page`/`limit` names without the request silently
+// resolving to page 1 every time (the backend defaults pageNumber to 1 when
+// it's missing, so a mismatched param name looks like "pagination is broken").
+const withPageParams = (params?: any) => {
+  if (!params) return params;
+  const { page, limit, ...rest } = params;
+  return {
+    ...rest,
+    ...(page !== undefined && { pageNumber: page }),
+    ...(limit !== undefined && { perPageData: limit }),
+  };
+};
+
 // --- Fee Category ---
 export const getFeeCategories = async (params?: any) => {
-  return await appClient.get(Api.GET_ALL_FEE_CATEGORIES, { params });
+  return await appClient.get(Api.GET_ALL_FEE_CATEGORIES, { params: withPageParams(params) });
 };
 
 export const getFeeCategoryById = async (id: string) => {
@@ -41,7 +56,7 @@ export const changeFeeCategoryStatus = async (id: string, data: any) => {
 
 // --- Fee Structure ---
 export const getFeeStructures = async (params?: any) => {
-  return await appClient.get(Api.GET_ALL_FEE_STRUCTURES, { params });
+  return await appClient.get(Api.GET_ALL_FEE_STRUCTURES, { params: withPageParams(params) });
 };
 
 export const getFeeStructureById = async (id: string) => {
@@ -66,7 +81,7 @@ export const changeFeeStructureStatus = async (id: string, data: any) => {
 
 // --- Fee Collection ---
 export const getFeeCollections = async (params?: any) => {
-  return await appClient.get(Api.GET_ALL_FEE_COLLECTIONS, { params });
+  return await appClient.get(Api.GET_ALL_FEE_COLLECTIONS, { params: withPageParams(params) });
 };
 
 export const collectFee = async (data: any) => {

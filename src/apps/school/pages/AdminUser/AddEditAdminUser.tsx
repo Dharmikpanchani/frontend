@@ -31,11 +31,10 @@ import {
   Email as EmailIcon,
   LocalPhone as PhoneIcon,
   ContentCopy as CopyIcon,
-  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
-import { getAllRolesSimple } from "@/redux/slices/roleSlice";
+import { roleService } from "@/api/services/role.service";
 import {
   addEditAdminUser,
   getAdminUserById,
@@ -67,7 +66,7 @@ export default function AddEditAdminUser() {
   const isView = location.pathname.endsWith("/view");
   const isEdit = !!id && location.pathname.endsWith("/edit");
 
-  const { allRoles } = useSelector((state: RootState) => state.RoleReducer);
+  const [rolesOptions, setRolesOptions] = useState<any[]>([]);
   const { adminDetails } = useSelector(
     (state: RootState) => state.AdminReducer,
   );
@@ -231,9 +230,12 @@ export default function AddEditAdminUser() {
   ];
   // ----------------------------------------
 
+  // Roles is a multi-select, which AsyncPaginatedSelect doesn't (yet) support —
+  // request a generously bounded page via the real paginated endpoint instead
+  // of the old fetch-all "Simple" one (same pattern as PromoteStudents.tsx).
   useEffect(() => {
-    dispatch(getAllRolesSimple("filter") as any);
-  }, [dispatch]);
+    roleService.getAll(1, 100, "").then((res: any) => setRolesOptions(res?.data || []));
+  }, []);
 
   const initialValues = useMemo(
     () => ({
@@ -441,31 +443,13 @@ export default function AddEditAdminUser() {
                               *
                             </span>
                           </Typography>
-                          <Tooltip title="Refresh Roles" arrow>
-                            <IconButton
-                              onClick={() =>
-                                dispatch(getAllRolesSimple("filter") as any)
-                              }
-                              size="small"
-                              sx={{
-                                mb: 0.5,
-                                color: "var(--primary-color)",
-                                "&:hover": {
-                                  backgroundColor:
-                                    "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                                },
-                              }}
-                            >
-                              <RefreshIcon sx={{ fontSize: 18 }} />
-                            </IconButton>
-                          </Tooltip>
                         </Box>
                         <Autocomplete
                           multiple
-                          options={allRoles || []}
+                          options={rolesOptions || []}
                           getOptionLabel={(option: { role?: string; _id?: string }) => option.role || ""}
                           value={
-                            allRoles?.filter((role: { _id?: string; role?: string }) =>
+                            rolesOptions?.filter((role: { _id?: string; role?: string }) =>
                               values.roles?.includes(role._id),
                             ) || []
                           }

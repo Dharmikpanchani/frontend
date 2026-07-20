@@ -95,8 +95,11 @@ export const renderMultipleImage = (values: any, setFieldValue: any) => {
 export const renderSingleImage = (values: any) => {
   const isUploadImg = values?.imageUrl || values.profile;
   const isImageBlob = values.profile instanceof Blob;
-  const imageUrl = values?.imageUrl
-    ? `${import.meta.env.VITE_BASE_URL_IMAGE}/${values?.imageUrl}`
+  const rawUrl = values?.imageUrl || "";
+  const imageUrl = rawUrl
+    ? (rawUrl.startsWith("http://") || rawUrl.startsWith("https://") || rawUrl.startsWith("blob:") || rawUrl.startsWith("data:")
+        ? rawUrl
+        : `${import.meta.env.VITE_BASE_URL_IMAGE}/${rawUrl.replace(/^\/?(uploads\/)?/, "")}`)
     : null;
   let src;
 

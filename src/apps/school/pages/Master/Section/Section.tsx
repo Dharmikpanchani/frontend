@@ -32,7 +32,7 @@ import {
   deleteSection,
   changeSectionStatus,
 } from "@/redux/slices/sectionSlice";
-import { getClasses } from "@/redux/slices/classSlice";
+import { masterService } from "@/api/services/master.service";
 import Svg from "@/assets/Svg";
 import Filter from "@/apps/common/filter/Filter";
 import Loader from "@/apps/common/loader/Loader";
@@ -45,7 +45,6 @@ import PopupModal from "@/apps/school/component/schoolCommon/popUpModal/PopupMod
 import { IOSSwitch } from "@/apps/school/component/schoolCommon/commonCssFunction/cssFunction";
 import { toasterSuccess, toasterError } from "@/utils/toaster/Toaster";
 import BulkImportModal from "@/apps/common/BulkImportModal";
-import { masterService } from "@/api/services/master.service";
 
 const getAvailableYears = (): number[] => {
   const now = new Date();
@@ -64,8 +63,12 @@ export default function Section() {
   const { sections, total, loading, actionLoading } = useSelector(
     (state: RootState) => state.SectionReducer,
   );
-  const { classes } = useSelector((state: RootState) => state.ClassReducer);
   const { hasPermission, hasAnyPermission } = usePermissions();
+
+  const fetchClassPage = async (page: number, search: string) => {
+    const res: any = await masterService.getClasses({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -198,10 +201,6 @@ export default function Section() {
       }) as any,
     );
   };
-
-  useEffect(() => {
-    dispatch(getClasses({ type: "filter" }) as any);
-  }, [dispatch]);
 
   useEffect(() => {
     handleGetData(searchNameValue);
@@ -596,11 +595,11 @@ export default function Section() {
         title="Section Filter"
         fields={[
           {
-            type: "searchbaseSelect",
+            type: "asyncSearchSelect",
             name: "classId",
             label: "Class",
             placeholder: "Select Class",
-            options: classes || [],
+            fetchPage: fetchClassPage,
             getOptionLabel: (option: any) => option.name || "",
             getOptionValue: (option: any) => option._id,
           },

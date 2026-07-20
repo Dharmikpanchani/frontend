@@ -15,7 +15,6 @@ import {
 import {
   fetchFeeStructures, removeFeeStructure, fetchFeeCategories,
 } from "@/redux/slices/feeSlice";
-import { getClasses } from "@/redux/slices/classSlice";
 import type { RootState, AppDispatch } from "@/redux/Store";
 import { toasterSuccess, toasterError } from "@/utils/toaster/Toaster";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -115,13 +114,12 @@ const FeeStructure = () => {
   useEffect(() => {
     loadStructures();
     dispatch(fetchFeeCategories({ page: 1, limit: 100 }) as any);
-    dispatch(getClasses({ type: "filter" }) as any);
   }, [page, rowsPerPage]);
 
   const loadStructures = async () => {
     try {
       const res: any = await dispatch(fetchFeeStructures({ page: page + 1, limit: rowsPerPage })).unwrap();
-      if (res?.data) setTotalDocs(res.data.totalDocs || res.data.length || 0);
+      if (res?.data) setTotalDocs(res.pagination?.totalArrayLength ?? res.data.length ?? 0);
     } catch (err) { }
   };
 
@@ -253,7 +251,7 @@ const FeeStructure = () => {
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
-                {loading && structures.length === 0 ? (
+                {loading ? (
                   <Loader colSpan={canStatus ? 5 : 4} />
                 ) : structures.length === 0 ? (
                   <DataNotFound text="No fee structures found." colSpan={canStatus ? 5 : 4} />

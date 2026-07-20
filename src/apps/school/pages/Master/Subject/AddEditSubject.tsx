@@ -10,8 +10,6 @@ import {
   Breadcrumbs,
   Link,
   Autocomplete,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -21,14 +19,12 @@ import {
   getSubjectById,
 } from "@/redux/slices/subjectSlice";
 import { getDepartments } from "@/redux/slices/departmentSlice";
-import { getClasses } from "@/redux/slices/classSlice";
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import {
   AddCircleOutline as AddIcon,
   Edit as EditIcon,
-  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx, multiInputSx } from "@/utils/styles/commonSx";
@@ -60,9 +56,10 @@ export default function AddEditSubject() {
   });
 
   useEffect(() => {
-    const params = { type: "filter" };
-    dispatch(getDepartments(params) as any);
-    dispatch(getClasses(params) as any);
+    // Departments is a multi-select here (AsyncPaginatedSelect doesn't support
+    // multi yet) — request a generously bounded page instead of literally
+    // everything (same pattern as PromoteStudents.tsx / TeacherAssignment.tsx).
+    dispatch(getDepartments({ type: "filter", perPage: 100 }) as any);
 
     if (id) {
       dispatch(getSubjectById(id) as any);
@@ -258,25 +255,6 @@ export default function AddEditSubject() {
                             *
                           </span>
                         </Typography>
-                        <Tooltip title="Refresh Departments" arrow>
-                          <IconButton
-                            onClick={() =>
-                              dispatch(
-                                getDepartments({ type: "filter" }) as any,
-                              )
-                            }
-                            size="small"
-                            sx={{
-                              color: "var(--primary-color)",
-                              "&:hover": {
-                                backgroundColor:
-                                  "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                              },
-                            }}
-                          >
-                            <RefreshIcon sx={{ fontSize: 18 }} />
-                          </IconButton>
-                        </Tooltip>
                       </Box>
                       <Autocomplete
                         multiple

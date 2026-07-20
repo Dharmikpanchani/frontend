@@ -26,7 +26,7 @@ import {
   getAllAdminUsers,
   deleteAdminUser,
 } from "@/redux/slices/adminUserSlice";
-import { getAllRolesSimple } from "@/redux/slices/roleSlice";
+import { roleService } from "@/api/services/role.service";
 import Svg from "@/assets/Svg";
 import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
 import Loader from "@/apps/common/loader/Loader";
@@ -107,10 +107,6 @@ export default function AdminUser() {
     handleGetData(searchNameValue);
   }, [currentPage, rowsPerPage]);
 
-  useEffect(() => {
-    dispatch(getAllRolesSimple("filter") as any);
-  }, [dispatch]);
-
   const handleApplyFilter = (values: any) => {
     setFilterValues(values);
     handleGetData(searchNameValue, values);
@@ -153,15 +149,18 @@ export default function AdminUser() {
     [],
   );
 
-  const { allRoles } = useSelector((state: RootState) => state.RoleReducer);
+  const fetchRolePage = async (page: number, search: string) => {
+    const res: any = await roleService.getAll(page, 25, search);
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
 
   const filterFields: any[] = [
     {
-      type: "searchbaseSelect",
+      type: "asyncSearchSelect",
       name: "role",
       label: "Role",
       placeholder: "Select Role",
-      options: allRoles || [],
+      fetchPage: fetchRolePage,
       getOptionLabel: (option: any) => option.role || "",
       getOptionValue: (option: any) => option._id,
     },

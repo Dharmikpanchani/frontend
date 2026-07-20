@@ -123,7 +123,7 @@ export default function Header(props: any) {
         </Box>
         <Box className="admin-header-right" sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           {allYears.length > 0 && (
-            <FormControl size="small" sx={{ minWidth: 140, mr: 1.5 }}>
+            <FormControl size="small" sx={{ minWidth: 105, mr: 1.5 }}>
               <Select
                 value={viewingYearId || ""}
                 onChange={(e) => {
@@ -137,25 +137,35 @@ export default function Header(props: any) {
                         endYear: yr.endYear,
                       }),
                     );
+                    window.location.reload();
                   }
                 }}
                 displayEmpty
                 sx={{
-                  height: "40px",
-                  borderRadius: "var(--button-radius, 6px) !important",
+                  height: "36px !important",
+                  borderRadius: "6px !important",
                   background: "linear-gradient(135deg, #ffffff 20%, #e2e8f0 100%) !important",
                   "&.MuiOutlinedInput-root, & .MuiOutlinedInput-root, & .MuiInputBase-root": {
                     background: "linear-gradient(135deg, #ffffff 20%, #e2e8f0 100%) !important",
-                    borderRadius: "var(--button-radius, 6px) !important",
+                    borderRadius: "6px !important",
+                    height: "36px !important",
                   },
                   "& .MuiSelect-select": {
                     color: "#111827",
                     fontWeight: 600,
-                    fontSize: "0.875rem",
+                    fontSize: "12px !important",
+                    padding: "0 8px !important",
+                    paddingRight: "26px !important",
+                    display: "flex",
+                    alignItems: "center",
+                  },
+                  "& .MuiSelect-icon": {
+                    right: "6px !important",
                   },
                   "& .MuiOutlinedInput-notchedOutline, & fieldset": {
                     borderColor: "var(--input-border, #ced4da) !important",
                     borderWidth: "1px !important",
+                    borderRadius: "6px !important",
                   },
                   "&:hover .MuiOutlinedInput-notchedOutline, &:hover fieldset": {
                     borderColor: "var(--primary-color, #002147) !important",

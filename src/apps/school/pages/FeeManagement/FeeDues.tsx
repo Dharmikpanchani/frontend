@@ -4,7 +4,7 @@ import {
   Box, Typography, Button, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Paper,
   MenuItem, Tooltip,
-  Menu, CircularProgress, TextField
+  Menu, CircularProgress, TextField, Chip
 } from "@mui/material";
 import { Download as DownloadIcon, Notifications as NotificationsIcon, MoneyOff as MoneyOffIcon, Group as GroupIcon, FilterList as FilterIcon, Search as SearchIcon, FileDownload as ExcelIcon, PictureAsPdf as PdfIcon, Print as PrintIcon } from "@mui/icons-material";
 import { fetchFeeDues, sendReminder, fetchFeeCategories } from "@/redux/slices/feeSlice";
@@ -40,8 +40,14 @@ const FeeDues = () => {
     feeCategoryId: "",
   });
 
+  const { viewingYearId } = useSelector((state: RootState) => state.AcademicYearReducer);
+
+  // `allClasses` is also used to resolve classId → class name for display
+  // throughout this page's (client-side-paginated) table, not just the
+  // filter dropdown — request a generously bounded page instead of literally
+  // everything (same pattern as PromoteStudents.tsx).
   useEffect(() => {
-    dispatch(getClasses({ type: "filter" }) as any);
+    dispatch(getClasses({ type: "filter", perPage: 100 }) as any);
     dispatch(fetchFeeCategories({ page: 1, limit: 100 }) as any);
   }, [dispatch]);
 
@@ -49,13 +55,14 @@ const FeeDues = () => {
     if (canView) {
       loadDues();
     }
-  }, [canView]);
+  }, [canView, viewingYearId]);
 
   const loadDues = (filters?: any) => {
     const activeFilters = filters || filterValues;
     dispatch(fetchFeeDues({
       classId: activeFilters.classId || undefined,
       feeCategoryId: activeFilters.feeCategoryId || undefined,
+      academicYearId: viewingYearId || undefined,
     }));
   };
 
@@ -230,6 +237,20 @@ const FeeDues = () => {
     },
   ];
 
+  // ─── Status chip style matching AdminUser (/admin-list) ────────
+  const getStatusStyle = (status: string) => {
+    const map: Record<string, { bg: string; color: string; shadow: string }> = {
+      PAID:     { bg: "#e8f5e9", color: "#2e7d32", shadow: "rgba(76, 175, 80, 0.4)" },
+      FAILED:   { bg: "#ffebee", color: "#d32f2f", shadow: "rgba(244, 67, 54, 0.4)" },
+      OVERDUE:  { bg: "#ffebee", color: "#d32f2f", shadow: "rgba(244, 67, 54, 0.4)" },
+      PENDING:  { bg: "#fff8e1", color: "#f57c00", shadow: "rgba(255, 152, 0, 0.4)" },
+      PARTIAL:  { bg: "#fff3e0", color: "#e65100", shadow: "rgba(230, 81, 0, 0.35)" },
+      WAIVED:   { bg: "#e0f7fa", color: "#00838f", shadow: "rgba(0, 131, 143, 0.35)" },
+      REFUNDED: { bg: "#e8eaf6", color: "#283593", shadow: "rgba(40, 53, 147, 0.35)" },
+    };
+    return map[status] || { bg: "#f5f5f5", color: "#616161", shadow: "rgba(158, 158, 158, 0.3)" };
+  };
+
   // Filtered dues based on search
   const filteredDues = dues.filter((row: any) => {
     if (!searchValue.trim()) return true;
@@ -258,7 +279,7 @@ const FeeDues = () => {
                   fullWidth
                   id="search"
                   className="admin-form-control"
-                  placeholder="Search by student or adm no"
+                  placeholder="Search"
                   onChange={(e) => {
                     setSearchValue(e.target.value);
                     setPage(0);
@@ -279,9 +300,11 @@ const FeeDues = () => {
               onClick={() => setOpenFilter(true)}
               sx={{
                 ml: { xs: 0, sm: 1 },
-                width: "100%",
-                minWidth: "45px",
-                p: "0 12px",
+                width: { xs: "100%", sm: "auto" },
+                minWidth: "45px !important",
+                height: "36px !important",
+                p: "0 12px !important",
+                borderRadius: "6px !important",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -302,10 +325,11 @@ const FeeDues = () => {
                 onClick={(e) => setExportAnchorEl(e.currentTarget)}
                 sx={{
                   textTransform: "none",
-                  borderRadius: "8px",
+                  borderRadius: "6px !important",
                   borderColor: "#eaecf0",
                   color: "#344054",
-                  height: "40px",
+                  height: "36px !important",
+                  fontSize: "12px !important",
                   ml: { xs: 0, sm: 1 },
                   width: { xs: "100%", sm: "auto" },
                 }}
@@ -574,13 +598,14 @@ const FeeDues = () => {
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
-                {loading && dues.length === 0 ? (
+                {loading ? (
                   <Loader colSpan={9} />
                 ) : dues.length === 0 ? (
                   <DataNotFound text="No outstanding dues found." colSpan={9} />
                 ) : (
                   paginatedDues.map((row: any) => {
                     const className = allClasses?.find((c: any) => c._id === row.student?.classId)?.name || "N/A";
+                    const statusStyle = getStatusStyle(row.status);
                     return (
                       <TableRow
                         key={row._id}
@@ -610,12 +635,21 @@ const FeeDues = () => {
                         <TableCell className="table-td" sx={{ color: "#B93815", fontWeight: 600 }}>₹{(row.balanceDue || 0).toLocaleString()}</TableCell>
                         <TableCell className="table-td" sx={{ color: "#D97706" }}>₹{(row.fineAmount || 0).toLocaleString()}</TableCell>
                         <TableCell className="table-td">
-                          <Box sx={{
-                            display: "inline-flex", px: 1.5, py: 0.5, borderRadius: "16px", fontSize: "12px", fontWeight: 600,
-                            backgroundColor: row.status === "OVERDUE" ? "#FEE2E2" : "#FFF4ED", color: row.status === "OVERDUE" ? "#B91C1C" : "#B93815"
-                          }}>
-                            {row.status}
-                          </Box>
+                          <Chip
+                            label={row.status}
+                            sx={{
+                              backgroundColor: statusStyle.bg,
+                              color: statusStyle.color,
+                              boxShadow: `0px 0px 8px ${statusStyle.shadow}`,
+                              fontWeight: 600,
+                              fontSize: "11px",
+                              height: "22px",
+                              width: "fit-content",
+                              "& .MuiChip-label": {
+                                padding: "0 8px",
+                              },
+                            }}
+                          />
                         </TableCell>
                         <TableCell className="table-td" align="right">
                           <Button

@@ -39,7 +39,7 @@ export const useColorExtractor = () => {
             return VITE_BASE_URL || "http://localhost:3032";
           };
 
-          const baseUrl = getBaseURL().replace(/\/+$/, "");
+          const baseUrl = getBaseURL().replace(/\/+$/, "").replace(/\/v1$/, "");
           const targetUrl = `${baseUrl}/v1/images/proxy?url=${encodeURIComponent(imageUrl)}`;
           img.src = targetUrl.includes("?") ? `${targetUrl}&_t=${Date.now()}` : `${targetUrl}?_t=${Date.now()}`;
 

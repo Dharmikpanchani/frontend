@@ -26,7 +26,7 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 import { getAllSchools } from "@/redux/slices/schoolSlice";
-import { getAllAdminUsersSimple } from "@/redux/slices/adminUserSlice";
+import { adminUserService } from "@/api/services/adminUser.service";
 import Svg from "@/assets/Svg";
 import DataNotFound from "../../component/developerCommon/dataNotFound/DataNotFound";
 import Loader from "@/apps/common/loader/Loader";
@@ -47,10 +47,12 @@ export default function SchoolList() {
   const { schools, total, loading } = useSelector(
     (state: RootState) => state.SchoolReducer,
   );
-  const { allAdminUsersSimple } = useSelector(
-    (state: RootState) => state.AdminUserReducer,
-  );
   const { hasPermission, hasAnyPermission } = usePermissions();
+
+  const fetchAdminPage = async (page: number, search: string) => {
+    const res: any = await adminUserService.getAll(page, 25, search);
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
 
   const [openFilter, setOpenFilter] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -167,10 +169,6 @@ export default function SchoolList() {
     handleGetData(searchNameValue);
   }, [currentPage, rowsPerPage]);
 
-  useEffect(() => {
-    dispatch(getAllAdminUsersSimple("filter") as any);
-  }, [dispatch]);
-
   const handleApplyFilter = (values: any) => {
     setFilterValues(values);
     handleGetData(searchNameValue, values);
@@ -274,11 +272,11 @@ export default function SchoolList() {
       placeholder: "Enter Plan Name",
     },
     {
-      type: "searchbaseSelect",
+      type: "asyncSearchSelect",
       name: "adminId",
       label: "Admin/Developer",
       placeholder: "Select Admin/Developer",
-      options: allAdminUsersSimple || [],
+      fetchPage: fetchAdminPage,
       getOptionLabel: (option: any) => option.name || "",
       getOptionValue: (option: any) => option._id,
     },

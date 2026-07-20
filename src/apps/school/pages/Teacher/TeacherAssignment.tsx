@@ -154,10 +154,15 @@ export default function TeacherAssignment() {
     debouncedCallGetApi(val, 0, rowsPerPage);
   };
 
+  // This modal's "usedCombos" duplicate-detection and per-class section
+  // filtering (below) need a mostly-complete Class/Section/Subject list to
+  // be correct — not a good fit for scroll-pagination without a larger
+  // rework. Request a generously bounded page instead of literally
+  // everything (same pattern used in PromoteStudents.tsx).
   useEffect(() => {
-    dispatch(getClasses({ type: "filter" }) as any);
-    dispatch(getSections({ type: "filter" }) as any);
-    dispatch(getSubjects({ type: "filter" }) as any);
+    dispatch(getClasses({ type: "filter", perPage: 100 }) as any);
+    dispatch(getSections({ type: "filter", perPage: 100 }) as any);
+    dispatch(getSubjects({ type: "filter", perPage: 100 }) as any);
     fetchAssignments();
   }, [dispatch]);
 
@@ -376,21 +381,24 @@ export default function TeacherAssignment() {
                           <TableCell className="table-td">
                             {assign && assign.subjects?.length > 0 ? (
                               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                {assign.subjects.map((sub: any, idx: number) => (
-                                  <Chip
-                                    key={idx}
-                                    label={sub.name || sub}
-                                    size="small"
-                                    variant="outlined"
-                                    sx={{
-                                      height: "22px",
-                                      fontSize: "11px",
-                                      color: "var(--primary-color)",
-                                      borderColor: "var(--primary-color)",
-                                      borderRadius: "4px",
-                                    }}
-                                  />
-                                ))}
+                                {assign.subjects.map((sub: any, idx: number) => {
+                                  const subName = typeof sub === "object" ? (sub?.name || sub?._id) : (subjects?.find((s: any) => s._id === sub)?.name || sub);
+                                  return (
+                                    <Chip
+                                      key={idx}
+                                      label={subName}
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{
+                                        height: "22px",
+                                        fontSize: "11px",
+                                        color: "var(--primary-color)",
+                                        borderColor: "var(--primary-color)",
+                                        borderRadius: "4px",
+                                      }}
+                                    />
+                                  );
+                                })}
                               </Box>
                             ) : (
                               <Typography variant="body2" sx={{ color: "#94a3b8", fontStyle: "italic" }}>
@@ -546,7 +554,7 @@ export default function TeacherAssignment() {
                       <Tooltip title="Refresh Subjects" arrow>
                         <IconButton
                           onClick={() =>
-                            dispatch(getSubjects({ type: "filter" }) as any)
+                            dispatch(getSubjects({ type: "filter", perPage: 100 }) as any)
                           }
                           size="small"
                           sx={{

@@ -34,7 +34,8 @@ import {
   createFeeStructure,
   editFeeStructure,
 } from "@/redux/slices/feeSlice";
-import { getClasses } from "@/redux/slices/classSlice";
+import { masterService } from "@/api/services/master.service";
+import AsyncPaginatedSelect from "@/apps/common/filter/AsyncPaginatedSelect";
 import toast from "react-hot-toast";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
@@ -54,7 +55,15 @@ export default function AddEditFeeStructure() {
   const [openDates, setOpenDates] = useState<{ [key: number]: boolean }>({});
 
   const { categories } = useSelector((state: RootState) => state.FeeReducer);
-  const { allClasses } = useSelector((state: RootState) => state.ClassReducer);
+  const [selectedClassOption, setSelectedClassOption] = useState<any>(null);
+
+  const fetchClassPage = async (page: number, search: string) => {
+    const res: any = await masterService.getClasses({ page, perPage: 25, search, type: "filter" });
+    return {
+      items: res?.data || [],
+      hasMore: (res?.pagination?.totalPages ?? 0) > page,
+    };
+  };
 
   const initialForm = {
     classId: "",
@@ -65,7 +74,6 @@ export default function AddEditFeeStructure() {
 
   useEffect(() => {
     dispatch(fetchFeeCategories({ page: 1, limit: 100 }) as any);
-    dispatch(getClasses({ type: "filter" }) as any);
   }, [dispatch]);
 
   useEffect(() => {
@@ -76,6 +84,9 @@ export default function AddEditFeeStructure() {
           const res = await getFeeStructureById(id);
           if (res?.data?.data) {
             const struct = res.data.data;
+            if (struct.classId && typeof struct.classId === "object") {
+              setSelectedClassOption(struct.classId);
+            }
             setFormData({
               classId: struct.classId?._id || struct.classId || "",
               feeCategoryId: struct.feeCategoryId?._id || struct.feeCategoryId || "",
@@ -227,59 +238,16 @@ export default function AddEditFeeStructure() {
                               Select Class
                               <span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
                             </Typography>
-                            {!isView && (
-                              <Tooltip title="Refresh Classes" arrow>
-                                <IconButton
-                                  onClick={() => dispatch(getClasses({ type: "filter" }) as any)}
-                                  size="small"
-                                  sx={{
-                                    color: "var(--primary-color)",
-                                    "&:hover": {
-                                      backgroundColor: "rgba(0, 33, 71, 0.1)",
-                                    },
-                                  }}
-                                >
-                                  <RefreshIcon sx={{ fontSize: 18 }} />
-                                </IconButton>
-                              </Tooltip>
-                            )}
                           </Box>
-                          <Autocomplete
-                            options={allClasses || []}
+                          <AsyncPaginatedSelect
+                            fetchPage={fetchClassPage}
+                            value={values.classId}
+                            onChange={(val) => setFieldValue("classId", val ?? "")}
                             getOptionLabel={(option: any) => option.name || ""}
-                            value={
-                              allClasses?.find((cls: any) => cls._id === values.classId) || null
-                            }
-                            onChange={(_, newValue: any) => {
-                              setFieldValue("classId", newValue ? newValue._id : "");
-                            }}
+                            getOptionValue={(option: any) => option._id}
+                            selectedOption={selectedClassOption}
                             disabled={isView}
-                            clearIcon={null}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                placeholder="Select Class"
-                                variant="outlined"
-                                sx={inputSx}
-                                error={touched.classId && Boolean(errors.classId)}
-                              />
-                            )}
-                            sx={{
-                              "& .MuiAutocomplete-inputRoot": {
-                                paddingTop: "0 !important",
-                                paddingBottom: "0 !important",
-                                paddingLeft: "0 !important",
-                                paddingRight: "30px !important",
-                                height: "auto",
-                                minHeight: "40px",
-                                "& .MuiAutocomplete-input": {
-                                  padding: "0 10px !important",
-                                  height: "40px",
-                                  fontFamily: "'Poppins', sans-serif !important",
-                                  fontSize: "14px !important",
-                                },
-                              },
-                            }}
+                            placeholder="Select Class"
                           />
                           <FormHelperText className="error-text">
                             {touched.classId && errors.classId

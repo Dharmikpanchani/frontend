@@ -61,10 +61,7 @@ import {
   deleteTeacher,
   getPendingTeachers,
 } from "@/redux/slices/teacherSlice";
-import { getDepartments } from "@/redux/slices/departmentSlice";
-import { getSubjects } from "@/redux/slices/subjectSlice";
-import { getClasses } from "@/redux/slices/classSlice";
-import { getSections } from "@/redux/slices/sectionSlice";
+import { masterService } from "@/api/services/master.service";
 import ProfileAvatar from "@/apps/common/ProfileAvatar";
 import Svg from "@/assets/Svg";
 import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
@@ -77,7 +74,6 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { schoolAdminPermission } from "@/apps/common/StaticArrayData";
 import Filter from "@/apps/common/filter/Filter";
 import type { RootState } from "@/redux/Store";
-import { masterService } from "@/api/services/master.service";
 import toast from "react-hot-toast";
 import { Formik, Form } from "formik";
 import { documentRejectionValidationSchema } from "@/utils/validation/FormikValidation";
@@ -321,23 +317,25 @@ export default function Teacher() {
     );
   };
 
-  const { allDepartments } = useSelector(
-    (state: RootState) => state.DepartmentReducer,
-  );
-  const { allSubjects } = useSelector(
-    (state: RootState) => state.SubjectReducer,
-  );
-  const { allClasses } = useSelector((state: RootState) => state.ClassReducer);
-  const { allSections } = useSelector(
-    (state: RootState) => state.SectionReducer,
-  );
+  const fetchDepartmentPage = async (page: number, search: string) => {
+    const res: any = await masterService.getDepartments({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
+  const fetchSubjectPage = async (page: number, search: string) => {
+    const res: any = await masterService.getSubjects({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
+  const fetchClassPage = async (page: number, search: string) => {
+    const res: any = await masterService.getClasses({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
+  const fetchSectionPage = async (page: number, search: string) => {
+    const res: any = await masterService.getSections({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
 
   useEffect(() => {
     handleGetData(searchNameValue);
-    dispatch(getDepartments({ type: "filter" }) as any);
-    dispatch(getSubjects({ type: "filter" }) as any);
-    dispatch(getClasses({ type: "filter" }) as any);
-    dispatch(getSections({ type: "filter" }) as any);
   }, [currentPage, rowsPerPage]);
 
   const handleApplyFilter = (values: any) => {
@@ -406,11 +404,11 @@ export default function Teacher() {
       placeholder: "Select Joining Date",
     },
     {
-      type: "searchbaseSelect",
+      type: "asyncSearchSelect",
       name: "departmentId",
       label: "Department",
       placeholder: "Select Department",
-      options: allDepartments || [],
+      fetchPage: fetchDepartmentPage,
       getOptionLabel: (opt: any) => opt.name || "",
       getOptionValue: (opt: any) => opt._id,
     },
@@ -421,29 +419,29 @@ export default function Teacher() {
       placeholder: "Enter Designation",
     },
     {
-      type: "searchbaseSelect",
+      type: "asyncSearchSelect",
       name: "subjectId",
       label: "Subjects Specialty",
       placeholder: "Select Subject",
-      options: allSubjects || [],
+      fetchPage: fetchSubjectPage,
       getOptionLabel: (opt: any) => opt.name || "",
       getOptionValue: (opt: any) => opt._id,
     },
     {
-      type: "searchbaseSelect",
+      type: "asyncSearchSelect",
       name: "classId",
       label: "Assigned Classes",
       placeholder: "Select Class",
-      options: allClasses || [],
+      fetchPage: fetchClassPage,
       getOptionLabel: (opt: any) => opt.name || "",
       getOptionValue: (opt: any) => opt._id,
     },
     {
-      type: "searchbaseSelect",
+      type: "asyncSearchSelect",
       name: "sectionId",
       label: "Assigned Section",
       placeholder: "Select Section",
-      options: allSections || [],
+      fetchPage: fetchSectionPage,
       getOptionLabel: (opt: any) => opt.code || "",
       getOptionValue: (opt: any) => opt._id,
     },

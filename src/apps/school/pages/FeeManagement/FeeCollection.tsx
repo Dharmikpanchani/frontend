@@ -40,7 +40,7 @@ import {
 } from "@mui/icons-material";
 import { useFormik } from "formik";
 import { fetchFeeCollections, clearFeePayment } from "@/redux/slices/feeSlice";
-import { getClasses } from "@/redux/slices/classSlice";
+import { masterService } from "@/api/services/master.service";
 import type { RootState, AppDispatch } from "@/redux/Store";
 import toast from "react-hot-toast";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -59,7 +59,6 @@ const FeeCollection = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { hasPermission } = usePermissions();
   const { collections, loading } = useSelector((state: RootState) => state.FeeReducer);
-  const { allClasses } = useSelector((state: RootState) => state.ClassReducer);
 
   const canCollect = hasPermission(schoolAdminPermission.fee_collection.create);
   const canExport = hasPermission(schoolAdminPermission.fee_collection.export);
@@ -97,9 +96,13 @@ const FeeCollection = () => {
   const [exportLimitOpen, setExportLimitOpen] = useState(false);
   const [pendingExportFormat, setPendingExportFormat] = useState<"excel" | "pdf" | "print" | null>(null);
 
-  useEffect(() => {
-    dispatch(getClasses({ type: "filter" }) as any);
-  }, [dispatch]);
+  const fetchClassPage = async (page: number, search: string) => {
+    const res: any = await masterService.getClasses({ page, perPage: 25, search, type: "filter" });
+    return {
+      items: res?.data || [],
+      hasMore: (res?.pagination?.totalPages ?? 0) > page,
+    };
+  };
 
   const loadCollections = async (searchVal?: string, filters?: any) => {
     const activeFilters = filters || filterValues;
@@ -119,7 +122,7 @@ const FeeCollection = () => {
         })
       ).unwrap();
       if (res?.data) {
-        setTotalDocs(res.data.totalDocs || res.data.length || 0);
+        setTotalDocs(res.pagination?.totalArrayLength ?? res.data.length ?? 0);
       }
     } catch (err) {
       console.error(err);
@@ -168,11 +171,11 @@ const FeeCollection = () => {
 
   const filterFields: any[] = [
     {
-      type: "searchbaseSelect",
+      type: "asyncSearchSelect",
       name: "classId",
       label: "Class",
       placeholder: "Select Class",
-      options: allClasses || [],
+      fetchPage: fetchClassPage,
       getOptionLabel: (option: any) => option.name || "",
       getOptionValue: (option: any) => option._id,
     },
@@ -247,13 +250,18 @@ const FeeCollection = () => {
     try {
       const { exportFeeReceipt } = await import("@/api/services/fee.service");
       const response: any = await exportFeeReceipt(id, "pdf");
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `receipt_${id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      const htmlContent = typeof response?.data === "string" ? response.data : response;
+
+      const printWindow = window.open("", "_blank");
+      if (printWindow) {
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        setTimeout(() => {
+          printWindow.print();
+        }, 500);
+      } else {
+        toast.error("Popup blocked! Please allow popups to view receipt.");
+      }
     } catch (err) {
       toast.error("Failed to export receipt");
     }
@@ -323,18 +331,18 @@ const FeeCollection = () => {
     }
   };
 
-  // ─── Status badge color ────────────────────────────────────────
+  // ─── Status chip style matching AdminUser (/admin-list) ────────
   const getStatusStyle = (status: string) => {
-    const map: Record<string, { bg: string; color: string }> = {
-      PAID:     { bg: "#ECFDF3", color: "#027A48" },
-      FAILED:   { bg: "#FEF3F2", color: "#B42318" },
-      PENDING:  { bg: "#FFFAEB", color: "#B54708" },
-      PARTIAL:  { bg: "#FFF4ED", color: "#B93815" },
-      OVERDUE:  { bg: "#FEF3F2", color: "#B42318" },
-      WAIVED:   { bg: "#F0F9FF", color: "#026AA2" },
-      REFUNDED: { bg: "#F0F4FF", color: "#3538CD" },
+    const map: Record<string, { bg: string; color: string; shadow: string }> = {
+      PAID:     { bg: "#e8f5e9", color: "#2e7d32", shadow: "rgba(76, 175, 80, 0.4)" },
+      FAILED:   { bg: "#ffebee", color: "#d32f2f", shadow: "rgba(244, 67, 54, 0.4)" },
+      OVERDUE:  { bg: "#ffebee", color: "#d32f2f", shadow: "rgba(244, 67, 54, 0.4)" },
+      PENDING:  { bg: "#fff8e1", color: "#f57c00", shadow: "rgba(255, 152, 0, 0.4)" },
+      PARTIAL:  { bg: "#fff3e0", color: "#e65100", shadow: "rgba(230, 81, 0, 0.35)" },
+      WAIVED:   { bg: "#e0f7fa", color: "#00838f", shadow: "rgba(0, 131, 143, 0.35)" },
+      REFUNDED: { bg: "#e8eaf6", color: "#283593", shadow: "rgba(40, 53, 147, 0.35)" },
     };
-    return map[status] || { bg: "#F2F4F7", color: "#344054" };
+    return map[status] || { bg: "#f5f5f5", color: "#616161", shadow: "rgba(158, 158, 158, 0.3)" };
   };
 
   return (
@@ -370,9 +378,11 @@ const FeeCollection = () => {
               onClick={() => setOpenFilter(true)}
               sx={{
                 ml: { xs: 0, sm: 1 },
-                width: "100%",
-                minWidth: "45px",
-                p: "0 12px",
+                width: { xs: "100%", sm: "auto" },
+                minWidth: "45px !important",
+                height: "36px !important",
+                p: "0 12px !important",
+                borderRadius: "6px !important",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -382,6 +392,20 @@ const FeeCollection = () => {
               <FilterIcon sx={{ color: "var(--button-text, #fff)", fontSize: "18px" }} />
             </Button>
           </Box>
+
+          {canCollect && collections.length > 0 && (
+            <Box className="admin-add-user-btn-main" sx={{ ml: { xs: 0, sm: 1 }, width: { xs: "100%", sm: "auto" } }}>
+              <Button
+                variant="contained"
+                startIcon={<PaymentIcon />}
+                className="admin-btn-theme"
+                onClick={() => toast("Select a student from Students list to collect fee.")}
+                sx={{ width: "100%" }}
+              >
+                Collect Fee
+              </Button>
+            </Box>
+          )}
 
           {canExport && collections.length > 0 && (
             <>
@@ -415,20 +439,6 @@ const FeeCollection = () => {
               </Menu>
             </>
           )}
-
-          {canCollect && collections.length > 0 && (
-            <Box className="admin-add-user-btn-main" sx={{ ml: { xs: 0, sm: 1 }, width: { xs: "100%", sm: "auto" } }}>
-              <Button
-                variant="contained"
-                startIcon={<PaymentIcon />}
-                className="admin-btn-theme"
-                onClick={() => toast("Select a student from Students list to collect fee.")}
-                sx={{ width: "100%" }}
-              >
-                Collect Fee
-              </Button>
-            </Box>
-          )}
         </Box>
       </Box>
 
@@ -451,11 +461,10 @@ const FeeCollection = () => {
                 </TableRow>
               </TableHead>
               <TableBody className="table-body">
-                {loading && collections.length === 0 ? (
-                  <Loader colSpan={9} />
-                ) : collections.length === 0 ? (
-                  <DataNotFound text="No fee collections found." colSpan={9} />
-                ) : (
+                {!loading ? (
+                  collections.length === 0 ? (
+                    <DataNotFound text="No fee collections found." colSpan={9} />
+                  ) : (
                   collections.map((row: any) => {
                     const isClearancePending =
                       ["Cheque", "DD", "NEFT", "RTGS", "Bank Transfer"].includes(row.paymentMethod) &&
@@ -506,20 +515,21 @@ const FeeCollection = () => {
                           </Tooltip>
                         </TableCell>
                         <TableCell className="table-td">
-                          <Box
+                          <Chip
+                            label={row.status}
                             sx={{
-                              display: "inline-flex",
-                              px: 1.5,
-                              py: 0.5,
-                              borderRadius: "16px",
-                              fontSize: "11px",
-                              fontWeight: 600,
                               backgroundColor: statusStyle.bg,
                               color: statusStyle.color,
+                              boxShadow: `0px 0px 8px ${statusStyle.shadow}`,
+                              fontWeight: 600,
+                              fontSize: "11px",
+                              height: "22px",
+                              width: "fit-content",
+                              "& .MuiChip-label": {
+                                padding: "0 8px",
+                              },
                             }}
-                          >
-                            {row.status}
-                          </Box>
+                          />
                         </TableCell>
                         <TableCell className="table-td" align="right">
                           <Box className="admin-table-data-btn-flex" sx={{ justifyContent: "flex-end", gap: 0.5 }}>
@@ -550,7 +560,10 @@ const FeeCollection = () => {
                         </TableCell>
                       </TableRow>
                     );
-                  })
+                    })
+                  )
+                ) : (
+                  <Loader colSpan={9} />
                 )}
               </TableBody>
             </Table>

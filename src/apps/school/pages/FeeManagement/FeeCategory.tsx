@@ -149,8 +149,8 @@ const FeeCategory = () => {
     ).then((res: any) => {
       if (res?.payload?.data) {
         setTotalDocs(
-          res.payload.data.totalDocs ||
-          res.payload.data.length ||
+          res.payload.pagination?.totalArrayLength ??
+          res.payload.data.length ??
           0
         );
       }

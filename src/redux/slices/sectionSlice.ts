@@ -119,9 +119,13 @@ const sectionSlice = createSlice({
       .addCase(getSections.fulfilled, (state, action) => {
         state.loading = false;
         if ((action.meta.arg as any)?.type === "filter") {
-          state.allSections = action.payload?.data || [];
+          state.allSections = Array.isArray(action.payload?.data)
+            ? action.payload?.data
+            : action.payload?.data?.docs || [];
         } else {
-          state.sections = action.payload?.data || [];
+          state.sections = Array.isArray(action.payload?.data)
+            ? action.payload?.data
+            : action.payload?.data?.docs || [];
           state.total = action.payload?.pagination?.totalArrayLength || 0;
         }
       })

@@ -21,7 +21,6 @@ import {
   Menu,
   MenuItem,
   IconButton,
-  Autocomplete,
   FormHelperText,
   Dialog,
   DialogTitle,
@@ -62,8 +61,7 @@ import {
   getPendingAdmissionsCount,
   generateRollNumbersAction,
 } from "@/redux/slices/studentSlice";
-import { getClasses } from "@/redux/slices/classSlice";
-import { getSections } from "@/redux/slices/sectionSlice";
+import AsyncPaginatedSelect from "@/apps/common/filter/AsyncPaginatedSelect";
 import ProfileAvatar from "@/apps/common/ProfileAvatar";
 import Svg from "@/assets/Svg";
 import DataNotFound from "../../component/schoolCommon/dataNotFound/DataNotFound";
@@ -79,12 +77,6 @@ import type { RootState, AppDispatch } from "@/redux/Store";
 import { Formik, Form } from "formik";
 import { generateRollNumbersValidationSchema } from "@/utils/validation/FormikValidation";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
-interface SectionItem {
-  _id: string;
-  code?: string;
-  name?: string;
-  classId?: string | { _id: string };
-}
 
 export default function Student() {
   const dispatch = useDispatch<AppDispatch>();
@@ -290,11 +282,6 @@ export default function Student() {
 
 
 
-  const { allClasses } = useSelector((state: RootState) => state.ClassReducer);
-  const { allSections } = useSelector(
-    (state: RootState) => state.SectionReducer,
-  );
-
   const { viewingYearId } = useSelector((state: RootState) => state.AcademicYearReducer);
 
   const handleGetData = (searchQuery?: string, filters?: any) => {
@@ -314,9 +301,17 @@ export default function Student() {
 
   useEffect(() => {
     handleGetData(searchNameValue);
-    dispatch(getClasses({ type: "filter" }) as any);
-    dispatch(getSections({ type: "filter" }) as any);
   }, [currentPage, rowsPerPage]);
+
+  const fetchClassPage = async (page: number, search: string) => {
+    const res: any = await masterService.getClasses({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
+
+  const fetchSectionPage = async (page: number, search: string, classId?: string) => {
+    const res: any = await masterService.getSections({ page, perPage: 25, search, classId, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
 
   const handleApplyFilter = (values: any) => {
     setFilterValues(values);
@@ -367,20 +362,20 @@ export default function Student() {
       placeholder: "Enter Email",
     },
     {
-      type: "searchbaseSelect",
+      type: "asyncSearchSelect",
       name: "classId",
       label: "Class",
       placeholder: "Select Class",
-      options: allClasses || [],
+      fetchPage: fetchClassPage,
       getOptionLabel: (opt: any) => opt.name || "",
       getOptionValue: (opt: any) => opt._id,
     },
     {
-      type: "searchbaseSelect",
+      type: "asyncSearchSelect",
       name: "sectionId",
       label: "Section",
       placeholder: "Select Section",
-      options: allSections || [],
+      fetchPage: (page: number, search: string) => fetchSectionPage(page, search),
       getOptionLabel: (opt: any) => opt.code || "",
       getOptionValue: (opt: any) => opt._id,
     },
@@ -1909,27 +1904,17 @@ export default function Student() {
                   <Typography sx={labelSx}>
                     Class <span style={{ color: "#f04438" }}>*</span>
                   </Typography>
-                  <Autocomplete
-                    options={allClasses || []}
-                    getOptionLabel={(opt: any) => opt.name || ""}
-                    value={
-                      (allClasses || []).find(
-                        (c: any) => c._id === values.classId,
-                      ) || null
-                    }
-                    onChange={(_, newVal) => {
-                      setFieldValue("classId", (newVal as any)?._id || "");
+                  <AsyncPaginatedSelect
+                    fetchPage={fetchClassPage}
+                    value={values.classId}
+                    onChange={(val) => {
+                      setFieldValue("classId", val ?? "");
                       setFieldValue("sectionId", ""); // Reset section
                     }}
+                    getOptionLabel={(opt: any) => opt.name || ""}
+                    getOptionValue={(opt: any) => opt._id}
                     disabled={generatingRollNos}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Select Class"
-                        error={touched.classId && Boolean(errors.classId)}
-                        slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
-                      />
-                    )}
+                    placeholder="Select Class"
                   />
                   {touched.classId && errors.classId && (
                     <FormHelperText className="error-text">
@@ -1943,29 +1928,15 @@ export default function Student() {
                   <Typography sx={labelSx}>
                     Section <span style={{ color: "#f04438" }}>*</span>
                   </Typography>
-                  <Autocomplete
-                    options={(allSections || []).filter((sec: SectionItem) => {
-                      const classId = typeof sec.classId === "object" && sec.classId !== null ? sec.classId._id : sec.classId;
-                      return classId === values.classId;
-                    })}
+                  <AsyncPaginatedSelect
+                    key={values.classId || "no-class"}
+                    fetchPage={(page, search) => fetchSectionPage(page, search, values.classId)}
+                    value={values.sectionId}
+                    onChange={(val) => setFieldValue("sectionId", val ?? "")}
                     getOptionLabel={(opt: any) => opt.code || opt.name || ""}
-                    value={
-                      (allSections || []).find(
-                        (s: any) => s._id === values.sectionId,
-                      ) || null
-                    }
-                    onChange={(_, newVal) =>
-                      setFieldValue("sectionId", (newVal as any)?._id || "")
-                    }
+                    getOptionValue={(opt: any) => opt._id}
                     disabled={!values.classId || generatingRollNos}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Select Section"
-                        error={touched.sectionId && Boolean(errors.sectionId)}
-                        slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
-                      />
-                    )}
+                    placeholder="Select Section"
                   />
                   {touched.sectionId && errors.sectionId && (
                     <FormHelperText className="error-text">

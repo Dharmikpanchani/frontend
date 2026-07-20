@@ -11,7 +11,6 @@ import {
   Breadcrumbs,
   Link,
   Autocomplete,
-  Tooltip,
   Chip,
 } from "@mui/material";
 import {
@@ -26,7 +25,6 @@ import {
   AddCircleOutline as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Refresh as RefreshIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
 import { renderSingleImage } from "@/apps/common/uploadImageAndVideo";
@@ -36,11 +34,9 @@ import type { FormikProps } from "formik";
 import { teacherValidationSchema } from "@/utils/validation/FormikValidation";
 import { addEditTeacher, getTeacherById } from "@/redux/slices/teacherSlice";
 import { getProfileAdmin } from "@/redux/slices/authSlice";
-import { getDepartments } from "@/redux/slices/departmentSlice";
-import { getSubjects } from "@/redux/slices/subjectSlice";
-import { getClasses } from "@/redux/slices/classSlice";
-import { getSections } from "@/redux/slices/sectionSlice";
-import { getAllRolesSimple } from "@/redux/slices/roleSlice";
+import { masterService } from "@/api/services/master.service";
+import { roleService } from "@/api/services/role.service";
+import AsyncPaginatedSelect from "@/apps/common/filter/AsyncPaginatedSelect";
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
@@ -126,11 +122,6 @@ export default function AddEditTeacher() {
 
   const canAdd = hasPermission(schoolAdminPermission.teacher.create);
   const canEdit = hasPermission(schoolAdminPermission.teacher.update);
-  const { allDepartments: departments } = useSelector(
-    (state: RootState) => state.DepartmentReducer,
-  );
-
-  const { allRoles } = useSelector((state: RootState) => state.RoleReducer);
   const { actionLoading, loading: teacherLoading } = useSelector(
     (state: RootState) => state.TeacherReducer,
   );
@@ -208,13 +199,6 @@ export default function AddEditTeacher() {
   };
 
   useEffect(() => {
-    const params = { type: "filter" };
-    dispatch(getDepartments(params) as any);
-    dispatch(getSubjects(params) as any);
-    dispatch(getClasses(params) as any);
-    dispatch(getSections(params) as any);
-    dispatch(getAllRolesSimple("filter") as any);
-
     if (!adminDetails || !adminDetails.schoolData) {
       dispatch(getProfileAdmin() as any);
     }
@@ -223,6 +207,19 @@ export default function AddEditTeacher() {
       fetchTeacherDetails();
     }
   }, [id, dispatch, adminDetails]);
+
+  const fetchDepartmentPage = async (page: number, search: string) => {
+    const res: any = await masterService.getDepartments({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
+
+  // Roles is a multi-select, which AsyncPaginatedSelect doesn't (yet) support —
+  // request a generously bounded page via the real paginated endpoint instead
+  // of the old fetch-all "Simple" one (same pattern as PromoteStudents.tsx).
+  const [rolesOptions, setRolesOptions] = useState<any[]>([]);
+  useEffect(() => {
+    roleService.getAll(1, 100, "").then((res: any) => setRolesOptions(res?.data || []));
+  }, []);
 
   const initialValues = useMemo(
     () => ({
@@ -1320,31 +1317,13 @@ export default function AddEditTeacher() {
                               *
                             </span>
                           </Typography>
-                          <Tooltip title="Refresh Roles" arrow>
-                            <IconButton
-                              onClick={() =>
-                                dispatch(getAllRolesSimple("filter") as any)
-                              }
-                              size="small"
-                              sx={{
-                                mb: 0.5,
-                                color: "var(--primary-color)",
-                                "&:hover": {
-                                  backgroundColor:
-                                    "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                                },
-                              }}
-                            >
-                              <RefreshIcon sx={{ fontSize: 18 }} />
-                            </IconButton>
-                          </Tooltip>
                         </Box>
                         <Autocomplete
                           multiple
-                          options={allRoles || []}
+                          options={rolesOptions || []}
                           getOptionLabel={(option: { role?: string; _id?: string }) => option.role || ""}
                           value={
-                            allRoles?.filter((role: { _id?: string; role?: string }) =>
+                            rolesOptions?.filter((role: { _id?: string; role?: string }) =>
                               values.roles?.includes(role._id),
                             ) || []
                           }
@@ -1918,67 +1897,17 @@ export default function AddEditTeacher() {
                             Department
                             <span style={{ color: "#ef4444" }}>*</span>
                           </Typography>
-                          <Tooltip title="Refresh Departments" arrow>
-                            <IconButton
-                              onClick={() =>
-                                dispatch(
-                                  getDepartments({ type: "filter" }) as any,
-                                )
-                              }
-                              size="small"
-                              sx={{
-                                mb: 0.5,
-                                color: "var(--primary-color)",
-                                "&:hover": {
-                                  backgroundColor:
-                                    "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                                },
-                              }}
-                            >
-                              <RefreshIcon sx={{ fontSize: 18 }} />
-                            </IconButton>
-                          </Tooltip>
                         </Box>
-                        <Autocomplete
-                          options={departments || []}
-                          getOptionLabel={(o) => o.name || ""}
-                          value={
-                            departments?.find(
-                              (d: any) => d._id === values.departmentId,
-                            ) || null
+                        <AsyncPaginatedSelect
+                          fetchPage={fetchDepartmentPage}
+                          value={values.departmentId}
+                          onChange={(val) => setFieldValue("departmentId", val ?? "")}
+                          getOptionLabel={(o: any) => o.name || ""}
+                          getOptionValue={(o: any) => o._id}
+                          selectedOption={
+                            typeof teacherData?.departmentId === "object" ? teacherData.departmentId : undefined
                           }
-                          onChange={(_, v) =>
-                            setFieldValue("departmentId", v?._id || "")
-                          }
-                          clearIcon={null}
-                          renderInput={(p) => (
-                            <TextField
-                              {...p}
-                              placeholder="Select Department"
-                              variant="outlined"
-                              sx={inputSx}
-                              error={
-                                touched.departmentId &&
-                                Boolean(errors.departmentId)
-                              }
-                            />
-                          )}
-                          sx={{
-                            "& .MuiAutocomplete-inputRoot": {
-                              paddingTop: "0 !important",
-                              paddingBottom: "0 !important",
-                              paddingLeft: "0 !important",
-                              paddingRight: "30px !important",
-                              height: "auto",
-                              minHeight: "40px",
-                              "& .MuiAutocomplete-input": {
-                                padding: "0 10px !important",
-                                height: "40px",
-                                fontFamily: "'Poppins', sans-serif !important",
-                                fontSize: "14px !important",
-                              },
-                            },
-                          }}
+                          placeholder="Select Department"
                         />
                         {touched.departmentId && errors.departmentId && (
                           <FormHelperText className="error-text">

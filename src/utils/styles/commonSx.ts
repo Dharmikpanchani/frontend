@@ -57,12 +57,21 @@ export const inputSx: SxProps<Theme> = {
       },
       // Target Autocomplete specific root padding
       "&.MuiAutocomplete-inputRoot": {
-        padding: "0 14px !important",
+        paddingTop: "0 !important",
+        paddingBottom: "0 !important",
+        paddingLeft: "14px !important",
+        paddingRight: "65px !important",
         display: "flex",
         alignItems: "center",
         "& .MuiAutocomplete-input": {
           padding: "0 !important",
           height: "40px",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+        },
+        "& .MuiAutocomplete-endAdornment": {
+          right: "8px !important",
         },
       },
     },

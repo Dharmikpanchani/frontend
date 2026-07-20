@@ -225,13 +225,13 @@ export default function SchoolDetails() {
       principalName: d.principalName || "",
       udiseCode: d.udiseCode || "",
       ctsNumber: d.ctsNumber || "",
-      logoUrl: d.logo ? `${imageBaseUrl}/${d.logo}` : "",
-      bannerUrl: d.banner ? `${imageBaseUrl}/${d.banner}` : "",
+      logoUrl: d.logo ? (d.logo.startsWith("http") ? d.logo : `${imageBaseUrl}/${d.logo.replace(/^\/?(uploads\/)?/, "")}`) : "",
+      bannerUrl: d.banner ? (d.banner.startsWith("http") ? d.banner : `${imageBaseUrl}/${d.banner.replace(/^\/?(uploads\/)?/, "")}`) : "",
       affiliationCertificateUrl: d.affiliationCertificate
-        ? `${imageBaseUrl}/${d.affiliationCertificate}`
+        ? (d.affiliationCertificate.startsWith("http") ? d.affiliationCertificate : `${imageBaseUrl}/${d.affiliationCertificate.replace(/^\/?(uploads\/)?/, "")}`)
         : "",
       authorizedSignatureUrl: d.authorizedSignature
-        ? `${imageBaseUrl}/${d.authorizedSignature}`
+        ? (d.authorizedSignature.startsWith("http") ? d.authorizedSignature : `${imageBaseUrl}/${d.authorizedSignature.replace(/^\/?(uploads\/)?/, "")}`)
         : "",
     };
   }, [rawProfile, schoolCode]);
@@ -373,6 +373,7 @@ export default function SchoolDetails() {
               handleChange,
               handleBlur,
               setFieldValue,
+              setFieldTouched,
             } = formikProps;
 
             const logoPreviewSrc = values.logo
@@ -438,7 +439,10 @@ export default function SchoolDetails() {
                           type="file"
                           onChange={(e) => {
                             const f = e.target.files;
-                            if (f && f.length > 0) setFieldValue("logo", f[0]);
+                            if (f && f.length > 0) {
+                              setFieldValue("logo", f[0]);
+                              setFieldTouched("logo", true, true);
+                            }
                           }}
                         />
                       </Button>
@@ -457,7 +461,7 @@ export default function SchoolDetails() {
                       <Typography sx={{ fontSize: "13px", color: "#667085", mt: 0.5 }}>
                         Click the camera icon to change the school logo
                       </Typography>
-                      {(touched.logo && errors.logo) && (
+                      {Boolean(errors.logo) && (
                         <Typography sx={{ fontSize: "12px", color: "#ef4444", mt: 0.5 }}>
                           {errors.logo as string}
                         </Typography>
@@ -959,7 +963,10 @@ export default function SchoolDetails() {
                             hidden type="file" accept=".pdf,.jpg,.jpeg,.png"
                             onChange={(e) => {
                               const f = e.target.files;
-                              if (f && f.length > 0) setFieldValue("affiliationCertificate", f[0]);
+                              if (f && f.length > 0) {
+                                setFieldValue("affiliationCertificate", f[0]);
+                                setFieldTouched("affiliationCertificate", true, true);
+                              }
                             }}
                           />
                         </Button>
@@ -1038,7 +1045,10 @@ export default function SchoolDetails() {
                               hidden accept=".jpg,.jpeg,.png,.svg" type="file"
                               onChange={(e) => {
                                 const f = e.target.files;
-                                if (f && f.length > 0) setFieldValue("banner", f[0]);
+                                if (f && f.length > 0) {
+                                  setFieldValue("banner", f[0]);
+                                  setFieldTouched("banner", true, true);
+                                }
                               }}
                             />
                           </Button>
@@ -1057,7 +1067,7 @@ export default function SchoolDetails() {
                         </Typography>
                       </Box>
                       <FormHelperText className="error-text">
-                        {touched.banner && errors.banner ? (errors.banner as string) : ""}
+                        {errors.banner ? (errors.banner as string) : ""}
                       </FormHelperText>
                     </Box>
 
@@ -1081,15 +1091,31 @@ export default function SchoolDetails() {
                               "&:hover": { bgcolor: "transparent" },
                             }}
                           >
-                            {renderSingleImage({
-                              profile: values.authorizedSignature,
-                              imageUrl: values.authorizedSignatureUrl,
-                            })}
+                            {values.authorizedSignatureUrl ? (
+                              <img
+                                src={values.authorizedSignatureUrl.startsWith("http") ? values.authorizedSignatureUrl : `${imageBaseUrl}/${values.authorizedSignatureUrl.replace(/^\/?(uploads\/)?/, "")}`}
+                                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                                alt="Authorized Signature"
+                              />
+                            ) : values.authorizedSignature ? (
+                              <img
+                                src={URL.createObjectURL(values.authorizedSignature)}
+                                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                                alt="Authorized Signature"
+                              />
+                            ) : (
+                              <Typography sx={{ fontSize: "11px", fontWeight: 600, color: "#475467", letterSpacing: "0.02em", textAlign: "center" }}>
+                                UPLOAD SIGNATURE
+                              </Typography>
+                            )}
                             <input
                               hidden accept=".jpg,.jpeg,.png,.svg" type="file"
                               onChange={(e) => {
                                 const f = e.target.files;
-                                if (f && f.length > 0) setFieldValue("authorizedSignature", f[0]);
+                                if (f && f.length > 0) {
+                                  setFieldValue("authorizedSignature", f[0]);
+                                  setFieldTouched("authorizedSignature", true, true);
+                                }
                               }}
                             />
                           </Button>
@@ -1108,7 +1134,7 @@ export default function SchoolDetails() {
                         </Typography>
                       </Box>
                       <FormHelperText className="error-text">
-                        {touched.authorizedSignature && errors.authorizedSignature
+                        {errors.authorizedSignature
                           ? (errors.authorizedSignature as string)
                           : ""}
                       </FormHelperText>
@@ -1423,7 +1449,7 @@ export default function SchoolDetails() {
                     }}
                   >
                     <img
-                      src={viewData.authorizedSignatureUrl}
+                      src={viewData.authorizedSignatureUrl.startsWith("http") ? viewData.authorizedSignatureUrl : `${imageBaseUrl}/${viewData.authorizedSignatureUrl.replace(/^\/?(uploads\/)?/, "")}`}
                       alt="Authorized Signature"
                       style={{ width: "100%", height: "100%", objectFit: "contain" }}
                     />

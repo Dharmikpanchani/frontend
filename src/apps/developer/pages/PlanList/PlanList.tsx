@@ -29,7 +29,6 @@ import {
   changePlanStatus,
   deletePlan,
 } from "@/redux/slices/planSlice";
-import { getAllAdminUsersSimple } from "@/redux/slices/adminUserSlice";
 import Svg from "@/assets/Svg";
 import DataNotFound from "../../component/developerCommon/dataNotFound/DataNotFound";
 import Loader from "@/apps/common/loader/Loader";
@@ -80,12 +79,6 @@ export default function PlanList() {
   useEffect(() => {
     handleGetData(searchNameValue);
   }, [currentPage, rowsPerPage]);
-
-  useEffect(() => {
-    if (isSuperDeveloper) {
-      dispatch(getAllAdminUsersSimple("filter") as any);
-    }
-  }, [isSuperDeveloper, dispatch]);
 
   const handleApplyFilter = (values: any) => {
     setFilterValues(values);

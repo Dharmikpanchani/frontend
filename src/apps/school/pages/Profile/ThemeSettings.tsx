@@ -508,9 +508,6 @@ const ThemeSettings = () => {
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <ColorPicker label="Button Text Color" field="buttonText" value={theme.buttonText} onChange={handleChange} disabled={!canEdit} />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <ColorPicker label="Button Border Radius" field="buttonRadius" value={theme.buttonRadius} onChange={handleChange} disabled={!canEdit} />
-        </Grid>
       </Grid>
       <Box sx={{ mb: 4, p: 2, borderRadius: "8px", background: "#f9fafb", border: "1px solid #EAECF0" }}>
         <Typography sx={{ fontSize: "12px", color: "#667085" }}>

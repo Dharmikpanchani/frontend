@@ -16,6 +16,7 @@ export const SUPPORTED_FORMATS = [
   "image/jpeg",
   "image/png",
   "image/svg+xml",
+  "image/webp",
 ];
 
 /*#region field name validation */
@@ -397,6 +398,7 @@ export const imageValidation = (
   required = true,
   minWidth?: number,
   minHeight?: number,
+  targetRatio?: number,
 ) => {
   const schema = Yup.mixed()
     .nullable()
@@ -414,10 +416,11 @@ export const imageValidation = (
     })
     .test(
       "dimensions",
-      `Recommended minimum size for ${fieldName.toLowerCase()} is ${minWidth}x${minHeight}px`,
+      `${fieldName} dimensions must be at least ${minWidth}x${minHeight}px`,
       (value: any) => {
         if (!value || typeof value === "string" || !minWidth || !minHeight)
           return true;
+        if (value.type === "image/svg+xml") return true;
         return new Promise<boolean>((resolve) => {
           const img = new Image();
           img.src = URL.createObjectURL(value);
@@ -427,6 +430,30 @@ export const imageValidation = (
             resolve(valid);
           };
           img.onerror = () => {
+            URL.revokeObjectURL(img.src);
+            resolve(false);
+          };
+        });
+      },
+    )
+    .test(
+      "aspectRatio",
+      `${fieldName} must have a ${targetRatio}:1 aspect ratio (${targetRatio === 1 ? "square image, e.g. 200x200px" : `e.g. ${minWidth}x${minHeight}px`})`,
+      (value: any) => {
+        if (!value || typeof value === "string" || !targetRatio)
+          return true;
+        if (value.type === "image/svg+xml") return true;
+        return new Promise<boolean>((resolve) => {
+          const img = new Image();
+          img.src = URL.createObjectURL(value);
+          img.onload = () => {
+            const actualRatio = img.width / img.height;
+            const valid = Math.abs(actualRatio - targetRatio) <= 0.15;
+            URL.revokeObjectURL(img.src);
+            resolve(valid);
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(img.src);
             resolve(false);
           };
         });
@@ -690,13 +717,13 @@ export const schoolValidationSchema = Yup.object({
     .nullable()
     .when("id", {
       is: (id: string) => !id,
-      then: () => imageValidation("School logo", true, 200, 200),
-      otherwise: () => imageValidation("School logo", false, 200, 200),
+      then: () => imageValidation("School logo", true, 50, 50),
+      otherwise: () => imageValidation("School logo", false, 50, 50),
     }),
   logoUrl: Yup.string().optional(),
-  banner: imageValidation("School banner", false, 1200, 400).nullable(),
+  banner: imageValidation("School banner", false, 100, 50).nullable(),
   bannerUrl: Yup.string().optional(),
-  authorizedSignature: imageValidation("Authorized signature", false).nullable(),
+  authorizedSignature: imageValidation("Authorized signature", false, 30, 30).nullable(),
   authorizedSignatureUrl: Yup.string().optional(),
 });
 
@@ -725,10 +752,10 @@ export const schoolProfileUpdateValidationSchema = Yup.object({
   principalName: Yup.string().max(100, "Principal name must be at most 100 characters").optional(),
   udiseCode: Yup.string().max(50, "UDISE code must be at most 50 characters").optional(),
   ctsNumber: Yup.string().max(50, "CTS number must be at most 50 characters").optional(),
-  logo: imageValidation("School logo", false, 200, 200).nullable(),
-  banner: imageValidation("School banner", false, 1200, 400).nullable(),
+  logo: imageValidation("School logo", false, 50, 50).nullable(),
+  banner: imageValidation("School banner", false, 100, 50).nullable(),
   affiliationCertificate: fileValidation("Affiliation certificate", false),
-  authorizedSignature: imageValidation("Authorized signature", false).nullable(),
+  authorizedSignature: imageValidation("Authorized signature", false, 30, 30).nullable(),
 });
 
 export const exportLimitSchema = Yup.object({

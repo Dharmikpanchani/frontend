@@ -18,11 +18,13 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
 import { labelSx, inputSx, multiInputSx } from "@/utils/styles/commonSx";
+import AsyncPaginatedSelect, { type AsyncPageResult } from "./AsyncPaginatedSelect";
 
 export interface FilterField {
   type:
     | "select"
     | "searchbaseSelect"
+    | "asyncSearchSelect"
     | "multiSearchSelect"
     | "date"
     | "inputSelect"
@@ -39,6 +41,8 @@ export interface FilterField {
   minDate?: moment.Moment;
   maxDate?: moment.Moment;
   disableFuture?: boolean;
+  // Only used by "asyncSearchSelect" — see AsyncPaginatedSelect.tsx
+  fetchPage?: (page: number, search: string) => Promise<AsyncPageResult>;
 }
 
 interface FilterProps {
@@ -147,6 +151,20 @@ const Filter: React.FC<FilterProps> = ({
                   sx={inputSx}
                 />
               )}
+            />
+          </Box>
+        );
+      case "asyncSearchSelect":
+        return (
+          <Box key={field.name}>
+            <Typography sx={labelSx}>{field.label}</Typography>
+            <AsyncPaginatedSelect
+              fetchPage={field.fetchPage!}
+              value={values[field.name] ?? ""}
+              onChange={(val) => setFieldValue(field.name, val ?? "")}
+              getOptionLabel={field.getOptionLabel}
+              getOptionValue={field.getOptionValue}
+              placeholder={field.placeholder || "Select"}
             />
           </Box>
         );

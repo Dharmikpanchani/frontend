@@ -321,6 +321,7 @@ export default function RegisterSchool() {
                 handleChange,
                 handleSubmit,
                 setFieldValue,
+                setFieldTouched,
                 handleBlur,
               } = formikProps;
               return (
@@ -1418,6 +1419,7 @@ export default function RegisterSchool() {
                                   const files = e.target.files;
                                   if (files && files.length > 0) {
                                     setFieldValue("logo", files[0]);
+                                    setFieldTouched("logo", true, true);
                                   }
                                 }}
                               />
@@ -1461,9 +1463,7 @@ export default function RegisterSchool() {
                           </Typography>
                         </Box>
                         <FormHelperText className="error-text">
-                          {touched.logo && errors.logo
-                            ? (errors.logo as string)
-                            : ""}
+                          {errors.logo ? (errors.logo as string) : ""}
                         </FormHelperText>
                       </Box>
 
@@ -1542,6 +1542,7 @@ export default function RegisterSchool() {
                                   const files = e.target.files;
                                   if (files && files.length > 0) {
                                     setFieldValue("banner", files[0]);
+                                    setFieldTouched("banner", true, true);
                                   }
                                 }}
                               />
@@ -1586,9 +1587,7 @@ export default function RegisterSchool() {
                           </Typography>
                         </Box>
                         <FormHelperText className="error-text">
-                          {touched.banner && errors.banner
-                            ? (errors.banner as string)
-                            : ""}
+                          {errors.banner ? (errors.banner as string) : ""}
                         </FormHelperText>
                       </Box>
 
@@ -1636,6 +1635,7 @@ export default function RegisterSchool() {
                                   const files = e.target.files;
                                   if (files && files.length > 0) {
                                     setFieldValue("authorizedSignature", files[0]);
+                                    setFieldTouched("authorizedSignature", true, true);
                                   }
                                 }}
                               />
@@ -1679,7 +1679,7 @@ export default function RegisterSchool() {
                           </Typography>
                         </Box>
                         <FormHelperText className="error-text">
-                          {touched.authorizedSignature && errors.authorizedSignature
+                          {errors.authorizedSignature
                             ? (errors.authorizedSignature as string)
                             : ""}
                         </FormHelperText>

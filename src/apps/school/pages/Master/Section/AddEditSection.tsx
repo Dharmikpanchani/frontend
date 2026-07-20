@@ -9,22 +9,19 @@ import {
   FormHelperText,
   Breadcrumbs,
   Link,
-  Autocomplete,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
 import { Formik, Form } from "formik";
 import type { FormikProps } from "formik";
 import { sectionValidationSchema } from "@/utils/validation/FormikValidation";
 import { addEditSection, getSectionById } from "@/redux/slices/sectionSlice";
-import { getClasses } from "@/redux/slices/classSlice";
+import { masterService } from "@/api/services/master.service";
+import AsyncPaginatedSelect from "@/apps/common/filter/AsyncPaginatedSelect";
 import { toasterError } from "@/utils/toaster/Toaster";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import {
   AddCircleOutline as AddIcon,
   Edit as EditIcon,
-  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
@@ -38,7 +35,6 @@ export default function AddEditSection() {
   const isView = pathname.endsWith("/view");
   const isEdit = !!id && pathname.endsWith("/edit");
 
-  const { classes } = useSelector((state: RootState) => state.ClassReducer);
   const { actionLoading, loading, selectedSection } = useSelector(
     (state: RootState) => state.SectionReducer,
   );
@@ -52,9 +48,12 @@ export default function AddEditSection() {
     classId: "",
   });
 
-  useEffect(() => {
-    dispatch(getClasses({ type: "filter" }) as any);
+  const fetchClassPage = async (page: number, search: string) => {
+    const res: any = await masterService.getClasses({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
 
+  useEffect(() => {
     if (id) {
       dispatch(getSectionById(id) as any);
     }
@@ -158,60 +157,18 @@ export default function AddEditSection() {
                             *
                           </span>
                         </Typography>
-                        <Tooltip title="Refresh Classes" arrow>
-                          <IconButton
-                            onClick={() =>
-                              dispatch(getClasses({ type: "filter" }) as any)
-                            }
-                            size="small"
-                            sx={{
-                              color: "var(--primary-color)",
-                              "&:hover": {
-                                backgroundColor:
-                                  "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                              },
-                            }}
-                          >
-                            <RefreshIcon sx={{ fontSize: 18 }} />
-                          </IconButton>
-                        </Tooltip>
                       </Box>
-                      <Autocomplete
-                        options={classes || []}
+                      <AsyncPaginatedSelect
+                        fetchPage={fetchClassPage}
+                        value={values.classId}
+                        onChange={(val) => setFieldValue("classId", val ?? "")}
                         getOptionLabel={(option: any) => option.name || ""}
-                        value={
-                          classes?.find((c: any) => c._id === values.classId) ||
-                          null
-                        }
-                        onChange={(_, newValue) =>
-                          setFieldValue("classId", newValue ? newValue._id : "")
+                        getOptionValue={(option: any) => option._id}
+                        selectedOption={
+                          typeof selectedSection?.classId === "object" ? selectedSection.classId : undefined
                         }
                         disabled={isView}
-                        clearIcon={null}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder="Select Class"
-                            variant="outlined"
-                            sx={inputSx}
-                            error={touched.classId && Boolean(errors.classId)}
-                          />
-                        )}
-                        sx={{
-                          "& .MuiAutocomplete-inputRoot": {
-                            paddingTop: "0 !important",
-                            paddingBottom: "0 !important",
-                            paddingLeft: "0 !important",
-                            paddingRight: "30px !important",
-                            height: "40px",
-                            "& .MuiAutocomplete-input": {
-                              padding: "0 10px !important",
-                              height: "40px",
-                              fontFamily: "'Poppins', sans-serif !important",
-                              fontSize: "14px !important",
-                            },
-                          },
-                        }}
+                        placeholder="Select Class"
                       />
                       <FormHelperText className="error-text">
                         {touched.classId && errors.classId

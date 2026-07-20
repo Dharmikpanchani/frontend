@@ -12,7 +12,6 @@ import {
   Autocomplete,
   InputAdornment,
   IconButton,
-  Tooltip,
 } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
@@ -25,13 +24,12 @@ import {
   Close as CloseIcon,
   Visibility,
   VisibilityOff,
-  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import { Formik, Form } from "formik";
 import { studentValidationSchema } from "@/utils/validation/FormikValidation";
 import { addEditStudent, getStudentById } from "@/redux/slices/studentSlice";
-import { getClasses } from "@/redux/slices/classSlice";
-import { getSections } from "@/redux/slices/sectionSlice";
+import { masterService } from "@/api/services/master.service";
+import AsyncPaginatedSelect from "@/apps/common/filter/AsyncPaginatedSelect";
 import { CommonLoader } from "@/apps/common/loader/Loader";
 import Spinner from "@/apps/school/component/schoolCommon/spinner/Spinner";
 import { renderSingleImage } from "@/apps/common/uploadImageAndVideo";
@@ -57,12 +55,6 @@ export default function AddEditStudent() {
   const canAdd = hasPermission(schoolAdminPermission.student.create);
   const canEdit = hasPermission(schoolAdminPermission.student.update);
 
-  const { allClasses: classes } = useSelector(
-    (state: RootState) => state.ClassReducer,
-  );
-  const { allSections: sections } = useSelector(
-    (state: RootState) => state.SectionReducer,
-  );
   const { actionLoading, loading: studentLoading } = useSelector(
     (state: RootState) => state.StudentReducer,
   );
@@ -72,20 +64,32 @@ export default function AddEditStudent() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [studentData, setStudentData] = useState<any>(null);
+  const [selectedClassOption, setSelectedClassOption] = useState<any>(null);
+  const [selectedSectionOption, setSelectedSectionOption] = useState<any>(null);
 
   const imageBaseUrl = import.meta.env.VITE_BASE_URL_IMAGE || "";
+
+  const fetchClassPage = async (page: number, search: string) => {
+    const res: any = await masterService.getClasses({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
+
+  const fetchSectionPage = async (page: number, search: string) => {
+    const res: any = await masterService.getSections({ page, perPage: 25, search, type: "filter" });
+    return { items: res?.data || [], hasMore: (res?.pagination?.totalPages ?? 0) > page };
+  };
 
   const fetchStudentDetails = async () => {
     const result = await dispatch(getStudentById(id as string) as any);
     if (getStudentById.fulfilled.match(result)) {
-      setStudentData(result.payload?.data || result.payload);
+      const data = result.payload?.data || result.payload;
+      setStudentData(data);
+      if (data?.classId && typeof data.classId === "object") setSelectedClassOption(data.classId);
+      if (data?.sectionId && typeof data.sectionId === "object") setSelectedSectionOption(data.sectionId);
     }
   };
 
   useEffect(() => {
-    const params = { type: "filter" };
-    dispatch(getClasses(params) as any);
-    dispatch(getSections(params) as any);
     if (id) {
       fetchStudentDetails();
     }
@@ -687,48 +691,16 @@ export default function AddEditStudent() {
                   <Box>
                     <Typography sx={labelSx}>
                       Class <span style={{ color: "#f04438" }}>*</span>
-                      {!isReadOnly && (
-                        <Tooltip title="Refresh Classes" arrow>
-                          <IconButton
-                            onClick={() =>
-                              dispatch(getClasses({ type: "filter" }) as any)
-                            }
-                            size="small"
-                            sx={{
-                              color: "var(--primary-color)",
-                              p: 0,
-                              ml: 1,
-                              "&:hover": {
-                                backgroundColor:
-                                  "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                              },
-                            }}
-                          >
-                            <RefreshIcon sx={{ fontSize: 16 }} />
-                          </IconButton>
-                        </Tooltip>
-                      )}
                     </Typography>
-                    <Autocomplete
-                      options={classes || []}
+                    <AsyncPaginatedSelect
+                      fetchPage={fetchClassPage}
+                      value={values.classId}
+                      onChange={(val) => setFieldValue("classId", val ?? "")}
                       getOptionLabel={(opt: any) => opt.name || ""}
-                      value={
-                        (classes || []).find(
-                          (c: any) => c._id === values.classId,
-                        ) || null
-                      }
-                      onChange={(_, newVal) =>
-                        setFieldValue("classId", (newVal as any)?._id || "")
-                      }
+                      getOptionValue={(opt: any) => opt._id}
+                      selectedOption={selectedClassOption}
                       disabled={isReadOnly}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder="Select class"
-                          error={touched.classId && Boolean(errors.classId)}
-                          slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
-                        />
-                      )}
+                      placeholder="Select class"
                     />
                     {touched.classId && errors.classId && (
                       <FormHelperText className="error-text">
@@ -741,53 +713,16 @@ export default function AddEditStudent() {
                   <Box>
                     <Typography sx={labelSx}>
                       Section <span style={{ color: "#f04438" }}>*</span>
-                      {!isReadOnly && (
-                        <Tooltip title="Refresh Sections" arrow>
-                          <IconButton
-                            onClick={() =>
-                              dispatch(getSections({ type: "filter" }) as any)
-                            }
-                            size="small"
-                            sx={{
-                              color: "var(--primary-color)",
-                              p: 0,
-                              ml: 1,
-                              "&:hover": {
-                                backgroundColor:
-                                  "rgba(var(--primary-color-rgb, 92, 26, 26), 0.1)",
-                              },
-                            }}
-                          >
-                            <RefreshIcon sx={{ fontSize: 16 }} />
-                          </IconButton>
-                        </Tooltip>
-                      )}
                     </Typography>
-                    <Autocomplete
-                      options={sections || []}
+                    <AsyncPaginatedSelect
+                      fetchPage={fetchSectionPage}
+                      value={values.sectionId}
+                      onChange={(val) => setFieldValue("sectionId", val ?? "")}
                       getOptionLabel={(opt: any) => opt.code || ""}
-                      value={
-                        (sections || []).find(
-                          (s: any) => s._id === values.sectionId,
-                        ) || null
-                      }
-                      onChange={(_, newVal) =>
-                        setFieldValue(
-                          "sectionId",
-                          (newVal as any)?._id || "",
-                        )
-                      }
+                      getOptionValue={(opt: any) => opt._id}
+                      selectedOption={selectedSectionOption}
                       disabled={isReadOnly}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder="Select section"
-                          error={
-                            touched.sectionId && Boolean(errors.sectionId)
-                          }
-                          slotProps={{ input: { ...params.InputProps, sx: inputSx } }}
-                        />
-                      )}
+                      placeholder="Select section"
                     />
                     {touched.sectionId && errors.sectionId && (
                       <FormHelperText className="error-text">
@@ -1255,7 +1190,7 @@ export default function AddEditStudent() {
                       error={
                         touched.fatherPhone && Boolean(errors.fatherPhone)
                       }
-                      disabled={isReadOnly}
+                      disabled={isView || !!(id && studentData?.fatherPhone)}
                       slotProps={{
                         input: { sx: inputSx },
                         htmlInput: { maxLength: 10 },
@@ -1265,7 +1200,7 @@ export default function AddEditStudent() {
                       <FormHelperText className="error-text">
                         {errors.fatherPhone as string}
                       </FormHelperText>
-                    ) : (
+                    ) : !(id && studentData?.fatherPhone) && (
                       <FormHelperText sx={{ color: "#667085", fontSize: "11px", mt: 0.5, mx: 0 }}>
                         Father can use this number to login as parent
                       </FormHelperText>
