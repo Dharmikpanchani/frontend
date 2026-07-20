@@ -132,19 +132,13 @@ export default function ImportLogs() {
   };
 
   return (
-    <Box className="admin-body-content">
+    <Box className="admin-dashboard-content">
       {/* Header Card */}
-      <Box className="admin-page-title-main" sx={{ mb: 2.5 }}>
-        <Box className="admin-page-title-left">
-          <Typography variant="h5" fontWeight="bold" sx={{ color: "var(--text-primary)" }}>
-            {pageTitle}
-          </Typography>
-          <Typography variant="body2" sx={{ color: "var(--text-secondary)", mt: 0.5 }}>
-            View and audit bulk CSV import history and log reports.
-          </Typography>
-        </Box>
-
-        <Box className="admin-page-title-right" sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+      <Box className="admin-user-list-flex admin-page-title-main" sx={{ mb: 2.5 }}>
+        <Typography className="admin-page-title" component="h2" variant="h2">
+          {pageTitle}
+        </Typography>
+        <Box className="admin-flex-end">
           {/* Search Bar */}
           <Box className="admin-search-main">
             <Box className="admin-search-box">
@@ -154,7 +148,7 @@ export default function ImportLogs() {
                   fullWidth
                   id="search"
                   className="admin-form-control"
-                  placeholder="Search logs..."
+                  placeholder="Search"
                   onChange={handleSearchChange}
                   slotProps={{ htmlInput: { maxLength: 100 } }}
                 />
@@ -165,20 +159,6 @@ export default function ImportLogs() {
               </Box>
             </Box>
           </Box>
-
-          <Button
-            className="admin-btn-theme"
-            onClick={() => fetchLogs(currentPage, rowsPerPage, searchQuery)}
-            startIcon={<RefreshIcon />}
-            sx={{
-              height: "36px !important",
-              px: "16px !important",
-              fontSize: "12px !important",
-              borderRadius: "6px !important",
-            }}
-          >
-            Refresh
-          </Button>
         </Box>
       </Box>
 
