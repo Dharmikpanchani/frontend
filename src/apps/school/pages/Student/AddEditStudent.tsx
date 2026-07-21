@@ -37,6 +37,7 @@ import AutoCompleteLocation from "@/apps/common/AutoCompleteLocation";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
+import Cookies from "js-cookie";
 import type { RootState } from "@/redux/Store";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -812,10 +813,18 @@ export default function AddEditStudent() {
                       placeholder="e.g. 85"
                       value={values.percentage}
                       onChange={(e) => {
-                        let val = e.target.value;
+                        const val = e.target.value;
                         if (val !== "") {
-                          const num = Math.min(100, Math.max(0, Number(val)));
-                          val = String(num);
+                          const num = Number(val);
+                          if (!isNaN(num)) {
+                            if (num > 100) {
+                              setFieldValue("percentage", "100");
+                              return;
+                            } else if (num < 0) {
+                              setFieldValue("percentage", "0");
+                              return;
+                            }
+                          }
                         }
                         setFieldValue("percentage", val);
                       }}
@@ -824,7 +833,7 @@ export default function AddEditStudent() {
                       disabled={isReadOnly}
                       slotProps={{
                         input: { sx: inputSx },
-                        htmlInput: { min: 0, max: 100 },
+                        htmlInput: { min: 0, max: 100, step: "any" },
                       }}
                     />
                     {touched.percentage && errors.percentage && (
@@ -877,7 +886,7 @@ export default function AddEditStudent() {
                           values.resultDocument.name
                         ) : values.resultDocumentUrl ? (
                           <Link
-                            href={`${imageBaseUrl}/${values.resultDocumentUrl}`}
+                            href={`${imageBaseUrl}/${values.resultDocumentUrl}?token=${Cookies.get("auth_token")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             sx={{

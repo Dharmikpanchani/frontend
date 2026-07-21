@@ -54,6 +54,7 @@ import {
   FileDownload as ExcelIcon,
 } from "@mui/icons-material";
 import moment from "moment";
+import Cookies from "js-cookie";
 import { labelSx, inputSx } from "@/utils/styles/commonSx";
 import {
   getTeachers,
@@ -623,7 +624,12 @@ export default function Teacher() {
 
   const handleViewFile = (url: string) => {
     if (!url) return;
-    const fullUrl = url.startsWith("http") ? url : `${imageBaseUrl}/${url}`;
+    const token = Cookies.get("auth_token");
+    let fullUrl = url.startsWith("http") ? url : `${imageBaseUrl}/${url}`;
+    if (token) {
+      const separator = fullUrl.includes("?") ? "&" : "?";
+      fullUrl = `${fullUrl}${separator}token=${token}`;
+    }
     window.open(fullUrl, "_blank", "noopener,noreferrer");
   };
 

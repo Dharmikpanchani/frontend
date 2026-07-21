@@ -54,6 +54,7 @@ import { masterService } from "@/api/services/master.service";
 import { admissionService } from "@/api/services/admission.service";
 import toast from "react-hot-toast";
 import moment from "moment";
+import Cookies from "js-cookie";
 import {
   getStudents,
   changeStudentStatus,
@@ -1577,7 +1578,7 @@ export default function Student() {
                       variant="outlined"
                       size="small"
                       startIcon={<PdfIcon sx={{ fontSize: 16 }} />}
-                      href={`${import.meta.env.VITE_BASE_URL_IMAGE}/${reviewModal.resultDocument}`}
+                      href={`${import.meta.env.VITE_BASE_URL_IMAGE}/${reviewModal.resultDocument}?token=${Cookies.get("auth_token")}`}
                       target="_blank"
                       rel="noreferrer"
                       sx={{
