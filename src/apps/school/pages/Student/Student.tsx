@@ -1961,16 +1961,23 @@ export default function Student() {
                     setOpenRollNoModal(false);
                   }}
                   disabled={generatingRollNos}
+                  variant="outlined"
+                  className="admin-btn-secondary"
                   sx={{
-                    borderRadius: "8px",
                     px: 3,
-                    py: 1,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    color: "#4b5563",
-                    border: "1px solid #e5e7eb",
+                    minWidth: "100px",
+                    height: "36px !important",
+                    borderRadius: "8px !important",
+                    textTransform: "none !important",
+                    fontWeight: "600 !important",
+                    fontSize: "13px !important",
+                    border: "2px solid var(--primary-color, #002147) !important",
+                    color: "var(--primary-color, #002147) !important",
+                    backgroundColor: "transparent !important",
+                    boxShadow: "none !important",
                     "&:hover": {
-                      bgcolor: "#f3f4f6",
+                      border: "2px solid var(--primary-color, #002147) !important",
+                      backgroundColor: "rgba(var(--primary-color-rgb, 0, 33, 71), 0.05) !important",
                     },
                   }}
                 >
@@ -1981,17 +1988,7 @@ export default function Student() {
                   variant="contained"
                   className="admin-btn-theme"
                   disabled={generatingRollNos}
-                  sx={{
-                    borderRadius: "8px",
-                    px: 3,
-                    py: 1,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    boxShadow: "none",
-                    "&:hover": {
-                      boxShadow: "none",
-                    },
-                  }}
+                  sx={{ px: 3, minWidth: "100px", height: "36px !important" }}
                 >
                   {generatingRollNos ? (
                     <CircularProgress size={20} sx={{ color: "var(--button-text, #fff)" }} />

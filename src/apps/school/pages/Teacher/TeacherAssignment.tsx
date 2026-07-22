@@ -28,6 +28,7 @@ import {
   FormHelperText,
   debounce,
 } from "@mui/material";
+import { CommonLoader } from "@/apps/common/loader/Loader";
 import {
   Search as SearchIcon,
   History as HistoryIcon,
@@ -987,7 +988,7 @@ export default function TeacherAssignment() {
         <DialogContent sx={{ p: 3 }}>
           {historyLoading ? (
             <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-              <CircularProgress sx={{ color: "var(--primary-color)" }} />
+              <CommonLoader />
             </Box>
           ) : historyData.length === 0 ? (
             <Box sx={{ py: 6, textAlign: "center", color: "#94a3b8" }}>

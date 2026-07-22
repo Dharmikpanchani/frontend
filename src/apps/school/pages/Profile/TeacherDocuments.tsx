@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Link,
 } from "@mui/material";
+import { CommonLoader } from "@/apps/common/loader/Loader";
 import {
   Description as DocumentIcon,
   CheckCircle as ApprovedIcon,
@@ -156,7 +157,7 @@ export default function TeacherDocuments() {
           minHeight: "300px",
         }}
       >
-        <CircularProgress size={40} sx={{ color: "var(--primary-color)" }} />
+        <CommonLoader />
       </Box>
     );
   }
